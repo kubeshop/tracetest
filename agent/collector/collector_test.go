@@ -91,7 +91,7 @@ func TestCollectorWatchingSpansFromTest(t *testing.T) {
 
 	ctx := trace.ContextWithSpanContext(context.Background(), spanContext)
 
-	cache.Set(watchedTraceID.String(), []*v1.Span{})
+	cache.Append(watchedTraceID.String(), []*v1.Span{})
 
 	// 10 spans will be watched and stored in the cache
 	func(ctx context.Context) {

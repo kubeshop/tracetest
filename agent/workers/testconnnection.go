@@ -10,11 +10,13 @@ import (
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 )
 
 type TestConnectionWorker struct {
 	client *client.Client
 	tracer trace.Tracer
+	logger *zap.Logger
 }
 
 func NewTestConnectionWorker(client *client.Client) *TestConnectionWorker {
@@ -24,42 +26,65 @@ func NewTestConnectionWorker(client *client.Client) *TestConnectionWorker {
 	return &TestConnectionWorker{
 		client: client,
 		tracer: tracer,
+		logger: zap.NewNop(),
 	}
 }
 
+func (w *TestConnectionWorker) SetLogger(logger *zap.Logger) {
+	w.logger = logger
+}
+
 func (w *TestConnectionWorker) Test(ctx context.Context, request *proto.DataStoreConnectionTestRequest) error {
-	fmt.Println("Data Store Test Connection handled by agent")
+	w.logger.Debug("Received datastore connection test request")
 	datastoreConfig, err := convertProtoToDataStore(request.Datastore)
 	if err != nil {
+		w.logger.Error("Invalid datastore", zap.Error(err))
 		return err
 	}
+	w.logger.Debug("Converted datastore", zap.Any("datastore", datastoreConfig))
 
 	if datastoreConfig == nil {
+		w.logger.Error("Invalid datastore: nil")
 		return fmt.Errorf("invalid datastore: nil")
 	}
 
 	dsFactory := tracedb.Factory(nil)
 	ds, err := dsFactory(*datastoreConfig)
 	if err != nil {
+		w.logger.Error("Invalid datastore", zap.Error(err))
 		log.Printf("Invalid datastore: %s", err.Error())
 		return err
 	}
+	w.logger.Debug("Created datastore", zap.Any("datastore", ds))
+
+	response := &proto.DataStoreConnectionTestResponse{
+		RequestID:  request.RequestID,
+		Successful: false,
+		Steps:      nil,
+	}
 
 	if testableTraceDB, ok := ds.(tracedb.TestableTraceDB); ok {
+		w.logger.Debug("Datastore is testable")
 		connectionResult := testableTraceDB.TestConnection(ctx)
+		w.logger.Debug("Tested datastore", zap.Any("connectionResult", connectionResult))
 		success, steps := convertConnectionResultToProto(connectionResult)
+		w.logger.Debug("Converted connection result", zap.Bool("success", success), zap.Any("steps", steps))
 
-		w.client.SendDataStoreConnectionResult(ctx, &proto.DataStoreConnectionTestResponse{
+		response = &proto.DataStoreConnectionTestResponse{
 			RequestID:  request.RequestID,
 			Successful: success,
 			Steps:      steps,
-		})
+		}
 	} else {
-		w.client.SendDataStoreConnectionResult(ctx, &proto.DataStoreConnectionTestResponse{
-			RequestID:  request.RequestID,
-			Successful: false,
-			Steps:      nil,
-		})
+		w.logger.Debug("Datastore is not testable")
+	}
+
+	w.logger.Debug("Sending datastore connection test result", zap.Any("response", response))
+	err = w.client.SendDataStoreConnectionResult(ctx, response)
+	if err != nil {
+		w.logger.Error("Could not send datastore connection test result", zap.Error(err))
+	} else {
+		w.logger.Debug("Sent datastore connection test result")
 	}
 
 	return nil

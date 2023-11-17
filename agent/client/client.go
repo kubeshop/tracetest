@@ -13,6 +13,7 @@ import (
 
 	retry "github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -40,6 +41,8 @@ type Client struct {
 	config        Config
 	sessionConfig *SessionConfig
 	done          chan bool
+
+	logger *zap.Logger
 
 	triggerListener             func(context.Context, *proto.TriggerRequest) error
 	pollListener                func(context.Context, *proto.PollingRequest) error

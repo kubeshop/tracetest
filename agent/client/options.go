@@ -1,6 +1,10 @@
 package client
 
-import "time"
+import (
+	"time"
+
+	"go.uber.org/zap"
+)
 
 type Option func(*Client)
 
@@ -19,5 +23,11 @@ func WithAgentName(name string) Option {
 func WithPingPeriod(period time.Duration) Option {
 	return func(c *Client) {
 		c.config.PingPeriod = period
+	}
+}
+
+func WithLogger(logger *zap.Logger) Option {
+	return func(c *Client) {
+		c.logger = logger
 	}
 }

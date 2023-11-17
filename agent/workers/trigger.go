@@ -12,9 +12,11 @@ import (
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
+	"go.uber.org/zap"
 )
 
 type TriggerWorker struct {
+	logger     *zap.Logger
 	client     *client.Client
 	registry   *agentTrigger.Registry
 	traceCache collector.TraceCache
@@ -41,6 +43,7 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 	worker := &TriggerWorker{
 		client:   client,
 		registry: registry,
+		logger:   zap.NewNop(),
 	}
 
 	for _, opt := range opts {
@@ -50,9 +53,15 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 	return worker
 }
 
+func (w *TriggerWorker) SetLogger(logger *zap.Logger) {
+	w.logger = logger
+}
+
 func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
+	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
 	err := w.trigger(ctx, triggerRequest)
 	if err != nil {
+		w.logger.Error("Trigger error", zap.Error(err))
 		sendErr := w.client.SendTriggerResponse(ctx, &proto.TriggerResponse{
 			RequestID:           triggerRequest.RequestID,
 			AgentIdentification: w.client.SessionConfiguration().AgentIdentification,
@@ -66,6 +75,7 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 		})
 
 		if sendErr != nil {
+			w.logger.Error("Could not report trigger error back to the server", zap.Error(sendErr))
 			return fmt.Errorf("could not report trigger error back to the server: %w. Original error: %s", sendErr, err.Error())
 		}
 	}
@@ -75,20 +85,26 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
 	triggerConfig := convertProtoToTrigger(triggerRequest.Trigger)
+	w.logger.Debug("Triggering test", zap.Any("triggerConfig", triggerConfig))
 	triggerer, err := w.registry.Get(triggerConfig.Type)
 	if err != nil {
+		w.logger.Error("Could not get triggerer", zap.Error(err))
 		return err
 	}
+	w.logger.Debug("Triggerer found", zap.Any("triggerer", triggerer))
 
 	traceID, err := trace.TraceIDFromHex(triggerRequest.TraceID)
 	if err != nil {
+		w.logger.Error("Invalid traceID was received in TriggerRequest", zap.Error(err))
 		return fmt.Errorf("invalid traceID was received in TriggerRequest: %w", err)
 	}
+	w.logger.Debug("TraceID parsed", zap.Any("traceID", traceID))
 
 	if w.traceCache != nil {
 		// Set traceID to cache so the collector starts watching for incoming traces
 		// with same id
-		w.traceCache.Set(triggerRequest.TraceID, []*v1.Span{})
+		w.logger.Debug("Appending traceID to trace cache", zap.Any("traceID", traceID))
+		w.traceCache.Append(triggerRequest.TraceID, []*v1.Span{})
 	}
 
 	response, err := triggerer.Trigger(ctx, triggerConfig, &agentTrigger.Options{
@@ -96,17 +112,22 @@ func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.Trigg
 		SpanID:  id.NewRandGenerator().SpanID(),
 		TestID:  id.ID(triggerRequest.TestID),
 	})
-
 	if err != nil {
+		w.logger.Error("Could not trigger test", zap.Error(err))
 		return fmt.Errorf("could not trigger test: %w", err)
 	}
 
+	w.logger.Debug("Test triggered", zap.Any("response", response))
+
 	protoResponse := convertResponseToProtoResponse(triggerRequest, response)
 	protoResponse.RequestID = triggerRequest.RequestID
+	w.logger.Debug("Sending trigger response to server", zap.Any("protoResponse", protoResponse))
 	err = w.client.SendTriggerResponse(ctx, protoResponse)
 	if err != nil {
+		w.logger.Error("Could not send trigger response to server", zap.Error(err))
 		return fmt.Errorf("could not send trigger response to server: %w", err)
 	}
+	w.logger.Debug("Trigger response sent to server")
 
 	return nil
 }

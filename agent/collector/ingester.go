@@ -11,6 +11,7 @@ import (
 	"go.opencensus.io/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -19,13 +20,14 @@ type stoppable interface {
 	Stop()
 }
 
-func newForwardIngester(ctx context.Context, batchTimeout time.Duration, remoteIngesterConfig remoteIngesterConfig, startRemoteServer bool) (otlp.Ingester, error) {
+func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, startRemoteServer bool) (otlp.Ingester, error) {
 	ingester := &forwardIngester{
 		BatchTimeout:   batchTimeout,
-		RemoteIngester: remoteIngesterConfig,
+		RemoteIngester: cfg,
 		buffer:         &buffer{},
 		done:           make(chan bool),
-		traceCache:     remoteIngesterConfig.traceCache,
+		traceCache:     cfg.traceCache,
+		logger:         cfg.logger,
 	}
 
 	if startRemoteServer {
@@ -49,6 +51,7 @@ type forwardIngester struct {
 	buffer         *buffer
 	done           chan bool
 	traceCache     TraceCache
+	logger         *zap.Logger
 }
 
 type remoteIngesterConfig struct {
@@ -56,6 +59,7 @@ type remoteIngesterConfig struct {
 	Token             string
 	traceCache        TraceCache
 	startRemoteServer bool
+	logger            *zap.Logger
 }
 
 type buffer struct {
@@ -67,8 +71,10 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 	i.buffer.mutex.Lock()
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
 	i.buffer.mutex.Unlock()
+	i.logger.Debug("received spans", zap.Int("count", len(request.ResourceSpans)))
 
 	if i.traceCache != nil {
+		i.logger.Debug("caching test spans")
 		// In case of OTLP datastore, those spans will be polled from this cache instead
 		// of a real datastore
 		i.cacheTestSpans(request.ResourceSpans)
@@ -84,6 +90,7 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 func (i *forwardIngester) connectToRemoteServer(ctx context.Context) error {
 	conn, err := grpc.DialContext(ctx, i.RemoteIngester.URL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
+		i.logger.Error("could not connect to remote server", zap.Error(err))
 		return fmt.Errorf("could not connect to remote server: %w", err)
 	}
 
@@ -92,15 +99,19 @@ func (i *forwardIngester) connectToRemoteServer(ctx context.Context) error {
 }
 
 func (i *forwardIngester) startBatchWorker() {
+	i.logger.Debug("starting batch worker", zap.Duration("batch_timeout", i.BatchTimeout))
 	ticker := time.NewTicker(i.BatchTimeout)
 	done := make(chan bool)
 	for {
 		select {
 		case <-done:
+			i.logger.Debug("stopping batch worker")
 			return
 		case <-ticker.C:
+			i.logger.Debug("executing batch")
 			err := i.executeBatch(context.Background())
 			if err != nil {
+				i.logger.Error("could not execute batch", zap.Error(err))
 				log.Println(err)
 			}
 		}
@@ -114,13 +125,17 @@ func (i *forwardIngester) executeBatch(ctx context.Context) error {
 	i.buffer.mutex.Unlock()
 
 	if len(newSpans) == 0 {
+		i.logger.Debug("no spans to forward")
 		return nil
 	}
 
 	err := i.forwardSpans(ctx, newSpans)
 	if err != nil {
+		i.logger.Error("could not forward spans", zap.Error(err))
 		return err
 	}
+
+	i.logger.Debug("successfully forwarded spans", zap.Int("count", len(newSpans)))
 
 	return nil
 }
@@ -131,6 +146,7 @@ func (i *forwardIngester) forwardSpans(ctx context.Context, spans []*v1.Resource
 	})
 
 	if err != nil {
+		i.logger.Error("could not forward spans to remote server", zap.Error(err))
 		return fmt.Errorf("could not forward spans to remote server: %w", err)
 	}
 
@@ -138,6 +154,7 @@ func (i *forwardIngester) forwardSpans(ctx context.Context, spans []*v1.Resource
 }
 
 func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
+	i.logger.Debug("caching test spans")
 	spans := make(map[string][]*v1.Span)
 	for _, resourceSpan := range resourceSpans {
 		for _, scopedSpan := range resourceSpan.ScopeSpans {
@@ -148,16 +165,21 @@ func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
 		}
 	}
 
+	i.logger.Debug("caching test spans", zap.Int("count", len(spans)))
+
 	for traceID, spans := range spans {
 		if _, ok := i.traceCache.Get(traceID); !ok {
+			i.logger.Debug("traceID is not part of a test", zap.String("traceID", traceID))
 			// traceID is not part of a test
 			continue
 		}
 
-		i.traceCache.Set(traceID, spans)
+		i.traceCache.Append(traceID, spans)
+		i.logger.Debug("caching test spans", zap.String("traceID", traceID), zap.Int("count", len(spans)))
 	}
 }
 
 func (i *forwardIngester) Stop() {
+	i.logger.Debug("stopping forward ingester")
 	i.done <- true
 }
