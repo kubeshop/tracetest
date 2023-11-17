@@ -45,6 +45,9 @@ type Attributes struct {
 }
 
 func (a Attributes) Values() map[string]string {
+	a.lock()
+	defer a.unlock()
+
 	m := make(map[string]string, len(a.values))
 	for key, value := range a.values {
 		m[key] = value
