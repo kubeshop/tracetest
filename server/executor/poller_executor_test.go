@@ -89,9 +89,9 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_OneSpanCase(t *testing.T) {
 			Name:      "HTTP API",
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(retryDelay),
-			Attributes: map[string]string{
+			Attributes: traces.NewAttributes(map[string]string{
 				"testSpan": "true",
-			},
+			}),
 			Children: []*traces.Span{},
 		},
 	})
@@ -140,9 +140,9 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 		Name:      "HTTP API",
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
-		Attributes: map[string]string{
+		Attributes: traces.NewAttributes(map[string]string{
 			"testSpan": "true",
-		},
+		}),
 		Children: []*traces.Span{},
 	}
 
@@ -151,10 +151,10 @@ func Test_PollerExecutor_ExecuteRequest_NoRootSpan_TwoSpansCase(t *testing.T) {
 		Name:      "Database query",
 		StartTime: firstSpan.EndTime,
 		EndTime:   firstSpan.EndTime.Add(retryDelay),
-		Attributes: map[string]string{
+		Attributes: traces.NewAttributes(map[string]string{
 			"testSpan":                            "true",
 			traces.TracetestMetadataFieldParentID: firstSpan.ID.String(),
-		},
+		}),
 		Children: []*traces.Span{},
 	}
 
@@ -203,9 +203,9 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_NoSpanCase(t *testing.T) {
 		Name:      traces.TriggerSpanName,
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
-		Attributes: map[string]string{
+		Attributes: traces.NewAttributes(map[string]string{
 			"testSpan": "true",
-		},
+		}),
 		Children: []*traces.Span{},
 	}
 
@@ -257,9 +257,9 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 			Name:      traces.TriggerSpanName,
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(retryDelay),
-			Attributes: map[string]string{
+			Attributes: traces.NewAttributes(map[string]string{
 				"testSpan": "true",
-			},
+			}),
 			Children: []*traces.Span{},
 		},
 		{
@@ -267,10 +267,10 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneSpanCase(t *testing.T) {
 			Name:      "HTTP API",
 			StartTime: time.Now(),
 			EndTime:   time.Now().Add(retryDelay),
-			Attributes: map[string]string{
+			Attributes: traces.NewAttributes(map[string]string{
 				"testSpan":                            "true",
 				traces.TracetestMetadataFieldParentID: rootSpanID.String(),
-			},
+			}),
 			Children: []*traces.Span{},
 		},
 	})
@@ -317,9 +317,9 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 		Name:      traces.TriggerSpanName,
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
-		Attributes: map[string]string{
+		Attributes: traces.NewAttributes(map[string]string{
 			"testSpan": "true",
-		},
+		}),
 		Children: []*traces.Span{},
 	}
 
@@ -328,10 +328,10 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_OneDelayedSpanCase(t *testi
 		Name:      "HTTP API",
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
-		Attributes: map[string]string{
+		Attributes: traces.NewAttributes(map[string]string{
 			"testSpan":                            "true",
 			traces.TracetestMetadataFieldParentID: rootSpan.ID.String(),
-		},
+		}),
 		Children: []*traces.Span{},
 	}
 
@@ -386,9 +386,9 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		Name:      traces.TriggerSpanName,
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
-		Attributes: map[string]string{
+		Attributes: traces.NewAttributes(map[string]string{
 			"testSpan": "true",
-		},
+		}),
 		Children: []*traces.Span{},
 	}
 
@@ -397,10 +397,10 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		Name:      "HTTP API",
 		StartTime: time.Now(),
 		EndTime:   time.Now().Add(retryDelay),
-		Attributes: map[string]string{
+		Attributes: traces.NewAttributes(map[string]string{
 			"testSpan":                            "true",
 			traces.TracetestMetadataFieldParentID: rootSpan.ID.String(),
-		},
+		}),
 		Children: []*traces.Span{},
 	}
 
@@ -409,10 +409,10 @@ func Test_PollerExecutor_ExecuteRequest_WithRootSpan_TwoSpansCase(t *testing.T) 
 		Name:      "Database query",
 		StartTime: firstSpan.EndTime,
 		EndTime:   firstSpan.EndTime.Add(retryDelay),
-		Attributes: map[string]string{
+		Attributes: traces.NewAttributes(map[string]string{
 			"testSpan":                            "true",
 			traces.TracetestMetadataFieldParentID: firstSpan.ID.String(),
-		},
+		}),
 		Children: []*traces.Span{},
 	}
 

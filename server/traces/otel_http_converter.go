@@ -73,9 +73,9 @@ func FromHttpOtelResourceSpans(resourceSpans []*HttpResourceSpans) Trace {
 }
 
 func convertHttpOtelSpanIntoSpan(span *httpSpan) *Span {
-	attributes := make(Attributes, 0)
+	attributes := NewAttributes()
 	for _, attribute := range span.Attributes {
-		attributes[attribute.Key] = getHttpAttributeValue(attribute.Value)
+		attributes.Set(attribute.Key, getHttpAttributeValue(attribute.Value))
 	}
 
 	var startTime, endTime time.Time
@@ -91,7 +91,7 @@ func convertHttpOtelSpanIntoSpan(span *httpSpan) *Span {
 	}
 
 	spanID := createSpanID([]byte(span.SpanId))
-	attributes[TracetestMetadataFieldParentID] = createSpanID([]byte(span.ParentSpanId)).String()
+	attributes.Set(TracetestMetadataFieldParentID, createSpanID([]byte(span.ParentSpanId)).String())
 
 	return &Span{
 		ID:         spanID,
@@ -108,9 +108,9 @@ func convertHttpOtelSpanIntoSpan(span *httpSpan) *Span {
 func extractEventsFromHttpSpan(span *httpSpan) []SpanEvent {
 	output := make([]SpanEvent, 0, len(span.Events))
 	for _, event := range span.Events {
-		attributes := make(Attributes, 0)
+		attributes := NewAttributes()
 		for _, attribute := range event.Attributes {
-			attributes[attribute.Key] = getHttpAttributeValue(attribute.Value)
+			attributes.Set(attribute.Key, getHttpAttributeValue(attribute.Value))
 		}
 
 		var timestamp time.Time

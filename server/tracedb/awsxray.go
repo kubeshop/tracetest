@@ -194,7 +194,7 @@ func segToSpans(seg segment, traceID string, parent *traces.Span) ([]traces.Span
 }
 
 func generateSpan(seg *segment, parent *traces.Span) (traces.Span, error) {
-	attributes := make(traces.Attributes, 0)
+	attributes := traces.NewAttributes()
 	span := traces.Span{
 		Parent: parent,
 		Name:   *seg.Name,
@@ -206,9 +206,9 @@ func generateSpan(seg *segment, parent *traces.Span) (traces.Span, error) {
 			return span, err
 		}
 
-		attributes[traces.TracetestMetadataFieldParentID] = parentID.String()
+		attributes.Set(traces.TracetestMetadataFieldParentID, parentID.String())
 	} else if parent != nil {
-		attributes[traces.TracetestMetadataFieldParentID] = parent.ID.String()
+		attributes.Set(traces.TracetestMetadataFieldParentID, parent.ID.String())
 	}
 
 	// decode span id
@@ -229,7 +229,7 @@ func generateSpan(seg *segment, parent *traces.Span) (traces.Span, error) {
 	}
 
 	if seg.InProgress != nil {
-		attributes[AWSXRayInProgressAttribute] = strconv.FormatBool(*seg.InProgress)
+		attributes.Set(AWSXRayInProgressAttribute, strconv.FormatBool(*seg.InProgress))
 	}
 
 	attributes.SetPointerValue(conventions.AttributeEnduserID, seg.User)
@@ -241,7 +241,7 @@ func generateSpan(seg *segment, parent *traces.Span) (traces.Span, error) {
 	}
 
 	if seg.Traced != nil {
-		attributes[AWSXRayTracedAttribute] = strconv.FormatBool(*seg.Traced)
+		attributes.Set(AWSXRayTracedAttribute, strconv.FormatBool(*seg.Traced))
 	}
 
 	addAnnotations(seg.Annotations, attributes)
@@ -288,21 +288,21 @@ func addHTTP(seg *segment, attributes traces.Attributes) {
 		attributes.SetPointerValue(conventions.AttributeHTTPURL, req.URL)
 
 		if req.XForwardedFor != nil {
-			attributes[AWSXRayXForwardedForAttribute] = strconv.FormatBool(*req.XForwardedFor)
+			attributes.Set(AWSXRayXForwardedForAttribute, strconv.FormatBool(*req.XForwardedFor))
 		}
 	}
 
 	if resp := seg.HTTP.Response; resp != nil {
 		if resp.status != nil {
-			attributes[conventions.AttributeHTTPStatusCode] = fmt.Sprintf("%v", *resp.status)
+			attributes.Set(conventions.AttributeHTTPStatusCode, fmt.Sprintf("%v", *resp.status))
 		}
 
 		switch val := resp.contentLength.(type) {
 		case string:
-			attributes[conventions.AttributeHTTPResponseContentLength] = val
+			attributes.Set(conventions.AttributeHTTPResponseContentLength, val)
 		case float64:
 			lengthPointer := int64(val)
-			attributes[conventions.AttributeHTTPResponseContentLength] = fmt.Sprintf("%v", lengthPointer)
+			attributes.Set(conventions.AttributeHTTPResponseContentLength, fmt.Sprintf("%v", lengthPointer))
 		}
 	}
 }
@@ -317,7 +317,7 @@ func addAWSToSpan(aws *aWSData, attrs traces.Attributes) {
 		attrs.SetPointerValue(AWSTableNameAttribute, aws.TableName)
 
 		if aws.Retries != nil {
-			attrs[AWSXrayRetriesAttribute] = fmt.Sprintf("%v", *aws.Retries)
+			attrs.Set(AWSXrayRetriesAttribute, fmt.Sprintf("%v", *aws.Retries))
 		}
 	}
 }
@@ -333,8 +333,8 @@ func addSQLToSpan(sql *sQLData, attrs traces.Attributes) error {
 			return err
 		}
 
-		attrs[conventions.AttributeDBConnectionString] = dbURL
-		attrs[conventions.AttributeDBName] = dbName
+		attrs.Set(conventions.AttributeDBConnectionString, dbURL)
+		attrs.Set(conventions.AttributeDBName, dbName)
 	}
 	// not handling sql.ConnectionString for now because the X-Ray exporter
 	// does not support it
@@ -349,19 +349,19 @@ func addAnnotations(annos map[string]interface{}, attrs traces.Attributes) {
 		for k, v := range annos {
 			switch t := v.(type) {
 			case int:
-				attrs[k] = fmt.Sprintf("%v", t)
+				attrs.Set(k, fmt.Sprintf("%v", t))
 			case int32:
-				attrs[k] = fmt.Sprintf("%v", t)
+				attrs.Set(k, fmt.Sprintf("%v", t))
 			case int64:
-				attrs[k] = fmt.Sprintf("%v", t)
+				attrs.Set(k, fmt.Sprintf("%v", t))
 			case string:
-				attrs[k] = t
+				attrs.Set(k, t)
 			case bool:
-				attrs[k] = strconv.FormatBool(t)
+				attrs.Set(k, strconv.FormatBool(t))
 			case float32:
-				attrs[k] = fmt.Sprintf("%v", t)
+				attrs.Set(k, fmt.Sprintf("%v", t))
 			case float64:
-				attrs[k] = fmt.Sprintf("%v", t)
+				attrs.Set(k, fmt.Sprintf("%v", t))
 			default:
 			}
 		}
@@ -374,7 +374,7 @@ func addMetadata(meta map[string]map[string]interface{}, attrs traces.Attributes
 		if err != nil {
 			return err
 		}
-		attrs[AWSXraySegmentMetadataAttributePrefix+k] = string(val)
+		attrs.Set(AWSXraySegmentMetadataAttributePrefix+k, string(val))
 	}
 	return nil
 }

@@ -34,8 +34,8 @@ func (m OpenAPI) Span(in traces.Span) openapi.Span {
 		parentID = in.Parent.ID.String()
 	}
 
-	attributes := make(map[string]string, len(in.Attributes))
-	for name, value := range in.Attributes {
+	attributes := make(map[string]string, in.Attributes.Len())
+	for name, value := range in.Attributes.Values() {
 		attributes[name] = value
 		if m.traceConversionConfig.IsTimeField(name) {
 			valueAsInt, _ := strconv.Atoi(value)
@@ -94,14 +94,14 @@ func (m Model) Trace(in openapi.Trace) *traces.Trace {
 }
 
 func spanIsEmpty(span traces.Span) bool {
-	return span.ID == trace.SpanID{} && len(span.Attributes) == 0 && span.Name == "" && len(span.Children) == 0
+	return span.ID == trace.SpanID{} && span.Attributes.Len() == 0 && span.Name == "" && len(span.Children) == 0
 }
 
 func (m Model) Span(in openapi.Span, parent *traces.Span) traces.Span {
 	sid, _ := trace.SpanIDFromHex(in.Id)
 	span := traces.Span{
 		ID:         sid,
-		Attributes: in.Attributes,
+		Attributes: traces.NewAttributes(in.Attributes),
 		Name:       in.Name,
 		StartTime:  timing.ParseUnix(int64(in.StartTime)),
 		EndTime:    timing.ParseUnix(int64(in.EndTime)),

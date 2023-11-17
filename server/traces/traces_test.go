@@ -182,8 +182,8 @@ func TestTriggerSpanShouldBeRootWhenTemporaryRootExistsToo(t *testing.T) {
 
 func TestEventsAreInjectedIntoAttributes(t *testing.T) {
 	rootSpan := newSpan("Root", withEvents([]traces.SpanEvent{
-		{Name: "event 1", Attributes: traces.Attributes{"attribute1": "value"}},
-		{Name: "event 2", Attributes: traces.Attributes{"attribute2": "value"}},
+		{Name: "event 1", Attributes: attributesFromMap(map[string]string{"attribute1": "value"})},
+		{Name: "event 2", Attributes: attributesFromMap(map[string]string{"attribute2": "value"})},
 	}))
 	childSpan1 := newSpan("child 1", withParent(&rootSpan))
 	childSpan2 := newSpan("child 2", withParent(&rootSpan))
@@ -192,16 +192,16 @@ func TestEventsAreInjectedIntoAttributes(t *testing.T) {
 	spans := []traces.Span{rootSpan, childSpan1, childSpan2, grandchildSpan}
 	trace := traces.NewTrace("trace", spans)
 
-	require.NotEmpty(t, trace.RootSpan.Attributes["span.events"])
+	require.NotEmpty(t, trace.RootSpan.Attributes.Get("span.events"))
 
 	events := []traces.SpanEvent{}
-	err := json.Unmarshal([]byte(trace.RootSpan.Attributes["span.events"]), &events)
+	err := json.Unmarshal([]byte(trace.RootSpan.Attributes.Get("span.events")), &events)
 	require.NoError(t, err)
 
 	assert.Equal(t, "event 1", events[0].Name)
-	assert.Equal(t, "value", events[0].Attributes["attribute1"])
+	assert.Equal(t, "value", events[0].Attributes.Get("attribute1"))
 	assert.Equal(t, "event 2", events[1].Name)
-	assert.Equal(t, "value", events[1].Attributes["attribute2"])
+	assert.Equal(t, "value", events[1].Attributes.Get("attribute2"))
 }
 
 func TestMergingZeroTraces(t *testing.T) {
@@ -241,7 +241,7 @@ func newSpan(name string, options ...option) traces.Span {
 	span := traces.Span{
 		ID:         id.NewRandGenerator().SpanID(),
 		Name:       name,
-		Attributes: make(traces.Attributes),
+		Attributes: traces.NewAttributes(),
 		StartTime:  time.Now(),
 		EndTime:    time.Now().Add(1 * time.Second),
 	}
@@ -251,7 +251,7 @@ func newSpan(name string, options ...option) traces.Span {
 	}
 
 	if span.Parent != nil {
-		span.Attributes[traces.TracetestMetadataFieldParentID] = span.Parent.ID.String()
+		span.Attributes.Set(traces.TracetestMetadataFieldParentID, span.Parent.ID.String())
 	}
 
 	return span
@@ -401,9 +401,9 @@ func createSpan(name string) *traces.Span {
 		Name:      name,
 		StartTime: time.Date(2021, 11, 24, 14, 05, 12, 0, time.UTC),
 		EndTime:   time.Date(2021, 11, 24, 14, 05, 17, 0, time.UTC),
-		Attributes: traces.Attributes{
+		Attributes: attributesFromMap(map[string]string{
 			"service.name": name,
-		},
+		}),
 		Children: nil,
 	}
 }
@@ -503,4 +503,13 @@ func TestUnmarshalLargeTrace(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Greater(t, len(trace.Flat), 0)
+}
+
+func attributesFromMap(input map[string]string) traces.Attributes {
+	attributes := traces.NewAttributes()
+	for key, value := range input {
+		attributes.Set(key, value)
+	}
+
+	return attributes
 }
