@@ -343,15 +343,15 @@ func (span Span) setTriggerResultAttributes(result trigger.TriggerResult) Span {
 	case trigger.TriggerTypeHTTP:
 		resp := result.HTTP
 		jsonheaders, _ := json.Marshal(resp.Headers)
-		span.Attributes.Set(",cetest.response.status", strconv.Itoa(resp.StatusCode))
-		span.Attributes.Set(",cetest.response.body", resp.Body)
-		span.Attributes.Set(",cetest.response.headers", string(jsonheaders))
+		span.Attributes.Set("tracetest.response.status", strconv.Itoa(resp.StatusCode))
+		span.Attributes.Set("tracetest.response.body", resp.Body)
+		span.Attributes.Set("tracetest.response.headers", string(jsonheaders))
 	case trigger.TriggerTypeGRPC:
 		resp := result.GRPC
 		jsonheaders, _ := json.Marshal(resp.Metadata)
-		span.Attributes.Set(",cetest.response.status", strconv.Itoa(resp.StatusCode))
-		span.Attributes.Set(",cetest.response.body", resp.Body)
-		span.Attributes.Set(",cetest.response.headers", string(jsonheaders))
+		span.Attributes.Set("tracetest.response.status", strconv.Itoa(resp.StatusCode))
+		span.Attributes.Set("tracetest.response.body", resp.Body)
+		span.Attributes.Set("tracetest.response.headers", string(jsonheaders))
 	}
 
 	return span
