@@ -18,10 +18,21 @@ import (
 
 var ErrOtlpServerStart = errors.New("OTLP server start error")
 
+var logger *zap.Logger
+
 func NewClient(ctx context.Context, config config.Config, traceCache collector.TraceCache) (*client.Client, error) {
+	if enableLogging() {
+		var err error
+		logger, err = zap.NewDevelopment()
+		if err != nil {
+			return nil, fmt.Errorf("could not create logger: %w", err)
+		}
+	}
+
 	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
+		client.WithLogger(logger),
 	)
 	if err != nil {
 		return nil, err
@@ -32,6 +43,12 @@ func NewClient(ctx context.Context, config config.Config, traceCache collector.T
 		poller.NewInMemoryDatastore(traceCache),
 	))
 	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient)
+
+	if enableLogging() {
+		triggerWorker.SetLogger(logger)
+		pollingWorker.SetLogger(logger)
+		dataStoreTestConnectionWorker.SetLogger(logger)
+	}
 
 	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
 	controlPlaneClient.OnTriggerRequest(triggerWorker.Trigger)
@@ -81,10 +98,6 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 	}
 
 	if enableLogging() {
-		logger, err := zap.NewDevelopment()
-		if err != nil {
-			return fmt.Errorf("could not create logger: %w", err)
-		}
 		opts = append(opts, collector.WithLogger(logger))
 	}
 
