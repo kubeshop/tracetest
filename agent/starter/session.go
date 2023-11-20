@@ -1,4 +1,4 @@
-package initialization
+package starter
 
 import "github.com/kubeshop/tracetest/agent/client"
 

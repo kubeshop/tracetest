@@ -7,11 +7,10 @@ import (
 	"fmt"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
-	"github.com/kubeshop/tracetest/agent/initialization"
+	"github.com/kubeshop/tracetest/agent/ui"
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
-	"github.com/kubeshop/tracetest/cli/ui"
 )
 
 type Starter struct {
@@ -20,12 +19,11 @@ type Starter struct {
 	ui           ui.UI
 }
 
-func NewStarter(configurator config.Configurator, resources *resourcemanager.Registry) *Starter {
-	ui := ui.DefaultUI
+func NewStarter(configurator config.Configurator, resources *resourcemanager.Registry, ui ui.UI) *Starter {
 	return &Starter{configurator, resources, ui}
 }
 
-func (s *Starter) Run(ctx context.Context, cfg config.Config, flags config.ConfigFlags) error {
+func (s *Starter) Run(ctx context.Context, cfg config.Config, flags agentConfig.Flags) error {
 	s.ui.Banner(config.Version)
 	s.ui.Println(`Tracetest start launches a lightweight agent. It enables you to run tests and collect traces with Tracetest.
 Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.`)
@@ -113,10 +111,10 @@ func (s *Starter) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpo
 	s.ui.Info(fmt.Sprintf("Starting Agent with name %s...", cfg.Name))
 
 	isStarted := false
-	session := &initialization.Session{}
+	session := &Session{}
 	for !isStarted {
-		session, err = initialization.Start(ctx, cfg)
-		if err != nil && errors.Is(err, initialization.ErrOtlpServerStart) {
+		session, err = Start(ctx, cfg)
+		if err != nil && errors.Is(err, ErrOtlpServerStart) {
 			s.ui.Error("Tracetest Agent binds to the OpenTelemetry ports 4317 and 4318 which are used to receive trace information from your system. The agent tried to bind to these ports, but failed.")
 			shouldRetry := s.ui.Enter("Please stop the process currently listening on these ports and press enter to try again.")
 

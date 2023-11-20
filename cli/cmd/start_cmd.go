@@ -5,13 +5,13 @@ import (
 	"os"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
-	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/pkg/starter"
+	"github.com/kubeshop/tracetest/agent/starter"
+	"github.com/kubeshop/tracetest/agent/ui"
 	"github.com/spf13/cobra"
 )
 
 var (
-	start           = starter.NewStarter(configurator, resources)
+	start           = starter.NewStarter(configurator, resources, ui.DefaultUI)
 	defaultToken    = os.Getenv("TRACETEST_TOKEN")
 	defaultEndpoint = os.Getenv("TRACETEST_SERVER_URL")
 	defaultAPIKey   = os.Getenv("TRACETEST_API_KEY")
@@ -27,13 +27,13 @@ var startCmd = &cobra.Command{
 	Run: WithResultHandler((func(_ *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()
 
-		flags := config.ConfigFlags{
+		flags := agentConfig.Flags{
 			OrganizationID: saveParams.organizationID,
 			EnvironmentID:  saveParams.environmentID,
 			Endpoint:       saveParams.endpoint,
 			AgentApiKey:    saveParams.agentApiKey,
 			Token:          saveParams.token,
-			Mode:           saveParams.mode,
+			Mode:           agentConfig.Mode(saveParams.mode),
 		}
 
 		cfg, err := agentConfig.LoadConfig()

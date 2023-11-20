@@ -21,23 +21,6 @@ var (
 	DefaultCloudPath     = "/"
 )
 
-type Mode string
-
-const (
-	Mode_Desktop Mode = "desktop"
-	Mode_Verbose Mode = "verbose"
-)
-
-type ConfigFlags struct {
-	Endpoint       string
-	OrganizationID string
-	EnvironmentID  string
-	CI             bool
-	AgentApiKey    string
-	Token          string
-	Mode           Mode
-}
-
 type Config struct {
 	Scheme            string  `yaml:"scheme"`
 	Endpoint          string  `yaml:"endpoint"`
