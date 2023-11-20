@@ -53,6 +53,24 @@ func TestTraceWithMultipleRoots(t *testing.T) {
 	assert.Equal(t, "Child from root 3", trace.RootSpan.Children[2].Children[0].Name)
 }
 
+func TestTraceWithMultipleTemporaryRoots(t *testing.T) {
+	root1 := newSpan("Temporary Tracetest root span")
+	root1Child := newSpan("Child from root 1", withParent(&root1))
+	root2 := newSpan("Temporary Tracetest root span")
+	root2Child := newSpan("Child from root 2", withParent(&root2))
+	root3 := newSpan("Temporary Tracetest root span")
+	root3Child := newSpan("Child from root 3", withParent(&root3))
+
+	spans := []traces.Span{root1, root1Child, root2, root2Child, root3, root3Child}
+	trace := traces.NewTrace("trace", spans)
+
+	require.Len(t, trace.Flat, 4)
+	assert.Equal(t, traces.TemporaryRootSpanName, trace.RootSpan.Name)
+	assert.Equal(t, "Child from root 1", trace.RootSpan.Children[0].Name)
+	assert.Equal(t, "Child from root 2", trace.RootSpan.Children[1].Name)
+	assert.Equal(t, "Child from root 3", trace.RootSpan.Children[2].Name)
+}
+
 func TestTraceWithMultipleRootsFromOtel(t *testing.T) {
 	root1 := newOtelSpan("Root 1", nil)
 	root1Child := newOtelSpan("Child from root 1", root1)
