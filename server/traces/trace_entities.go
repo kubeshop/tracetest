@@ -53,8 +53,23 @@ func MergeTraces(traces ...*Trace) *Trace {
 }
 
 func NewTrace(traceID string, spans []Span) Trace {
+	var temporaryRootSpan *Span
 	spanMap := make(map[string]*Span, 0)
 	for _, span := range spans {
+		if span.Name == TemporaryRootSpanName {
+			if temporaryRootSpan != nil {
+				// It should never have more than one temporary root span
+				// so if that happens, clean them up.
+				continue
+			}
+
+			// Make sure that removing extra temporary spans don't leave any orphan spans
+			temporaryRootSpan = &span
+			for _, child := range span.Children {
+				temporaryRootSpan.Children = append(temporaryRootSpan.Children, child)
+				child.Parent = temporaryRootSpan
+			}
+		}
 		spanCopy := span.setMetadataAttributes()
 		spanID := span.ID.String()
 		spanMap[spanID] = &spanCopy
@@ -170,7 +185,7 @@ func (t *Trace) HasRootSpan() bool {
 }
 
 func (t *Trace) InsertRootSpan(newRoot Span) *Trace {
-	if !t.RootSpan.IsZero() {
+	if !t.RootSpan.IsZero() || t.RootSpan.Name == TemporaryRootSpanName {
 		newRoot = replaceRoot(t.RootSpan, newRoot)
 	}
 
