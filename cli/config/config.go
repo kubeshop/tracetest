@@ -21,6 +21,13 @@ var (
 	DefaultCloudPath     = "/"
 )
 
+type Mode string
+
+const (
+	Mode_Desktop Mode = "desktop"
+	Mode_Verbose Mode = "verbose"
+)
+
 type ConfigFlags struct {
 	Endpoint       string
 	OrganizationID string
@@ -28,6 +35,7 @@ type ConfigFlags struct {
 	CI             bool
 	AgentApiKey    string
 	Token          string
+	Mode           Mode
 }
 
 type Config struct {
