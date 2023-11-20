@@ -1,8 +1,8 @@
 package ui
 
-var DefaultUI UI = &ptermUI{}
+var DefaultUI ConsoleUI = &ptermUI{}
 
-type UI interface {
+type ConsoleUI interface {
 	Banner(version string)
 
 	Panic(error)
@@ -34,5 +34,5 @@ type UI interface {
 
 type Option struct {
 	Text string
-	Fn   func(ui UI)
+	Fn   func(ui ConsoleUI)
 }
