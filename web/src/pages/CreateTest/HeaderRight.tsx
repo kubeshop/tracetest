@@ -10,7 +10,7 @@ interface IProps {
 const HeaderRight = ({demos}: IProps) => (
   <S.Section $justifyContent="flex-end">
     <VariableSetSelector />
-    {demos.length && <DemoSelector demos={demos} />}
+    {!!demos.length && <DemoSelector demos={demos} />}
   </S.Section>
 );
 
