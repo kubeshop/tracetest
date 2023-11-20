@@ -16,7 +16,7 @@ export const SelectTestFromCollection = ({form}: IProps) => {
     <Form.Item
       rules={[{required: true, message: 'No test selected yet'}]}
       name="collectionTest"
-      label="Select test from Postman Collection"
+      label="Select test from Postman collection"
     >
       <Select<string>
         data-cy="collectionTest-select"

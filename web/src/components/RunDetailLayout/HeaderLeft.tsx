@@ -5,7 +5,7 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useMemo} from 'react';
 import Date from 'utils/Date';
 import {isRunStateFinished} from 'models/TestRun.model';
-import { TDraftTest } from 'types/Test.types';
+import {TDraftTest} from 'types/Test.types';
 import TestService from 'services/Test.service';
 import HeaderForm from './HeaderForm';
 import Info from './Info';
@@ -53,12 +53,8 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
         <S.BackIcon />
       </a>
       <S.InfoContainer>
-        <S.Row>
-          <HeaderForm
-            name={name}
-            onSubmit={handleOnEdit}
-            isDisabled={isLoading || !stateIsFinished}
-          />
+        <S.Row $height={24}>
+          <HeaderForm name={name} onSubmit={handleOnEdit} isDisabled={isLoading || !stateIsFinished} />
           <Info
             date={createdAt ?? ''}
             executionTime={executionTime ?? 0}

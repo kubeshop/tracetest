@@ -12,7 +12,7 @@ export const CollectionFileField = ({form}: IProps): React.ReactElement => (
   <Form.Item
     rules={[{required: true, message: 'No file selected yet'}]}
     name="collectionFile"
-    label="Upload Postman Collection"
+    label="Upload Postman collection"
   >
     <FileUpload data-cy="collectionFile" accept=".json" onChange={useUploadCollectionCallback(form)} />
   </Form.Item>

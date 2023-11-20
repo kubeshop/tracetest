@@ -9,7 +9,7 @@ export const FORM_ID = 'create-test';
 const Curl = () => {
   return (
     <Form.Item
-      label="Paste cUrl command, raw text, or url to definition file"
+      label="Paste cURL command"
       name="command"
       rules={[
         {required: true, message: 'Please enter a command'},
@@ -21,7 +21,7 @@ const Curl = () => {
 
             return Promise.resolve();
           },
-          message: 'Invalid CURL command',
+          message: 'Invalid cURL command',
         },
       ]}
     >

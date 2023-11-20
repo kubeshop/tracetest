@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import {Modal as AntModal} from 'antd';
+import {Modal as AntModal, Typography} from 'antd';
 
 export const Modal = styled(AntModal)`
   min-width: 625px;
@@ -14,4 +14,10 @@ export const Modal = styled(AntModal)`
 
 export const Container = styled.div`
   min-height: 361px;
+`;
+
+export const Title = styled(Typography.Title)`
+  && {
+    margin-bottom: 0px;
+  }
 `;

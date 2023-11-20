@@ -6,9 +6,9 @@ import ImportService from 'services/Import.service';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {ImportTypeToPlugin} from 'constants/Plugins.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
+import {ImportSelector} from 'components/Inputs';
+import ImportFactory from 'components/TestPlugins/ImportFactory';
 import * as S from './ImportModal.styled';
-import {ImportSelector} from '../Inputs';
-import ImportFactory from '../TestPlugins/ImportFactory';
 import Tip from './Tip';
 
 interface IProps {
@@ -55,7 +55,7 @@ const ImportModal = ({isOpen, onClose}: IProps) => {
         </>
       }
       onCancel={onClose}
-      title="Import to Tracetest"
+      title={<S.Title level={2}>Import a test</S.Title>}
       visible={isOpen}
       centered
     >
