@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 
+	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/spf13/cobra"
 )
@@ -22,7 +23,7 @@ var configureCmd = &cobra.Command{
 	PreRun:  setupLogger,
 	Run: WithResultHandler(WithParamsHandler(configParams)(func(cmd *cobra.Command, _ []string) (string, error) {
 		ctx := context.Background()
-		flags := config.ConfigFlags{
+		flags := agentConfig.Flags{
 			CI: configParams.CI,
 		}
 		config, err := config.LoadConfig("")

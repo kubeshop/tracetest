@@ -21,15 +21,6 @@ var (
 	DefaultCloudPath     = "/"
 )
 
-type ConfigFlags struct {
-	Endpoint       string
-	OrganizationID string
-	EnvironmentID  string
-	CI             bool
-	AgentApiKey    string
-	Token          string
-}
-
 type Config struct {
 	Scheme            string  `yaml:"scheme"`
 	Endpoint          string  `yaml:"endpoint"`

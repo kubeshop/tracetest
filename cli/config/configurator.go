@@ -7,9 +7,13 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt"
+
+	agentConfig "github.com/kubeshop/tracetest/agent/config"
+
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/pkg/oauth"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
 )
 
@@ -19,7 +23,7 @@ type Configurator struct {
 	resources *resourcemanager.Registry
 	ui        cliUI.UI
 	onFinish  onFinishFn
-	flags     ConfigFlags
+	flags     agentConfig.Flags
 }
 
 func NewConfigurator(resources *resourcemanager.Registry) Configurator {
@@ -28,7 +32,7 @@ func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 		ui.Success("Successfully configured Tracetest CLI")
 		ui.Finish()
 	}
-	flags := ConfigFlags{}
+	flags := agentConfig.Flags{}
 
 	return Configurator{resources, ui, onFinish, flags}
 }
@@ -38,7 +42,7 @@ func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
 	return c
 }
 
-func (c Configurator) Start(ctx context.Context, prev Config, flags ConfigFlags) error {
+func (c Configurator) Start(ctx context.Context, prev Config, flags agentConfig.Flags) error {
 	c.flags = flags
 	serverURL := getFirstValidString(flags.Endpoint, prev.UIEndpoint, DefaultCloudEndpoint)
 	if serverURL == "" {
@@ -168,7 +172,7 @@ func (c Configurator) onOAuthFailure(err error) {
 	c.ui.Exit(err.Error())
 }
 
-func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, flags ConfigFlags) {
+func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, flags agentConfig.Flags) {
 	cfg.OrganizationID = flags.OrganizationID
 	if cfg.OrganizationID == "" && flags.AgentApiKey == "" {
 		orgID, err := c.organizationSelector(ctx, cfg)
