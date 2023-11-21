@@ -1,6 +1,7 @@
 import {Form, Switch} from 'antd';
 import DocsBanner from 'components/DocsBanner/DocsBanner';
 import {INGESTOR_ENDPOINT_URL} from 'constants/Common.constants';
+import {withCustomization} from 'providers/Customization';
 import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
 import * as S from './OpenTelemetryCollector.styled';
 
@@ -39,4 +40,4 @@ const Ingestor = () => {
   );
 };
 
-export default Ingestor;
+export default withCustomization(Ingestor, 'ingestorConfiguration');

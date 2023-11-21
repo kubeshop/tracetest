@@ -30,7 +30,7 @@ func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace traces.Tr
 		for _, span := range trace.Flat {
 			errors := make([]analyzer.Error, 0)
 			namespaces := make([]string, 0)
-			for name := range span.Attributes {
+			for name := range span.Attributes.Values() {
 				if !regex.MatchString(name) {
 					errors = append(errors, analyzer.Error{
 						Value:       name,
@@ -43,7 +43,7 @@ func (r ensureAttributeNamingRule) Evaluate(ctx context.Context, trace traces.Tr
 			}
 
 			// ensure no attribute is named after a namespace
-			for name := range span.Attributes {
+			for name := range span.Attributes.Values() {
 				for _, namespace := range namespaces {
 					if name == namespace {
 						errors = append(errors, analyzer.Error{

@@ -7,6 +7,7 @@ import (
 	"log"
 
 	gocache "github.com/Code-Hex/go-generics-cache"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
@@ -15,6 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 )
 
 type PollerWorker struct {
@@ -22,6 +24,7 @@ type PollerWorker struct {
 	tracer            trace.Tracer
 	sentSpanIDs       *gocache.Cache[string, bool]
 	inmemoryDatastore tracedb.TraceDB
+	logger            *zap.Logger
 }
 
 type PollerOption func(*PollerWorker)
@@ -40,6 +43,7 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 		client:      client,
 		tracer:      tracer,
 		sentSpanIDs: gocache.New[string, bool](),
+		logger:      zap.NewNop(),
 	}
 
 	for _, opt := range opts {
@@ -49,10 +53,16 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 	return pollerWorker
 }
 
+func (w *PollerWorker) SetLogger(logger *zap.Logger) {
+	w.logger = logger
+}
+
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
+	w.logger.Debug("Received polling request", zap.Any("request", request))
 	err := w.poll(ctx, request)
 	if err != nil {
-		sendErr := w.client.SendTrace(ctx, &proto.PollingResponse{
+		w.logger.Error("Error polling", zap.Error(err))
+		errorResponse := &proto.PollingResponse{
 			RequestID:           request.RequestID,
 			AgentIdentification: w.client.SessionConfiguration().AgentIdentification,
 			TestID:              request.GetTestID(),
@@ -62,9 +72,13 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 			Error: &proto.Error{
 				Message: err.Error(),
 			},
-		})
+		}
+
+		w.logger.Debug("Sending polling error", zap.Any("response", errorResponse))
+		sendErr := w.client.SendTrace(ctx, errorResponse)
 
 		if sendErr != nil {
+			w.logger.Error("Error sending polling error", zap.Error(sendErr))
 			return fmt.Errorf("could not report polling error back to the server: %w. Original error: %s", sendErr, err.Error())
 		}
 	}
@@ -73,23 +87,30 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 }
 
 func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) error {
+	w.logger.Debug("Received polling request", zap.Any("request", request))
 	datastoreConfig, err := convertProtoToDataStore(request.Datastore)
 	if err != nil {
+		w.logger.Error("Invalid datastore", zap.Error(err))
 		return err
 	}
+	w.logger.Debug("Converted datastore", zap.Any("datastore", datastoreConfig))
 
 	if datastoreConfig == nil {
+		w.logger.Error("Invalid datastore: nil")
 		return fmt.Errorf("invalid datastore: nil")
 	}
 
 	dsFactory := tracedb.Factory(nil)
 	ds, err := dsFactory(*datastoreConfig)
 	if err != nil {
+		w.logger.Error("Invalid datastore", zap.Error(err))
 		log.Printf("Invalid datastore: %s", err.Error())
 		return err
 	}
+	w.logger.Debug("Created datastore", zap.Any("datastore", ds), zap.Bool("isOTLPBasedProvider", datastoreConfig.IsOTLPBasedProvider()))
 
 	if datastoreConfig.IsOTLPBasedProvider() && w.inmemoryDatastore != nil {
+		w.logger.Debug("Using in-memory datastore")
 		ds = w.inmemoryDatastore
 	}
 
@@ -101,33 +122,42 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 	}
 
 	trace, err := ds.GetTraceByID(ctx, request.TraceID)
-
 	if err != nil {
+		w.logger.Error("Cannot get trace from datastore", zap.Error(err))
 		if !errors.Is(err, connection.ErrTraceNotFound) {
-			// let controlplane know we didn't find the trace
+			w.logger.Debug("error was %s was not %s", zap.Error(err), zap.Error(connection.ErrTraceNotFound))
 			log.Printf("cannot get trace from datastore: %s", err.Error())
 			return err
 		}
 
+		w.logger.Debug("Trace not found")
 		pollingResponse.TraceFound = false
 	} else {
+		w.logger.Debug("Trace found")
 		pollingResponse.TraceFound = true
 		pollingResponse.Spans = convertTraceInToProtoSpans(trace)
+		w.logger.Debug("Converted trace", zap.Any("trace", trace), zap.Any("pollingResponse", spew.Sdump(pollingResponse)))
 
 		// remove sent spans
 		newSpans := make([]*proto.Span, 0, len(pollingResponse.Spans))
 		for _, span := range pollingResponse.Spans {
 			runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
+			w.logger.Debug("Checking if span was already sent", zap.String("runKey", runKey))
 			_, alreadySent := w.sentSpanIDs.Get(runKey)
 			if !alreadySent {
+				w.logger.Debug("Span was not sent", zap.String("runKey", runKey))
 				newSpans = append(newSpans, span)
+			} else {
+				w.logger.Debug("Span was already sent", zap.String("runKey", runKey))
 			}
 		}
 		pollingResponse.Spans = newSpans
+		w.logger.Debug("Filtered spans", zap.Any("pollingResponse", spew.Sdump(pollingResponse)))
 	}
 
 	err = w.client.SendTrace(ctx, pollingResponse)
 	if err != nil {
+		w.logger.Error("Cannot send trace to server", zap.Error(err))
 		log.Printf("cannot send trace to server: %s", err.Error())
 		return err
 	}
@@ -135,6 +165,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 	// mark spans as sent
 	for _, span := range pollingResponse.Spans {
 		runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
+		w.logger.Debug("Marking span as sent", zap.String("runKey", runKey))
 		// TODO: we can set the expiration for this key to be
 		// 1 second after the pollingProfile max waiting time
 		// but we need to get that info here from controlplane
@@ -198,8 +229,8 @@ func convertProtoToDataStore(r *proto.DataStore) (*datastore.DataStore, error) {
 func convertTraceInToProtoSpans(trace traces.Trace) []*proto.Span {
 	spans := make([]*proto.Span, 0, len(trace.Flat))
 	for _, span := range trace.Flat {
-		attributes := make([]*proto.KeyValuePair, 0, len(span.Attributes))
-		for name, value := range span.Attributes {
+		attributes := make([]*proto.KeyValuePair, 0, span.Attributes.Len())
+		for name, value := range span.Attributes.Values() {
 			attributes = append(attributes, &proto.KeyValuePair{
 				Key:   name,
 				Value: value,

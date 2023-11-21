@@ -69,14 +69,14 @@ func traceWithSpans(spans ...traces.Span) traces.Trace {
 
 func spanWithAttributes(spanType string, attributes map[string]string) traces.Span {
 	span := traces.Span{
-		Attributes: make(traces.Attributes, 0),
+		Attributes: traces.NewAttributes(),
 	}
 
 	for name, value := range attributes {
-		span.Attributes[name] = value
+		span.Attributes.Set(name, value)
 	}
 
-	span.Attributes["tracetest.span.type"] = spanType
+	span.Attributes.Set("tracetest.span.type", spanType)
 
 	return span
 }

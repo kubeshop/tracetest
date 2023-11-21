@@ -7,6 +7,7 @@ import (
 	"net"
 	"time"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -24,6 +25,7 @@ func Connect(ctx context.Context, endpoint string, opts ...Option) (*Client, err
 		pollListener:                pollListener,
 		shutdownListener:            shutdownListener,
 		dataStoreConnectionListener: dataStoreConnectionListener,
+		logger:                      zap.NewNop(),
 	}
 
 	for _, opt := range opts {

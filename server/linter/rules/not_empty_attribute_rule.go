@@ -25,7 +25,7 @@ func (r notEmptyRuleAttributesRule) Evaluate(ctx context.Context, trace traces.T
 	if config.ErrorLevel != analyzer.ErrorLevelDisabled {
 		for _, span := range trace.Flat {
 			emptyAttributes := make([]string, 0)
-			for name, value := range span.Attributes {
+			for name, value := range span.Attributes.Values() {
 				if value == "" {
 					emptyAttributes = append(emptyAttributes, name)
 				}

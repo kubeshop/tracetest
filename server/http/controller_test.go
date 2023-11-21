@@ -29,11 +29,11 @@ var (
 			RootSpan: traces.Span{
 				ID:   id.NewRandGenerator().SpanID(),
 				Name: "POST /pokemon/import",
-				Attributes: traces.Attributes{
+				Attributes: traces.NewAttributes(map[string]string{
 					"tracetest.span.type": "http",
 					"service.name":        "pokeshop",
 					"http.response.body":  `{"id":52}`,
-				},
+				}),
 			},
 		},
 	}

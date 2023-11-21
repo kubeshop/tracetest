@@ -205,19 +205,19 @@ func convertElasticSearchSpanIntoSpan(input map[string]interface{}) traces.Span 
 	endTime := startTime.Add(time.Microsecond * time.Duration(duration))
 
 	// Attributes
-	attributes := make(traces.Attributes, 0)
+	attributes := traces.NewAttributes()
 
 	for attrName, attrValue := range flatInput {
 		name := attrName
 		name = strings.ReplaceAll(name, "transaction.", "")
 		name = strings.ReplaceAll(name, "span.", "")
-		attributes[name] = fmt.Sprintf("%v", attrValue)
+		attributes.Set(name, fmt.Sprintf("%v", attrValue))
 	}
 
 	// ParentId
 	parentId := flatInput["parent.id"]
 	if parentId != nil {
-		attributes[traces.TracetestMetadataFieldParentID] = flatInput["parent.id"].(string)
+		attributes.Set(traces.TracetestMetadataFieldParentID, flatInput["parent.id"].(string))
 	}
 
 	return traces.Span{

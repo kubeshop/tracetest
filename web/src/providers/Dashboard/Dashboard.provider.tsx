@@ -4,11 +4,13 @@ import {NavigateFunction} from 'react-router-dom';
 
 interface IContext {
   baseUrl: string;
+  dashboardUrl: string;
   navigate: NavigateFunction;
 }
 
 export const Context = createContext<IContext>({
   baseUrl: '',
+  dashboardUrl: '',
   navigate: noop,
 });
 
