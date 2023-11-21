@@ -1,6 +1,7 @@
 import {Form, Switch} from 'antd';
 import DocsBanner from 'components/DocsBanner/DocsBanner';
 import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
+import {INGESTOR_ENDPOINT_URL} from 'constants/Common.constants';
 import * as S from './Agent.styled';
 
 const Ingestor = () => {
@@ -29,7 +30,7 @@ const Ingestor = () => {
       </S.SwitchContainer>
       <DocsBanner>
         Need more information about setting up the agent ingestion endpoint?{' '}
-        <a target="_blank" href="">
+        <a target="_blank" href={INGESTOR_ENDPOINT_URL}>
           Go to our docs
         </a>
       </DocsBanner>
