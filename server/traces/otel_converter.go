@@ -39,9 +39,9 @@ func FromSpanList(input []*v1.Span) Trace {
 }
 
 func ConvertOtelSpanIntoSpan(span *v1.Span) *Span {
-	attributes := make(Attributes, 0)
+	attributes := NewAttributes()
 	for _, attribute := range span.Attributes {
-		attributes[attribute.Key] = getAttributeValue(attribute.Value)
+		attributes.Set(attribute.Key, getAttributeValue(attribute.Value))
 	}
 
 	var startTime, endTime time.Time
@@ -63,7 +63,7 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *Span {
 	}
 
 	spanID := createSpanID(span.SpanId)
-	attributes[TracetestMetadataFieldParentID] = createSpanID(span.ParentSpanId).String()
+	attributes.Set(TracetestMetadataFieldParentID, createSpanID(span.ParentSpanId).String())
 	return &Span{
 		ID:         spanID,
 		Name:       span.Name,
@@ -81,9 +81,9 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *Span {
 func extractEvents(v1 *v1.Span) []SpanEvent {
 	output := make([]SpanEvent, 0, len(v1.Events))
 	for _, v1Event := range v1.Events {
-		attributes := make(Attributes, 0)
+		attributes := NewAttributes()
 		for _, attribute := range v1Event.Attributes {
-			attributes[attribute.Key] = getAttributeValue(attribute.Value)
+			attributes.Set(attribute.Key, getAttributeValue(attribute.Value))
 		}
 		var timestamp time.Time
 

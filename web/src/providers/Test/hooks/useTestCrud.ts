@@ -1,6 +1,6 @@
 import {useCallback} from 'react';
 import {noop} from 'lodash';
-import {useMatch} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TVariableSetValue} from 'models/VariableSet.model';
@@ -34,7 +34,8 @@ const useTestCrud = () => {
   const [editTest, {isLoading: isLoadingEditTest}] = useEditTestMutation();
   const [runTestAction, {isLoading: isLoadingRunTest}] = useRunTestMutation();
   const isEditLoading = isLoadingEditTest || isLoadingRunTest;
-  const match = useMatch('/test/:testId/run/:runId/:mode');
+  const {mode = 'trigger'} = useParams();
+
   const {selectedVariableSet} = useVariableSet();
   const {onOpen} = useMissingVariablesModal();
 
@@ -46,7 +47,6 @@ const useTestCrud = () => {
           const {id} = await runTestAction({testId: test.id, variableSetId, variables: updatedVars}).unwrap();
           dispatch(reset());
 
-          const mode = match?.params.mode || 'trigger';
           navigate(`/test/${test.id}/run/${id}/${mode}`);
         } catch (error) {
           const {type, missingVariables} = error as RunError;
@@ -66,7 +66,7 @@ const useTestCrud = () => {
 
       run();
     },
-    [dispatch, match?.params.mode, navigate, onOpen, runTestAction, selectedVariableSet?.id]
+    [dispatch, mode, navigate, onOpen, runTestAction, selectedVariableSet?.id]
   );
 
   const edit = useCallback(

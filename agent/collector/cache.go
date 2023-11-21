@@ -9,7 +9,7 @@ import (
 
 type TraceCache interface {
 	Get(string) ([]*v1.Span, bool)
-	Set(string, []*v1.Span)
+	Append(string, []*v1.Span)
 }
 
 type traceCache struct {
@@ -25,8 +25,8 @@ func (c *traceCache) Get(traceID string) ([]*v1.Span, bool) {
 	return c.internalCache.Get(traceID)
 }
 
-// Set implements TraceCache.
-func (c *traceCache) Set(traceID string, spans []*v1.Span) {
+// Append implements TraceCache.
+func (c *traceCache) Append(traceID string, spans []*v1.Span) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 

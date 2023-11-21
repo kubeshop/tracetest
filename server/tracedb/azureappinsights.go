@@ -242,7 +242,7 @@ func parseEvent(row spanRow) (traces.SpanEvent, error) {
 
 	event.Timestamp = timestamp
 
-	attributes := make(traces.Attributes, 0)
+	attributes := traces.NewAttributes()
 	rawAttributes := row.Get("customDimensions").(string)
 	err = json.Unmarshal([]byte(rawAttributes), &attributes)
 	if err != nil {
@@ -255,7 +255,7 @@ func parseEvent(row spanRow) (traces.SpanEvent, error) {
 }
 
 func parseRowToSpan(row spanRow) (traces.Span, error) {
-	attributes := make(traces.Attributes, 0)
+	attributes := traces.NewAttributes()
 	span := traces.Span{
 		Attributes: attributes,
 	}
@@ -313,15 +313,15 @@ func parseSpanID(span *traces.Span, value any) error {
 }
 
 func parseAttributes(span *traces.Span, value any) error {
-	attributes := make(traces.Attributes, 0)
+	attributes := traces.NewAttributes()
 	rawAttributes := value.(string)
 	err := json.Unmarshal([]byte(rawAttributes), &attributes)
 	if err != nil {
 		return fmt.Errorf("failed to parse attributes: %w", err)
 	}
 
-	for key, value := range attributes {
-		span.Attributes[key] = value
+	for key, value := range attributes.Values() {
+		span.Attributes.Set(key, value)
 	}
 	return nil
 }
@@ -329,9 +329,9 @@ func parseAttributes(span *traces.Span, value any) error {
 func parseParentID(span *traces.Span, value any) error {
 	rawParentID, ok := value.(string)
 	if ok {
-		span.Attributes[traces.TracetestMetadataFieldParentID] = rawParentID
+		span.Attributes.Set(traces.TracetestMetadataFieldParentID, rawParentID)
 	} else {
-		span.Attributes[traces.TracetestMetadataFieldParentID] = ""
+		span.Attributes.Set(traces.TracetestMetadataFieldParentID, "")
 	}
 	return nil
 }

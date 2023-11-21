@@ -10,6 +10,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 )
 
 type Config struct {
@@ -34,6 +35,12 @@ func WithStartRemoteServer(startRemoteServer bool) CollectorOption {
 	}
 }
 
+func WithLogger(logger *zap.Logger) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.logger = logger
+	}
+}
+
 type collector struct {
 	grpcServer stoppable
 	httpServer stoppable
@@ -47,8 +54,9 @@ func (c *collector) Stop() {
 
 func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) (stoppable, error) {
 	ingesterConfig := remoteIngesterConfig{
-		URL:   config.RemoteServerURL,
-		Token: config.RemoteServerToken,
+		URL:    config.RemoteServerURL,
+		Token:  config.RemoteServerToken,
+		logger: zap.NewNop(),
 	}
 
 	for _, opt := range opts {
@@ -61,9 +69,12 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...Coll
 	}
 
 	grpcServer := otlp.NewGrpcServer(fmt.Sprintf("0.0.0.0:%d", config.GRPCPort), ingester, tracer)
+	grpcServer.SetLogger(ingesterConfig.logger)
 	httpServer := otlp.NewHttpServer(fmt.Sprintf("0.0.0.0:%d", config.HTTPPort), ingester)
+	httpServer.SetLogger(ingesterConfig.logger)
 
 	onProcessTermination(func() {
+		ingesterConfig.logger.Debug("Stopping collector")
 		grpcServer.Stop()
 		httpServer.Stop()
 		if stoppableIngester, ok := ingester.(stoppable); ok {

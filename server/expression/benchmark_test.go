@@ -22,9 +22,9 @@ func BenchmarkJSONPathExpressions(b *testing.B) {
 
 	attributeDataStore := expression.AttributeDataStore{
 		Span: traces.Span{
-			Attributes: traces.Attributes{
+			Attributes: traces.NewAttributes(map[string]string{
 				"my_json": getJSON(),
-			},
+			}),
 		},
 	}
 	executor := expression.NewExecutor(attributeDataStore)

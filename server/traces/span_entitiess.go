@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/timing"
@@ -23,19 +24,106 @@ const (
 	TracetestMetadataFieldStatusDescription string = "tracetest.span.status_description"
 )
 
-type Attributes map[string]string
-
-func (a Attributes) Get(key string) string {
-	if v, ok := a[key]; ok {
-		return v
+func NewAttributes(inputs ...map[string]string) Attributes {
+	attr := Attributes{
+		mutex:  &sync.Mutex{},
+		values: make(map[string]string),
 	}
 
-	return ""
+	for _, input := range inputs {
+		for key, value := range input {
+			attr.values[key] = value
+		}
+	}
+
+	return attr
+}
+
+type Attributes struct {
+	mutex  *sync.Mutex
+	values map[string]string
+}
+
+func (a Attributes) Values() map[string]string {
+	a.lock()
+	defer a.unlock()
+
+	m := make(map[string]string, len(a.values))
+	for key, value := range a.values {
+		m[key] = value
+	}
+	return m
+}
+
+func (a Attributes) Len() int {
+	return len(a.values)
+}
+
+func (a *Attributes) lock() {
+	if a.mutex == nil {
+		a.mutex = &sync.Mutex{}
+	}
+
+	a.mutex.Lock()
+}
+
+func (a *Attributes) unlock() {
+	if a.mutex != nil {
+		a.mutex.Unlock()
+	}
+}
+
+func (a Attributes) MarshalJSON() ([]byte, error) {
+	a.lock()
+	defer a.unlock()
+
+	return json.Marshal(a.values)
+}
+
+func (a *Attributes) UnmarshalJSON(in []byte) error {
+	if a.mutex == nil {
+		a.mutex = &sync.Mutex{}
+	}
+	a.lock()
+	defer a.unlock()
+
+	a.values = make(map[string]string, 0)
+
+	return json.Unmarshal(in, &a.values)
+}
+
+func (a Attributes) GetExists(key string) (string, bool) {
+	a.lock()
+	defer a.unlock()
+
+	if v, ok := a.values[key]; ok {
+		return v, true
+	}
+
+	return "", false
+}
+
+func (a Attributes) Get(key string) string {
+	v, _ := a.GetExists(key)
+	return v
+}
+
+func (a Attributes) Set(key, value string) {
+	a.lock()
+	defer a.unlock()
+	a.values[key] = value
+}
+
+func (a Attributes) Delete(key string) {
+	a.lock()
+	defer a.unlock()
+
+	delete(a.values, key)
 }
 
 func (a Attributes) SetPointerValue(key string, value *string) {
 	if value != nil {
-		a[key] = *value
+		a.values[key] = *value
 	}
 }
 
@@ -94,7 +182,7 @@ func (s *Span) injectEventsIntoAttributes() {
 	}
 
 	eventsJson, _ := json.Marshal(s.Events)
-	s.Attributes["span.events"] = string(eventsJson)
+	s.Attributes.Set("span.events", string(eventsJson))
 }
 
 type SpanEvent struct {
@@ -240,19 +328,19 @@ func decodeChildren(parent *Span, children []encodedSpan, cache spanCache) ([]*S
 }
 
 func (span Span) setMetadataAttributes() Span {
-	if span.Attributes == nil {
-		span.Attributes = Attributes{}
+	if span.Attributes.values == nil {
+		span.Attributes = NewAttributes()
 	}
 
-	span.Attributes[TracetestMetadataFieldName] = span.Name
-	span.Attributes[TracetestMetadataFieldType] = spanType(span.Attributes)
-	span.Attributes[TracetestMetadataFieldDuration] = spanDuration(span)
-	span.Attributes[TracetestMetadataFieldStartTime] = strconv.FormatInt(span.StartTime.UTC().UnixNano(), 10)
-	span.Attributes[TracetestMetadataFieldEndTime] = strconv.FormatInt(span.EndTime.UTC().UnixNano(), 10)
+	span.Attributes.Set(TracetestMetadataFieldName, span.Name)
+	span.Attributes.Set(TracetestMetadataFieldType, spanType(span.Attributes))
+	span.Attributes.Set(TracetestMetadataFieldDuration, spanDuration(span))
+	span.Attributes.Set(TracetestMetadataFieldStartTime, strconv.FormatInt(span.StartTime.UTC().UnixNano(), 10))
+	span.Attributes.Set(TracetestMetadataFieldEndTime, strconv.FormatInt(span.EndTime.UTC().UnixNano(), 10))
 
 	if span.Status != nil {
-		span.Attributes[TracetestMetadataFieldStatusCode] = span.Status.Code
-		span.Attributes[TracetestMetadataFieldStatusDescription] = span.Status.Description
+		span.Attributes.Set(TracetestMetadataFieldStatusCode, span.Status.Code)
+		span.Attributes.Set(TracetestMetadataFieldStatusDescription, span.Status.Description)
 	}
 
 	return span
@@ -263,15 +351,15 @@ func (span Span) setTriggerResultAttributes(result trigger.TriggerResult) Span {
 	case trigger.TriggerTypeHTTP:
 		resp := result.HTTP
 		jsonheaders, _ := json.Marshal(resp.Headers)
-		span.Attributes["tracetest.response.status"] = strconv.Itoa(resp.StatusCode)
-		span.Attributes["tracetest.response.body"] = resp.Body
-		span.Attributes["tracetest.response.headers"] = string(jsonheaders)
+		span.Attributes.Set("tracetest.response.status", strconv.Itoa(resp.StatusCode))
+		span.Attributes.Set("tracetest.response.body", resp.Body)
+		span.Attributes.Set("tracetest.response.headers", string(jsonheaders))
 	case trigger.TriggerTypeGRPC:
 		resp := result.GRPC
 		jsonheaders, _ := json.Marshal(resp.Metadata)
-		span.Attributes["tracetest.response.status"] = strconv.Itoa(resp.StatusCode)
-		span.Attributes["tracetest.response.body"] = resp.Body
-		span.Attributes["tracetest.response.headers"] = string(jsonheaders)
+		span.Attributes.Set("tracetest.response.status", strconv.Itoa(resp.StatusCode))
+		span.Attributes.Set("tracetest.response.body", resp.Body)
+		span.Attributes.Set("tracetest.response.headers", string(jsonheaders))
 	}
 
 	return span

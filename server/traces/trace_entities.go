@@ -53,8 +53,23 @@ func MergeTraces(traces ...*Trace) *Trace {
 }
 
 func NewTrace(traceID string, spans []Span) Trace {
+	var temporaryRootSpan *Span
 	spanMap := make(map[string]*Span, 0)
 	for _, span := range spans {
+		if span.Name == TemporaryRootSpanName {
+			if temporaryRootSpan != nil {
+				// It should never have more than one temporary root span
+				// so if that happens, clean them up.
+				continue
+			}
+
+			// Make sure that removing extra temporary spans don't leave any orphan spans
+			temporaryRootSpan = &span
+			for _, child := range span.Children {
+				temporaryRootSpan.Children = append(temporaryRootSpan.Children, child)
+				child.Parent = temporaryRootSpan
+			}
+		}
 		spanCopy := span.setMetadataAttributes()
 		spanID := span.ID.String()
 		spanMap[spanID] = &spanCopy
@@ -64,7 +79,7 @@ func NewTrace(traceID string, spans []Span) Trace {
 	for _, span := range spanMap {
 		span.injectEventsIntoAttributes()
 
-		parentID := span.Attributes[TracetestMetadataFieldParentID]
+		parentID := span.Attributes.Get(TracetestMetadataFieldParentID)
 		parentSpan, found := spanMap[parentID]
 		if !found {
 			rootSpans = append(rootSpans, span)
@@ -108,7 +123,7 @@ func getRootSpan(allRoots []*Span) *Span {
 	}
 
 	if root == nil {
-		root = &Span{ID: id.NewRandGenerator().SpanID(), Name: TemporaryRootSpanName, Attributes: make(Attributes), Children: []*Span{}}
+		root = &Span{ID: id.NewRandGenerator().SpanID(), Name: TemporaryRootSpanName, Attributes: NewAttributes(), Children: []*Span{}}
 	}
 
 	for _, span := range allRoots {
@@ -124,7 +139,7 @@ func getRootSpan(allRoots []*Span) *Span {
 func spanType(attrs Attributes) string {
 	// based on https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions
 	// using the first required attribute for each type
-	for key := range attrs {
+	for key := range attrs.Values() {
 		switch true {
 		case strings.HasPrefix(key, "http."):
 			return "http"
@@ -170,7 +185,7 @@ func (t *Trace) HasRootSpan() bool {
 }
 
 func (t *Trace) InsertRootSpan(newRoot Span) *Trace {
-	if !t.RootSpan.IsZero() {
+	if !t.RootSpan.IsZero() || t.RootSpan.Name == TemporaryRootSpanName {
 		newRoot = replaceRoot(t.RootSpan, newRoot)
 	}
 
@@ -194,11 +209,11 @@ func replaceRoot(oldRoot, newRoot Span) Span {
 		return newRoot
 	}
 
-	if oldRoot.Attributes == nil {
-		oldRoot.Attributes = make(Attributes)
+	if oldRoot.Attributes.values == nil {
+		oldRoot.Attributes = NewAttributes()
 	}
 	oldRoot.Parent = &newRoot
-	oldRoot.Attributes[TracetestMetadataFieldParentID] = newRoot.ID.String()
+	oldRoot.Attributes.Set(TracetestMetadataFieldParentID, newRoot.ID.String())
 
 	newRoot.Children = append(newRoot.Children, &oldRoot)
 
