@@ -71,6 +71,29 @@ func TestTraceWithMultipleTemporaryRoots(t *testing.T) {
 	assert.Equal(t, "Child from root 3", trace.RootSpan.Children[2].Name)
 }
 
+func TestTraceAssemble(t *testing.T) {
+	rootSpan := newSpan("Root")
+	childSpan1 := newSpan("child 1", withParent(&rootSpan))
+	childSpan2 := newSpan("child 2", withParent(&rootSpan))
+	grandchildSpan := newSpan("grandchild", withParent(&childSpan2))
+
+	spans := []traces.Span{rootSpan, childSpan1, grandchildSpan}
+	trace := traces.NewTrace("trace", spans)
+
+	assert.Len(t, trace.Flat, 4)
+	assert.Equal(t, "Temporary Tracetest root span", trace.RootSpan.Name)
+	assert.Equal(t, "Root", trace.RootSpan.Children[0].Name)
+	assert.Equal(t, "child 1", trace.RootSpan.Children[0].Children[0].Name)
+	assert.Equal(t, "grandchild", trace.RootSpan.Children[1].Name)
+
+	trace = traces.NewTrace(trace.ID.String(), append(trace.Spans(), childSpan2))
+	assert.Len(t, trace.Flat, 4)
+	assert.Equal(t, "Root", trace.RootSpan.Name)
+	assert.Equal(t, "child 1", trace.RootSpan.Children[0].Name)
+	assert.Equal(t, "child 2", trace.RootSpan.Children[1].Name)
+	assert.Equal(t, "grandchild", trace.RootSpan.Children[1].Children[0].Name)
+}
+
 func TestTraceWithMultipleRootsFromOtel(t *testing.T) {
 	root1 := newOtelSpan("Root 1", nil)
 	root1Child := newOtelSpan("Child from root 1", root1)
@@ -168,7 +191,7 @@ func TestNoTemporaryRootIfTracetestRootExists(t *testing.T) {
 	assert.Equal(t, root2.Name, trace.RootSpan.Name)
 }
 
-func TestNoTemporaryRootIfATemporaryRootExists(t *testing.T) {
+func TestNewTemporaryRootIfATemporaryRootExists(t *testing.T) {
 	root1 := newSpan("Root 1")
 	root1Child := newSpan("Child from root 1", withParent(&root1))
 	root2 := newSpan(traces.TemporaryRootSpanName)
@@ -179,8 +202,8 @@ func TestNoTemporaryRootIfATemporaryRootExists(t *testing.T) {
 	spans := []traces.Span{root1, root1Child, root2, root2Child, root3, root3Child}
 	trace := traces.NewTrace("trace", spans)
 
-	assert.Equal(t, root2.ID, trace.RootSpan.ID)
-	assert.Equal(t, root2.Name, trace.RootSpan.Name)
+	assert.NotEqual(t, root2.ID, trace.RootSpan.ID)
+	assert.Equal(t, traces.TemporaryRootSpanName, root2.Name)
 }
 
 func TestTriggerSpanShouldBeRootWhenTemporaryRootExistsToo(t *testing.T) {
