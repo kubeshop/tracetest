@@ -61,9 +61,10 @@ func (c *collector) Stop() {
 
 func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) (stoppable, error) {
 	ingesterConfig := remoteIngesterConfig{
-		URL:    config.RemoteServerURL,
-		Token:  config.RemoteServerToken,
-		logger: zap.NewNop(),
+		URL:      config.RemoteServerURL,
+		Token:    config.RemoteServerToken,
+		logger:   zap.NewNop(),
+		observer: event.NewNopObserver(),
 	}
 
 	for _, opt := range opts {

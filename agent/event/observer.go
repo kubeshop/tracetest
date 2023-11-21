@@ -25,6 +25,12 @@ type wrapperObserver struct {
 	wrappedObserver Observer
 }
 
+func NewNopObserver() Observer {
+	return &wrapperObserver{
+		wrappedObserver: nil,
+	}
+}
+
 func WrapObserver(observer Observer) Observer {
 	return &wrapperObserver{
 		wrappedObserver: observer,

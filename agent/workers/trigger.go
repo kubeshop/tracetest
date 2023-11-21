@@ -52,6 +52,7 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 		client:   client,
 		registry: registry,
 		logger:   zap.NewNop(),
+		observer: event.NewNopObserver(),
 	}
 
 	for _, opt := range opts {

@@ -52,6 +52,7 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 		tracer:      tracer,
 		sentSpanIDs: gocache.New[string, bool](),
 		logger:      zap.NewNop(),
+		observer:    event.NewNopObserver(),
 	}
 
 	for _, opt := range opts {
