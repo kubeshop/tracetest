@@ -4,7 +4,7 @@ import TestSpecActions from 'components/TestSpec/Actions';
 import * as STestSpec from 'components/TestSpec/TestSpec.styled';
 import {singularOrPlural} from 'utils/Common';
 import {SupportedEditors} from 'constants/Editor.constants';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import * as S from './TestSpecDetail.styled';
 
 interface IProps {

@@ -1,3 +1,4 @@
+import {SupportedPlugins} from '../../../src/constants/Common.constants';
 import {POKEMON_HTTP_ENDPOINT, PokeshopDemo} from '../constants/Test';
 
 describe('Create test', () => {
@@ -11,18 +12,24 @@ describe('Create test', () => {
   it('should create a basic GET test from scratch', () => {
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
     cy.openTestCreationModal();
+    cy.get(`[data-cy=${SupportedPlugins.REST.toLowerCase()}-plugin]`).click();
     cy.fillCreateFormBasicStep(name);
+
     cy.setCreateFormUrl('GET', `${POKEMON_HTTP_ENDPOINT}/pokemon`);
     cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+    cy.get('[data-cy=overlay-input-overlay]').should('contain.text', name);
   });
 
   it('should create a basic POST test from scratch', () => {
     const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
     cy.openTestCreationModal();
+    cy.get(`[data-cy=${SupportedPlugins.REST.toLowerCase()}-plugin]`).click();
     cy.fillCreateFormBasicStep(name);
     cy.setCreateFormUrl('POST', `${POKEMON_HTTP_ENDPOINT}/pokemon`);
+
+    cy.get('#rc-tabs-0-tab-body').click();
+    cy.get('[data-cy="bodyMode"]').click();
     cy.get('[data-cy=bodyMode-json]').click();
     cy.get('[data-cy=body] [data-cy=interpolation-editor] [contenteditable]')
       .first()
@@ -34,7 +41,7 @@ describe('Create test', () => {
       );
     cy.submitCreateForm();
     cy.makeSureUserIsOnTracePage();
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+    cy.get('[data-cy=overlay-input-overlay]').should('contain.text', name);
   });
 
   it('should create a GET test from an example', () => {

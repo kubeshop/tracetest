@@ -1,8 +1,13 @@
 import {LinkOutlined} from '@ant-design/icons';
-import {useMemo} from 'react';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
+import {useMemo} from 'react';
 import Date from 'utils/Date';
+import {isRunStateFinished} from 'models/TestRun.model';
+import {TDraftTest} from 'types/Test.types';
+import TestService from 'services/Test.service';
+import HeaderForm from './HeaderForm';
 import Info from './Info';
 import * as S from './RunDetailLayout.styled';
 
@@ -15,13 +20,20 @@ interface IProps {
 const HeaderLeft = ({name, triggerType, origin}: IProps) => {
   const {run: {createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {}, run} =
     useTestRun();
+  const {onEdit, isEditLoading: isLoading, test} = useTest();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
   const {navigate} = useDashboard();
+  const stateIsFinished = isRunStateFinished(run.state);
+
+  const handleOnEdit = (draft: TDraftTest) => {
+    const update = TestService.getInitialValues(test);
+    onEdit({...update, ...draft});
+  };
 
   const description = useMemo(() => {
     return (
       <>
-        {triggerType} • Ran {createdTimeAgo}
+        v{testVersion} • {triggerType} • Ran {createdTimeAgo}
         {testSuiteId && testSuiteRunId && (
           <>
             {' '}
@@ -33,7 +45,7 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
         )}
       </>
     );
-  }, [triggerType, createdTimeAgo, testSuiteId, testSuiteRunId]);
+  }, [triggerType, createdTimeAgo, testSuiteId, testSuiteRunId, testVersion]);
 
   return (
     <S.Section $justifyContent="flex-start">
@@ -41,10 +53,8 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
         <S.BackIcon />
       </a>
       <S.InfoContainer>
-        <S.Row>
-          <S.Title data-cy="test-details-name">
-            {name} (v{testVersion})
-          </S.Title>
+        <S.Row $height={24}>
+          <HeaderForm name={name} onSubmit={handleOnEdit} isDisabled={isLoading || !stateIsFinished} />
           <Info
             date={createdAt ?? ''}
             executionTime={executionTime ?? 0}

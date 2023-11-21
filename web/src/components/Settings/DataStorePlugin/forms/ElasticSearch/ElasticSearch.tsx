@@ -1,6 +1,6 @@
 import {Checkbox, Col, Form, Input, Row} from 'antd';
 
-import RequestDetailsFileInput from 'components/CreateTestPlugins/Grpc/steps/RequestDetails/RequestDetailsFileInput';
+import {FileUpload} from 'components/Inputs';
 import {SupportedDataStoresToDefaultEndpoint, SupportedDataStoresToName} from 'constants/DataStore.constants';
 import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 import * as S from '../../DataStorePluginForm.styled';
@@ -58,7 +58,7 @@ const OpenSearch = () => {
         </Col>
         <Col span={12}>
           <Form.Item label="Upload CA file" name={[...baseName, 'certificateFile']}>
-            <RequestDetailsFileInput accept="" />
+            <FileUpload accept="" />
           </Form.Item>
         </Col>
       </Row>

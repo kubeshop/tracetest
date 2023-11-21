@@ -1,12 +1,11 @@
 import {Form, Radio, Typography} from 'antd';
 import {toUpper} from 'lodash';
 import {useEffect, useMemo} from 'react';
-import RequiredGatesInput from 'components/Settings/TestRunner/RequiredGatesInput';
+import {RequiredGates, SwitchControl} from 'components/Inputs';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import {CliCommandFormat, CliCommandOption, TCliCommandConfig} from 'services/CliCommand.service';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './CliCommand.styled';
-import SwitchControl from './SwitchControl';
 import {defaultOptions} from './hooks/useCliCommand';
 
 interface IOptionsMetadataParams {
@@ -88,7 +87,7 @@ const Controls = ({onChange, id, variableSetId, fileName, resourceType}: IProps)
         </S.OptionsContainer>
 
         <Form.Item name="required-gates">
-          <RequiredGatesInput
+          <RequiredGates
             title={
               <Typography.Paragraph>
                 Override default Required Gates:{' '}

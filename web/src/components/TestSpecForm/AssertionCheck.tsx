@@ -11,7 +11,7 @@ import OperatorService from 'services/Operator.service';
 import {CompareOperator} from 'constants/Operator.constants';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import {useAppSelector} from 'redux/hooks';
-import Editor from '../Editor';
+import {Editor} from 'components/Inputs';
 import {OtelReference} from './hooks/useGetOTELSemanticConventionAttributesInfo';
 import {IValues} from './TestSpecForm';
 import * as S from './TestSpecForm.styled';

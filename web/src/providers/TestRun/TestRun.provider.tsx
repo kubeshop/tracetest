@@ -6,22 +6,26 @@ import TestRunEvent from 'models/TestRunEvent.model';
 import TracetestAPI from 'redux/apis/Tracetest';
 import TestProvider from '../Test';
 
-const {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation} = TracetestAPI.instance;
+const {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation, useSkipPollingMutation} = TracetestAPI.instance;
 
 interface IContext {
   run: TestRun;
   isError: boolean;
   isLoadingStop: boolean;
+  isLoadingSkipPolling: boolean;
   runEvents: TestRunEvent[];
   stopRun(): void;
+  skipPolling(): void;
 }
 
 export const Context = createContext<IContext>({
   run: {} as TestRun,
   isError: false,
   isLoadingStop: false,
+  isLoadingSkipPolling: false,
   runEvents: [],
   stopRun: noop,
+  skipPolling: noop,
 });
 
 interface IProps {
@@ -32,21 +36,21 @@ interface IProps {
 
 export const useTestRun = () => useContext(Context);
 
-const POLLING_INTERVAL = 5000;
+const POLLING_INTERVAL = 1000;
 
 const TestRunProvider = ({children, testId, runId = 0}: IProps) => {
   const [pollingInterval, setPollingInterval] = useState<number | undefined>(POLLING_INTERVAL);
   const {data: run, isError} = useGetRunByIdQuery({testId, runId}, {skip: !runId, pollingInterval});
   const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId, pollingInterval});
   const [stopRunAction, {isLoading: isLoadingStop}] = useStopRunMutation();
+  const [skipPollingAction, {isLoading: isLoadingSkipPolling}] = useSkipPollingMutation();
 
-  const stopRun = useCallback(async () => {
-    await stopRunAction({runId, testId});
-  }, [runId, stopRunAction, testId]);
+  const stopRun = useCallback(() => stopRunAction({runId, testId}), [runId, stopRunAction, testId]);
+  const skipPolling = useCallback(() => skipPollingAction({runId, testId}), [runId, skipPollingAction, testId]);
 
   const value = useMemo<IContext>(
-    () => ({run: run!, isError, isLoadingStop, runEvents, stopRun}),
-    [run, isError, isLoadingStop, runEvents, stopRun]
+    () => ({run: run!, isError, isLoadingStop, isLoadingSkipPolling, runEvents, stopRun, skipPolling}),
+    [run, isError, isLoadingStop, isLoadingSkipPolling, runEvents, stopRun, skipPolling]
   );
 
   useEffect(() => {

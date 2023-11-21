@@ -6,17 +6,16 @@ describe('Create test from Postman Collection', () => {
 
   it('should create a basic GET test', () => {
     cy.interceptHomeApiCall();
-    const name = `Test - Pokemon - #${String(Date.now()).slice(-4)}`;
-    cy.openTestCreationModal();
+    cy.get('[data-cy=import-button]').click();
     cy.get('[data-cy=postman-plugin]').click();
-    cy.fillCreateFormBasicStep(name, 'Create from Postman Collection');
     cy.get('[data-cy="collectionFile"]').attachFile('collection.json');
     cy.get('[data-cy=collectionTest-select]').click();
     cy.get('[data-cy=collectionTest-1]').click({force: true});
+    cy.get(`[data-cy="import-test-submit"]`).click();
     cy.submitCreateForm();
     cy.matchTestRunPageUrl();
     cy.cancelOnBoarding();
-    cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+    cy.get('[data-cy=overlay-input-overlay]').should('contain.text', 'create Test');
     cy.deleteTest(true);
   });
 });

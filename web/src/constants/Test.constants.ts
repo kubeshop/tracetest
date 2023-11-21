@@ -12,6 +12,11 @@ export enum TriggerTypes {
   kafka = 'kafka',
 }
 
+export enum ImportTypes {
+  postman = 'postman',
+  curl = 'curl',
+}
+
 export enum SortBy {
   Created = 'created',
   LastRun = 'last_run',

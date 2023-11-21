@@ -46,6 +46,7 @@ const {
   useDryRunMutation,
   useDeleteRunByIdMutation,
   useStopRunMutation,
+  useSkipPollingMutation,
   useGetJUnitByRunIdQuery,
   useLazyGetJUnitByRunIdQuery,
 
@@ -104,6 +105,7 @@ export {
   useDryRunMutation,
   useDeleteRunByIdMutation,
   useStopRunMutation,
+  useSkipPollingMutation,
   useGetJUnitByRunIdQuery,
   useLazyGetJUnitByRunIdQuery,
   useCreateTestSuiteMutation,

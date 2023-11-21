@@ -6,7 +6,6 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 24px;
 `;
 
 export const TitleContainer = styled.div`

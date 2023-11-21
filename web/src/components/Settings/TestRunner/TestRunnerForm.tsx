@@ -5,8 +5,8 @@ import {ResourceType, TDraftTestRunner} from 'types/Settings.types';
 import {useSettings} from 'providers/Settings/Settings.provider';
 import SettingService from 'services/Setting.service';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
+import {RequiredGates} from 'components/Inputs';
 import * as S from '../common/Settings.styled';
-import RequiredGatesInput from './RequiredGatesInput';
 
 const FORM_ID = 'testRunner';
 
@@ -39,7 +39,7 @@ const TestRunnerForm = () => {
       <Form.Item hidden name="name" />
 
       <Form.Item name="requiredGates">
-        <RequiredGatesInput />
+        <RequiredGates />
       </Form.Item>
 
       <S.FooterContainer>

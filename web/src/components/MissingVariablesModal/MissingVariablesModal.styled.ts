@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-import {Form, Modal as AntModal, Typography} from 'antd';
-import {InfoCircleOutlined} from '@ant-design/icons';
+import {Modal as AntModal, Typography} from 'antd';
 
 export const Modal = styled(AntModal)`
   top: 50px;
@@ -51,30 +50,10 @@ export const ToolTipTitle = styled(Typography.Text)`
   }
 `;
 
-export const TestsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
 export const TestContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`;
-
-export const FromItem = styled(Form.Item)<{$hasValue: boolean}>`
-  margin: 0;
-
-  input {
-    border: 1px solid ${({theme, $hasValue}) => !$hasValue && theme.color.error};
-  }
-`;
-
-export const InfoIcon = styled(InfoCircleOutlined)`
-  color: ${({theme}) => theme.color.textSecondary};
-  cursor: pointer;
-  margin: 4px;
 `;
 
 export const DetailContainer = styled.div`

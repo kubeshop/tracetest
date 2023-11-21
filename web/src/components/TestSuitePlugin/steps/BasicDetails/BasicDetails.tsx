@@ -1,9 +1,9 @@
 import {Form} from 'antd';
 import {useCallback} from 'react';
-import * as Step from 'components/CreateTestPlugins/Step.styled';
+import * as Step from 'components/TestSuitePlugin/Step.styled';
 import {useCreateTestSuite} from 'providers/CreateTestSuite';
 import {TDraftTestSuite} from 'types/TestSuite.types';
-import BasicDetailsForm from 'components/CreateTestPlugins/Default/steps/BasicDetails/BasicDetailsForm';
+import BasicDetailsForm from 'components/BasicDetailsForm/BasicDetailsForm';
 import {ComponentNames} from 'constants/Plugins.constants';
 
 const BasicDetails = () => {
@@ -29,8 +29,8 @@ const BasicDetails = () => {
       <Step.FormContainer>
         <Step.Title $withSubtitle>Name your Test Suite</Step.Title>
         <Step.Subtitle>
-          Create a test suite which will run several tests in sequence. You can set outputs into variables and use
-          these variables later in the test suite in other tests.{' '}
+          Create a test suite which will run several tests in sequence. You can set outputs into variables and use these
+          variables later in the test suite in other tests.{' '}
         </Step.Subtitle>
         <Form<TDraftTestSuite>
           id={ComponentNames.BasicDetails}
@@ -41,7 +41,7 @@ const BasicDetails = () => {
           onFinish={handleSubmit}
           onValuesChange={onValidate}
         >
-          <BasicDetailsForm onSelectDemo={() => null} selectedDemo={undefined} demoList={[]} />
+          <BasicDetailsForm />
         </Form>
       </Step.FormContainer>
     </Step.Step>

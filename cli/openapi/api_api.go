@@ -2368,6 +2368,102 @@ func (a *ApiApiService) RunTestSuiteExecute(r ApiRunTestSuiteRequest) (*TestSuit
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiSkipTraceCollectionRequest struct {
+	ctx        context.Context
+	ApiService *ApiApiService
+	testId     string
+	runId      int32
+}
+
+func (r ApiSkipTraceCollectionRequest) Execute() (*http.Response, error) {
+	return r.ApiService.SkipTraceCollectionExecute(r)
+}
+
+/*
+SkipTraceCollection skips the trace collection of a test run
+
+skips the trace collection of a test run
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param testId id of the test
+	@param runId id of the run
+	@return ApiSkipTraceCollectionRequest
+*/
+func (a *ApiApiService) SkipTraceCollection(ctx context.Context, testId string, runId int32) ApiSkipTraceCollectionRequest {
+	return ApiSkipTraceCollectionRequest{
+		ApiService: a,
+		ctx:        ctx,
+		testId:     testId,
+		runId:      runId,
+	}
+}
+
+// Execute executes the request
+func (a *ApiApiService) SkipTraceCollectionExecute(r ApiSkipTraceCollectionRequest) (*http.Response, error) {
+	var (
+		localVarHTTPMethod = http.MethodPost
+		localVarPostBody   interface{}
+		formFiles          []formFile
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.SkipTraceCollection")
+	if err != nil {
+		return nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/tests/{testId}/run/{runId}/skipPolling"
+	localVarPath = strings.Replace(localVarPath, "{"+"testId"+"}", url.PathEscape(parameterValueToString(r.testId, "testId")), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"runId"+"}", url.PathEscape(parameterValueToString(r.runId, "runId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 type ApiStopTestRunRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService

@@ -29,6 +29,7 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
       {type: TracetestApiTags.TEST, id: 'LIST'},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
+      {type: TracetestApiTags.TEST, id: testId},
     ],
     transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
     transformErrorResponse: ({data: result}) => RunError(result),
@@ -55,6 +56,7 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
       {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
       {type: TracetestApiTags.TEST_RUN, id: runId},
       {type: TracetestApiTags.RESOURCE, id: 'LIST'},
+      {type: TracetestApiTags.TEST, id: testId},
     ],
     transformResponse: (rawTestRun: TRawTestRun) => TestRun(rawTestRun),
   }),
@@ -79,6 +81,22 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
       url: `/tests/${testId}/run/${runId}/stop`,
       method: HTTP_METHOD.POST,
     }),
+    invalidatesTags: (response, error, {testId, runId}) => [
+      {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
+      {type: TracetestApiTags.TEST_RUN, id: runId},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
+    ],
+  }),
+  skipPolling: builder.mutation<null, {runId: number; testId: string}>({
+    query: ({runId, testId}) => ({
+      url: `/tests/${testId}/run/${runId}/skipPolling`,
+      method: HTTP_METHOD.POST,
+    }),
+    invalidatesTags: (response, error, {testId, runId}) => [
+      {type: TracetestApiTags.TEST_RUN, id: `${testId}-LIST`},
+      {type: TracetestApiTags.TEST_RUN, id: runId},
+      {type: TracetestApiTags.RESOURCE, id: 'LIST'},
+    ],
   }),
   getJUnitByRunId: builder.query<string, {testId: string; runId: number}>({
     query: ({testId, runId}) => ({url: `/tests/${testId}/run/${runId}/junit.xml`, responseHandler: 'text'}),

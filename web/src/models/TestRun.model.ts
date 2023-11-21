@@ -91,6 +91,10 @@ export function isRunStateAnalyzingError(state: TTestRunState) {
   return state === TestState.ANALYZING_ERROR;
 }
 
+export function isRunPollingState(state: TTestRunState) {
+  return state === TestState.AWAITING_TRACE;
+}
+
 const TestRun = ({
   id = 0,
   traceId = '',

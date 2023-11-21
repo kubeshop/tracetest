@@ -42,6 +42,9 @@ components:
           format: date-time
         trigger:
           $ref: "./triggers.yaml#/components/schemas/Trigger"
+        skipTraceCollection:
+          type: boolean
+          description: If true, the test will not collect a trace
         specs:
           type: array
           items:

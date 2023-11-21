@@ -10,6 +10,7 @@ import TestSuite from 'pages/TestSuite';
 import TestSuiteRunOverview from 'pages/TestSuiteRunOverview';
 import TestSuiteRunAutomate from 'pages/TestSuiteRunAutomate';
 import AutomatedTestRun from 'pages/AutomatedTestRun';
+import CreateTest from 'pages/CreateTest';
 import Layout from 'components/Layout/Layout';
 
 const Router = () => (
@@ -22,6 +23,7 @@ const Router = () => (
     </Route>
 
     <Route element={<Layout />}>
+      <Route path="/test/create/:triggerType" element={<CreateTest />} />
       <Route path="/test/:testId" element={<Test />} />
       <Route path="/test/:testId/run/:runId" element={<RunDetail />} />
       <Route path="/test/:testId/run/:runId/:mode" element={<RunDetail />} />

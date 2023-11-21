@@ -1,6 +1,6 @@
 import {Form} from 'antd';
 import {TDraftTestSuite, TDraftTestSuiteForm} from 'types/TestSuite.types';
-import BasicDetailsForm from '../CreateTestPlugins/Default/steps/BasicDetails/BasicDetailsForm';
+import BasicDetailsForm from '../BasicDetailsForm/BasicDetailsForm';
 import TestsSelectionForm from '../TestSuitePlugin/steps/TestsSelection/TestsSelectionForm';
 import * as S from './EditTestSuiteForm.styled';
 
@@ -26,7 +26,7 @@ const EditTestSuiteForm = ({form, onSubmit, testSuite, onValidation}: IProps) =>
       initialValues={testSuite}
     >
       <S.FormContainer>
-        <BasicDetailsForm isEditing />
+        <BasicDetailsForm />
 
         <TestsSelectionForm />
       </S.FormContainer>

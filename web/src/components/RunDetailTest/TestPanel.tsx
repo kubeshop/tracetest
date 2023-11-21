@@ -19,9 +19,11 @@ import {useTestSpecs} from 'providers/TestSpecs/TestSpecs.provider';
 import AssertionAnalyticsService from 'services/Analytics/AssertionAnalytics.service';
 import TestRunAnalytics from 'services/Analytics/TestRunAnalytics.service';
 import AssertionService from 'services/Assertion.service';
+import {useTest} from 'providers/Test/Test.provider';
 import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
 import {FillPanel} from '../ResizablePanels';
+import SkipTraceCollectionInfo from '../SkipTraceCollectionInfo';
 
 const TABS = {
   SPECS: 'specs',
@@ -51,6 +53,9 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
     isValid: isOutputFormValid,
     onValidate,
   } = useTestOutput();
+  const {
+    test: {skipTraceCollection},
+  } = useTest();
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
 
   const handleClose = useCallback(() => {
@@ -115,6 +120,7 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
             )}
           </S.SwitchContainer>
 
+          {skipTraceCollection && <SkipTraceCollectionInfo runId={run.id} testId={testId} />}
           <Visualization
             runEvents={runEvents}
             runState={run.state}

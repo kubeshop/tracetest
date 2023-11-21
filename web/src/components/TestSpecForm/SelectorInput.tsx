@@ -1,6 +1,6 @@
 import {Form, FormInstance} from 'antd';
 
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
 import useQuerySelector from './hooks/useQuerySelector';
 import {IValues} from './TestSpecForm';

@@ -3,7 +3,7 @@ import {Col, Row, Space} from 'antd';
 import {debounce} from 'lodash';
 import {useCallback, useMemo, useState} from 'react';
 
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import TracetestAPI from 'redux/apis/Tracetest';

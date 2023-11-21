@@ -1,8 +1,8 @@
 import AllowButton, {Operation} from 'components/AllowButton';
 import CreateButton from 'components/CreateButton';
-import CreateTestModal from 'components/CreateTestModal/CreateTestModal';
 import Pagination from 'components/Pagination';
 import TestCard from 'components/ResourceCard/TestCard';
+import TriggerTypeModal from 'components/TriggerTypeModal';
 import {SortBy, SortDirection, sortOptions} from 'constants/Test.constants';
 import usePagination from 'hooks/usePagination';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
@@ -13,6 +13,7 @@ import useDeleteResource from 'hooks/useDeleteResource';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import VariableSetSelector from 'components/VariableSetSelector/VariableSetSelector';
 import Test from 'models/Test.model';
+import ImportModal from 'components/ImportModal/ImportModal';
 import * as S from './Home.styled';
 import HomeFilters from './HomeFilters';
 import Loading from './Loading';
@@ -26,6 +27,7 @@ const [{params: defaultSort}] = sortOptions;
 
 const Tests = () => {
   const [isCreateTestOpen, setIsCreateTestOpen] = useState(false);
+  const [isImportTestOpen, setIsImportTestOpen] = useState(false);
   const [parameters, setParameters] = useState<TParameters>(defaultSort);
 
   const pagination = usePagination<Test, TParameters>(useGetTestListQuery, {
@@ -67,15 +69,28 @@ const Tests = () => {
             onSortBy={(sortBy, sortDirection) => setParameters({sortBy, sortDirection})}
             isEmpty={pagination.list?.length === 0}
           />
-          <AllowButton
-            operation={Operation.Edit}
-            ButtonComponent={CreateButton}
-            data-cy="create-button"
-            onClick={() => setIsCreateTestOpen(true)}
-            type="primary"
-          >
-            Create
-          </AllowButton>
+          <S.ButtonsContainer>
+            <AllowButton
+              operation={Operation.Edit}
+              ButtonComponent={CreateButton}
+              data-cy="import-button"
+              onClick={() => setIsImportTestOpen(true)}
+              type="primary"
+              ghost
+            >
+              Import
+            </AllowButton>
+
+            <AllowButton
+              operation={Operation.Edit}
+              ButtonComponent={CreateButton}
+              data-cy="create-button"
+              onClick={() => setIsCreateTestOpen(true)}
+              type="primary"
+            >
+              Create
+            </AllowButton>
+          </S.ButtonsContainer>
         </S.ActionsContainer>
 
         <Pagination<Test>
@@ -98,7 +113,8 @@ const Tests = () => {
         </Pagination>
       </S.Wrapper>
 
-      <CreateTestModal isOpen={isCreateTestOpen} onClose={() => setIsCreateTestOpen(false)} />
+      <TriggerTypeModal isOpen={isCreateTestOpen} onClose={() => setIsCreateTestOpen(false)} />
+      <ImportModal isOpen={isImportTestOpen} onClose={() => setIsImportTestOpen(false)} />
     </>
   );
 };

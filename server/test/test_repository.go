@@ -74,6 +74,7 @@ const (
 		t.specs,
 		t.outputs,
 		t.created_at,
+		t.skip_trace_collection,
 		(SELECT COUNT(*) FROM test_runs tr WHERE tr.test_id = t.id AND tr.tenant_id = t.tenant_id) as total_runs,
 		last_test_run.created_at as last_test_run_time,
 		last_test_run.pass as last_test_run_pass,
@@ -273,6 +274,7 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 		&jsonSpecs,
 		&jsonOutputs,
 		&test.CreatedAt,
+		&test.SkipTraceCollection,
 		&test.Summary.Runs,
 		&lastRunTime,
 		&pass,
@@ -325,8 +327,9 @@ INSERT INTO tests (
 	"specs",
 	"outputs",
 	"created_at",
+	"skip_trace_collection",
 	"tenant_id"
-) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
 
 func (r *repository) Create(ctx context.Context, test Test) (Test, error) {
 	if test.HasID() {
@@ -389,6 +392,7 @@ func (r *repository) insertTest(ctx context.Context, test Test) (Test, error) {
 		specsJson,
 		outputsJson,
 		test.CreatedAt,
+		test.SkipTraceCollection,
 	)
 
 	_, err = stmt.ExecContext(ctx, params...)
@@ -464,7 +468,9 @@ func testHasChanged(oldTest Test, newTest Test) (bool, error) {
 	nameHasChanged := oldTest.Name != newTest.Name
 	descriptionHasChanged := oldTest.Description != newTest.Description
 
-	return outputsHaveChanged || definitionHasChanged || triggerHasChanged || nameHasChanged || descriptionHasChanged, nil
+	traceCollectionChanged := oldTest.SkipTraceCollection != newTest.SkipTraceCollection
+
+	return outputsHaveChanged || definitionHasChanged || triggerHasChanged || nameHasChanged || descriptionHasChanged || traceCollectionChanged, nil
 }
 
 func testFieldHasChanged(oldField interface{}, newField interface{}) (bool, error) {

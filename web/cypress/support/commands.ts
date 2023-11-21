@@ -2,6 +2,7 @@ import 'cypress-file-upload';
 import {camelCase} from 'lodash';
 import {POKEMON_HTTP_ENDPOINT, PokeshopDemo} from '../e2e/constants/Test';
 import {getTestId, getTestSuiteId} from '../e2e/utils/Common';
+import {SupportedPlugins} from '../../src/constants/Common.constants';
 
 export const testRunPageRegex = /\/test\/(.*)\/run\/(.*)/;
 export const getAttributeListId = (number: number) => `.cm-tooltip-autocomplete [id$=-${number}]`;
@@ -48,7 +49,6 @@ Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
 
 Cypress.Commands.add('openTestCreationModal', () => {
   cy.get('[data-cy=create-button]').click();
-  cy.get('[data-cy=create-test-steps-CreateTestFactory]').should('be.visible');
 });
 
 Cypress.Commands.add('interceptTracePageApiCalls', () => {
@@ -78,7 +78,7 @@ Cypress.Commands.add('waitForTracePageApiCalls', () => {
 });
 
 Cypress.Commands.add('createTestWithAuth', (authMethod: string, keys: string[]): any => {
-  cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
+  cy.get(`[data-cy=${SupportedPlugins.REST.toLowerCase()}-plugin]`).click();
   cy.selectTestFromDemoList();
   cy.get('[data-cy=auth-type-select]').click();
   cy.get(`[data-cy=auth-type-select-option-${authMethod}]`).click();
@@ -91,7 +91,7 @@ Cypress.Commands.add('submitAndMakeSureTestIsCreated', (name: string) => {
   cy.interceptTracePageApiCalls();
   cy.makeSureUserIsOnTracePage();
   cy.waitForTracePageApiCalls();
-  cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+  cy.get('[data-cy=overlay-input-overlay]').should('contain.text', name);
   cy.deleteTest(true);
 });
 
@@ -130,38 +130,46 @@ Cypress.Commands.add('cancelOnBoarding', () => {
 });
 
 Cypress.Commands.add('submitCreateForm', (mode = 'CreateTestFactory') => {
-  cy.get(`[data-cy=${mode}-create-create-button]`).last().click();
-  if (mode === 'CreateTestFactory') cy.wait('@testCreation');
-  if (mode === 'CreateTestSuiteFactory') cy.wait('@testSuiteCreation');
+  if (mode === 'CreateTestFactory') {
+    cy.get(`[data-cy="run-test-submit"]`).click();
+    cy.wait('@testCreation');
+  } else {
+    cy.get(`[data-cy=${mode}-create-create-button]`).last().click();
+    cy.wait('@testSuiteCreation');
+  }
 });
 
-Cypress.Commands.add('fillCreateFormBasicStep', (name: string, description?: string, mode = 'CreateTestFactory') => {
-  if (mode === 'CreateTestFactory') cy.get(`[data-cy=${mode}-create-next-button]`).click();
-  cy.get('[data-cy=create-test-name-input').type(name);
-  cy.get('[data-cy=create-test-description-input').type(description || name);
-  cy.get(`[data-cy=${mode}-create-next-button]`).last().click();
+Cypress.Commands.add('fillCreateFormBasicStep', (name: string, mode = 'CreateTestFactory') => {
+  if (mode === 'CreateTestFactory') {
+    cy.get('[data-cy=overlay-input-overlay]').should('be.visible').click();
+    cy.get('[data-cy="overlay-input"]').clear().type(name);
+  } else {
+    cy.get('[data-cy=create-test-name-input').type(name);
+    cy.get('[data-cy=create-test-description-input').type(name);
+    cy.get(`[data-cy=${mode}-create-next-button]`).last().click();
+  }
 });
 
 Cypress.Commands.add('createTestByName', (name: string) => {
   cy.openTestCreationModal();
-  cy.get('[data-cy=CreateTestFactory-create-next-button]').click();
+  cy.get(`[data-cy=${SupportedPlugins.REST.toLowerCase()}-plugin]`).click();
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(name)}]`).click();
-  cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
   cy.submitCreateForm();
   cy.makeSureUserIsOnTracePage();
-  cy.get('[data-cy=test-details-name]').should('have.text', `${name} (v1)`);
+  cy.get('[data-cy=overlay-input-overlay]').should('contain.text', name);
 });
 
 Cypress.Commands.add('editTestByTestId', () => {
   cy.interceptEditTestCall();
   cy.get('[data-cy=edit-test-form]').should('be.visible');
-  cy.get('[data-cy=create-test-name-input] input').clear().type('Edited Test');
-  cy.get('[data-cy=edit-test-submit]').click();
+  cy.get('[data-cy=overlay-input-overlay]').click();
+  cy.get('[data-cy=overlay-input]').clear().type('Edited Test');
+  cy.get('[data-cy=edit-test-form]').click();
   cy.wait('@testEdit');
   cy.wait('@testObject');
   cy.wait('@testRun');
-  cy.get('[data-cy=test-details-name]').should('have.text', `Edited Test (v2)`);
+  cy.get('[data-cy=overlay-input-overlay]').should('contain.text', 'Edited Test');
   cy.matchTestRunPageUrl();
 });
 
@@ -178,11 +186,10 @@ Cypress.Commands.add('selectOperator', (index: number, text?: string) => {
 Cypress.Commands.add('selectTestFromDemoList', () => {
   cy.get('[data-cy=example-button]').click();
   cy.get(`[data-cy=demo-example-${camelCase(PokeshopDemo[0].name)}]`).click();
-  cy.get('[data-cy=CreateTestFactory-create-next-button]').last().click();
 });
 
 Cypress.Commands.add('clickNextOnCreateTestWizard', () => {
-  cy.get('[data-cy=CreateTestFactory-create-next-button]').click();
+  cy.get(`[data-cy=${SupportedPlugins.REST.toLowerCase()}-plugin]`).click();
 });
 
 Cypress.Commands.add('createTest', () => {

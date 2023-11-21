@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 import {Typography} from 'antd';
 import {LeftOutlined} from '@ant-design/icons';
 import Link from 'components/Link';
@@ -11,8 +11,8 @@ export const BackIcon = styled(LeftOutlined)`
 export const Container = styled.div`
   height: 100vh;
 
-  .ant-tabs,
-  .ant-tabs-content {
+  .run-tabs.ant-tabs,
+  .run-tabs.ant-tabs .ant-tabs-content {
     height: 100%;
   }
 `;
@@ -85,8 +85,9 @@ export const InfoContainer = styled.div`
   flex: 1;
 `;
 
-export const Row = styled.div`
+export const Row = styled.div<{$height?: number}>`
   display: flex;
+  height: ${({$height}) => `${$height}px` || 'auto'};
 `;
 
 export const Section = styled.div<{$justifyContent: string}>`
@@ -101,10 +102,6 @@ export const StateContainer = styled.div`
   align-items: center;
   display: flex;
   justify-self: flex-end;
-`;
-
-export const StopContainer = styled.div`
-  margin-left: 12px;
 `;
 
 export const StateText = styled(Typography.Text)`
@@ -123,14 +120,7 @@ export const Text = styled(Typography.Text).attrs({
   }
 `;
 
-export const Title = styled(Typography.Title).attrs({ellipsis: true, level: 2})`
-  && {
-    margin: 0;
-    max-width: calc((100vw / 2) - 200px - 54px);
-  }
-`;
-
-export const TabLink = styled(Link)<{$isActive: boolean}>`
+export const TabLink = styled(Link)<{$isActive: boolean; $isDisabled?: boolean}>`
   && {
     color: ${({theme, $isActive}) => $isActive && theme.color.white};
     padding: 5px 16px;
@@ -140,5 +130,12 @@ export const TabLink = styled(Link)<{$isActive: boolean}>`
     &:focused {
       color: ${({theme, $isActive}) => $isActive && theme.color.white};
     }
+
+    ${({$isDisabled}) =>
+      $isDisabled &&
+      css`
+        opacity: 0.5;
+        pointer-events: none;
+      `}
   }
 `;

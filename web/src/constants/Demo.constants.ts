@@ -4,21 +4,15 @@ import {SupportedDemos} from 'types/Settings.types';
 import {HTTP_METHOD, SupportedPlugins} from './Common.constants';
 import pokeshopProtoData from './demos/pokeshop.proto';
 import otelDemoProtoData from './demos/otel-demo.proto';
-import pokeshopPostmanData from './demos/pokeshop.postman';
 
 const pokeshopProtoFile = new File([pokeshopProtoData?.proto], 'pokeshop.proto');
 const otelProtoFile = new File([otelDemoProtoData?.proto], 'otel-demo.proto');
-const pokeshopPostmanFile = new File([JSON.stringify(pokeshopPostmanData)], 'pokeshop.postman_collection.json');
 
 const userId = '2491f868-88f1-4345-8836-d5d8511a9f83';
 
 export function getPokeshopDemo(demoSettings: Demo) {
   const {
-    pokeshop: {
-      httpEndpoint: pokeshopHttp = '',
-      grpcEndpoint: pokeshopGrpc = '',
-      kafkaBroker: pokeshopKafka = '',
-    },
+    pokeshop: {httpEndpoint: pokeshopHttp = '', grpcEndpoint: pokeshopGrpc = '', kafkaBroker: pokeshopKafka = ''},
   } = demoSettings;
 
   return {
@@ -72,63 +66,17 @@ export function getPokeshopDemo(demoSettings: Demo) {
         description: 'Import a Pokemon',
       },
     ],
-    [SupportedPlugins.Postman]: [
-      {
-        name: 'Pokeshop - List',
-        url: `${pokeshopHttp}/pokemon?take=20&skip=0`,
-        method: HTTP_METHOD.GET,
-        body: '',
-        description: 'Get a Pokemon',
-        collectionTest: 'List',
-        collectionFile: pokeshopPostmanFile,
-      },
-      {
-        name: 'Pokeshop - Add',
-        url: `${pokeshopHttp}/pokemon`,
-        method: HTTP_METHOD.POST,
-        body: '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}',
-        description: 'Add a Pokemon',
-        collectionTest: 'Create',
-        collectionFile: pokeshopPostmanFile,
-      },
-      {
-        name: 'Pokeshop - Import',
-        url: `${pokeshopHttp}/pokemon/import`,
-        method: HTTP_METHOD.POST,
-        body: '{"id":52}',
-        description: 'Import a Pokemon',
-        collectionTest: 'Import',
-        collectionFile: pokeshopPostmanFile,
-      },
-    ],
-    [SupportedPlugins.CURL]: [
-      {
-        name: 'Pokeshop - List',
-        description: 'Get a Pokemon',
-        command: `curl -XGET -H "Content-type: application/json" '${pokeshopHttp}/pokemon?take=20&skip=0'`,
-      },
-      {
-        name: 'Pokeshop - Add',
-        description: 'Add a Pokemon',
-        command: `curl -XPOST -H "Content-type: application/json" --data '{"name":"meowth","type":"normal","imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png","isFeatured":true}' '${pokeshopHttp}/pokemon'`,
-      },
-      {
-        name: 'Pokeshop - Import',
-        description: 'Import a Pokemon',
-        command: `curl -XPOST -H "Content-type: application/json" --data '{"id":52}' '${pokeshopHttp}/pokemon/import'`,
-      },
-    ],
     [SupportedPlugins.Kafka]: [
       {
         name: 'Pokeshop - Import from Stream',
-        brokerUrls: [ `${pokeshopKafka}` ],
+        brokerUrls: [`${pokeshopKafka}`],
         topic: 'pokemon',
         headers: [],
         messageKey: 'snorlax-key',
         messageValue: '{"id":143}',
         description: 'Import a Pokemon via Stream',
-      }
-    ]
+      },
+    ],
   };
 }
 
@@ -279,10 +227,7 @@ export function getDemoByPluginMap(demos: Demo[]) {
       ...((pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.GRPC]) || []),
       ...((otelDemoMap && otelDemoMap[SupportedPlugins.GRPC]) || []),
     ],
-    [SupportedPlugins.Postman]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.Postman]) || [],
-    [SupportedPlugins.CURL]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.CURL]) || [],
     [SupportedPlugins.TraceID]: [],
     [SupportedPlugins.Kafka]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.Kafka]) || [],
-    [SupportedPlugins.OpenAPI]: [],
   };
 }

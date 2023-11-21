@@ -56,6 +56,11 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 	ctx, span := w.state.tracer.Start(ctx, "Fetching trace")
 	defer span.End()
 
+	if job.Run.SkipTraceCollection {
+		w.outputQueue.Enqueue(ctx, job)
+		return
+	}
+
 	populateSpan(span, job, "", nil)
 
 	traceDB, err := getTraceDB(ctx, w.state)

@@ -17,7 +17,6 @@ export interface IPlugin {
   name: SupportedPlugins;
   title: string;
   description: string;
-  stepList: ICreateTestStep[];
   demoList: TDraftTest[];
   isActive: boolean;
   type: TriggerTypes;

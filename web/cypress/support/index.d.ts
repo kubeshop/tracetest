@@ -21,7 +21,7 @@ declare namespace Cypress {
     createTestByName(name: string): Chainable<Element>;
     submitAndMakeSureTestIsCreated(name: string): Chainable<Element>;
     createTestWithAuth(authMethod: string, keys: string[]): Chainable<string>;
-    fillCreateFormBasicStep(name: string, description?: string, mode?: string): Chainable<Element>;
+    fillCreateFormBasicStep(name: string, mode?: string): Chainable<Element>;
     setCreateFormUrl(method: string, url: string): Chainable<Element>;
     selectRunDetailMode(index: number): Chainable<Element>;
     interceptEditTestCall(): Chainable<Element>;

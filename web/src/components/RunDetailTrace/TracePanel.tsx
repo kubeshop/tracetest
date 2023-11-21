@@ -9,14 +9,16 @@ import * as S from './RunDetailTrace.styled';
 import Switch from '../Visualization/components/Switch/Switch';
 import Visualization from './Visualization';
 import {FillPanel} from '../ResizablePanels';
+import SkipTraceCollectionInfo from '../SkipTraceCollectionInfo';
 
 type TProps = {
   run: TestRun;
   testId: string;
   runEvents: TestRunEvent[];
+  skipTraceCollection: boolean;
 };
 
-const TracePanel = ({run, testId, runEvents}: TProps) => {
+const TracePanel = ({run, testId, runEvents, skipTraceCollection}: TProps) => {
   const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
 
   return (
@@ -28,6 +30,7 @@ const TracePanel = ({run, testId, runEvents}: TProps) => {
           </S.SearchContainer>
 
           <S.VisualizationContainer>
+            {skipTraceCollection && <SkipTraceCollectionInfo runId={run.id} testId={testId} />}
             <S.SwitchContainer>
               {run.state === TestState.FINISHED && (
                 <Switch

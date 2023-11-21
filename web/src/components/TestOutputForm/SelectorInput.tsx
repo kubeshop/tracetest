@@ -1,6 +1,6 @@
 import {noop} from 'lodash';
 import {Form, FormInstance} from 'antd';
-import Editor from 'components/Editor';
+import {Editor} from 'components/Inputs';
 import useQuerySelector from 'components/TestSpecForm/hooks/useQuerySelector';
 import {SupportedEditors} from 'constants/Editor.constants';
 import TestOutput from 'models/TestOutput.model';

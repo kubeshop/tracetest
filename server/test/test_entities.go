@@ -22,15 +22,16 @@ const (
 type (
 	// this struct yaml/json encoding is handled at ./test_json.go for custom encodings
 	Test struct {
-		ID          id.ID           `json:"id,omitempty"`
-		CreatedAt   *time.Time      `json:"createdAt,omitempty"`
-		Name        string          `json:"name,omitempty"`
-		Description string          `json:"description,omitempty"`
-		Version     *int            `json:"version,omitempty"`
-		Trigger     trigger.Trigger `json:"trigger,omitempty"`
-		Specs       Specs           `json:"specs,omitempty"`
-		Outputs     Outputs         `json:"outputs,omitempty"`
-		Summary     *Summary        `json:"summary,omitempty"`
+		ID                  id.ID           `json:"id,omitempty"`
+		CreatedAt           *time.Time      `json:"createdAt,omitempty"`
+		Name                string          `json:"name,omitempty"`
+		Description         string          `json:"description,omitempty"`
+		Version             *int            `json:"version,omitempty"`
+		Trigger             trigger.Trigger `json:"trigger,omitempty"`
+		Specs               Specs           `json:"specs,omitempty"`
+		Outputs             Outputs         `json:"outputs,omitempty"`
+		Summary             *Summary        `json:"summary,omitempty"`
+		SkipTraceCollection bool            `json:"skipTraceCollection,omitempty"`
 	}
 
 	Specs []TestSpec
@@ -128,11 +129,13 @@ type (
 		VariableSet variableset.VariableSet
 
 		// transaction
+		TestSuiteID    string
+		TestSuiteRunID string
 
-		TestSuiteID         string
-		TestSuiteRunID      string
+		// pipeline
 		Linter              analyzer.LinterResult
 		RequiredGatesResult testrunner.RequiredGatesResult
+		SkipTraceCollection bool
 	}
 
 	RunResults struct {

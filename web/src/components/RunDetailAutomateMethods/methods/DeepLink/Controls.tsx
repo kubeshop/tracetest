@@ -3,8 +3,8 @@ import {useEffect, useMemo} from 'react';
 import {TDeepLinkConfig} from 'services/DeepLink.service';
 import VariableSet from 'models/VariableSet.model';
 import Test from 'models/Test.model';
+import {SwitchControl} from 'components/Inputs';
 import * as S from './DeepLink.styled';
-import SwitchControl from '../CLICommand/SwitchControl';
 import Variables from './Variables';
 
 interface IProps {

@@ -1,7 +1,6 @@
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import CreateTestSuiteProvider from 'providers/CreateTestSuite';
-import CreateTestProvider from 'providers/CreateTest';
 import Content from './Content';
 
 const Home = () => {
@@ -9,13 +8,11 @@ const Home = () => {
 
   return (
     <CreateTestSuiteProvider>
-      <CreateTestProvider>
-        <Content
-          isLoading={isLoading}
-          shouldDisplayConfigSetup={shouldDisplayConfigSetup}
-          skipConfigSetup={skipConfigSetup}
-        />
-      </CreateTestProvider>
+      <Content
+        isLoading={isLoading}
+        shouldDisplayConfigSetup={shouldDisplayConfigSetup}
+        skipConfigSetup={skipConfigSetup}
+      />
     </CreateTestSuiteProvider>
   );
 };
