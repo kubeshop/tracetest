@@ -55,7 +55,7 @@ func (o *verboseObserver) EndDataStoreConnection(request *proto.DataStoreConnect
 		return
 	}
 
-	o.ui.Infof("%s Testing connection to DataStore %s succeed", consoleUI.Emoji_WhiteCheckMark, request.Datastore.Type)
+	o.ui.Infof("%s Testing connection to %s data store succeed", consoleUI.Emoji_WhiteCheckMark, request.Datastore.Type)
 	o.ui.Println("")
 }
 
@@ -102,7 +102,7 @@ func (o *verboseObserver) Error(err error) {
 }
 
 func (o *verboseObserver) StartDataStoreConnection(request *proto.DataStoreConnectionTestRequest) {
-	o.ui.Infof("%s Testing connection to DataStore %s ...", consoleUI.Emoji_Magnifier, request.Datastore.Type)
+	o.ui.Infof("%s Testing connection to %s data store ...", consoleUI.Emoji_Magnifier, request.Datastore.Type)
 }
 
 func (o *verboseObserver) StartSpanReceive(spans []*v1.Span) {
