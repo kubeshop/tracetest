@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -38,6 +39,12 @@ func WithStartRemoteServer(startRemoteServer bool) CollectorOption {
 func WithLogger(logger *zap.Logger) CollectorOption {
 	return func(ric *remoteIngesterConfig) {
 		ric.logger = logger
+	}
+}
+
+func WithObserver(observer event.Observer) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.observer = observer
 	}
 }
 

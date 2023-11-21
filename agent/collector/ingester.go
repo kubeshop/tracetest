@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opencensus.io/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -60,6 +61,7 @@ type remoteIngesterConfig struct {
 	traceCache        TraceCache
 	startRemoteServer bool
 	logger            *zap.Logger
+	observer          event.Observer
 }
 
 type buffer struct {
@@ -136,7 +138,6 @@ func (i *forwardIngester) executeBatch(ctx context.Context) error {
 	}
 
 	i.logger.Debug("successfully forwarded spans", zap.Int("count", len(newSpans)))
-
 	return nil
 }
 
@@ -174,8 +175,12 @@ func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
 			continue
 		}
 
+		i.RemoteIngester.observer.StartSpanReceive(spans)
+
 		i.traceCache.Append(traceID, spans)
 		i.logger.Debug("caching test spans", zap.String("traceID", traceID), zap.Int("count", len(spans)))
+
+		i.RemoteIngester.observer.EndSpanReceive(spans, nil)
 	}
 }
 

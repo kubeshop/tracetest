@@ -15,4 +15,5 @@ type Flags struct {
 	AgentApiKey    string
 	Token          string
 	Mode           Mode
+	LogLevel       string
 }

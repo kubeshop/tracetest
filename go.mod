@@ -14,6 +14,7 @@ require (
 	github.com/alecthomas/participle/v2 v2.0.0-alpha8
 	github.com/alexeyco/simpletable v1.0.0
 	github.com/alitto/pond v1.8.3
+	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/aws/aws-sdk-go v1.44.196
 	github.com/brianvoe/gofakeit/v6 v6.17.0
 	github.com/compose-spec/compose-go v1.20.0
@@ -39,6 +40,7 @@ require (
 	github.com/jackc/pgx/v5 v5.4.2
 	github.com/jhump/protoreflect v1.12.0
 	github.com/json-iterator/go v1.1.12
+	github.com/kyokomi/emoji/v2 v2.2.12
 	github.com/labstack/gommon v0.3.0
 	github.com/mitchellh/mapstructure v1.5.1-0.20220423185008-bf980b35cac4
 	github.com/nats-io/nats.go v1.31.0
@@ -96,8 +98,6 @@ require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/Shopify/toxiproxy v2.1.4+incompatible // indirect
-	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -198,7 +198,6 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20230711160842-782d3b101e98 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 )
 
 // Temporary fix until we manage to merge the patch to the gnomock repo (https://github.com/orlangure/gnomock/pull/534)

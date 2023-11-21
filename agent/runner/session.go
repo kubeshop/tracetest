@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/config"
+	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/kubeshop/tracetest/agent/workers/poller"
@@ -18,8 +18,6 @@ import (
 )
 
 var ErrOtlpServerStart = errors.New("OTLP server start error")
-
-var logger *zap.Logger
 
 type Session struct {
 	Token  string
@@ -35,9 +33,11 @@ func (s *Session) WaitUntilDisconnected() {
 }
 
 // Start the agent session with given configuration
-func StartSession(ctx context.Context, cfg config.Config) (*Session, error) {
+func StartSession(ctx context.Context, cfg config.Config, observer event.Observer, logger *zap.Logger) (*Session, error) {
+	observer = event.WrapObserver(observer)
+
 	traceCache := collector.NewTraceCache()
-	controlPlaneClient, err := newControlPlaneClient(ctx, cfg, traceCache)
+	controlPlaneClient, err := newControlPlaneClient(ctx, cfg, traceCache, observer, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func StartSession(ctx context.Context, cfg config.Config) (*Session, error) {
 		return nil, err
 	}
 
-	err = StartCollector(ctx, cfg, traceCache)
+	err = StartCollector(ctx, cfg, traceCache, observer, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func StartSession(ctx context.Context, cfg config.Config) (*Session, error) {
 	}, nil
 }
 
-func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache) error {
+func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger) error {
 	noopTracer := trace.NewNoopTracerProvider().Tracer("noop")
 	collectorConfig := collector.Config{
 		HTTPPort: config.OTLPServer.HTTPPort,
@@ -68,10 +68,8 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 	opts := []collector.CollectorOption{
 		collector.WithTraceCache(traceCache),
 		collector.WithStartRemoteServer(false),
-	}
-
-	if enableLogging() {
-		opts = append(opts, collector.WithLogger(logger))
+		collector.WithObserver(observer),
+		collector.WithLogger(logger),
 	}
 
 	_, err := collector.Start(
@@ -87,39 +85,34 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 	return nil
 }
 
-func enableLogging() bool {
-	return os.Getenv("TRACETEST_DEV") == "true"
-}
-
-func newControlPlaneClient(ctx context.Context, config config.Config, traceCache collector.TraceCache) (*client.Client, error) {
-	if enableLogging() {
-		var err error
-		logger, err = zap.NewDevelopment()
-		if err != nil {
-			return nil, fmt.Errorf("could not create logger: %w", err)
-		}
-	}
-
+func newControlPlaneClient(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger) (*client.Client, error) {
 	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
 		client.WithLogger(logger),
 	)
 	if err != nil {
+		observer.Error(err)
 		return nil, err
 	}
 
-	triggerWorker := workers.NewTriggerWorker(controlPlaneClient, workers.WithTraceCache(traceCache))
-	pollingWorker := workers.NewPollerWorker(controlPlaneClient, workers.WithInMemoryDatastore(
-		poller.NewInMemoryDatastore(traceCache),
-	))
-	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient)
+	triggerWorker := workers.NewTriggerWorker(
+		controlPlaneClient,
+		workers.WithTraceCache(traceCache),
+		workers.WithTriggerObserver(observer),
+	)
 
-	if enableLogging() {
-		triggerWorker.SetLogger(logger)
-		pollingWorker.SetLogger(logger)
-		dataStoreTestConnectionWorker.SetLogger(logger)
-	}
+	pollingWorker := workers.NewPollerWorker(
+		controlPlaneClient,
+		workers.WithInMemoryDatastore(poller.NewInMemoryDatastore(traceCache)),
+		workers.WithObserver(observer),
+	)
+
+	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient, observer)
+
+	triggerWorker.SetLogger(logger)
+	pollingWorker.SetLogger(logger)
+	dataStoreTestConnectionWorker.SetLogger(logger)
 
 	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
 	controlPlaneClient.OnTriggerRequest(triggerWorker.Trigger)

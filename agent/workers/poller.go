@@ -10,6 +10,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/agent/client"
+	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -25,6 +26,7 @@ type PollerWorker struct {
 	sentSpanIDs       *gocache.Cache[string, bool]
 	inmemoryDatastore tracedb.TraceDB
 	logger            *zap.Logger
+	observer          event.Observer
 }
 
 type PollerOption func(*PollerWorker)
@@ -32,6 +34,12 @@ type PollerOption func(*PollerWorker)
 func WithInMemoryDatastore(datastore tracedb.TraceDB) PollerOption {
 	return func(pw *PollerWorker) {
 		pw.inmemoryDatastore = datastore
+	}
+}
+
+func WithObserver(observer event.Observer) PollerOption {
+	return func(pw *PollerWorker) {
+		pw.observer = observer
 	}
 }
 
@@ -59,6 +67,8 @@ func (w *PollerWorker) SetLogger(logger *zap.Logger) {
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
 	w.logger.Debug("Received polling request", zap.Any("request", request))
+	w.observer.StartTracePoll(request)
+
 	err := w.poll(ctx, request)
 	if err != nil {
 		w.logger.Error("Error polling", zap.Error(err))
@@ -74,15 +84,19 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 			},
 		}
 
+		w.observer.EndTracePoll(request, err)
 		w.logger.Debug("Sending polling error", zap.Any("response", errorResponse))
 		sendErr := w.client.SendTrace(ctx, errorResponse)
 
 		if sendErr != nil {
 			w.logger.Error("Error sending polling error", zap.Error(sendErr))
+			w.observer.Error(sendErr)
+
 			return fmt.Errorf("could not report polling error back to the server: %w. Original error: %s", sendErr, err.Error())
 		}
 	}
 
+	w.observer.EndTracePoll(request, nil)
 	return err
 }
 
