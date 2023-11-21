@@ -21,7 +21,7 @@ exporters:
     logLevel: debug
 
   ${traceTestBlock}
-  
+
   # OTLP for Lightstep
   otlp/lightstep:
     endpoint: ingest.lightstep.com:443
@@ -58,7 +58,7 @@ service:
     traces/1:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/1]
+      exporters: [otlp/tracetest]
 `;
 
 export const NewRelic = (traceTestBlock: string) => `receivers:
@@ -204,7 +204,7 @@ processors:
 exporters:
   logging:
     logLevel: debug
-  
+
   ${traceTestBlock}
 
   # OTLP for Signoz
@@ -237,8 +237,8 @@ processors:
 
 exporters:
   logging:
-    verbosity: detailed  
-  
+    verbosity: detailed
+
   ${traceTestBlock}
 
   # OTLP for Dynatrace
