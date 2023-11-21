@@ -41,7 +41,14 @@ func (d *inmemoryDatastore) GetTraceByID(ctx context.Context, traceID string) (t
 		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
-	return traces.FromSpanList(spans), nil
+	trace := traces.FromSpanList(spans)
+
+	if !trace.RootSpan.ID.IsValid() {
+		// the trace has no root span yet, treat it as not found
+		return traces.Trace{}, connection.ErrTraceNotFound
+	}
+
+	return trace, nil
 }
 
 // GetTraceID implements tracedb.TraceDB.
