@@ -44,7 +44,8 @@ export type TCollectorDataStores =
   | SupportedDataStores.Lightstep
   | SupportedDataStores.Datadog
   | SupportedDataStores.Signoz
-  | SupportedDataStores.Dynatrace;
+  | SupportedDataStores.Dynatrace
+  | SupportedDataStores.Agent;
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
