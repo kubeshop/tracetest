@@ -5,11 +5,11 @@ import * as S from '../SSL/SSL.styled';
 const SkipTraceCollection = () => {
   return (
     <S.SSLVerificationContainer>
-      <label htmlFor="skipTraceCollection">Skip Trace Collection</label>
+      <label htmlFor="skipTraceCollection">Skip Trace collection</label>
       <Form.Item name="skipTraceCollection" valuePropName="checked" style={{marginBottom: 0}}>
         <Switch id="skipTraceCollection" />
       </Form.Item>
-      <TooltipQuestion title="Skips Trace Collection for all runs. You can still create and run tests." />
+      <TooltipQuestion title="Skip Trace collection for all runs. You can still create and run tests." />
     </S.SSLVerificationContainer>
   );
 };

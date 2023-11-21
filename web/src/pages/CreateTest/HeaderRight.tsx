@@ -1,19 +1,17 @@
-import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
 import DemoSelector from 'components/DemoSelector';
+import * as S from 'components/RunDetailLayout/RunDetailLayout.styled';
+import VariableSetSelector from 'components/VariableSetSelector';
 import {TDraftTest} from 'types/Test.types';
 
 interface IProps {
   demos: TDraftTest[];
 }
 
-const HeaderRight = ({demos}: IProps) => {
-  return demos.length ? (
-    <S.Section $justifyContent="end">
-      <DemoSelector demos={demos} />
-    </S.Section>
-  ) : (
-    <S.Section $justifyContent="" />
-  );
-};
+const HeaderRight = ({demos}: IProps) => (
+  <S.Section $justifyContent="flex-end">
+    <VariableSetSelector />
+    {!!demos.length && <DemoSelector demos={demos} />}
+  </S.Section>
+);
 
 export default HeaderRight;

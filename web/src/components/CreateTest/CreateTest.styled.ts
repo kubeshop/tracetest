@@ -33,7 +33,7 @@ export const HeaderRight = styled.div`
 
 export const Body = styled.div`
   display: flex;
-  height: calc(100vh - 166px);
+  height: calc(100vh - 172px);
   width: 100%;
 `;
 

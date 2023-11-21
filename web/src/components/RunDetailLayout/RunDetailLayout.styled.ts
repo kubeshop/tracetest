@@ -85,8 +85,9 @@ export const InfoContainer = styled.div`
   flex: 1;
 `;
 
-export const Row = styled.div`
+export const Row = styled.div<{$height?: number}>`
   display: flex;
+  height: ${({$height}) => `${$height}px` || 'auto'};
 `;
 
 export const Section = styled.div<{$justifyContent: string}>`

@@ -17,12 +17,12 @@ const HeaderLeft = ({triggerType, origin}: IProps) => {
         <S.BackIcon />
       </a>
       <S.InfoContainer>
-        <Form.Item name="name" noStyle>
-          <Overlay />
-        </Form.Item>
-        <S.Row>
-          <S.Text>{triggerType.toUpperCase()}</S.Text>
+        <S.Row $height={24}>
+          <Form.Item name="name" noStyle>
+            <Overlay />
+          </Form.Item>
         </S.Row>
+        <S.Text>{triggerType.toUpperCase()}</S.Text>
       </S.InfoContainer>
     </S.Section>
   );
