@@ -13,12 +13,12 @@ const PluginHeader = ({fieldKey}: IProps) => {
 
   return (
     <Space>
-      <S.SwitchContainer>
+      <S.LinterSwitchContainer>
         <Form.Item name={[fieldKey, 'enabled']} valuePropName="checked" noStyle>
           <Switch onClick={(_, event) => event.stopPropagation()} />
         </Form.Item>
-      </S.SwitchContainer>
-      <Typography.Text strong>{plugin.name}</Typography.Text>
+        <Typography.Text strong>{plugin.name}</Typography.Text>
+      </S.LinterSwitchContainer>
     </Space>
   );
 };

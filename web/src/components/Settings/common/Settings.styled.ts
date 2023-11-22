@@ -46,6 +46,10 @@ export const SwitchContainer = styled.div`
   margin-bottom: 12px;
 `;
 
+export const LinterSwitchContainer = styled(SwitchContainer)`
+  margin: 0;
+`;
+
 export const SwitchLabel = styled.label<{$disabled?: boolean}>`
   color: ${({$disabled, theme}) => ($disabled ? theme.color.textLight : theme.color.text)};
   cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};

@@ -40,7 +40,7 @@ const DemoForm = () => {
       <Form.Item name={[SupportedDemosFormField.Pokeshop, 'name']} hidden />
 
       <S.SwitchContainer>
-        <Form.Item name={[SupportedDemosFormField.Pokeshop, 'enabled']} valuePropName="checked">
+        <Form.Item name={[SupportedDemosFormField.Pokeshop, 'enabled']} valuePropName="checked" noStyle>
           <Switch />
         </Form.Item>
         <S.SwitchLabel htmlFor={`${FORM_ID}_pokeshop_enabled`}>Enable Pokeshop</S.SwitchLabel>
@@ -53,7 +53,7 @@ const DemoForm = () => {
       <Form.Item name={[SupportedDemosFormField.OpentelemetryStore, 'name']} hidden />
 
       <S.SwitchContainer>
-        <Form.Item name={[SupportedDemosFormField.OpentelemetryStore, 'enabled']} valuePropName="checked">
+        <Form.Item name={[SupportedDemosFormField.OpentelemetryStore, 'enabled']} valuePropName="checked" noStyle>
           <Switch />
         </Form.Item>
         <S.SwitchLabel htmlFor={`${FORM_ID}_opentelemetryStore_enabled`}>

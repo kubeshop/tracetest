@@ -34,7 +34,7 @@ const AnalyticsForm = () => {
       <Form.Item hidden name="name" />
 
       <S.SwitchContainer>
-        <Form.Item name="analyticsEnabled" valuePropName="checked">
+        <Form.Item name="analyticsEnabled" valuePropName="checked" noStyle>
           <Switch />
         </Form.Item>
         <S.SwitchLabel htmlFor={`${FORM_ID}_analyticsEnabled`}>Enable analytics</S.SwitchLabel>
