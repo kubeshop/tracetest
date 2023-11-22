@@ -11,7 +11,8 @@ export const OCTOLIINT_ISSUE_URL = 'https://github.com/kubeshop/tracetest/issues
 export const CLI_RUNNING_TESTS_URL = 'https://docs.tracetest.io/cli/running-tests';
 export const CLI_RUNNING_TEST_SUITES_URL = 'https://docs.tracetest.io/cli/running-test-suites';
 
-export const INGESTOR_ENDPOINT_URL = 'https://docs.tracetest.io/configuration/opentelemetry-collector-configuration-file-reference';
+export const INGESTOR_ENDPOINT_URL =
+  'https://docs.tracetest.io/configuration/opentelemetry-collector-configuration-file-reference';
 
 export const TRACE_SEMANTIC_CONVENTIONS_URL =
   'https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions';
@@ -34,6 +35,8 @@ export const SELECTOR_LANGUAGE_CHEAT_SHEET_URL = `${process.env.PUBLIC_URL}/SL_c
 
 export const POKESHOP_GITHUB = 'https://github.com/kubeshop/pokeshop';
 export const OTEL_DEMO_GITHUB = 'https://github.com/open-telemetry/opentelemetry-demo';
+
+export const AGENT_DOCS_URL = 'https://docs.tracetest.io/concepts/agent';
 
 export enum HTTP_METHOD {
   GET = 'GET',

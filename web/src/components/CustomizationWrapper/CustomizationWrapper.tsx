@@ -13,9 +13,10 @@ const flagValues = {
 const getComponent = <T,>(id: string, fallback: React.ComponentType<T>) => fallback;
 const getFlag = (flag: Flag) => flagValues[flag];
 const getIsAllowed = () => true;
+const getRole = () => '';
 
 const CustomizationWrapper = ({children}: IProps) => {
-  const customizationProviderValue = useMemo(() => ({getComponent, getFlag, getIsAllowed}), []);
+  const customizationProviderValue = useMemo(() => ({getComponent, getFlag, getIsAllowed, getRole}), []);
 
   return <CustomizationProvider value={customizationProviderValue}>{children}</CustomizationProvider>;
 };
