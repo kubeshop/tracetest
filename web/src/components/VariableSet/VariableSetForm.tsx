@@ -31,7 +31,6 @@ const VariableSetForm = ({form, initialValues, onSubmit, onValidate}: IProps) =>
       <Form.Item
         label="Description"
         name="description"
-        rules={[{required: true, message: 'Please input a description'}]}
       >
         <Input />
       </Form.Item>

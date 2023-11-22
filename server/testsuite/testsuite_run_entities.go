@@ -68,3 +68,12 @@ func (tr TestSuiteRun) StepsGatesValidation() bool {
 
 	return true
 }
+
+func (tr TestSuiteRun) RunMetadata(step int) test.RunMetadata {
+	tr.Metadata["step"] = fmt.Sprintf("%d", step+1)
+	tr.Metadata["testsuite_run_id"] = fmt.Sprintf("%d", tr.ID)
+	tr.Metadata["testsuite_id"] = string(tr.TestSuiteID)
+	tr.Metadata["testsuite_version"] = fmt.Sprintf("%d", tr.TestSuiteVersion)
+
+	return tr.Metadata
+}

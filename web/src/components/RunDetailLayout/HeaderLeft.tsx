@@ -18,8 +18,19 @@ interface IProps {
 }
 
 const HeaderLeft = ({name, triggerType, origin}: IProps) => {
-  const {run: {createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId, testVersion} = {}, run} =
-    useTestRun();
+  const {
+    run: {
+      createdAt,
+      testSuiteId,
+      testSuiteRunId,
+      executionTime,
+      trace,
+      traceId,
+      testVersion,
+      metadata: {source} = {},
+    } = {},
+    run,
+  } = useTestRun();
   const {onEdit, isEditLoading: isLoading, test} = useTest();
   const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
   const {navigate} = useDashboard();
@@ -33,8 +44,8 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
   const description = useMemo(() => {
     return (
       <>
-        v{testVersion} • {triggerType} • Ran {createdTimeAgo}
-        {testSuiteId && testSuiteRunId && (
+        v{testVersion} • {triggerType} • Ran {createdTimeAgo} • {source && <>Run via {source.toUpperCase()}</>}
+        {testSuiteId && !!testSuiteRunId && (
           <>
             {' '}
             •{' '}
@@ -45,7 +56,7 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
         )}
       </>
     );
-  }, [triggerType, createdTimeAgo, testSuiteId, testSuiteRunId, testVersion]);
+  }, [testVersion, triggerType, createdTimeAgo, source, testSuiteId, testSuiteRunId]);
 
   return (
     <S.Section $justifyContent="flex-start">

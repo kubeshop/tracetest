@@ -8,6 +8,7 @@ import TestRunOutput from './TestRunOutput.model';
 import Trace from './Trace.model';
 import TriggerResult from './TriggerResult.model';
 import RequiredGatesResult from './RequiredGatesResult.model';
+import RunMetadata from './RunMetadata.model';
 
 export type TRawTestRun = Modify<
   TTestSchemas['TestRun'],
@@ -35,6 +36,7 @@ type TestRun = Model<
     linter: LinterResult;
     requiredGatesResult: RequiredGatesResult;
     testSuiteRunId: number;
+    metadata: RunMetadata;
   }
 >;
 
@@ -140,7 +142,7 @@ const TestRun = ({
     totalAssertionCount: getTestResultCount(result),
     failedAssertionCount: getTestResultCount(result, 'failed'),
     passedAssertionCount: getTestResultCount(result, 'passed'),
-    metadata,
+    metadata: RunMetadata(metadata),
     outputs: outputs?.map(rawOutput => TestRunOutput(rawOutput)),
     variableSet: VariableSet.fromRun(variableSet),
     testSuiteId,

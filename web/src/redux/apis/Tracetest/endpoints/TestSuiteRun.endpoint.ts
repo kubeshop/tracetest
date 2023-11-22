@@ -4,6 +4,7 @@ import {PaginationResponse} from 'hooks/usePagination';
 import {TVariableSetValue} from 'models/VariableSet.model';
 import RunError from 'models/RunError.model';
 import TestSuiteRun, {TRawTestSuiteRunResourceRun} from 'models/TestSuiteRun.model';
+import {KnownSources} from 'models/RunMetadata.model';
 import {getTotalCountFromHeaders} from 'utils/Common';
 import {TTestApiEndpointBuilder} from '../Tracetest.api';
 
@@ -15,7 +16,7 @@ export const testSuiteRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     query: ({testSuiteId, variableSetId, variables = []}) => ({
       url: `/testsuites/${testSuiteId}/run`,
       method: HTTP_METHOD.POST,
-      body: {variableSetId, variables},
+      body: {variableSetId, variables, metadata: {source: KnownSources.WEB}},
     }),
     invalidatesTags: (result, error, {testSuiteId}) => [
       {type: TracetestApiTags.TESTSUITE_RUN, id: `${testSuiteId}-LIST`},

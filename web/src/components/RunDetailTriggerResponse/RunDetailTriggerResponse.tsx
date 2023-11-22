@@ -18,11 +18,13 @@ import ResponseVariableSet from './ResponseVariableSet';
 import ResponseHeaders from './ResponseHeaders';
 import * as S from './RunDetailTriggerResponse.styled';
 import {IPropsComponent} from './RunDetailTriggerResponseFactory';
+import ResponseMetadata from './ResponseMetadata';
 
 const TabsKeys = {
   Body: 'body',
   Headers: 'headers',
   VariableSet: 'variable-set',
+  Metadata: 'metadata',
 };
 
 const tracetestTriggerSelector = 'span[tracetest.span.type="general" name="Tracetest trigger"]';
@@ -145,6 +147,9 @@ const RunDetailTriggerResponse = ({
           </Tabs.TabPane>
           <Tabs.TabPane key={TabsKeys.VariableSet} tab="Variable Set">
             <ResponseVariableSet />
+          </Tabs.TabPane>
+          <Tabs.TabPane key={TabsKeys.Metadata} tab="Metadata">
+            <ResponseMetadata />
           </Tabs.TabPane>
         </Tabs>
       </S.TabsContainer>

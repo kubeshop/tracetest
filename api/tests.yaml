@@ -1,7 +1,6 @@
 openapi: 3.0.0
 components:
   schemas:
-
     TestResourceList:
       type: object
       properties:
