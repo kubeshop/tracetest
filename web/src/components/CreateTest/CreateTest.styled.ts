@@ -18,13 +18,6 @@ export const Header = styled.div`
 export const HeaderLeft = styled.div`
   flex: 1;
   overflow: hidden;
-
-  .ant-form-item-with-help .ant-form-item-explain {
-    display: none;
-    min-height: 0;
-    height: 0;
-    transition: none;
-  }
 `;
 
 export const HeaderRight = styled.div`
