@@ -8,6 +8,7 @@ import SelectedSpans, {TRawSelectedSpans} from 'models/SelectedSpans.model';
 import Test from 'models/Test.model';
 import TestRun, {TRawTestRun} from 'models/TestRun.model';
 import TestRunEvent, {TRawTestRunEvent} from 'models/TestRunEvent.model';
+import {KnownSources} from 'models/RunMetadata.model';
 import {TRawTestSpecs} from 'models/TestSpecs.model';
 import {TTestApiEndpointBuilder} from '../Tracetest.api';
 
@@ -23,6 +24,9 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
       body: {
         variableSetId,
         variables,
+        metadata: {
+          source: KnownSources.WEB,
+        },
       },
     }),
     invalidatesTags: (response, error, {testId}) => [

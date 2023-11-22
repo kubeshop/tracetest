@@ -94,7 +94,7 @@ func (r persistentTransactionRunner) ProcessItem(ctx context.Context, job Job) {
 }
 
 func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr testsuite.TestSuiteRun, step int, testObj test.Test) (testsuite.TestSuiteRun, error) {
-	testRun := r.testRunner.Run(ctx, testObj, tr.Metadata, tr.VariableSet, tr.RequiredGates)
+	testRun := r.testRunner.Run(ctx, testObj, tr.RunMetadata(step), tr.VariableSet, tr.RequiredGates)
 	tr, err := r.updateStepRun(ctx, tr, step, testRun)
 	if err != nil {
 		return testsuite.TestSuiteRun{}, fmt.Errorf("could not update transaction run: %w", err)

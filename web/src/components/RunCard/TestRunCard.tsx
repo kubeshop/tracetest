@@ -27,7 +27,7 @@ const TestRunCard = ({
     state,
     createdAt,
     testVersion,
-    metadata,
+    metadata: {name, buildNumber, branch, url, source},
     testSuiteId,
     testSuiteRunId,
     linter,
@@ -37,10 +37,6 @@ const TestRunCard = ({
   linkTo,
 }: IProps) => {
   const {navigate} = useDashboard();
-  const metadataName = metadata?.name;
-  const metadataBuildNumber = metadata?.buildNumber;
-  const metadataBranch = metadata?.branch;
-  const metadataUrl = metadata?.url;
 
   const handleResultClick = (
     event: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -64,13 +60,14 @@ const TestRunCard = ({
             </Tooltip>
 
             {isRunStateFinished(state) && <S.Text>&nbsp;• {executionTime}s</S.Text>}
+            {source && <S.Text>&nbsp;• Run via {source.toUpperCase()}</S.Text>}
 
-            {metadataName && (
-              <a href={metadataUrl} target="_blank" onClick={event => event.stopPropagation()}>
-                <S.Text $hasLink={Boolean(metadataUrl)}>&nbsp;• {`${metadataName} ${metadataBuildNumber}`}</S.Text>
+            {name && (
+              <a href={url} target="_blank" onClick={event => event.stopPropagation()}>
+                <S.Text $hasLink={Boolean(url)}>&nbsp;• {`${name} ${buildNumber}`}</S.Text>
               </a>
             )}
-            {metadataBranch && <S.Text>&nbsp;• Branch: {metadataBranch}</S.Text>}
+            {branch && <S.Text>&nbsp;• Branch: {branch}</S.Text>}
           </S.Row>
         </S.Info>
 
@@ -108,12 +105,7 @@ const TestRunCard = ({
         )}
 
         <div>
-          <RunActionsMenu
-            resultId={runId}
-            testId={testId}
-            testSuiteRunId={testSuiteRunId}
-            testSuiteId={testSuiteId}
-          />
+          <RunActionsMenu resultId={runId} testId={testId} testSuiteRunId={testSuiteRunId} testSuiteId={testSuiteId} />
         </div>
       </S.Container>
     </Link>

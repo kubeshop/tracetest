@@ -335,16 +335,21 @@ func (a orchestrator) writeJUnitReport(ctx context.Context, r Runner, result Run
 	return err
 }
 
+var source = "cli"
+
 func getMetadata() map[string]string {
 	ci := cienvironment.DetectCIEnvironment()
 	if ci == nil {
-		return map[string]string{}
+		return map[string]string{
+			"source": source,
+		}
 	}
 
 	metadata := map[string]string{
 		"name":        ci.Name,
 		"url":         ci.URL,
 		"buildNumber": ci.BuildNumber,
+		"source":      source,
 	}
 
 	if ci.Git != nil {
