@@ -26,7 +26,7 @@ const RequestDetailsForm = () => {
     getMethodList();
   }, [protoFile]);
 
-  const [activeKey, setActiveKey] = useQueryTabs('service-definition');
+  const [activeKey, setActiveKey] = useQueryTabs('service-definition', 'triggerTab');
 
   return (
     <Tabs defaultActiveKey={activeKey} onChange={setActiveKey} activeKey={activeKey}>

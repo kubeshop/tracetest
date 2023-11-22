@@ -6,7 +6,7 @@ import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from './Kafka.styled';
 
 const Kafka = () => {
-  const [activeKey, setActiveKey] = useQueryTabs('auth');
+  const [activeKey, setActiveKey] = useQueryTabs('auth', 'triggerTab');
 
   return (
     <Tabs defaultActiveKey={activeKey} onChange={setActiveKey} activeKey={activeKey}>

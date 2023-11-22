@@ -6,7 +6,7 @@ import {Auth, SSL, KeyValueList, SkipTraceCollection} from 'components/Fields';
 import * as S from './Rest.styled';
 
 const Rest = () => {
-  const [activeKey, setActiveKey] = useQueryTabs('auth');
+  const [activeKey, setActiveKey] = useQueryTabs('auth', 'triggerTab');
 
   return (
     <Tabs defaultActiveKey={activeKey} activeKey={activeKey} onChange={setActiveKey}>

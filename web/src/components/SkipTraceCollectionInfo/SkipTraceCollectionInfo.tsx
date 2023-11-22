@@ -13,7 +13,7 @@ const SkipTraceCollectionInfo = ({runId, testId}: IProps) => {
     <S.SkipTraceContainer>
       <Typography.Paragraph type="secondary">
         <InfoCircleOutlined /> This test has been set to skip the <b>awaiting trace</b> step. You can change this in{' '}
-        <Link to={`/test/${testId}/run/${runId}/trigger?tab=settings`}>
+        <Link to={`/test/${testId}/run/${runId}/trigger?triggerTab=settings`}>
           <Typography.Text type="secondary" underline>
             <b>Settings</b>
           </Typography.Text>
