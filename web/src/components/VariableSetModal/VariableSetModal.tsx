@@ -52,7 +52,7 @@ const VariableSetModal = ({variableSet, isOpen, onClose, onSubmit, isLoading}: I
         />
       }
       onCancel={onClose}
-      title={<S.Title>{isEditing ? 'Edit Variable Set' : 'Create Variable Set'}</S.Title>}
+      title={<S.Title>{isEditing ? 'Edit variable set' : 'Create a new variable set'}</S.Title>}
       visible={isOpen}
     >
       <VariableSetForm

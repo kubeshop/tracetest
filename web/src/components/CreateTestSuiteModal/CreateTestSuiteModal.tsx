@@ -25,7 +25,7 @@ const CreateTestSuiteModal = ({isOpen, onClose}: IProps) => {
       isValid={isFormValid}
       isOpen
       onClose={onClose}
-      title="Create Test Suite"
+      title="Create a new test suite"
       stepList={stepList}
       activeStep={activeStep}
       onGoTo={() => null}

@@ -15,6 +15,9 @@ const Date = {
     }
     return formatDistanceToNowStrict(isoDate, {addSuffix: true});
   },
+  isDefaultDate(date: string) {
+    return date === '0001-01-01T00:00:00Z';
+  },
 };
 
 export default Date;
