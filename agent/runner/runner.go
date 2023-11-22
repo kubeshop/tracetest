@@ -2,12 +2,16 @@ package runner
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/ui"
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+
+	"go.uber.org/zap"
 )
 
 type Runner struct {
@@ -15,6 +19,7 @@ type Runner struct {
 	resources    *resourcemanager.Registry
 	ui           ui.ConsoleUI
 	mode         agentConfig.Mode
+	logger       *zap.Logger
 }
 
 func NewRunner(configurator config.Configurator, resources *resourcemanager.Registry, ui ui.ConsoleUI) *Runner {
@@ -23,6 +28,7 @@ func NewRunner(configurator config.Configurator, resources *resourcemanager.Regi
 		resources:    resources,
 		ui:           ui,
 		mode:         agentConfig.Mode_Desktop,
+		logger:       nil,
 	}
 }
 
@@ -30,14 +36,26 @@ func (s *Runner) Run(ctx context.Context, cfg config.Config, flags agentConfig.F
 	s.ui.Banner(config.Version)
 	s.ui.Println(`Tracetest start launches a lightweight agent. It enables you to run tests and collect traces with Tracetest.
 Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.`)
+	s.ui.Println("") // print empty line
 
 	if flags.Token == "" || flags.AgentApiKey != "" {
 		s.configurator = s.configurator.WithOnFinish(s.onStartAgent)
 	}
 
+	s.mode = flags.Mode
 	s.ui.Infof("Running in %s mode...", s.mode)
 
-	s.mode = flags.Mode
+	logger := zap.NewNop()
+
+	if enableLogging(flags.LogLevel) {
+		var err error
+		logger, err = zap.NewDevelopment()
+		if err != nil {
+			return fmt.Errorf("could not create logger: %w", err)
+		}
+	}
+
+	s.logger = logger
 
 	return s.configurator.Start(ctx, cfg, flags)
 }
@@ -78,9 +96,12 @@ func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoi
 	}
 
 	if s.mode == agentConfig.Mode_Desktop {
-		return RunDesktopStrategy(ctx, cfg, s.ui, uiEndpoint)
+		return s.RunDesktopStrategy(ctx, cfg, uiEndpoint)
 	}
 
-	// TODO: Add verbose strategy
-	return nil
+	return s.RunVerboseStrategy(ctx, cfg)
+}
+
+func enableLogging(logLevel string) bool {
+	return os.Getenv("TRACETEST_DEV") == "true" && logLevel == "debug"
 }

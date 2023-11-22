@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
@@ -41,6 +42,12 @@ func WithLogger(logger *zap.Logger) CollectorOption {
 	}
 }
 
+func WithObserver(observer event.Observer) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.observer = observer
+	}
+}
+
 type collector struct {
 	grpcServer stoppable
 	httpServer stoppable
@@ -54,9 +61,10 @@ func (c *collector) Stop() {
 
 func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) (stoppable, error) {
 	ingesterConfig := remoteIngesterConfig{
-		URL:    config.RemoteServerURL,
-		Token:  config.RemoteServerToken,
-		logger: zap.NewNop(),
+		URL:      config.RemoteServerURL,
+		Token:    config.RemoteServerToken,
+		logger:   zap.NewNop(),
+		observer: event.NewNopObserver(),
 	}
 
 	for _, opt := range opts {

@@ -34,6 +34,7 @@ var startCmd = &cobra.Command{
 			AgentApiKey:    saveParams.agentApiKey,
 			Token:          saveParams.token,
 			Mode:           agentConfig.Mode(saveParams.mode),
+			LogLevel:       saveParams.logLevel,
 		}
 
 		cfg, err := agentConfig.LoadConfig()
@@ -58,6 +59,7 @@ func init() {
 	startCmd.Flags().StringVarP(&saveParams.token, "token", "", defaultToken, "token authentication key")
 	startCmd.Flags().StringVarP(&saveParams.endpoint, "endpoint", "e", defaultEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
 	startCmd.Flags().StringVarP(&saveParams.mode, "mode", "m", "desktop", "set how the agent will start")
+	startCmd.Flags().StringVarP(&saveParams.logLevel, "log-level", "l", "debug", "set the agent log level")
 	rootCmd.AddCommand(startCmd)
 }
 
@@ -68,4 +70,5 @@ type saveParameters struct {
 	agentApiKey    string
 	token          string
 	mode           string
+	logLevel       string
 }

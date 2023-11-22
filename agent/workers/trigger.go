@@ -6,6 +6,7 @@ import (
 
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/collector"
+	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -20,6 +21,7 @@ type TriggerWorker struct {
 	client     *client.Client
 	registry   *agentTrigger.Registry
 	traceCache collector.TraceCache
+	observer   event.Observer
 }
 
 type TriggerOption func(*TriggerWorker)
@@ -27,6 +29,12 @@ type TriggerOption func(*TriggerWorker)
 func WithTraceCache(cache collector.TraceCache) TriggerOption {
 	return func(tw *TriggerWorker) {
 		tw.traceCache = cache
+	}
+}
+
+func WithTriggerObserver(observer event.Observer) TriggerOption {
+	return func(tw *TriggerWorker) {
+		tw.observer = observer
 	}
 }
 
@@ -44,6 +52,7 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 		client:   client,
 		registry: registry,
 		logger:   zap.NewNop(),
+		observer: event.NewNopObserver(),
 	}
 
 	for _, opt := range opts {
@@ -59,9 +68,13 @@ func (w *TriggerWorker) SetLogger(logger *zap.Logger) {
 
 func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
 	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
+	w.observer.StartTriggerExecution(triggerRequest)
+
 	err := w.trigger(ctx, triggerRequest)
 	if err != nil {
 		w.logger.Error("Trigger error", zap.Error(err))
+		w.observer.EndTriggerExecution(triggerRequest, err)
+
 		sendErr := w.client.SendTriggerResponse(ctx, &proto.TriggerResponse{
 			RequestID:           triggerRequest.RequestID,
 			AgentIdentification: w.client.SessionConfiguration().AgentIdentification,
@@ -76,9 +89,13 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 		if sendErr != nil {
 			w.logger.Error("Could not report trigger error back to the server", zap.Error(sendErr))
+			w.observer.Error(sendErr)
+
 			return fmt.Errorf("could not report trigger error back to the server: %w. Original error: %s", sendErr, err.Error())
 		}
 	}
+
+	w.observer.EndTriggerExecution(triggerRequest, nil)
 
 	return err
 }
