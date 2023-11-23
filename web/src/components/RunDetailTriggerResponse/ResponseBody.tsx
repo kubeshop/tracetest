@@ -1,9 +1,9 @@
 import AttributeActions from 'components/AttributeActions';
+import CodeBlock from 'components/CodeBlock';
 import {isRunStateFinished} from 'models/TestRun.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {TTestRunState} from 'types/TestRun.types';
 import SkeletonResponse from './SkeletonResponse';
-import CodeBlock from '../CodeBlock';
 import * as S from './RunDetailTriggerResponse.styled';
 
 interface IProps {
