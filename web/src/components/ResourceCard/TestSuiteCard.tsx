@@ -19,6 +19,7 @@ interface IProps {
   onEdit(id: string, lastRunId: number, type: ResourceType): void;
   onDelete(id: string, name: string, type: ResourceType): void;
   onRun(testSuite: TestSuite, type: ResourceType): void;
+  onDuplicate(testSuite: TestSuite): void;
   onViewAll(id: string, type: ResourceType): void;
   testSuite: TestSuite;
 }
@@ -27,6 +28,7 @@ const TestSuiteCard = ({
   onEdit,
   onDelete,
   onRun,
+  onDuplicate,
   onViewAll,
   testSuite: {id: testSuiteId, summary, name, description},
   testSuite,
@@ -71,6 +73,7 @@ const TestSuiteCard = ({
             shouldEdit={shouldEdit}
             onDelete={() => onDelete(testSuiteId, name, ResourceType.TestSuite)}
             onEdit={() => onEdit(testSuiteId, lastRunId, ResourceType.TestSuite)}
+            onDuplicate={() => onDuplicate(testSuite)}
           />
         </S.Row>
       </S.TestContainer>

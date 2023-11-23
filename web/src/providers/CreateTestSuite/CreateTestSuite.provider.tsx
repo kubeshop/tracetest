@@ -43,8 +43,7 @@ export const useCreateTestSuite = () => useContext(Context);
 
 const CreateTestSuiteProvider = ({children}: IProps) => {
   const dispatch = useAppDispatch();
-  const [create, {isLoading: isLoadingCreate}] = useCreateTestSuiteMutation();
-  const {runTestSuite, isEditLoading} = useTestSuiteCrud();
+  const {isEditLoading, create, isLoadingCreate} = useTestSuiteCrud();
 
   const draft = useAppSelector(CreateTestSuitesSelectors.selectDraft);
   const stepNumber = useAppSelector(CreateTestSuitesSelectors.selectStepNumber);
@@ -55,10 +54,9 @@ const CreateTestSuiteProvider = ({children}: IProps) => {
 
   const onCreate = useCallback(
     async (values: TDraftTestSuite) => {
-      const suite = await create(values).unwrap();
-      runTestSuite(suite);
+      await create(values);
     },
-    [create, runTestSuite]
+    [create]
   );
 
   const onUpdate = useCallback(

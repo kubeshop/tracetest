@@ -14,6 +14,7 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import VariableSetSelector from 'components/VariableSetSelector/VariableSetSelector';
 import Test from 'models/Test.model';
 import ImportModal from 'components/ImportModal/ImportModal';
+import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import * as S from './Home.styled';
 import HomeFilters from './HomeFilters';
 import Loading from './Loading';
@@ -29,12 +30,13 @@ const Tests = () => {
   const [isCreateTestOpen, setIsCreateTestOpen] = useState(false);
   const [isImportTestOpen, setIsImportTestOpen] = useState(false);
   const [parameters, setParameters] = useState<TParameters>(defaultSort);
+  const {onOpen} = useConfirmationModal();
 
   const pagination = usePagination<Test, TParameters>(useGetTestListQuery, {
     ...parameters,
   });
   const onDelete = useDeleteResource();
-  const {runTest} = useTestCrud();
+  const {runTest, duplicate} = useTestCrud();
   const {navigate} = useDashboard();
 
   const handleOnRun = useCallback(
@@ -42,6 +44,18 @@ const Tests = () => {
       runTest({test});
     },
     [runTest]
+  );
+
+  const handleOnDuplicate = useCallback(
+    (test: Test) => {
+      onOpen({
+        heading: `Duplicate Test`,
+        title: `Create a duplicated version of Test: ${test.name}`,
+        okText: 'Duplicate',
+        onConfirm: () => duplicate(test),
+      });
+    },
+    [duplicate, onOpen]
   );
 
   const handleOnViewAll = useCallback((id: string) => {
@@ -106,6 +120,7 @@ const Tests = () => {
                 onDelete={onDelete}
                 onRun={handleOnRun}
                 onViewAll={handleOnViewAll}
+                onDuplicate={handleOnDuplicate}
                 test={test}
               />
             ))}

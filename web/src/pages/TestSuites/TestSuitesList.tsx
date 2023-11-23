@@ -14,6 +14,7 @@ import HomeAnalyticsService from 'services/Analytics/HomeAnalytics.service';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import useTestSuiteCrud from 'providers/TestSuite/hooks/useTestSuiteCrud';
 import VariableSetSelector from 'components/VariableSetSelector/VariableSetSelector';
+import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import TestSuite from 'models/TestSuite.model';
 import * as S from './TestSuites.styled';
 import HomeFilters from '../Home/HomeFilters';
@@ -32,8 +33,9 @@ const Resources = () => {
   const {data: testListData} = useGetTestListQuery({});
   const pagination = usePagination<TestSuite, TParameters>(useGetTestSuiteListQuery, parameters);
   const onDelete = useDeleteResource();
-  const {runTestSuite} = useTestSuiteCrud();
+  const {runTestSuite, duplicate} = useTestSuiteCrud();
   const {navigate} = useDashboard();
+  const {onOpen} = useConfirmationModal();
 
   const handleOnRun = useCallback(
     (resource: TestSuite) => {
@@ -51,6 +53,18 @@ const Resources = () => {
       navigate(`/testsuite/${id}/run/${lastRunId}`);
     },
     [navigate]
+  );
+
+  const handleOnDuplicate = useCallback(
+    (suite: TestSuite) => {
+      onOpen({
+        heading: `Duplicate Test Suite`,
+        title: `Create a duplicated version of Test Suite: ${suite.name}`,
+        okText: 'Duplicate',
+        onConfirm: () => duplicate(suite),
+      });
+    },
+    [duplicate, onOpen]
   );
 
   return (
@@ -126,6 +140,7 @@ const Resources = () => {
                 onEdit={handleOnEdit}
                 onDelete={onDelete}
                 onRun={handleOnRun}
+                onDuplicate={handleOnDuplicate}
                 onViewAll={handleOnViewAll}
                 testSuite={suite}
               />

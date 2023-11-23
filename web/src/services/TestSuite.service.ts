@@ -15,6 +15,12 @@ const TestSuiteService = () => ({
       steps: suite.fullSteps.map(step => step.id),
     };
   },
+
+  getDuplicatedDraftTestSuite(suite: TestSuite, name: string): TDraftTestSuite {
+    const draft = this.getInitialValues(suite);
+
+    return {...draft, name, id: undefined, version: undefined};
+  },
 });
 
 export default TestSuiteService();

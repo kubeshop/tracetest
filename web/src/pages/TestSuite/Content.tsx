@@ -8,6 +8,7 @@ import TestSuiteRun from 'models/TestSuiteRun.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTestSuite} from 'providers/TestSuite/TestSuite.provider';
 import {useTestSuiteCrud} from 'providers/TestSuite';
+import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import TracetestAPI from 'redux/apis/Tracetest';
 import * as S from './TestSuite.styled';
 
@@ -15,7 +16,8 @@ const {useGetTestSuiteRunsQuery} = TracetestAPI.instance;
 
 const Content = () => {
   const {onDelete, testSuite} = useTestSuite();
-  const {runTestSuite, isEditLoading} = useTestSuiteCrud();
+  const {runTestSuite, duplicate, isEditLoading} = useTestSuiteCrud();
+  const {onOpen} = useConfirmationModal();
   const params = useMemo(() => ({testSuiteId: testSuite.id}), [testSuite.id]);
 
   useDocumentTitle(`${testSuite.name}`);
@@ -29,6 +31,15 @@ const Content = () => {
   const shouldEdit = testSuite.summary.hasRuns;
   const onEdit = () => navigate(`/testsuite/${testSuite.id}/run/${testSuite.summary.runs}`);
 
+  const handleOnDuplicate = useCallback(() => {
+    onOpen({
+      heading: `Duplicate Test Suite`,
+      title: `Create a duplicated version of Test Suite: ${suite.name}`,
+      okText: 'Duplicate',
+      onConfirm: () => duplicate(testSuite),
+    });
+  }, [duplicate, onOpen, testSuite]);
+
   return (
     <S.Container $isWhite>
       <TestHeader
@@ -36,6 +47,7 @@ const Content = () => {
         id={testSuite.id}
         onDelete={() => onDelete(testSuite.id, testSuite.name)}
         onEdit={onEdit}
+        onDuplicate={handleOnDuplicate}
         shouldEdit={shouldEdit}
         title={`${testSuite.name} (v${testSuite.version})`}
         runButton={

@@ -9,11 +9,12 @@ interface IProps {
   shouldEdit: boolean;
   onEdit(): void;
   onDelete(): void;
+  onDuplicate(): void;
   title: string;
   runButton: React.ReactElement;
 }
 
-const TestHeader = ({description, id, shouldEdit, onEdit, onDelete, title, runButton}: IProps) => {
+const TestHeader = ({description, id, shouldEdit, onEdit, onDelete, onDuplicate, title, runButton}: IProps) => {
   const {navigate} = useDashboard();
 
   return (
@@ -30,7 +31,13 @@ const TestHeader = ({description, id, shouldEdit, onEdit, onDelete, title, runBu
       <S.Section>
         <VariableSetSelector />
         {runButton}
-        <ResourceCardActions id={id} onDelete={onDelete} onEdit={onEdit} shouldEdit={shouldEdit} />
+        <ResourceCardActions
+          id={id}
+          onDuplicate={onDuplicate}
+          onDelete={onDelete}
+          onEdit={onEdit}
+          shouldEdit={shouldEdit}
+        />
       </S.Section>
     </S.Container>
   );

@@ -18,11 +18,12 @@ interface IProps {
   onEdit(id: string, lastRunId: number, type: ResourceType): void;
   onDelete(id: string, name: string, type: ResourceType): void;
   onRun(test: Test, type: ResourceType): void;
+  onDuplicate(test: Test, type: ResourceType): void;
   onViewAll(id: string, type: ResourceType): void;
   test: Test;
 }
 
-const TestCard = ({onEdit, onDelete, onRun, onViewAll, test}: IProps) => {
+const TestCard = ({onEdit, onDelete, onDuplicate, onRun, onViewAll, test}: IProps) => {
   const queryParams = useMemo(() => ({take: 5, testId: test.id}), [test.id]);
   const {isCollapsed, isLoading, list, onClick} = useRuns<TestRun, {testId: string}>(
     useLazyGetRunListQuery,
@@ -65,6 +66,7 @@ const TestCard = ({onEdit, onDelete, onRun, onViewAll, test}: IProps) => {
             shouldEdit={shouldEdit}
             onDelete={() => onDelete(test.id, test.name, ResourceType.Test)}
             onEdit={() => onEdit(test.id, lastRunId, ResourceType.Test)}
+            onDuplicate={() => onDuplicate(test, ResourceType.Test)}
           />
         </S.Row>
       </S.TestContainer>
