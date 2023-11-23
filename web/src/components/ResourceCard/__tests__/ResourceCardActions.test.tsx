@@ -8,6 +8,14 @@ test('ResourceCardActions', async () => {
   const onDelete = jest.fn();
   const testId = faker.datatype.uuid();
 
-  const {getByTestId} = render(<ResourceCardActions shouldEdit={shouldEdit} onEdit={onEdit} onDelete={onDelete} id={testId} />);
+  const {getByTestId} = render(
+    <ResourceCardActions
+      shouldEdit={shouldEdit}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      id={testId}
+      onDuplicate={jest.fn()}
+    />
+  );
   await waitFor(() => getByTestId(`test-actions-button-${testId}`));
 });

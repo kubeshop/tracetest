@@ -10,7 +10,14 @@ test('TestCard', async () => {
   const test = TestMock.model();
 
   const {getByTestId, getByText} = render(
-    <TestCard onEdit={onEdit} onDelete={onDelete} onRun={onRunTest} onViewAll={onClick} test={test} />
+    <TestCard
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onRun={onRunTest}
+      onViewAll={onClick}
+      test={test}
+      onDuplicate={jest.fn()}
+    />
   );
   const mouseEvent = new MouseEvent('click', {bubbles: true});
   fireEvent(getByTestId(`test-actions-button-${test.id}`), mouseEvent);

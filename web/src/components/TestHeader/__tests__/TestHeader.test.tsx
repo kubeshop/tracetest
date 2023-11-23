@@ -10,7 +10,16 @@ test('SpanAttributesTable', () => {
   const shouldEdit = true;
 
   const {getByTestId} = render(
-    <TestHeader description={test.description} id={test.id} shouldEdit={shouldEdit} onEdit={onEdit} onDelete={onDelete} title={test.name} runButton={<div />} />
+    <TestHeader
+      description={test.description}
+      id={test.id}
+      shouldEdit={shouldEdit}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      title={test.name}
+      runButton={<div />}
+      onDuplicate={jest.fn()}
+    />
   );
   expect(getByTestId('test-details-name')).toBeInTheDocument();
 });
