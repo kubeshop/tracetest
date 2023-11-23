@@ -108,3 +108,5 @@ services:
       - "/otel-local-config.yaml"
     volumes:
       - ./collector.config.yaml:/otel-local-config.yaml
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
