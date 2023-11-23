@@ -1,6 +1,7 @@
 import parseCurl from 'parse-curl';
 import {ICurlValues, IImportService} from 'types/Test.types';
 import Validator from 'utils/Validator';
+import {Plugins} from 'constants/Plugins.constants';
 import {HTTP_METHOD} from 'constants/Common.constants';
 
 interface ICurlTriggerService extends IImportService {
@@ -25,6 +26,10 @@ const CurlTriggerService = (): ICurlTriggerService => ({
 
     const {url, method} = this.getRequestFromCommand(command);
     return Validator.required(url) && Validator.required(method);
+  },
+
+  getPlugin() {
+    return Plugins.REST;
   },
 
   getRequestFromCommand(command) {

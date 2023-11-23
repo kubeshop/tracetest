@@ -70,6 +70,7 @@ export enum SupportedEditors {
   Interpolation = 'interpolation-editor',
   Expression = 'expression-editor',
   CurlCommand = 'curlCommand-editor',
+  Definition = 'definition-editor',
 }
 
 export const operatorList = [

@@ -1,6 +1,6 @@
 import {IPlugin} from 'types/Plugins.types';
 import {SupportedPlugins} from './Common.constants';
-import {ImportTypes, TriggerTypes} from './Test.constants';
+import {TriggerTypes} from './Test.constants';
 
 export enum ComponentNames {
   SelectPlugin = 'SelectPlugin',
@@ -60,9 +60,4 @@ export const TriggerTypeToPlugin = {
   [TriggerTypes.grpc]: Plugins.GRPC,
   [TriggerTypes.kafka]: Plugins.Kafka,
   [TriggerTypes.traceid]: Plugins.TraceID,
-} as const;
-
-export const ImportTypeToPlugin = {
-  [ImportTypes.curl]: Plugins.REST,
-  [ImportTypes.postman]: Plugins.REST,
 } as const;

@@ -1,6 +1,7 @@
 import {Collection, Item, ItemGroup, Request, RequestAuthDefinition, VariableDefinition} from 'postman-collection';
 import {HTTP_METHOD} from 'constants/Common.constants';
 import {IImportService, IPostmanValues, TDraftTestForm, TRequestAuth} from 'types/Test.types';
+import {Plugins} from 'constants/Plugins.constants';
 import Validator from 'utils/Validator';
 import HttpService from '../Triggers/Http.service';
 
@@ -45,6 +46,11 @@ const Postman = (): IPostmanTriggerService => ({
     const draft = await this.valuesFromRequest(requests, variables, collectionTest || '');
     return !!draft && HttpService.validateDraft(draft);
   },
+
+  getPlugin() {
+    return Plugins.REST;
+  },
+
   valuesFromRequest(requests, variables, identifier) {
     const request = requests.find(({id}) => identifier === id);
     if (request) {

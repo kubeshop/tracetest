@@ -3,10 +3,12 @@ import {TDraftTestForm} from 'types/Test.types';
 import Postman from './Imports/Postman';
 import Curl from './Imports/Curl';
 import useShortcut from './hooks/useShortcut';
+import Definition from './Imports/Definition';
 
 const ImportFactoryMap = {
   [ImportTypes.postman]: Postman,
   [ImportTypes.curl]: Curl,
+  [ImportTypes.definition]: Definition,
 };
 
 export interface IFormProps {

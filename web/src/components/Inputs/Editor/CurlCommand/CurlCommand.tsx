@@ -13,6 +13,7 @@ const CurlCommand = ({value, onChange}: IEditorProps) => {
       extensions={[StreamLanguage.define(shell)]}
       spellCheck={false}
       placeholder="curl -X POST http://site.com"
+      autoFocus
     />
   );
 };

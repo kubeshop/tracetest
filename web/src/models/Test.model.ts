@@ -1,3 +1,4 @@
+import {load} from 'js-yaml';
 import {Model, TTestSchemas} from 'types/Common.types';
 import TestOutput from './TestOutput.model';
 import TestSpecs from './TestSpecs.model';
@@ -46,6 +47,11 @@ Test.FromRawTest = ({
     summary: Summary(summary),
     outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
   };
+};
+
+Test.FromDefinition = (definition: string): Test => {
+  const raw: TRawTestResource = load(definition);
+  return Test(raw);
 };
 
 export default Test;
