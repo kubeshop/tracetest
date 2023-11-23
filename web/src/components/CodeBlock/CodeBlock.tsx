@@ -12,7 +12,11 @@ export interface IProps {
   minHeight?: string;
 }
 
-const getLang = (mimeType: string): LanguageName | undefined => langNames.find(lang => mimeType.includes(`/${lang}`));
+const getLanguage = (mimeType: string): LanguageName | undefined => {
+  const language = langNames.find(lang => mimeType.includes(`/${lang}`));
+  // SyntaxHighlighter does not support html, so we need to use xml instead
+  return language === 'html' ? 'xml' : language;
+};
 
 const formatValue = (value: string, lang?: string): string => {
   switch (lang) {
@@ -29,13 +33,22 @@ const formatValue = (value: string, lang?: string): string => {
 };
 
 const CodeBlock = ({value, language, mimeType = '', maxHeight = '', minHeight = ''}: IProps) => {
-  const lang = useMemo(() => language || getLang(mimeType), [language, mimeType]);
+  const lang = useMemo(() => language || getLanguage(mimeType), [language, mimeType]);
 
-  return (
-    <S.CodeContainer data-cy="code-block" $maxHeight={maxHeight} $minHeight={minHeight}>
+  // SyntaxHighlighter has a performance problem, so we need to memoize it
+  // See https://github.com/react-syntax-highlighter/react-syntax-highlighter/issues/302
+  const memoizedHighlighter = useMemo(
+    () => (
       <SyntaxHighlighter language={lang} style={arduinoLight} wrapLongLines>
         {formatValue(value, lang)}
       </SyntaxHighlighter>
+    ),
+    [lang, value]
+  );
+
+  return (
+    <S.CodeContainer data-cy="code-block" $maxHeight={maxHeight} $minHeight={minHeight}>
+      {memoizedHighlighter}
     </S.CodeContainer>
   );
 };
