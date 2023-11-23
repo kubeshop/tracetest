@@ -6,6 +6,8 @@ export type TDraftTestSuite = {
   steps?: string[];
   name?: string;
   description?: string;
+  id?: string;
+  version?: number;
 };
 
 export interface ICreateTestSuiteState {

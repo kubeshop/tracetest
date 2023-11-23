@@ -9,33 +9,34 @@ interface IProps {
   shouldEdit: boolean;
   onDelete(): void;
   onEdit(): void;
+  onDuplicate(): void;
 }
 
-const ResourceCardActions = ({id, shouldEdit = true, onDelete, onEdit}: IProps) => {
+const ResourceCardActions = ({id, shouldEdit = true, onDelete, onEdit, onDuplicate}: IProps) => {
   const {getIsAllowed} = useCustomization();
+  const canEdit = getIsAllowed(Operation.Edit);
 
-  const onDeleteClick = useCallback(
-    ({domEvent}) => {
-      domEvent?.stopPropagation();
-      onDelete();
-    },
-    [onDelete]
-  );
-
-  const onEditClick = useCallback(
-    ({domEvent}) => {
-      domEvent?.stopPropagation();
-      onEdit();
-    },
-    [onEdit]
+  const onAction = useCallback(
+    action =>
+      ({domEvent}: {domEvent: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>}) => {
+        domEvent?.stopPropagation();
+        action();
+      },
+    []
   );
 
   const menuItems = useMemo(() => {
     const defaultItems = [
       {
+        key: 'duplicate',
+        label: <span data-cy="test-card-duplicate">Duplicate</span>,
+        onClick: onAction(onDuplicate),
+        disabled: !canEdit,
+      },
+      {
         key: 'delete',
         label: <span data-cy="test-card-delete">Delete</span>,
-        onClick: onDeleteClick,
+        onClick: onAction(onDelete),
         disabled: !getIsAllowed(Operation.Edit),
       },
     ];
@@ -45,13 +46,13 @@ const ResourceCardActions = ({id, shouldEdit = true, onDelete, onEdit}: IProps) 
           {
             key: 'edit',
             label: <span data-cy="test-card-edit">Edit</span>,
-            onClick: onEditClick,
+            onClick: onAction(onEdit),
             disabled: !getIsAllowed(Operation.Edit),
           },
           ...defaultItems,
         ]
       : defaultItems;
-  }, [getIsAllowed, onDeleteClick, onEditClick, shouldEdit]);
+  }, [canEdit, getIsAllowed, onAction, onDelete, onDuplicate, onEdit, shouldEdit]);
 
   return (
     <Dropdown overlay={<Menu items={menuItems} />} placement="bottomLeft" trigger={['click']}>

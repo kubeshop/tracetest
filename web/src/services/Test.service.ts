@@ -97,6 +97,11 @@ const TestService = () => ({
     const updatedTest = {...test, ...partialTest};
     return this.getRequest(plugin, testTriggerData, updatedTest);
   },
+
+  async getDuplicatedRawTest(test: Test, name: string): Promise<TRawTestResource> {
+    const raw = await this.getUpdatedRawTest(test, {});
+    return {...raw, spec: {...raw.spec, name}};
+  },
 });
 
 export default TestService();

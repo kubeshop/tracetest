@@ -1,4 +1,5 @@
 import {Modal} from 'antd';
+import useKeyEvent, {Keys} from 'hooks/useKeyEvent';
 
 interface IProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ const ConfirmationModal = ({
   okText = 'Delete',
   cancelText = 'Cancel',
 }: IProps) => {
+  useKeyEvent([Keys.Enter], onConfirm);
+
   return (
     <Modal
       cancelText={cancelText}

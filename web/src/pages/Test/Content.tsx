@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import {useCallback, useMemo} from 'react';
 import CreateButton from 'components/CreateButton';
 import PaginatedList from 'components/PaginatedList';
 import TestRunCard from 'components/RunCard/TestRunCard';
@@ -10,6 +10,7 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTest} from 'providers/Test/Test.provider';
 import useTestCrud from 'providers/Test/hooks/useTestCrud';
 import TracetestAPI from 'redux/apis/Tracetest';
+import {useConfirmationModal} from 'providers/ConfirmationModal/ConfirmationModal.provider';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './Test.styled';
 
@@ -18,7 +19,8 @@ const {useGetRunListQuery} = TracetestAPI.instance;
 const Content = () => {
   const {test} = useTest();
   const onDeleteResource = useDeleteResource();
-  const {runTest, isLoadingRunTest} = useTestCrud();
+  const {runTest, isLoadingRunTest, duplicate} = useTestCrud();
+  const {onOpen} = useConfirmationModal();
   const params = useMemo(() => ({testId: test.id}), [test.id]);
   useDocumentTitle(`${test.name}`);
 
@@ -26,6 +28,15 @@ const Content = () => {
 
   const shouldEdit = test.summary.hasRuns;
   const onEdit = () => navigate(`/test/${test.id}/run/${test.summary.runs}`);
+
+  const handleOnDuplicate = useCallback(() => {
+    onOpen({
+      heading: `Duplicate Test`,
+      title: `Create a duplicated version of Test: ${test.name}`,
+      okText: 'Duplicate',
+      onConfirm: () => duplicate(test),
+    });
+  }, [duplicate, onOpen, test]);
 
   return (
     <S.Container $isWhite>
@@ -36,6 +47,7 @@ const Content = () => {
         id={test.id}
         onDelete={() => onDeleteResource(test.id, test.name, ResourceType.Test)}
         onEdit={onEdit}
+        onDuplicate={handleOnDuplicate}
         shouldEdit={shouldEdit}
         title={`${test.name} (v${test.version})`}
         runButton={

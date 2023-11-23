@@ -14,13 +14,13 @@ type TestOutput = {
   error: string;
 };
 
-function TestOutput({name = '', selectorParsed = {}, value = ''}: TRawTestOutput, id = -1): TestOutput {
+function TestOutput({name = '', selectorParsed = {}, selector = '', value = ''}: TRawTestOutput, id = -1): TestOutput {
   return {
     id,
     isDeleted: false,
     isDraft: false,
     name,
-    selector: selectorParsed.query || '',
+    selector: selectorParsed.query || selector || '',
     value,
     valueRun: '',
     valueRunDraft: '',

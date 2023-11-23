@@ -8,12 +8,14 @@ import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingV
 import TracetestAPI from 'redux/apis/Tracetest';
 import {RunErrorTypes} from 'types/TestRun.types';
 import {TDraftTestSuite} from 'types/TestSuite.types';
+import TestSuiteService from 'services/TestSuite.service';
 
 const {
   useEditTestSuiteMutation,
   useRunTestSuiteMutation,
   useLazyGetTestSuiteVersionByIdQuery,
   useDeleteTestSuiteByIdMutation,
+  useCreateTestSuiteMutation,
 } = TracetestAPI.instance;
 
 const useTestSuiteCrud = () => {
@@ -22,6 +24,7 @@ const useTestSuiteCrud = () => {
   const [runTestSuiteAction, {isLoading: isLoadingRunTestSuite}] = useRunTestSuiteMutation();
   const [getTestSuite] = useLazyGetTestSuiteVersionByIdQuery();
   const [deleteTestSuiteAction] = useDeleteTestSuiteByIdMutation();
+  const [createAction, {isLoading: isLoadingCreate}] = useCreateTestSuiteMutation();
   const isEditLoading = isTestSuiteEditLoading || isLoadingRunTestSuite;
   const {selectedVariableSet} = useVariableSet();
   const {onOpen} = useMissingVariablesModal();
@@ -76,11 +79,31 @@ const useTestSuiteCrud = () => {
     [deleteTestSuiteAction, navigate]
   );
 
+  const create = useCallback(
+    async (values: TDraftTestSuite) => {
+      const suite = await createAction(values).unwrap();
+      runTestSuite(suite);
+    },
+    [createAction, runTestSuite]
+  );
+
+  const duplicate = useCallback(
+    async (suite: TestSuite) => {
+      const draft = TestSuiteService.getDuplicatedDraftTestSuite(suite, `${suite.name} (copy)`);
+
+      await create(draft);
+    },
+    [create]
+  );
+
   return {
     edit,
     runTestSuite,
     deleteTestSuite,
+    duplicate,
+    create,
     isEditLoading,
+    isLoadingCreate,
   };
 };
 

@@ -5,7 +5,7 @@ import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import {TVariableSetValue} from 'models/VariableSet.model';
 import RunError from 'models/RunError.model';
-import Test from 'models/Test.model';
+import Test, {TRawTestResource} from 'models/Test.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useVariableSet} from 'providers/VariableSet';
 import {useMissingVariablesModal} from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
@@ -18,7 +18,7 @@ import TestService from 'services/Test.service';
 import {TDraftTest} from 'types/Test.types';
 import {RunErrorTypes} from 'types/TestRun.types';
 
-const {useEditTestMutation, useRunTestMutation} = TracetestAPI.instance;
+const {useEditTestMutation, useRunTestMutation, useCreateTestMutation} = TracetestAPI.instance;
 
 export type TTestRunRequest = {
   test: Test;
@@ -33,6 +33,7 @@ const useTestCrud = () => {
   const {updateIsInitialized} = useTestSpecs();
   const [editTest, {isLoading: isLoadingEditTest}] = useEditTestMutation();
   const [runTestAction, {isLoading: isLoadingRunTest}] = useRunTestMutation();
+  const [createTest, {isLoading: isLoadingCreateTest}] = useCreateTestMutation();
   const isEditLoading = isLoadingEditTest || isLoadingRunTest;
   const {mode = 'trigger'} = useParams();
 
@@ -88,11 +89,31 @@ const useTestCrud = () => {
     [editTest, runTest, updateIsInitialized]
   );
 
+  const create = useCallback(
+    async (rawTest: TRawTestResource) => {
+      const test = await createTest(rawTest).unwrap();
+      runTest({test});
+    },
+    [createTest, runTest]
+  );
+
+  const duplicate = useCallback(
+    async (test: Test) => {
+      const rawTest = await TestService.getDuplicatedRawTest(test, `${test.name} (copy)`);
+
+      await create(rawTest);
+    },
+    [create]
+  );
+
   return {
     edit,
+    create,
     runTest,
+    duplicate,
     isEditLoading,
     isLoadingRunTest,
+    isLoadingCreateTest,
   };
 };
 
