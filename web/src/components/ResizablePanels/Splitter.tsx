@@ -49,7 +49,14 @@ const Splitter = ({
     <S.SplitterContainer id={id} key={id} className={className} onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
       <S.ButtonContainer>
         {isToolTipVisible ? (
-          <Tooltip title={tooltip} visible trigger={[]} placement={tooltipPlacement} overlayClassName="splitter">
+          <Tooltip
+            title={tooltip}
+            visible
+            trigger={[]}
+            placement={tooltipPlacement}
+            overlayClassName="splitter"
+            getPopupContainer={node => node.parentElement ?? document.body}
+          >
             {button}
           </Tooltip>
         ) : (
