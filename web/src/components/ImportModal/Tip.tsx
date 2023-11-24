@@ -6,7 +6,7 @@ const Tip = () => (
     <Typography.Title level={3} type="secondary">
       <BulbOutlined /> What are the supported formats?
     </Typography.Title>
-    <Typography.Text type="secondary">We support cURL & Postman. OpenAPI is coming soon!</Typography.Text>
+    <Typography.Text type="secondary">We support Tracetest Definition, cURL & Postman. OpenAPI is coming soon!</Typography.Text>
   </>
 );
 

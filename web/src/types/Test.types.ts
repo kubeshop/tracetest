@@ -7,6 +7,7 @@ import HttpRequest from 'models/HttpRequest.model';
 import TraceIDRequest from 'models/TraceIDRequest.model';
 import KafkaRequest from 'models/KafkaRequest.model';
 import {Model, TGrpcSchemas, THttpSchemas, TKafkaSchemas} from './Common.types';
+import {IPlugin} from './Plugins.types';
 
 export type TRequestAuth = THttpSchemas['HTTPRequest']['auth'];
 export type TMethod = THttpSchemas['HTTPRequest']['method'];
@@ -62,6 +63,10 @@ export interface ICurlValues extends IHttpValues {
   command: string;
 }
 
+export interface IDefinitionValues {
+  definition: string;
+}
+
 export interface IBasicValues {
   name: string;
   description: string;
@@ -74,6 +79,7 @@ export interface ITraceIDValues extends IHttpValues {
 }
 
 export type TTestRequestDetailsValues = IRpcValues | IHttpValues | IPostmanValues | ICurlValues | ITraceIDValues;
+
 export type TDraftTest<T = TTestRequestDetailsValues> = Partial<IBasicValues & T>;
 export type TDraftTestForm<T = TTestRequestDetailsValues> = FormInstance<TDraftTest<T>>;
 
@@ -85,6 +91,7 @@ export interface ITriggerService {
 }
 
 export interface IImportService {
-  getRequest(values: TDraftTest): Promise<TDraftTest>;
+  getRequest(draft: TDraftTest): Promise<TDraftTest>;
   validateDraft(draft: TDraftTest): Promise<boolean>;
+  getPlugin(draft: TDraftTest): IPlugin;
 }

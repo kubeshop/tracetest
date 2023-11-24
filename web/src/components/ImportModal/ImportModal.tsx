@@ -4,7 +4,6 @@ import {TDraftTest} from 'types/Test.types';
 import {ImportTypes} from 'constants/Test.constants';
 import ImportService from 'services/Import.service';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import {ImportTypeToPlugin} from 'constants/Plugins.constants';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import {ImportSelector} from 'components/Inputs';
 import ImportFactory from 'components/TestPlugins/ImportFactory';
@@ -36,7 +35,7 @@ const ImportModal = ({isOpen, onClose}: IProps) => {
   const handleImport = useCallback(
     async (values: TDraftTest) => {
       const draft = await ImportService.getRequest(type, values);
-      const plugin = ImportTypeToPlugin[type];
+      const plugin = await ImportService.getPlugin(type, values);
 
       onInitialValues(draft);
       navigate(`/test/create/${plugin.type}`);
@@ -66,7 +65,7 @@ const ImportModal = ({isOpen, onClose}: IProps) => {
         layout="vertical"
         name={FORM_ID}
         onFinish={handleImport}
-        initialValues={{importType: ImportTypes.curl}}
+        initialValues={{importType: ImportTypes.definition}}
         onValuesChange={(_: any, values) => handleChange(values)}
       >
         <S.Container>

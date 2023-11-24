@@ -15,6 +15,7 @@ export enum TriggerTypes {
 export enum ImportTypes {
   postman = 'postman',
   curl = 'curl',
+  definition = 'definition',
 }
 
 export enum SortBy {

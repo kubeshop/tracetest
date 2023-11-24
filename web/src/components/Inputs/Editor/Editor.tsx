@@ -11,6 +11,7 @@ const EditorMap = {
   [SupportedEditors.Selector]: lazy(() => import('./Selector')),
   [SupportedEditors.Interpolation]: lazy(() => import('./Interpolation')),
   [SupportedEditors.CurlCommand]: lazy(() => import('./CurlCommand')),
+  [SupportedEditors.Definition]: lazy(() => import('./Definition')),
 } as const;
 
 export interface IEditorProps {
