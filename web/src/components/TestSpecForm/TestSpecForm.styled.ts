@@ -55,7 +55,10 @@ export const DeleteCheckIcon = styled(DeleteOutlined)`
 
 export const AssertionForm = styled.div`
   background-color: ${({theme}) => theme.color.white};
+  height: 100%;
+  overflow-y: auto;
   padding: 24px;
+  position: relative;
 `;
 
 export const AssertionFormTitle = styled(Typography.Title).attrs({level: 2})``;

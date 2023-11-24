@@ -4,7 +4,10 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   background-color: ${({theme}) => theme.color.white};
+  height: 100%;
+  overflow-y: auto;
   padding: 24px;
+  position: relative;
 `;
 
 export const Title = styled(Typography.Title).attrs({level: 2})`

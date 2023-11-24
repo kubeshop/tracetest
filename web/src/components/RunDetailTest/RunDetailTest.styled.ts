@@ -40,6 +40,11 @@ export const TabsContainer = styled.div`
   .ant-tabs-small > .ant-tabs-nav .ant-tabs-tab {
     padding: 0 0 8px;
   }
+
+  .ant-tabs,
+  .ant-tabs .ant-tabs-content {
+    height: 100%;
+  }
 `;
 
 export const CountBadge = styled(Badge)`
