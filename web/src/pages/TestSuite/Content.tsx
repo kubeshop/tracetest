@@ -34,7 +34,7 @@ const Content = () => {
   const handleOnDuplicate = useCallback(() => {
     onOpen({
       heading: `Duplicate Test Suite`,
-      title: `Create a duplicated version of Test Suite: ${suite.name}`,
+      title: `Create a duplicated version of Test Suite: ${testSuite.name}`,
       okText: 'Duplicate',
       onConfirm: () => duplicate(testSuite),
     });
