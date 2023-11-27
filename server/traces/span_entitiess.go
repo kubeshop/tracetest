@@ -340,7 +340,10 @@ func (span Span) setMetadataAttributes() Span {
 
 	if span.Status != nil {
 		span.Attributes.Set(TracetestMetadataFieldStatusCode, span.Status.Code)
-		span.Attributes.Set(TracetestMetadataFieldStatusDescription, span.Status.Description)
+
+		if span.Status.Description != "" {
+			span.Attributes.Set(TracetestMetadataFieldStatusDescription, span.Status.Description)
+		}
 	}
 
 	return span
