@@ -8,8 +8,8 @@ const VariableSetService = () => ({
     };
   },
 
-  validateDraft({name = '', description = '', values = []}: VariableSet) {
-    return !!name && !!description && !!values.length;
+  validateDraft({name = '', values = []}: VariableSet) {
+    return !!name && !!values.length;
   },
 });
 
