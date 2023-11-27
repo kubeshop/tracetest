@@ -55,12 +55,10 @@ func (r ensureSpanNamingRule) validateSpanName(ctx context.Context, span *traces
 
 func (r ensureSpanNamingRule) validateHTTPSpanName(ctx context.Context, span *traces.Span) analyzer.Result {
 	expectedName := ""
-	if span.Kind == traces.SpanKindServer {
-		expectedName = fmt.Sprintf("%s %s", span.Attributes.Get("http.method"), span.Attributes.Get("http.route"))
-	}
-
 	if span.Kind == traces.SpanKindClient {
 		expectedName = span.Attributes.Get("http.method")
+	} else {
+		expectedName = fmt.Sprintf("%s %s", span.Attributes.Get("http.method"), span.Attributes.Get("http.route"))
 	}
 
 	if span.Name != expectedName {
