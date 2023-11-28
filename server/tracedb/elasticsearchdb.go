@@ -137,6 +137,11 @@ func getClusterInfo(client *elasticsearch.Client) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error getting cluster info response: %s", err)
 	}
+
+	if res == nil {
+		return "", fmt.Errorf("could not get response")
+	}
+
 	defer res.Body.Close()
 
 	// Check response status

@@ -114,6 +114,10 @@ func (db signalfxDB) getSegmentsTimestamps(ctx context.Context, traceID string) 
 		return []int64{}, fmt.Errorf("could not execute request: %w", err)
 	}
 
+	if response == nil {
+		return []int64{}, fmt.Errorf("could not get response")
+	}
+
 	if response.StatusCode != http.StatusOK {
 		return []int64{}, fmt.Errorf("service responded with a non ok status code: %s", strconv.Itoa(response.StatusCode))
 	}
@@ -146,6 +150,10 @@ func (db signalfxDB) getSegmentSpans(ctx context.Context, traceID string, timest
 	response, err := db.httpClient.Do(request)
 	if err != nil {
 		return []signalFXSpan{}, fmt.Errorf("could not execute request: %w", err)
+	}
+
+	if response == nil {
+		return []signalFXSpan{}, fmt.Errorf("could not get response")
 	}
 
 	if response.StatusCode != 200 {

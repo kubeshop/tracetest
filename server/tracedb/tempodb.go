@@ -121,9 +121,12 @@ func httpGetTraceByID(ctx context.Context, traceID string, client *datasource.Ht
 		return traces.Trace{}, err
 	}
 	resp, err := client.Request(ctx, fmt.Sprintf("/api/traces/%s", trID), http.MethodGet, "")
-
 	if err != nil {
 		return traces.Trace{}, handleError(err)
+	}
+
+	if resp == nil {
+		return traces.Trace{}, fmt.Errorf("could not get response")
 	}
 
 	if resp.StatusCode == 404 {
