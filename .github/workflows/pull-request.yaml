@@ -72,10 +72,6 @@ jobs:
           cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd cli; make test
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   unit-test-server:
     name: API Server unit tests
@@ -95,10 +91,6 @@ jobs:
           cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd server; make test -B
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   unit-test-agent:
     name: Agent unit tests
@@ -117,10 +109,6 @@ jobs:
           cache-dependency-path: "go.mod"
       - name: Run unit tests
         run: cd agent; make test -B
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   unit-test-web:
     name: WebUI unit tests
