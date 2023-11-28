@@ -1,0 +1,112 @@
+name: Synthetic monitoring with Tracetest
+
+on:
+  # allows the manual trigger
+  workflow_dispatch:
+
+  schedule:
+  - cron: '0 */1 * * *' # every hour
+
+jobs:
+  pokeshop-trace-based-tests:
+    name: Run trace based tests for Pokeshop
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Tracetest CLI
+        run: |
+          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+      - name: Configure Tracetest CLI
+        run: |
+          tracetest configure --token ${{secrets.TRACETEST_POKESHOP_TOKEN}}
+      - name: Run synthetic monitoring tests
+        run: |
+          tracetest run testsuite --file ./testing/synthetic-monitoring/pokeshop/_testsuite.yaml
+      - name: Send message on Slack in case of failure
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          # check the block kit builder docs to understand how it works
+          # and how to modify it: https://api.slack.com/block-kit
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":warning: Synthetic Monitoring Alert - Pokeshop Demo :warning:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\nFailed"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+  otel-demo-trace-based-tests:
+    name: Run trace based tests for Open Telemetry demo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Tracetest CLI
+        run: |
+          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+      - name: Configure Tracetest CLI
+        run: |
+          tracetest configure --token ${{secrets.TRACETEST_OTELDEMO_TOKEN}}
+      - name: Run synthetic monitoring tests
+        run: |
+          tracetest run testsuite --file ./testing/synthetic-monitoring/otel-demo/_testsuite.yaml --vars ./testing/synthetic-monitoring/otel-demo/_variableset.yaml
+      - name: Send message on Slack in case of failure
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          # check the block kit builder docs to understand how it works
+          # and how to modify it: https://api.slack.com/block-kit
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":warning: Synthetic Monitoring Alert - OTel Demo :warning:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\nFailed"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

@@ -1,0 +1,10 @@
+type: Transaction
+spec:
+  id: pokeshop-demo-test-suite
+  name: Pokeshop Synthetic tests
+  description: Simulate a user doing a series of imports on Pokeshop and listing its results
+  steps:
+    - ./01-add-pokemon-with-api.yaml
+    - ./02-import-pokemon-with-queue.yaml
+    - ./03-import-pokemon-with-stream.yaml
+    - ./04-list-pokemons.yaml

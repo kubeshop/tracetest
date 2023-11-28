@@ -1,0 +1,33 @@
+type: Test
+spec:
+  id: pokeshop-demo-add-pokemon
+  name: Pokeshop - Add
+  description: Add a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: http://demo-pokeshop/pokemon
+      body: |
+        {
+          "name": "meowth",
+          "type":"normal",
+          "imageUrl":"https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png",
+          "isFeatured": true
+        }
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="POST /pokemon" http.method="POST"]
+    name: The POST /pokemon was called correctly
+    assertions:
+    - attr:http.status_code = 201
+  - selector: span[tracetest.span.type="general" name="validate request"]
+    name: The request sent to API is valid
+    assertions:
+    - attr:validation.is_valid = "true"
+  - selector: span[tracetest.span.type="database" name="create pokeshop.pokemon" db.operation="create" db.sql.table="pokemon"]
+    name: A Pokemon was inserted on database
+    assertions:
+    - attr:db.result | json_path '$.imageUrl'  =  "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png"
