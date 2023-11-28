@@ -1,0 +1,7 @@
+type: VariableSet
+spec:
+  id: tracetesting-vars
+  name: tracetesting-vars
+  values:
+    - key: FRONTEND_ADDR
+      value: demo-otel-frontend:8080

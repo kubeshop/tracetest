@@ -1,0 +1,23 @@
+type: Test
+spec:
+  id: pokeshop-demo-import-pokemon-stream
+  name: Import a Pokemon reading a Stream
+  description: Import a Pokemon via Stream
+  trigger:
+    type: kafka
+    kafka:
+      brokerUrls:
+      - stream:9092
+      topic: pokemon
+      headers: []
+      messageKey: snorlax-key
+      messageValue: "{\"id\":144}"
+  specs:
+  - selector: span[tracetest.span.type="messaging" name="pokemon process" messaging.system="kafka" messaging.destination="pokemon" messaging.destination_kind="topic" messaging.operation="process"]
+    name: A message was received from Kafka stream
+    assertions:
+    - attr:messaging.system = "kafka"
+  - selector: span[tracetest.span.type="general" name="import pokemon"]
+    name: Import Pokemon use case was triggered
+    assertions:
+    - attr:name = "import pokemon"
