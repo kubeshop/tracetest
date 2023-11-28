@@ -302,7 +302,7 @@ func decodeChildren(parent *Span, children []encodedSpan, cache spanCache) ([]*S
 	}
 	res := make([]*Span, len(children))
 	for i, c := range children {
-		if span, ok := cache.Get(c.ID); ok {
+		if span, ok := cache.Get(c.ID); ok && span != nil {
 			res[i] = span
 			continue
 		}
