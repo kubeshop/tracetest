@@ -1,0 +1,26 @@
+type: Test
+spec:
+  id: pokeshop-demo-list-pokemon
+  name: List Pokemons
+  description: List Pokemons registered on Pokeshop API
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: http://demo-pokeshop/pokemon?take=100&skip=0
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /pokemon?take=100&skip=0" http.method="GET"]
+    name: GET /pokemon endpoint was called and returned valid data
+    assertions:
+    - attr:http.status_code  =  200
+  - selector: span[tracetest.span.type="database" name="count pokeshop.pokemon" db.system="postgres" db.name="pokeshop" db.user="ashketchum" db.operation="count" db.sql.table="pokemon"]
+    name: A count operation was triggered on database
+    assertions:
+    - attr:db.operation = "count"
+  - selector: span[tracetest.span.type="database" name="findMany pokeshop.pokemon" db.system="postgres" db.name="pokeshop" db.user="ashketchum" db.operation="findMany" db.sql.table="pokemon"]
+    name: A select operation was triggered on database
+    assertions:
+    - attr:db.operation = "findMany"
