@@ -28,7 +28,7 @@ const sidebars = {
       label: "OpenTelemetry Store Demo",
       link: {
         type: "doc",
-        id: "live-examples/opentelemetry-store/overview"
+        id: "live-examples/opentelemetry-store/overview",
       },
       items: [
         {
@@ -69,7 +69,7 @@ const sidebars = {
       label: "Pokeshop API Demo",
       link: {
         type: "doc",
-        id: "live-examples/pokeshop/overview"
+        id: "live-examples/pokeshop/overview",
       },
       items: [
         {
@@ -122,7 +122,7 @@ const sidebars = {
       type: "category",
       link: {
         type: "doc",
-        id: "examples-tutorials/recipes"
+        id: "examples-tutorials/recipes",
       },
       label: "Recipes",
       items: [
@@ -360,7 +360,7 @@ const sidebars = {
       label: "Getting Started",
       link: {
         type: "doc",
-        id: "core/getting-started/overview"
+        id: "core/getting-started/overview",
       },
       items: [
         {
@@ -443,7 +443,7 @@ const sidebars = {
       label: "Getting Started",
       link: {
         type: "doc",
-        id: "getting-started/overview"
+        id: "getting-started/overview",
       },
       items: [
         {
@@ -769,6 +769,27 @@ const sidebars = {
               type: "doc",
               id: "web-ui/creating-tests",
               label: "Creating Tests",
+            },
+            {
+              type: "category",
+              label: "Importing Tests",
+              items: [
+                {
+                  type: "doc",
+                  id: "web-ui/importing-tests-definition",
+                  label: "Importing Tests from Tracetest Definition",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/importing-tests-curl",
+                  label: "Importing Tests from CURL",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/importing-tests-postman",
+                  label: "Importing Tests from Postman",
+                },
+              ],
             },
             {
               type: "doc",

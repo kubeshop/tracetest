@@ -1,0 +1,72 @@
+---
+id: importing-tests-postman
+title: Importing Tests from Postman
+description: Tracetest enables importing tests from Postman visually in the Tracetest Web UI.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - postman
+  - import
+  - importing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+👉 **Join our [shared Pokeshop API Demo environment](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept) and try importing a Test yourself!**
+
+![Main Screen](../img/main-screen-0.14.png)
+
+Click the **Import** button:
+
+![Import a Test Button](../img/import-test-button-0.14.png)
+
+The "Import a Test" dialog appears:
+
+![Import a Test](../img/import-a-test-0.14.png)
+
+The option to choose the import method is presented:
+
+- Definition - Use a Tracetest Definition file as a starting point.
+- Postman - Define your HTTP request via a Postman collection.
+- CURL Command - Define your HTTP test via a cURL command.
+
+Choose **Postman** to display the import options:
+
+![Choose Import Method](../img/import-select-method-0.14.png)
+
+Input the **Postman Collection File**:
+
+![Choose Collection File](../img/import-postman-file-0.14.png)
+
+[Postman Collection](../img/pokeshop-api-demo.postman_collection.json) used for this example.
+
+The name of the file will be displayed:
+
+![Postman File Name](../img/import-postman-filename-0.14.png)
+
+Select a test from the **Postman Collection**:
+
+![Select Test](../img/import-postman-select-0.14.png)
+
+Click **Import**:
+
+![After Import Postman](../img/import-postman-create-0.14.png)
+
+From the Create Test Page add any additional information and click **Run**:
+
+![Create Test](../img/provide-addl-information-0.14.png)
+
+The test will start:
+
+![Awaiting Trace](../img/awaiting-trace-0.14.png)
+
+When the test is finished, you will get the following results:
+
+![Finished Trace](../img/finished-trace-0.14.png)
+
+Please visit the [Test Results](/web-ui/test-results) document for an explanation of viewing the results of a test.
+
+👉 **Join our [shared Pokeshop API Demo environment](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept) and try importing a Test yourself!**
