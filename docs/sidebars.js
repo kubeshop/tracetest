@@ -825,6 +825,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "web-ui/black-box-testing",
+          label: "Enabling Black-Box Testing",
+        },
+        {
+          type: "doc",
           id: "web-ui/creating-variable-sets",
           label: "Creating Variable Sets",
         },
