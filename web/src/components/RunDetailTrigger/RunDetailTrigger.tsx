@@ -14,7 +14,7 @@ import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import TestService from 'services/Test.service';
 import {TDraftTest} from 'types/Test.types';
 import * as S from './RunDetailTrigger.styled';
@@ -46,6 +46,10 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
   const isDisabled = isLoading || !stateIsFinished;
 
   useShortcutWithDefault(form);
+
+  useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [form, initialValues]);
 
   return (
     <S.Container>

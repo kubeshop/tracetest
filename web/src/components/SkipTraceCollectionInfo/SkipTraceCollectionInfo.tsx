@@ -1,6 +1,6 @@
 import {InfoCircleOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
-import {Link} from 'react-router-dom';
+import Link from 'components/Link';
 import * as S from './SkipTraceCollectionInfo.styled';
 
 interface IProps {

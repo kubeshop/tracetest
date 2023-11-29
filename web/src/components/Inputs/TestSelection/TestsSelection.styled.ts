@@ -40,6 +40,9 @@ export const ItemListContainer = styled.ul`
 export const TestLink = styled(Link)`
   && {
     color: ${({theme}) => theme.color.text};
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     &:hover,
     &:visited,
@@ -47,4 +50,8 @@ export const TestLink = styled(Link)`
       color: ${({theme}) => theme.color.text};
     }
   }
+`;
+
+export const TestNameContainer = styled.div`
+  overflow: hidden;
 `;
