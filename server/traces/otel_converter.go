@@ -121,12 +121,24 @@ func spanKind(span *v1.Span) SpanKind {
 func getAttributeValue(value *v11.AnyValue) string {
 	switch v := value.GetValue().(type) {
 	case *v11.AnyValue_StringValue:
+		if v == nil {
+			return ""
+		}
+
 		return v.StringValue
 
 	case *v11.AnyValue_IntValue:
+		if v == nil {
+			return "0"
+		}
+
 		return fmt.Sprintf("%d", v.IntValue)
 
 	case *v11.AnyValue_DoubleValue:
+		if v == nil {
+			return "0.0"
+		}
+
 		if v.DoubleValue != 0.0 {
 			isFloatingPoint := math.Abs(v.DoubleValue-math.Abs(v.DoubleValue)) > 0.0
 			if isFloatingPoint {
@@ -137,6 +149,10 @@ func getAttributeValue(value *v11.AnyValue) string {
 		}
 
 	case *v11.AnyValue_BoolValue:
+		if v == nil {
+			return "false"
+		}
+
 		return fmt.Sprintf("%t", v.BoolValue)
 	}
 
@@ -166,6 +182,10 @@ func CreateTraceID(id []byte) trace.TraceID {
 
 func DecodeTraceID(id string) trace.TraceID {
 	bytes, _ := hex.DecodeString(id)
+	if len(bytes) < 16 {
+		return trace.TraceID{}
+	}
+
 	var tid [16]byte
 	copy(tid[:], bytes[:16])
 	return trace.TraceID(tid)

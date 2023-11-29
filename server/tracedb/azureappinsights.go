@@ -214,6 +214,10 @@ func parseSpans(table *azquery.Table) ([]traces.Span, error) {
 
 	for _, eventRow := range eventRows {
 		parentSpan := spanMap[eventRow.ParentID()]
+		if parentSpan == nil {
+			continue
+		}
+
 		event, err := parseEvent(eventRow)
 		if err != nil {
 			return []traces.Span{}, err

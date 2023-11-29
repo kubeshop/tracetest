@@ -24,11 +24,12 @@ func TestTraces(t *testing.T) {
 	spans := []traces.Span{rootSpan, childSpan1, childSpan2, grandchildSpan}
 	trace := traces.NewTrace("trace", spans)
 
-	assert.Len(t, trace.Flat, 4)
+	require.Len(t, trace.Flat, 4)
 	assert.Equal(t, "Root", trace.RootSpan.Name)
-	assert.Equal(t, "child 1", trace.RootSpan.Children[0].Name)
-	assert.Equal(t, "child 2", trace.RootSpan.Children[1].Name)
-	assert.Equal(t, "grandchild", trace.RootSpan.Children[1].Children[0].Name)
+
+	assert.Equal(t, "child 1", child(t, &trace.RootSpan, 0).Name)
+	assert.Equal(t, "child 2", child(t, &trace.RootSpan, 1).Name)
+	assert.Equal(t, "grandchild", grandchild(t, &trace.RootSpan, 1, 0).Name)
 }
 
 func TestTraceWithMultipleRoots(t *testing.T) {
@@ -45,12 +46,12 @@ func TestTraceWithMultipleRoots(t *testing.T) {
 	// agreggate root + 3 roots + 3 child
 	assert.Len(t, trace.Flat, 7)
 	assert.Equal(t, traces.TemporaryRootSpanName, trace.RootSpan.Name)
-	assert.Equal(t, "Root 1", trace.RootSpan.Children[0].Name)
-	assert.Equal(t, "Root 2", trace.RootSpan.Children[1].Name)
-	assert.Equal(t, "Root 3", trace.RootSpan.Children[2].Name)
-	assert.Equal(t, "Child from root 1", trace.RootSpan.Children[0].Children[0].Name)
-	assert.Equal(t, "Child from root 2", trace.RootSpan.Children[1].Children[0].Name)
-	assert.Equal(t, "Child from root 3", trace.RootSpan.Children[2].Children[0].Name)
+	assert.Equal(t, "Root 1", child(t, &trace.RootSpan, 0).Name)
+	assert.Equal(t, "Root 2", child(t, &trace.RootSpan, 1).Name)
+	assert.Equal(t, "Root 3", child(t, &trace.RootSpan, 2).Name)
+	assert.Equal(t, "Child from root 1", grandchild(t, &trace.RootSpan, 0, 0).Name)
+	assert.Equal(t, "Child from root 2", grandchild(t, &trace.RootSpan, 1, 0).Name)
+	assert.Equal(t, "Child from root 3", grandchild(t, &trace.RootSpan, 2, 0).Name)
 }
 
 func TestTraceWithMultipleTemporaryRoots(t *testing.T) {
@@ -66,9 +67,9 @@ func TestTraceWithMultipleTemporaryRoots(t *testing.T) {
 
 	require.Len(t, trace.Flat, 4)
 	assert.Equal(t, traces.TemporaryRootSpanName, trace.RootSpan.Name)
-	assert.Equal(t, "Child from root 1", trace.RootSpan.Children[0].Name)
-	assert.Equal(t, "Child from root 2", trace.RootSpan.Children[1].Name)
-	assert.Equal(t, "Child from root 3", trace.RootSpan.Children[2].Name)
+	assert.Equal(t, "Child from root 1", child(t, &trace.RootSpan, 0).Name)
+	assert.Equal(t, "Child from root 2", child(t, &trace.RootSpan, 1).Name)
+	assert.Equal(t, "Child from root 3", child(t, &trace.RootSpan, 2).Name)
 }
 
 func TestTraceAssemble(t *testing.T) {
@@ -82,16 +83,16 @@ func TestTraceAssemble(t *testing.T) {
 
 	assert.Len(t, trace.Flat, 4)
 	assert.Equal(t, "Temporary Tracetest root span", trace.RootSpan.Name)
-	assert.Equal(t, "Root", trace.RootSpan.Children[0].Name)
-	assert.Equal(t, "child 1", trace.RootSpan.Children[0].Children[0].Name)
-	assert.Equal(t, "grandchild", trace.RootSpan.Children[1].Name)
+	assert.Equal(t, "Root", child(t, &trace.RootSpan, 0).Name)
+	assert.Equal(t, "child 1", grandchild(t, &trace.RootSpan, 0, 0).Name)
+	assert.Equal(t, "grandchild", child(t, &trace.RootSpan, 1).Name)
 
 	trace = traces.NewTrace(trace.ID.String(), append(trace.Spans(), childSpan2))
 	assert.Len(t, trace.Flat, 4)
 	assert.Equal(t, "Root", trace.RootSpan.Name)
-	assert.Equal(t, "child 1", trace.RootSpan.Children[0].Name)
-	assert.Equal(t, "child 2", trace.RootSpan.Children[1].Name)
-	assert.Equal(t, "grandchild", trace.RootSpan.Children[1].Children[0].Name)
+	assert.Equal(t, "child 1", child(t, &trace.RootSpan, 0).Name)
+	assert.Equal(t, "child 2", child(t, &trace.RootSpan, 1).Name)
+	assert.Equal(t, "grandchild", grandchild(t, &trace.RootSpan, 1, 0).Name)
 }
 
 func TestTraceWithMultipleRootsFromOtel(t *testing.T) {
@@ -119,12 +120,12 @@ func TestTraceWithMultipleRootsFromOtel(t *testing.T) {
 	// agreggate root + 3 roots + 3 child
 	assert.Len(t, trace.Flat, 7)
 	assert.Equal(t, traces.TemporaryRootSpanName, trace.RootSpan.Name)
-	assert.Equal(t, "Root 1", trace.RootSpan.Children[0].Name)
-	assert.Equal(t, "Root 2", trace.RootSpan.Children[1].Name)
-	assert.Equal(t, "Root 3", trace.RootSpan.Children[2].Name)
-	assert.Equal(t, "Child from root 1", trace.RootSpan.Children[0].Children[0].Name)
-	assert.Equal(t, "Child from root 2", trace.RootSpan.Children[1].Children[0].Name)
-	assert.Equal(t, "Child from root 3", trace.RootSpan.Children[2].Children[0].Name)
+	assert.Equal(t, "Root 1", child(t, &trace.RootSpan, 0).Name)
+	assert.Equal(t, "Root 2", child(t, &trace.RootSpan, 1).Name)
+	assert.Equal(t, "Root 3", child(t, &trace.RootSpan, 2).Name)
+	assert.Equal(t, "Child from root 1", grandchild(t, &trace.RootSpan, 0, 0).Name)
+	assert.Equal(t, "Child from root 2", grandchild(t, &trace.RootSpan, 1, 0).Name)
+	assert.Equal(t, "Child from root 3", grandchild(t, &trace.RootSpan, 2, 0).Name)
 }
 
 func TestInjectingNewRootWhenSingleRoot(t *testing.T) {
@@ -142,7 +143,7 @@ func TestInjectingNewRootWhenSingleRoot(t *testing.T) {
 	assert.Len(t, newTrace.Flat, 5)
 	assert.Equal(t, "new Root", newTrace.RootSpan.Name)
 	assert.Len(t, newTrace.RootSpan.Children, 1)
-	assert.Equal(t, "Root", newTrace.RootSpan.Children[0].Name)
+	assert.Equal(t, "Root", child(t, &newTrace.RootSpan, 0).Name)
 }
 
 func TestInjectingNewRootWhenMultipleRoots(t *testing.T) {
@@ -166,9 +167,9 @@ func TestInjectingNewRootWhenMultipleRoots(t *testing.T) {
 	assert.Len(t, newTrace.Flat, 7)
 	assert.Equal(t, "new Root", newTrace.RootSpan.Name)
 	assert.Len(t, newTrace.RootSpan.Children, 3)
-	assert.Equal(t, "Root 1", newTrace.RootSpan.Children[0].Name)
-	assert.Equal(t, "Root 2", newTrace.RootSpan.Children[1].Name)
-	assert.Equal(t, "Root 3", newTrace.RootSpan.Children[2].Name)
+	assert.Equal(t, "Root 1", child(t, &newTrace.RootSpan, 0).Name)
+	assert.Equal(t, "Root 2", child(t, &newTrace.RootSpan, 1).Name)
+	assert.Equal(t, "Root 3", child(t, &newTrace.RootSpan, 2).Name)
 
 	for _, oldRoot := range trace.RootSpan.Children {
 		require.NotNil(t, oldRoot.Parent)
@@ -260,6 +261,7 @@ func TestMergingFragmentsFromSameTrace(t *testing.T) {
 	secondFragment := traces.NewTrace(traceID, []traces.Span{rootSpan, childSpan1})
 
 	trace := traces.MergeTraces(&firstFragment, &secondFragment)
+	require.NotNil(t, trace)
 	assert.NotEmpty(t, trace.ID)
 	assert.Len(t, trace.Flat, 3)
 }
@@ -553,4 +555,21 @@ func attributesFromMap(input map[string]string) traces.Attributes {
 	}
 
 	return attributes
+}
+
+func child(t *testing.T, span *traces.Span, index int) *traces.Span {
+	if len(span.Children) < index+1 {
+		t.FailNow()
+	}
+
+	child := span.Children[index]
+	if child == nil {
+		t.FailNow()
+	}
+
+	return child
+}
+
+func grandchild(t *testing.T, span *traces.Span, parentIndex int, grandChildIndex int) *traces.Span {
+	return child(t, child(t, span, parentIndex), grandChildIndex)
 }
