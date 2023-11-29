@@ -610,6 +610,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/cloud-agent",
+          label: "Cloud Agent (Beta)",
+        },
+        {
+          type: "doc",
           id: "concepts/architecture",
           label: "Architecture",
         },
