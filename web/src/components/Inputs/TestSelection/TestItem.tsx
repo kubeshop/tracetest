@@ -20,9 +20,11 @@ const TestItem = ({test, onDelete, sortableId}: IProps) => {
   return (
     <S.TestItemContainer ref={setNodeRef} style={style} {...attributes}>
       <S.DragHandle {...listeners} />
-      <S.TestLink to={`/test/${test.id}`} target="_blank">
-        <span>{test.name}</span>
-      </S.TestLink>
+      <S.TestNameContainer>
+        <S.TestLink to={`/test/${test.id}`} target="_blank">
+          <span>{test.name}</span>
+        </S.TestLink>
+      </S.TestNameContainer>
       <S.DeleteIcon onClick={() => onDelete(sortableId)} />
     </S.TestItemContainer>
   );
