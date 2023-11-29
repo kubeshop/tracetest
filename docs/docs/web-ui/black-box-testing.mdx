@@ -1,0 +1,85 @@
+---
+id: black-box-testing
+title: Enabling Black-Box Testing
+description: Tracetest enables configuring tests to run in a black box environment visually in the Tracetest Web UI.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - observability
+  - distributed tracing
+  - testing
+  - black-box testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+This page shows how to configure black box testing in the Tracetest Web UI.
+
+👉 **Join our [shared Pokeshop API Demo environment](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept) and try creating a Test yourself!**
+
+![Main Screen](../img/main-screen-0.14.png)
+
+Click the **Create** button:
+
+![Create a Test Button](../img/create-test-button-0.14.png)
+
+The "Create New Test" dialog appears.
+The option to choose the kind of trigger to initiate the trace is presented:
+
+- HTTP Request - Create a basic HTTP request.
+- GRPC Request - Test and debug your GRPC request.
+- Kafka - Test consumers with Kafka messages.
+- TraceID - Define your test via a TraceID (Not Available for Black-Box Testing).
+
+Then, click one of the options to continue:
+
+![Choose Trigger](../img/choose-trigger-0.14.png)
+
+In this example, HTTP Request has been chosen.
+
+![Choose Example](../img/choose-example-0.14.png)
+
+Input the **Name** and **Trigger** details for a non-instrumented service.
+
+We are using a generic **GET** request to **google.com** in this case:
+
+![GET Google](../img/black-box-google-0.14.png)
+
+Click **Run**:
+
+![Run Test](../img/black-box-google-run-0.14.png)
+
+The test will start:
+
+![Trigger Response](../img/black-box-google-response-0.14.png)
+
+After a few seconds, the skip **awaiting trace** popup will show up:
+
+![Skip Trace Collection Popup](../img/black-box-popup-0.14.png)
+
+Click, the  **Skip awaiting trace** button:
+
+![Skip Trace Collection Click](../img/black-box-popup-click-0.14.png)
+
+The Run will complete, showing the **Tracetest trigger** root span:
+
+![Tracetest Trigger Span](../img/black-box-test-tab-0.14.png)
+
+Create a **Test Spec** from the **Tracetest Trigger** span:
+
+![Create Test Spec](../img/black-box-create-spec-0.14.gif)
+
+To have test runs always skip the **awaiting trace** step, go to the settings tab under the trigger section:
+
+![Trigger Settings](../img/black-box-settings-0.14.png)
+
+And, enable the **Skip Trace collection** option:
+
+![Skip Trace Collection Setting](../img/black-box-skip-settings-0.14.png)
+
+Then click **Run** to save the changes:
+
+![Skip Trace Collection Setting Run](../img/black-box-skip-settings-run-0.14.png)
+
+Please visit the [Test Results](/web-ui/test-results) document for an explanation of viewing the results of a test.
+
+👉 **Join our [shared Pokeshop API Demo environment](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept) and try creating a Test yourself!**
