@@ -1,0 +1,27 @@
+---
+id: environment-tokens
+title: Environment Tokens
+description: Environment Tokens are strings used to authenticate Tracetest CLI against an organization and environment.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+Environment Tokens are strings used to authenticate the Tracetest CLI against an organization and environment.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1701296331/docs/environment-tokens_gkt9kx.png)
+
+These tokens are used to configure the Tracetest CLI in environment where you cannot login with user interaction, like CI/CD environments.
+
+Create a new token by clicking on the `Create a new token` button, choosing a name, role and expiration and then clicking on `Create`. This will create a token that you can copy and use to configure Tracetest CLI with:
+
+```bash
+tracetest configure --token {ADD_YOUR_TOKEN_HERE}
+```
+
+One example of this usage can be seen [here](https://github.com/kubeshop/tracetest/blob/main/.github/workflows/scheduled-jobs.yml#L23).

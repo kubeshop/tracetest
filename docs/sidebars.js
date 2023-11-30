@@ -630,6 +630,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/environment-tokens",
+          label: "Environment Tokens",
+        },
+        {
+          type: "doc",
           id: "concepts/assertions",
           label: "Assertions",
         },
