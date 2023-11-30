@@ -1,0 +1,51 @@
+---
+id: cloud-agent
+title: Tracetest Cloud Agent (Beta)
+description: Tracetest Cloud Agent allows you to run Tracetest tests against public facing endpoints without deploying the Tracetest Agent.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - agent
+  - cloud agent
+  - serverless agent
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+Tracetest Cloud Agent allows you to run Tracetest tests against public facing endpoints without deploying the Tracetest Agent. This allowing you to trigger tests against public endpoints and collect traces information from either public trace data stores or, alternatively, directly receive incoming OTLP data.
+
+## Opt-In
+
+### Prerequisites
+
+- Not supported for **localMode**.
+- Having Admin level access to the Environment.
+
+### Steps
+
+Go to your Environment Agent Settings page:
+
+![Agent Settings](../img/agent-settings-0.14.png)
+
+Turn the **Run Agent on the Cloud** switch on:
+
+![Agent Settings Switch](../img/agent-settings-switch-0.14.png)
+
+Wait for the Agent information is ready:
+
+![Cloud Agent](../img/agent-settings-cloud-0.14.png)
+
+Configure the public trace data store that the trace data is being written into via the configure data store tab or use the supplied OTLP endpoints to alter your OTel Collector configuration to send trace information via either gRPC or HTTP directly to Tracetest.io.
+
+## How It Works
+
+- Tracetest Cloud Agent executes tests from [Tracetest](https://app.tracetest.io), so it must be able to reach the public endpoint. It gathers the response from the trigger and updates the test run.
+- Tracetest Cloud Agent listens on OTLP ports 4317 (gRPC) and 4318 (HTTP) for OpenTelemetry trace spans to capture distributed trace data and relay it to [Tracetest](https://app.tracetest.io).
+- Alternatively, the Tracetest Cloud Agent can gather the associated trace data from a publicly reachable trace data store. Eg. a Grafana Cloud Tempo instance which has been configured for this environment via the Configure Data Store tab.
+- With both the response and trace, you build tests and create assertions with data from either or both of them.
+
+## Architecture
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1701291031/docs/cloud-agent.png)
