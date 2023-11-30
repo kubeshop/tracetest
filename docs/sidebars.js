@@ -630,6 +630,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/roles-and-permissions",
+          label: "Roles and Permissions",
+        },
+        {
+          type: "doc",
           id: "concepts/environment-tokens",
           label: "Environment Tokens",
         },
