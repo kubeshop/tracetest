@@ -114,7 +114,7 @@ spec:
 ```
 
 Execute the following command to create the test executor object in Testkube. Do not forget to provide the path to your Tracetest definition file using the `--file` argument, and also the follow variables:
-- **If you are using [Tracetest Core](https://docs.tracetest.io/core/getting-started/installation/)**: define the Tracetest Server endpoint using the `TRACETEST_ENDPOINT` `--variable` (remember that the TRACETEST_ENDPOINT should be reachable from the Testkube instance)
+- **If you are using [Tracetest Core](https://docs.tracetest.io/core/getting-started/installation/)**: Define the Tracetest Server endpoint using the `TRACETEST_ENDPOINT` `--variable` (remember that the TRACETEST_ENDPOINT should be reachable from the Testkube instance).
 
 ```bash
 kubectl testkube create test --file my/file/location.yaml --type "tracetest/test" --name pokeshop-tracetest-test --variable TRACETEST_ENDPOINT=http://tracetest
