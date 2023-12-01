@@ -11,7 +11,7 @@ const FramedCodeBlock = ({title, actions, ...props}: IProps) => {
   const copy = useCopy();
 
   return (
-    <S.FrameContainer>
+    <S.FrameContainer $isFullHeight={props.isFullHeight}>
       <S.FrameHeader>
         <S.FrameTitle>{title}</S.FrameTitle>
         <S.ActionsContainer>

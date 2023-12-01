@@ -11,7 +11,6 @@ export const Section = styled.div`
   background-color: ${({theme}) => theme.color.white};
   overflow-y: scroll;
   flex-basis: 50%;
-  max-width: 50vw;
 `;
 
 export const SectionLeft = styled(Section)`

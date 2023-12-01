@@ -33,12 +33,18 @@ const RunDetailAutomateDefinition = ({id, version, resourceType, fileName, onFil
       <S.FileName>
         <Overlay value={fileName} onChange={onFileNameChange} />
       </S.FileName>
-      <FramedCodeBlock title="Preview your YAML file" value={definition} language="yaml" />
-      <S.Footer>
-        <Button data-cy="file-viewer-download" icon={<DownloadOutlined />} onClick={onDownload} type="primary">
-          Download File
-        </Button>
-      </S.Footer>
+
+      <FramedCodeBlock
+        title="Preview your YAML file"
+        value={definition}
+        language="yaml"
+        actions={
+          <Button data-cy="file-viewer-download" icon={<DownloadOutlined />} onClick={onDownload} type="primary">
+            Download File
+          </Button>
+        }
+        isFullHeight
+      />
     </S.Container>
   );
 };
