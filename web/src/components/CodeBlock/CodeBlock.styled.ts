@@ -6,7 +6,6 @@ export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string;
   min-height: ${({$minHeight}) => $minHeight || '370px'};
 
   pre {
-    border: ${({theme}) => `1px solid ${theme.color.border}`};
     margin: 0;
     padding: 13px 16px !important;
     min-height: inherit;
