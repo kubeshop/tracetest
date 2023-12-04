@@ -10,6 +10,7 @@ export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string;
     margin: 0;
     padding: 13px 16px !important;
     min-height: inherit;
+    border: ${({theme}) => `1px solid ${theme.color.border}`};
     max-height: ${({$maxHeight}) => $maxHeight || '340px'};
     background: ${({theme}) => theme.color.background} !important;
 
@@ -30,6 +31,8 @@ export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string;
 `;
 
 export const FrameContainer = styled.div<{$isFullHeight?: boolean}>`
+  position: relative;
+
   ${({$isFullHeight}) =>
     $isFullHeight &&
     css`
@@ -53,9 +56,12 @@ export const FrameTitle = styled(Typography.Paragraph)`
   }
 `;
 
-export const CopyButton = styled(Button)`
+export const CopyButton = styled(Button).attrs({
+  size: 'small',
+})`
   && {
     padding: 0 8px;
+    width: 80px;
     background: ${({theme}) => theme.color.white};
     font-weight: 600;
 
