@@ -16,9 +16,6 @@ your test spans not sampled by your probabilistic sampler. There are a couple of
 
 ## Add a Separate Pipeline for Tracetest in your OpenTelemetry Collector
 
-> :warning: Note: This requires the [OpenTelemetry collector contrib](https://hub.docker.com/r/otel/opentelemetry-collector-contrib) instead of the core release
-> of the collector
-
 Your existing OpenTelemetry Collector already receives traces from your applications and sends them to your datastore and you have a set of processors configured to ensure the quality of the traces your datastore is receiving. It probably looks like this one:
 
 ```yaml
@@ -59,22 +56,20 @@ receivers:
       http:
 
 processors:
+  batch:
+
   probabilistic_sampler:
     hash_seed: 22
     sampling_percentage: 5.0
 
-  batch:
-
-  # Filters spans that have the tracestate `tracetest=true` in their context. This value
-  # is injected by Tracetest when triggering the test
-  #
-  # Note: this requires the `collector-contrib` version of the collector
-  tail_sampling:
-    decision_wait: 5s
-    policies:
-      - name: tracetest-spans
-        type: trace_state
-        trace_state: { key: tracetest, values: ["true"] }
+  # If this configuration fails on your collector, make sure to update it to a newer version.
+  # This is the recommended way of filtering spans based on the `trace_state`. It's faster and less
+  # resource intensive than using a `tail_sampling` approach.
+  filter/tracetest:
+    error_mode: ignore
+    traces:
+      span:
+        - 'trace_state["tracetest"] != "true"'
 
 exporters:
   otlp/jaeger:
@@ -92,7 +87,7 @@ service:
   pipelines:
     traces/tracetest:
       receivers: [otlp]
-      processors: [tail_sampling, batch]
+      processors: [filter/tracetest, batch]
       exporters: [otlp/jaeger]
 ```
 
