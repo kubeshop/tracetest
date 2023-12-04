@@ -28,4 +28,4 @@ service:
     traces/1:
       receivers: [otlp]
       processors: [filter/tracetest, batch]
-      exporters: [logging]
+      exporters: [otlp/1]
