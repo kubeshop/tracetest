@@ -1,0 +1,54 @@
+version: '3'
+services:
+
+    tracetest:
+        image: kubeshop/tracetest:${TAG:-latest}
+        # uncommentig this line breaks the portability of this file, that is the base for the installer
+        # platform: linux/amd64
+        volumes:
+            - type: bind
+              source: ./tracetest-config.yaml
+              target: /app/tracetest.yaml
+            - type: bind
+              source: ./tracetest-provision.yaml
+              target: /app/provision.yaml
+        command: --provisioning-file /app/provision.yaml
+        ports:
+            - 11633:11633
+        extra_hosts:
+          - "host.docker.internal:host-gateway"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            otel-collector:
+                condition: service_started
+        healthcheck:
+            test: ["CMD", "wget", "--spider", "localhost:11633"]
+            interval: 1s
+            timeout: 3s
+            retries: 60
+        environment:
+            TRACETEST_DEV: ${TRACETEST_DEV}
+
+    postgres:
+        image: postgres:14
+        environment:
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_USER: postgres
+        healthcheck:
+            test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+            interval: 1s
+            timeout: 5s
+            retries: 60
+
+    otel-collector:
+        image: otel/opentelemetry-collector:0.90.1
+        command:
+            - "--config"
+            - "/otel-local-config.yaml"
+        volumes:
+            - ./collector.config.yaml:/otel-local-config.yaml
+        ports:
+          - 4317:4317
+        environment:
+            - TRACETEST_ENDPOINT=tracetest:4317

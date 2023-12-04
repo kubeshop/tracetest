@@ -1,0 +1,31 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+  filter/tracetest:
+    error_mode: ignore
+    traces:
+      span:
+        - 'trace_state["tracetest"] != "true"'
+
+exporters:
+  logging:
+    loglevel: debug
+
+  otlp/1:
+    endpoint: ${TRACETEST_ENDPOINT}
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces/1:
+      receivers: [otlp]
+      processors: [filter/tracetest, batch]
+      exporters: [logging]
