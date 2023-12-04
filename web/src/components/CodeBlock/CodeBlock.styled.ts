@@ -1,7 +1,7 @@
 import {Button, Typography} from 'antd';
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 
-export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string}>`
+export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string; $isFullHeight?: boolean}>`
   position: relative;
   min-height: ${({$minHeight}) => $minHeight || '370px'};
 
@@ -17,11 +17,28 @@ export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string}
       background: ${({theme}) => theme.color.backgroundInteractive} !important;
     }
   }
+
+  ${({$isFullHeight}) =>
+    $isFullHeight &&
+    css`
+      height: calc(100% - 49px);
+
+      pre {
+        max-height: 100%;
+      }
+    `}
 `;
 
-export const FrameContainer = styled.div`
+export const FrameContainer = styled.div<{$isFullHeight?: boolean}>`
   position: relative;
+
+  ${({$isFullHeight}) =>
+    $isFullHeight &&
+    css`
+      height: calc(100% - 72px);
+    `}
 `;
+
 export const FrameHeader = styled.div`
   display: flex;
   justify-content: space-between;

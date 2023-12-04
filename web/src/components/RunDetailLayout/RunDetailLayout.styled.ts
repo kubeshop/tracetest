@@ -9,7 +9,7 @@ export const BackIcon = styled(LeftOutlined)`
 `;
 
 export const Container = styled.div`
-  height: 100vh;
+  height: 100%;
 
   .run-tabs.ant-tabs,
   .run-tabs.ant-tabs .ant-tabs-content {
