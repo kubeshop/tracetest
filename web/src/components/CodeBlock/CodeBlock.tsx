@@ -10,6 +10,7 @@ export interface IProps {
   mimeType?: string;
   maxHeight?: string;
   minHeight?: string;
+  className?: string;
 }
 
 const getLanguage = (mimeType: string): LanguageName | undefined => {
@@ -32,7 +33,7 @@ const formatValue = (value: string, lang?: string): string => {
   }
 };
 
-const CodeBlock = ({value, language, mimeType = '', maxHeight = '', minHeight = ''}: IProps) => {
+const CodeBlock = ({value, language, mimeType = '', maxHeight = '', minHeight = '', className = ''}: IProps) => {
   const lang = useMemo(() => language || getLanguage(mimeType), [language, mimeType]);
 
   // SyntaxHighlighter has a performance problem, so we need to memoize it
@@ -47,7 +48,7 @@ const CodeBlock = ({value, language, mimeType = '', maxHeight = '', minHeight = 
   );
 
   return (
-    <S.CodeContainer data-cy="code-block" $maxHeight={maxHeight} $minHeight={minHeight}>
+    <S.CodeContainer className={className} data-cy="code-block" $maxHeight={maxHeight} $minHeight={minHeight}>
       {memoizedHighlighter}
     </S.CodeContainer>
   );

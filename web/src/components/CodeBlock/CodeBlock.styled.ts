@@ -3,13 +3,13 @@ import styled from 'styled-components';
 
 export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string}>`
   position: relative;
-  border: ${({theme}) => `1px solid ${theme.color.border}`};
   min-height: ${({$minHeight}) => $minHeight || '370px'};
 
   pre {
     margin: 0;
     padding: 13px 16px !important;
     min-height: inherit;
+    border: ${({theme}) => `1px solid ${theme.color.border}`};
     max-height: ${({$maxHeight}) => $maxHeight || '340px'};
     background: ${({theme}) => theme.color.background} !important;
 
@@ -19,7 +19,9 @@ export const CodeContainer = styled.div<{$maxHeight: string; $minHeight: string}
   }
 `;
 
-export const FrameContainer = styled.div``;
+export const FrameContainer = styled.div`
+  position: relative;
+`;
 export const FrameHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -36,9 +38,12 @@ export const FrameTitle = styled(Typography.Paragraph)`
   }
 `;
 
-export const CopyButton = styled(Button)`
+export const CopyButton = styled(Button).attrs({
+  size: 'small',
+})`
   && {
     padding: 0 8px;
+    width: 80px;
     background: ${({theme}) => theme.color.white};
     font-weight: 600;
 
