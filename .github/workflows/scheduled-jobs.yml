@@ -23,7 +23,7 @@ jobs:
           tracetest configure --token ${{secrets.TRACETEST_POKESHOP_TOKEN}}
       - name: Run synthetic monitoring tests
         run: |
-          tracetest run testsuite --file ./testing/synthetic-monitoring/pokeshop/_testsuite.yaml
+          tracetest run testsuite --file ./testing/synthetic-monitoring/pokeshop/_testsuite.yaml --vars ./testing/synthetic-monitoring/pokeshop/_variableset.yaml
       - name: Send message on Slack in case of failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
