@@ -39,7 +39,7 @@ const Router = () => {
         <Route path="/testsuite/:testSuiteId/run/:runId/automate" element={<TestSuiteRunAutomate />} />
       </Route>
 
-      <Route path="*" element={<Navigate to={baseUrl} />} />
+      <Route path="*" element={<Navigate to={baseUrl || '/'} />} />
     </Routes>
   );
 };
