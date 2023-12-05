@@ -7,7 +7,7 @@ spec:
     type: http
     httpRequest:
       method: GET
-      url: http://demo-pokeshop/pokemon?take=100&skip=0
+      url: ${var:POKESHOP_API_URL}/pokemon?take=100&skip=0
       headers:
       - key: Content-Type
         value: application/json

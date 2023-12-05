@@ -7,7 +7,7 @@ spec:
     type: http
     httpRequest:
       method: POST
-      url: http://demo-pokeshop/pokemon/import
+      url: ${var:POKESHOP_API_URL}/pokemon/import
       body: |
         {
           "id": 143
