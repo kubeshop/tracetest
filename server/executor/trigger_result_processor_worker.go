@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/analytics"
-	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
@@ -128,9 +127,7 @@ func (r triggerResultProcessorWorker) handleExecutionResult(run test.Run, ctx co
 	if run.TriggerResult.Error != nil {
 		run = run.TriggerFailed(fmt.Errorf(run.TriggerResult.Error.ErrorMessage))
 
-		eventData := map[string]string{"finalState": string(run.State)}
-		eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
-		analytics.SendEvent("test_run_finished", "error", "", &eventData)
+		analytics.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 		return run
 	}

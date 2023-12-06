@@ -10,7 +10,6 @@ import (
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
@@ -103,9 +102,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		populateSpan(span, job, reason, &successful)
 
 		run := job.Run.TraceFailed(err)
-		eventData := map[string]string{"finalState": string(run.State)}
-		eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
-		analytics.SendEvent("test_run_finished", "error", "", &eventData)
+		analytics.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 		handleDBError(w.state.updater.Update(ctx, run))
 

@@ -8,7 +8,6 @@ import (
 
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/expression"
-	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/maps"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
@@ -79,9 +78,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 		}
 
 		run = run.AssertionFailed(err)
-		eventData := map[string]string{"finalState": string(run.State)}
-		eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
-		analytics.SendEvent("test_run_finished", "error", "", &eventData)
+		analytics.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 		return test.Run{}, e.updater.Update(ctx, run)
 	}
@@ -138,9 +135,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 		allPassed,
 	)
 
-	eventData := map[string]string{"finalState": string(run.State)}
-	eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
-	analytics.SendEvent("test_run_finished", "successful", "", &eventData)
+	analytics.SendEventWithProperties("test_run_finished", "successful", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 	return run, nil
 }
