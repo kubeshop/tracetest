@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -329,7 +328,7 @@ func (app *App) Start(opts ...appOption) error {
 	router.Use(middleware.NewMetricMiddleware(meter))
 
 	// use the analytics middleware on complete router
-	router.Use(analyticsMW)
+	router.Use(middleware.AnalyticsMiddleware)
 
 	// use the tenant middleware on complete router
 	router.Use(middleware.TenantMiddleware)
@@ -370,42 +369,6 @@ func (app *App) Start(opts ...appOption) error {
 	log.Printf("HTTP Server started on %s", httpServer.Addr)
 
 	return nil
-}
-
-var (
-	matchFirstCap     = regexp.MustCompile("(.)([A-Z][a-z]+)")
-	matchAllCap       = regexp.MustCompile("([a-z0-9])([A-Z])")
-	matchResourceName = regexp.MustCompile(`(\w)(\.)(\w)`)
-)
-
-func toWords(str string) string {
-	if matchResourceName.MatchString(str) {
-		return str
-	}
-	words := matchFirstCap.ReplaceAllString(str, "${1} ${2}")
-	words = matchAllCap.ReplaceAllString(words, "${1} ${2}")
-	return words
-}
-
-// Analytics global middleware
-func analyticsMW(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		routeName := mux.CurrentRoute(r).GetName()
-		machineID := r.Header.Get("x-client-id")
-		source := r.Header.Get("x-source")
-		eventProperties := r.Header.Get("x-event-properties")
-
-		eventData := map[string]string{
-			"source": source,
-		}
-		eventData = analytics.InjectProperties(eventData, eventProperties)
-
-		if routeName != "" {
-			analytics.SendEvent(toWords(routeName), "test", machineID, &eventData)
-		}
-
-		next.ServeHTTP(w, r)
-	})
 }
 
 func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabled bool, serverID string, isTracetestDev bool) {

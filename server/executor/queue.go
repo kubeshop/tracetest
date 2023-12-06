@@ -515,6 +515,11 @@ func (b tenantPropagator) Inject(ctx context.Context, carrier propagation.TextMa
 	if instanceID != nil {
 		carrier.Set("instanceID", instanceID.(string))
 	}
+
+	eventProperties := middleware.EventPropertiesFromContext(ctx)
+	if eventProperties != "" {
+		carrier.Set(string(middleware.EventPropertiesKey), eventProperties)
+	}
 }
 
 // Extract returns a copy of parent with the baggage from the carrier added.
@@ -529,6 +534,11 @@ func (b tenantPropagator) Extract(parent context.Context, carrier propagation.Te
 	instanceID := carrier.Get("instanceID")
 	if instanceID != "" {
 		resultingCtx = context.WithValue(resultingCtx, "instanceID", instanceID)
+	}
+
+	eventProperties := carrier.Get(string(middleware.EventPropertiesKey))
+	if eventProperties != "" {
+		resultingCtx = context.WithValue(resultingCtx, middleware.EventPropertiesKey, eventProperties)
 	}
 
 	return resultingCtx

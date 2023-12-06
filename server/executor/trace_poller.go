@@ -203,10 +203,9 @@ func (tp tracePoller) handleTraceDBError(ctx context.Context, job Job, err error
 	}
 
 	run = run.TraceFailed(err)
-	analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-		"finalState": string(run.State),
-		"tenant_id":  middleware.TenantIDFromContext(ctx),
-	})
+	eventData := map[string]string{"finalState": string(run.State)}
+	eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
+	analytics.SendEvent("test_run_finished", "error", "", &eventData)
 
 	tp.handleDBError(tp.updater.Update(ctx, run))
 

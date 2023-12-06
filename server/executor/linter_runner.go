@@ -130,10 +130,9 @@ func (e *defaultLinterRunner) onError(ctx context.Context, job Job, run test.Run
 		log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterError event: %s\n", job.Test.ID, job.Run.ID, anotherErr.Error())
 	}
 
-	analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-		"finalState": string(run.State),
-		"tenant_id":  middleware.TenantIDFromContext(ctx),
-	})
+	eventData := map[string]string{"finalState": string(run.State)}
+	eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
+	analytics.SendEvent("test_run_finished", "error", "", &eventData)
 
 	run = run.LinterError(err)
 	return run, e.updater.Update(ctx, run)

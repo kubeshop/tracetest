@@ -79,10 +79,9 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 		}
 
 		run = run.AssertionFailed(err)
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-			"finalState": string(run.State),
-			"tenant_id":  middleware.TenantIDFromContext(ctx),
-		})
+		eventData := map[string]string{"finalState": string(run.State)}
+		eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
+		analytics.SendEvent("test_run_finished", "error", "", &eventData)
 
 		return test.Run{}, e.updater.Update(ctx, run)
 	}
@@ -139,10 +138,9 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 		allPassed,
 	)
 
-	analytics.SendEvent("test_run_finished", "successful", "", &map[string]string{
-		"finalState": string(run.State),
-		"tenant_id":  middleware.TenantIDFromContext(ctx),
-	})
+	eventData := map[string]string{"finalState": string(run.State)}
+	eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
+	analytics.SendEvent("test_run_finished", "successful", "", &eventData)
 
 	return run, nil
 }

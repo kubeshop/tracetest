@@ -103,10 +103,9 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		populateSpan(span, job, reason, &successful)
 
 		run := job.Run.TraceFailed(err)
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-			"finalState": string(run.State),
-			"tenant_id":  middleware.TenantIDFromContext(ctx),
-		})
+		eventData := map[string]string{"finalState": string(run.State)}
+		eventData = analytics.InjectProperties(eventData, middleware.EventPropertiesFromContext(ctx))
+		analytics.SendEvent("test_run_finished", "error", "", &eventData)
 
 		handleDBError(w.state.updater.Update(ctx, run))
 
