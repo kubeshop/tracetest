@@ -7,8 +7,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
@@ -202,7 +202,7 @@ func (tp tracePoller) handleTraceDBError(ctx context.Context, job Job, err error
 	}
 
 	run = run.TraceFailed(err)
-	analytics.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
+	middleware.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 	tp.handleDBError(tp.updater.Update(ctx, run))
 

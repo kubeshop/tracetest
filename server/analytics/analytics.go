@@ -1,12 +1,9 @@
 package analytics
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"os"
-
-	"github.com/kubeshop/tracetest/server/http/middleware"
 )
 
 type Tracker interface {
@@ -70,11 +67,6 @@ func SendEvent(name, category, clientID string, data *map[string]string) error {
 	}
 
 	return err
-}
-
-func SendEventWithProperties(name, category, clientID string, data map[string]string, ctx context.Context) error {
-	eventData := InjectProperties(data, middleware.EventPropertiesFromContext(ctx))
-	return SendEvent(name, category, clientID, &eventData)
 }
 
 func InjectProperties(data map[string]string, properties string) map[string]string {

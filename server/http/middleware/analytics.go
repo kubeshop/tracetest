@@ -57,3 +57,8 @@ func EventPropertiesFromContext(ctx context.Context) string {
 
 	return eventProperties.(string)
 }
+
+func SendEventWithProperties(name, category, clientID string, data map[string]string, ctx context.Context) error {
+	eventData := analytics.InjectProperties(data, EventPropertiesFromContext(ctx))
+	return analytics.SendEvent(name, category, clientID, &eventData)
+}

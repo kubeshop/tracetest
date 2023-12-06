@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kubeshop/tracetest/server/analytics"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/linter"
 	"github.com/kubeshop/tracetest/server/linter/analyzer"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -129,7 +129,7 @@ func (e *defaultLinterRunner) onError(ctx context.Context, job Job, run test.Run
 		log.Printf("[linterRunner] Test %s Run %d: fail to emit TracelinterError event: %s\n", job.Test.ID, job.Run.ID, anotherErr.Error())
 	}
 
-	analytics.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
+	middleware.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 	run = run.LinterError(err)
 	return run, e.updater.Update(ctx, run)
