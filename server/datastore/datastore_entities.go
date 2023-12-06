@@ -32,6 +32,7 @@ type DataStoreValues struct {
 	SignalFx         *SignalFXConfig           `json:"signalfx,omitempty"`
 	Tempo            *MultiChannelClientConfig `json:"tempo,omitempty"`
 	AzureAppInsights *AzureAppInsightsConfig   `json:"azureappinsights,omitempty"`
+	SumoLogic        *SumoLogicConfig          `json:"sumologic"`
 }
 
 type AWSXRayConfig struct {
@@ -126,6 +127,12 @@ type AzureAppInsightsConfig struct {
 	ConnectionType              ConnectionTypes `json:"connectionType"`
 }
 
+type SumoLogicConfig struct {
+	URL       string `json:"url"`
+	AccessID  string `json:"accessID"`
+	AccessKey string `json:"accessKey"`
+}
+
 const (
 	DataStoreTypeJaeger           DataStoreType = "jaeger"
 	DataStoreTypeTempo            DataStoreType = "tempo"
@@ -139,6 +146,7 @@ const (
 	DataStoreTypeAwsXRay          DataStoreType = "awsxray"
 	DataStoreTypeHoneycomb        DataStoreType = "honeycomb"
 	DatastoreTypeAzureAppInsights DataStoreType = "azureappinsights"
+	DatastoreTypeSumoLogic        DataStoreType = "sumologic"
 	DatastoreTypeSignoz           DataStoreType = "signoz"
 	DatastoreTypeDynatrace        DataStoreType = "dynatrace"
 	DatastoreTypeAgent            DataStoreType = "agent"

@@ -145,6 +145,16 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		return
 	}
 
+	if augmenter, ok := traceDB.(tracedb.TraceAugmenter); ok {
+		augmentedTrace, err := augmenter.AugmentTrace(ctx, job.Run.Trace)
+		if err != nil {
+			log.Printf("[TracePoller] Test %s Run %d: could not augment trace %s: %s", job.Test.ID, job.Run.ID, job.Run.TraceID, err.Error())
+			handleError(ctx, job, err, w.state, span)
+			return
+		}
+
+		job.Run.Trace = augmentedTrace
+	}
 	w.donePolling(ctx, reason, job)
 }
 
