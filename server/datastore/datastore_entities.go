@@ -338,5 +338,6 @@ func (d DataStore) squashed() squashedDataStore {
 		SignalFx:               d.Values.SignalFx,
 		Tempo:                  d.Values.Tempo,
 		AzureAppInsightsConfig: d.Values.AzureAppInsights,
+		SumoLogic:              d.Values.SumoLogic,
 	}
 }
