@@ -8,6 +8,7 @@ import BaseClientService from './DataStores/BaseClient.service';
 import JaegerService from './DataStores/Jaeger.service';
 import AwsXRayService from './DataStores/AwsXRay.service';
 import AzureAppInsightsService from './DataStores/AzureAppInsights.service';
+import SumoLogicService from './DataStores/SumoLogic.service';
 
 const dataStoreServiceMap = {
   [SupportedDataStores.Agent]: OtelCollectorService,
@@ -25,6 +26,7 @@ const dataStoreServiceMap = {
   [SupportedDataStores.AzureAppInsights]: AzureAppInsightsService,
   [SupportedDataStores.Signoz]: OtelCollectorService,
   [SupportedDataStores.Dynatrace]: OtelCollectorService,
+  [SupportedDataStores.SumoLogic]: SumoLogicService,
 } as const;
 
 interface IDataStoreService {

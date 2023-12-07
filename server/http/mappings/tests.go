@@ -56,14 +56,14 @@ func (m OpenAPI) TestSuiteRun(in testsuite.TestSuiteRun) openapi.TestSuiteRun {
 
 func (m OpenAPI) Test(in test.Test) openapi.Test {
 	return openapi.Test{
-		Id:          string(in.ID),
-		Name:        in.Name,
-		Description: in.Description,
-		Trigger:     m.Trigger(in.Trigger),
-		Specs:       m.Specs(in.Specs),
-		Version:     int32(*in.Version),
-		CreatedAt:   *in.CreatedAt,
-		Outputs:     m.Outputs(in.Outputs),
+		Id:                  string(in.ID),
+		Name:                in.Name,
+		Description:         in.Description,
+		Trigger:             m.Trigger(in.Trigger),
+		Specs:               m.Specs(in.Specs),
+		Version:             int32(*in.Version),
+		CreatedAt:           *in.CreatedAt,
+		Outputs:             m.Outputs(in.Outputs),
 		SkipTraceCollection: in.SkipTraceCollection,
 		Summary: openapi.TestSummary{
 			Runs: int32(in.Summary.Runs),

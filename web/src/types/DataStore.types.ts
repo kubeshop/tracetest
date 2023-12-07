@@ -31,6 +31,7 @@ export enum SupportedDataStores {
   AzureAppInsights = 'azureappinsights',
   Signoz = 'signoz',
   Dynatrace = 'dynatrace',
+  SumoLogic = 'sumologic',
 }
 
 export enum SupportedClientTypes {

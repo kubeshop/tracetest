@@ -15,6 +15,7 @@ import Honeycomb from './Icons/Honeycomb';
 import AzureAppInsights from './Icons/AzureAppInsights';
 import Signoz from './Icons/Signoz';
 import Dynatrace from './Icons/Dynatrace';
+import SumoLogic from './Icons/SumoLogic';
 
 const iconMap = {
   [SupportedDataStores.Agent]: Agent,
@@ -32,6 +33,7 @@ const iconMap = {
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Signoz]: Signoz,
   [SupportedDataStores.Dynatrace]: Dynatrace,
+  [SupportedDataStores.SumoLogic]: SumoLogic,
 } as const;
 
 interface IProps {

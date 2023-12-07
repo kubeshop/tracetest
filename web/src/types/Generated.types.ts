@@ -1324,6 +1324,7 @@ export interface external {
           signalfx?: external["dataStores.yaml"]["components"]["schemas"]["SignalFX"];
           awsxray?: external["dataStores.yaml"]["components"]["schemas"]["AwsXRay"];
           azureappinsights?: external["dataStores.yaml"]["components"]["schemas"]["AzureAppInsights"];
+          sumologic?: external["dataStores.yaml"]["components"]["schemas"]["SumoLogic"];
           /** Format: date-time */
           createdAt?: string;
         };
@@ -1356,6 +1357,11 @@ export interface external {
           secretAccessKey?: string;
           sessionToken?: string;
           useDefaultAuth?: boolean;
+        };
+        SumoLogic: {
+          url?: string;
+          accessID?: string;
+          accessKey?: string;
         };
         HTTPClientSettings: {
           url?: string;
@@ -1411,7 +1417,8 @@ export interface external {
           | "honeycomb"
           | "azureappinsights"
           | "signoz"
-          | "dynatrace";
+          | "dynatrace"
+          | "sumologic";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
         /** @enum {string} */

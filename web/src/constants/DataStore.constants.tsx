@@ -16,6 +16,7 @@ export const SupportedDataStoresToName = {
   [SupportedDataStores.AzureAppInsights]: 'Azure App Insights',
   [SupportedDataStores.Signoz]: 'Signoz',
   [SupportedDataStores.Dynatrace]: 'Dynatrace',
+  [SupportedDataStores.SumoLogic]: 'Sumo Logic',
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
@@ -36,6 +37,7 @@ export const SupportedDataStoresToDocsLink = {
     'https://docs.tracetest.io/configuration/connecting-to-data-stores/azure-app-insights',
   [SupportedDataStores.Signoz]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/signoz',
   [SupportedDataStores.Dynatrace]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/dynatrace',
+  [SupportedDataStores.SumoLogic]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/sumologic',
 } as const;
 
 export const SupportedDataStoresToDefaultEndpoint = {
@@ -54,4 +56,5 @@ export const SupportedDataStoresToDefaultEndpoint = {
   [SupportedDataStores.AzureAppInsights]: '',
   [SupportedDataStores.Signoz]: '',
   [SupportedDataStores.Dynatrace]: 'https://abc12345.live.dynatrace.com/api/v2/otlp',
+  [SupportedDataStores.SumoLogic]: '',
 } as const;

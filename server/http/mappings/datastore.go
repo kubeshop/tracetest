@@ -60,6 +60,7 @@ var dataStoreTypesMapping = map[datastore.DataStoreType]openapi.SupportedDataSto
 	datastore.DataStoreTypeHoneycomb:        openapi.HONEYCOMB,
 	datastore.DatastoreTypeAzureAppInsights: openapi.AZUREAPPINSIGHTS,
 	datastore.DatastoreTypeDynatrace:        openapi.DYNATRACE,
+	datastore.DatastoreTypeSumoLogic:        openapi.SUMOLOGIC,
 }
 
 func (m OpenAPI) DataStoreType(in datastore.DataStoreType) openapi.SupportedDataStores {
@@ -149,6 +150,12 @@ func (m Model) DataStore(in openapi.DataStore) datastore.DataStore {
 	if dataStore.Type == datastore.DatastoreTypeAzureAppInsights {
 		dataStore.Values.AzureAppInsights = &datastore.AzureAppInsightsConfig{}
 		deepcopy.DeepCopy(in.Azureappinsights, &dataStore.Values.AzureAppInsights)
+	}
+
+	// SumoLogic
+	if dataStore.Type == datastore.DatastoreTypeSumoLogic {
+		dataStore.Values.SumoLogic = &datastore.SumoLogicConfig{}
+		deepcopy.DeepCopy(in.Sumologic, &dataStore.Values.SumoLogic)
 	}
 
 	return dataStore
