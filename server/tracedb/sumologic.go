@@ -157,7 +157,7 @@ func (db *sumologicDB) convertSumoLogicSpanSummariesIntoSpans(summaries []sumolo
 			ID:   spanID,
 			Name: summary.Name,
 			Attributes: traces.NewAttributes(map[string]string{
-				"parent_id": summary.ParentID,
+				traces.TracetestMetadataFieldParentID: summary.ParentID,
 			}),
 			StartTime: startTime,
 			EndTime:   endTime,
@@ -261,7 +261,7 @@ func (db *sumologicDB) getAugmentedSpan(ctx context.Context, traceID string, spa
 	endTime := startTime.Add(time.Duration(span.Duration) * time.Nanosecond)
 
 	attributes := map[string]string{
-		"parent_id": span.ParentID,
+		traces.TracetestMetadataFieldParentID: span.ParentID,
 	}
 	for name, typedValue := range span.Attributes {
 		attributes[name] = typedValue.Value
