@@ -73,6 +73,8 @@ func (f *dataStoreFactory) getDatastoreInstance(ds datastore.DataStore) (DataSto
 		tdb, err = NewAwsXRayDB(ds.Values.AwsXRay)
 	case datastore.DatastoreTypeAzureAppInsights:
 		tdb, err = NewAzureAppInsightsDB(ds.Values.AzureAppInsights)
+	case datastore.DatastoreTypeSumoLogic:
+		tdb, err = NewSumoLogicDB(ds.Values.SumoLogic)
 	default:
 		return &noopDataStore{}, nil
 	}
