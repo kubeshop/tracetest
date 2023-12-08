@@ -145,6 +145,17 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		return
 	}
 
+	// This flow is important for one datastore today, but can be useful for more in the
+	// future. Sumo Logic doesn't give much details of each span in the `list trace spans` endpoint
+	// so, we have to execute one request per span in the trace to get details about the span (e.g. attributes
+	// and events).
+	// As we don't know how many spans are there and how many iterations will be needed by the
+	// poller profile, we augment the trace (i.e. retrieve span details) after the poller algorithm
+	// decides the trace is done, this way we don't send N+1 requests every time we try to poll traces.
+	//
+	// Another important thing that made me add this change is that Sumo Logic has a rate limit of
+	// 250 requests/min. Thus, we have to make sure to send as little requests as possible to it when
+	// polling the traces.
 	if augmenter, ok := traceDB.(tracedb.TraceAugmenter); ok {
 		augmentedTrace, err := augmenter.AugmentTrace(ctx, job.Run.Trace)
 		if err != nil {
