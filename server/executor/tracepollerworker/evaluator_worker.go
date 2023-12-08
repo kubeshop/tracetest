@@ -7,7 +7,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/http/middleware"
@@ -103,10 +102,7 @@ func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job execut
 		populateSpan(span, job, reason, &successful)
 
 		run := job.Run.TraceFailed(err)
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-			"finalState": string(run.State),
-			"tenant_id":  middleware.TenantIDFromContext(ctx),
-		})
+		middleware.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 		handleDBError(w.state.updater.Update(ctx, run))
 

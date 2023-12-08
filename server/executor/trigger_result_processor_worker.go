@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -128,10 +127,7 @@ func (r triggerResultProcessorWorker) handleExecutionResult(run test.Run, ctx co
 	if run.TriggerResult.Error != nil {
 		run = run.TriggerFailed(fmt.Errorf(run.TriggerResult.Error.ErrorMessage))
 
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-			"finalState": string(run.State),
-			"tenant_id":  middleware.TenantIDFromContext(ctx),
-		})
+		middleware.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 		return run
 	}

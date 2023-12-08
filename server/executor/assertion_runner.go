@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/expression"
 	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -79,10 +78,7 @@ func (e *defaultAssertionRunner) runAssertionsAndUpdateResult(ctx context.Contex
 		}
 
 		run = run.AssertionFailed(err)
-		analytics.SendEvent("test_run_finished", "error", "", &map[string]string{
-			"finalState": string(run.State),
-			"tenant_id":  middleware.TenantIDFromContext(ctx),
-		})
+		middleware.SendEventWithProperties("test_run_finished", "error", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 		return test.Run{}, e.updater.Update(ctx, run)
 	}
@@ -139,10 +135,7 @@ func (e *defaultAssertionRunner) executeAssertions(ctx context.Context, req Job)
 		allPassed,
 	)
 
-	analytics.SendEvent("test_run_finished", "successful", "", &map[string]string{
-		"finalState": string(run.State),
-		"tenant_id":  middleware.TenantIDFromContext(ctx),
-	})
+	middleware.SendEventWithProperties("test_run_finished", "successful", "", map[string]string{"finalState": string(run.State)}, ctx)
 
 	return run, nil
 }
