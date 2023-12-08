@@ -50,10 +50,10 @@ func (db *opensearchDB) TestConnection(ctx context.Context) model.ConnectionResu
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
 			_, err := db.GetTraceByID(ctx, trace.TraceID{}.String())
 			if strings.Contains(strings.ToLower(err.Error()), "unauthorized") {
-				return "Tracetest tried to execute a Sumo Logic API request but it failed due to authentication issues", err
+				return "Tracetest tried to execute an OpenSearch API request but it failed due to authentication issues", err
 			}
 
-			return "Tracetest managed to authenticate with Sumo Logic", nil
+			return "Tracetest managed to authenticate with OpenSearch", nil
 		})),
 	)
 

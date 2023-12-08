@@ -26,24 +26,6 @@ type sumologicDB struct {
 	AccessKey string
 }
 
-// TestConnection implements TestableTraceDB.
-func (db *sumologicDB) TestConnection(ctx context.Context) model.ConnectionResult {
-	tester := connection.NewTester(
-		connection.WithConnectivityTest(connection.ConnectivityStep(model.ProtocolHTTP, db.GetEndpoints())),
-		connection.WithPollingTest(connection.TracePollingTestStep(ttd)),
-		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
-			_, err := ttd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
-			if strings.Contains(err.Error(), "authentication handshake failed") {
-				return "Tracetest tried to execute a request but it failed due to authentication issues", err
-			}
-
-			return "Tracetest managed to authenticate with Tempo", nil
-		})),
-	)
-
-	return tester.TestConnection(ctx)
-}
-
 type sumologicSpanSummary struct {
 	ID        string `json:"id"`
 	Name      string `json:"operationName"`
@@ -85,18 +67,17 @@ func (db *sumologicDB) GetEndpoints() string {
 	return db.URL
 }
 
-func (ttd *tempoTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {
+func (db *sumologicDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	tester := connection.NewTester(
-		connection.WithPortLintingTest(connection.PortLinter("Tempo", tempoDefaultPorts(), ttd.dataSource.Endpoint())),
-		connection.WithConnectivityTest(ttd.dataSource),
-		connection.WithPollingTest(connection.TracePollingTestStep(ttd)),
+		connection.WithConnectivityTest(connection.ConnectivityStep(model.ProtocolHTTP, db.GetEndpoints())),
+		connection.WithPollingTest(connection.TracePollingTestStep(db)),
 		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
-			_, err := ttd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
-			if strings.Contains(err.Error(), "authentication handshake failed") {
+			_, err := db.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
+			if strings.Contains(err.Error(), "Expected 200, got 401") {
 				return "Tracetest tried to execute a request but it failed due to authentication issues", err
 			}
 
-			return "Tracetest managed to authenticate with Tempo", nil
+			return "Tracetest managed to authenticate with Sumo Logic", nil
 		})),
 	)
 
@@ -156,7 +137,7 @@ func (db *sumologicDB) getSpansPage(ctx context.Context, traceID string, token s
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code. Expected 200, got %d: %w", resp.StatusCode, err)
+		return nil, fmt.Errorf("unexpected status code. Expected 200, got %d", resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
