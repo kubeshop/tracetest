@@ -7,9 +7,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/model"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/trace"
@@ -21,6 +24,24 @@ type sumologicDB struct {
 	URL       string
 	AccessID  string
 	AccessKey string
+}
+
+// TestConnection implements TestableTraceDB.
+func (db *sumologicDB) TestConnection(ctx context.Context) model.ConnectionResult {
+	tester := connection.NewTester(
+		connection.WithConnectivityTest(connection.ConnectivityStep(model.ProtocolHTTP, db.GetEndpoints())),
+		connection.WithPollingTest(connection.TracePollingTestStep(ttd)),
+		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
+			_, err := ttd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
+			if strings.Contains(err.Error(), "authentication handshake failed") {
+				return "Tracetest tried to execute a request but it failed due to authentication issues", err
+			}
+
+			return "Tracetest managed to authenticate with Tempo", nil
+		})),
+	)
+
+	return tester.TestConnection(ctx)
 }
 
 type sumologicSpanSummary struct {
@@ -62,6 +83,24 @@ func (db *sumologicDB) Connect(ctx context.Context) error {
 // GetEndpoints implements TraceDB.
 func (db *sumologicDB) GetEndpoints() string {
 	return db.URL
+}
+
+func (ttd *tempoTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {
+	tester := connection.NewTester(
+		connection.WithPortLintingTest(connection.PortLinter("Tempo", tempoDefaultPorts(), ttd.dataSource.Endpoint())),
+		connection.WithConnectivityTest(ttd.dataSource),
+		connection.WithPollingTest(connection.TracePollingTestStep(ttd)),
+		connection.WithAuthenticationTest(connection.NewTestStep(func(ctx context.Context) (string, error) {
+			_, err := ttd.GetTraceByID(ctx, id.NewRandGenerator().TraceID().String())
+			if strings.Contains(err.Error(), "authentication handshake failed") {
+				return "Tracetest tried to execute a request but it failed due to authentication issues", err
+			}
+
+			return "Tracetest managed to authenticate with Tempo", nil
+		})),
+	)
+
+	return tester.TestConnection(ctx)
 }
 
 // GetTraceByID implements TraceDB.
@@ -294,3 +333,4 @@ func (db *sumologicDB) getAugmentedSpan(ctx context.Context, traceID string, spa
 
 var _ TraceDB = &sumologicDB{}
 var _ TraceAugmenter = &sumologicDB{}
+var _ TestableTraceDB = &sumologicDB{}
