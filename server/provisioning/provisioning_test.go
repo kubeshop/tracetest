@@ -366,4 +366,22 @@ var cases = []struct {
 			},
 		},
 	},
+	{
+		name: "SumoLogic",
+		file: "./testdata/sumologic.yaml",
+		expectations: expectations{
+			dataStore: &datastore.DataStore{
+				Name:    "Sumo Logic",
+				Default: true,
+				Type:    datastore.DatastoreTypeSumoLogic,
+				Values: datastore.DataStoreValues{
+					SumoLogic: &datastore.SumoLogicConfig{
+						URL:       "https://api.sumologic.com",
+						AccessID:  "xxxxxxxxxxxxxx",
+						AccessKey: "0123456789abcdefghijklmnopqrstuvwxyz",
+					},
+				},
+			},
+		},
+	},
 }
