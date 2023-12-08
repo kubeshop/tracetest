@@ -36,6 +36,8 @@ type DataStore struct {
 
 	Azureappinsights AzureAppInsights `json:"azureappinsights,omitempty"`
 
+	Sumologic SumoLogic `json:"sumologic,omitempty"`
+
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 }
 
@@ -70,6 +72,9 @@ func AssertDataStoreRequired(obj DataStore) error {
 		return err
 	}
 	if err := AssertAzureAppInsightsRequired(obj.Azureappinsights); err != nil {
+		return err
+	}
+	if err := AssertSumoLogicRequired(obj.Sumologic); err != nil {
 		return err
 	}
 	return nil

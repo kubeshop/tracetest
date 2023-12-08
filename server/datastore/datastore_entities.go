@@ -32,6 +32,7 @@ type DataStoreValues struct {
 	SignalFx         *SignalFXConfig           `json:"signalfx,omitempty"`
 	Tempo            *MultiChannelClientConfig `json:"tempo,omitempty"`
 	AzureAppInsights *AzureAppInsightsConfig   `json:"azureappinsights,omitempty"`
+	SumoLogic        *SumoLogicConfig          `json:"sumologic"`
 }
 
 type AWSXRayConfig struct {
@@ -126,6 +127,12 @@ type AzureAppInsightsConfig struct {
 	ConnectionType              ConnectionTypes `json:"connectionType"`
 }
 
+type SumoLogicConfig struct {
+	URL       string `json:"url"`
+	AccessID  string `json:"accessID"`
+	AccessKey string `json:"accessKey"`
+}
+
 const (
 	DataStoreTypeJaeger           DataStoreType = "jaeger"
 	DataStoreTypeTempo            DataStoreType = "tempo"
@@ -139,6 +146,7 @@ const (
 	DataStoreTypeAwsXRay          DataStoreType = "awsxray"
 	DataStoreTypeHoneycomb        DataStoreType = "honeycomb"
 	DatastoreTypeAzureAppInsights DataStoreType = "azureappinsights"
+	DatastoreTypeSumoLogic        DataStoreType = "sumologic"
 	DatastoreTypeSignoz           DataStoreType = "signoz"
 	DatastoreTypeDynatrace        DataStoreType = "dynatrace"
 	DatastoreTypeAgent            DataStoreType = "agent"
@@ -157,6 +165,7 @@ var validTypes = []DataStoreType{
 	DataStoreTypeAwsXRay,
 	DataStoreTypeHoneycomb,
 	DatastoreTypeAzureAppInsights,
+	DatastoreTypeSumoLogic,
 	DatastoreTypeSignoz,
 	DatastoreTypeDynatrace,
 	DatastoreTypeAgent,
@@ -220,6 +229,10 @@ func (ds DataStore) Validate() error {
 		return fmt.Errorf("data store should have Azure Application Insights config values set up")
 	}
 
+	if ds.Type == DatastoreTypeSumoLogic && ds.Values.SumoLogic == nil {
+		return fmt.Errorf("data store should have Sumo Logic config values set up")
+	}
+
 	return nil
 }
 
@@ -249,6 +262,7 @@ type squashedDataStore struct {
 	ElasticApm             *ElasticSearchConfig      `json:"elasticapm,omitempty"`
 	Jaeger                 *GRPCClientSettings       `json:"jaeger,omitempty"`
 	OpenSearch             *ElasticSearchConfig      `json:"opensearch,omitempty"`
+	SumoLogic              *SumoLogicConfig          `json:"sumologic,omitempty"`
 	SignalFx               *SignalFXConfig           `json:"signalfx,omitempty"`
 	Tempo                  *MultiChannelClientConfig `json:"tempo,omitempty"`
 	AzureAppInsightsConfig *AzureAppInsightsConfig   `json:"azureappinsights,omitempty"`
@@ -270,6 +284,7 @@ func (d squashedDataStore) populate(dataStore *DataStore) {
 		Jaeger:           d.Jaeger,
 		OpenSearch:       d.OpenSearch,
 		SignalFx:         d.SignalFx,
+		SumoLogic:        d.SumoLogic,
 		Tempo:            d.Tempo,
 		AzureAppInsights: d.AzureAppInsightsConfig,
 	}
@@ -323,5 +338,6 @@ func (d DataStore) squashed() squashedDataStore {
 		SignalFx:               d.Values.SignalFx,
 		Tempo:                  d.Values.Tempo,
 		AzureAppInsightsConfig: d.Values.AzureAppInsights,
+		SumoLogic:              d.Values.SumoLogic,
 	}
 }

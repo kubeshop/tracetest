@@ -31,6 +31,7 @@ type DataStore struct {
 	Signalfx         *SignalFX           `json:"signalfx,omitempty"`
 	Awsxray          *AwsXRay            `json:"awsxray,omitempty"`
 	Azureappinsights *AzureAppInsights   `json:"azureappinsights,omitempty"`
+	Sumologic        *SumoLogic          `json:"sumologic,omitempty"`
 	CreatedAt        *time.Time          `json:"createdAt,omitempty"`
 }
 
@@ -389,6 +390,38 @@ func (o *DataStore) SetAzureappinsights(v AzureAppInsights) {
 	o.Azureappinsights = &v
 }
 
+// GetSumologic returns the Sumologic field value if set, zero value otherwise.
+func (o *DataStore) GetSumologic() SumoLogic {
+	if o == nil || isNil(o.Sumologic) {
+		var ret SumoLogic
+		return ret
+	}
+	return *o.Sumologic
+}
+
+// GetSumologicOk returns a tuple with the Sumologic field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *DataStore) GetSumologicOk() (*SumoLogic, bool) {
+	if o == nil || isNil(o.Sumologic) {
+		return nil, false
+	}
+	return o.Sumologic, true
+}
+
+// HasSumologic returns a boolean if a field has been set.
+func (o *DataStore) HasSumologic() bool {
+	if o != nil && !isNil(o.Sumologic) {
+		return true
+	}
+
+	return false
+}
+
+// SetSumologic gets a reference to the given SumoLogic and assigns it to the Sumologic field.
+func (o *DataStore) SetSumologic(v SumoLogic) {
+	o.Sumologic = &v
+}
+
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
 func (o *DataStore) GetCreatedAt() time.Time {
 	if o == nil || isNil(o.CreatedAt) {
@@ -457,6 +490,9 @@ func (o DataStore) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Azureappinsights) {
 		toSerialize["azureappinsights"] = o.Azureappinsights
+	}
+	if !isNil(o.Sumologic) {
+		toSerialize["sumologic"] = o.Sumologic
 	}
 	if !isNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt

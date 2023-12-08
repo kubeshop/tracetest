@@ -28,6 +28,10 @@ type TestableTraceDB interface {
 	TestConnection(ctx context.Context) model.ConnectionResult
 }
 
+type TraceAugmenter interface {
+	AugmentTrace(ctx context.Context, trace *traces.Trace) (*traces.Trace, error)
+}
+
 type noopTraceDB struct{}
 
 func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t traces.Trace, err error) {
@@ -84,6 +88,8 @@ func (f *traceDBFactory) getTraceDBInstance(ds datastore.DataStore) (TraceDB, er
 		tdb, err = NewAwsXRayDB(ds.Values.AwsXRay)
 	case datastore.DatastoreTypeAzureAppInsights:
 		tdb, err = NewAzureAppInsightsDB(ds.Values.AzureAppInsights)
+	case datastore.DatastoreTypeSumoLogic:
+		tdb, err = NewSumoLogicDB(ds.Values.SumoLogic)
 	default:
 		return &noopTraceDB{}, nil
 	}

@@ -50,6 +50,8 @@ components:
           $ref: "#/components/schemas/AwsXRay"
         azureappinsights:
           $ref: "#/components/schemas/AzureAppInsights"
+        sumologic:
+          $ref: "#/components/schemas/SumoLogic"
         createdAt:
           type: string
           format: date-time
@@ -110,6 +112,15 @@ components:
           type: string
         useDefaultAuth:
           type: boolean
+    SumoLogic:
+      type: object
+      properties:
+        url:
+          type: string
+        accessID:
+          type: string
+        accessKey:
+          type: string
     HTTPClientSettings:
       type: object
       properties:
@@ -197,6 +208,7 @@ components:
           azureappinsights,
           signoz,
           dynatrace,
+          sumologic,
         ]
     SupportedClients:
       type: string

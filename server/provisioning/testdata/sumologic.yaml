@@ -1,0 +1,8 @@
+type: DataStore
+spec:
+  name: Sumo Logic
+  type: sumologic
+  sumologic:
+    url: https://api.sumologic.com
+    accessID: xxxxxxxxxxxxxx
+    accessKey: 0123456789abcdefghijklmnopqrstuvwxyz

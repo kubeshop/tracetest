@@ -7,6 +7,7 @@ import SignalFx from './forms/SignalFx/SignalFx';
 import BaseClient from './forms/BaseClient';
 import AwsXRay from './forms/AwsXRay';
 import AzureAppInsights from './forms/AzureAppInsights/AzureAppInsights';
+import SumoLogic from './forms/SumoLogic';
 
 export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.Agent]: Agent,
@@ -24,6 +25,7 @@ export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Signoz]: OpenTelemetryCollector,
   [SupportedDataStores.Dynatrace]: OpenTelemetryCollector,
+  [SupportedDataStores.SumoLogic]: SumoLogic,
 };
 
 export default DataStoreComponentMap;

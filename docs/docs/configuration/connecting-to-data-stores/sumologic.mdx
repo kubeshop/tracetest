@@ -1,0 +1,41 @@
+---
+id: sumologic
+title: Sumo Logic
+description: Use Sumo Logic as the trace data store for Tracetest. You can use the native connection from Tracetest to pull telemetry data directly from Sumo Logic.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+Tracetest fetches traces from [Sumo Logic's API](https://help.sumologic.com/docs/api/tracing/).
+
+## Connect Tracetest to Tempo with the CLI
+
+If you prefer using the CLI, you can use this file config.
+
+For gRPC:
+
+```yaml
+type: DataStore
+spec:
+  name: Sumo Logic
+  type: sumologic
+  sumologic:
+    url: "https://api.sumologic.com",
+    accessID: "your-access-id",
+    accessKey: "your-access-key"
+```
+
+:::tip
+The URL for Sumo Logic changes depending on the region your Sumo Logic account is deployed on. Take a look at their [documentation](https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use) to understand more about it.
+:::
+
+Proceed to run this command in the terminal, and specify the file above.
+
+```bash
+tracetest apply datastore -f my/data-store/file/location.yaml
+```

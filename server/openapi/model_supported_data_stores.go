@@ -28,6 +28,7 @@ const (
 	AZUREAPPINSIGHTS SupportedDataStores = "azureappinsights"
 	SIGNOZ           SupportedDataStores = "signoz"
 	DYNATRACE        SupportedDataStores = "dynatrace"
+	SUMOLOGIC        SupportedDataStores = "sumologic"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

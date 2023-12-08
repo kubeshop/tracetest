@@ -31,6 +31,7 @@ const DataStore = ({
     tempo = {},
     awsxray = {},
     azureappinsights = {},
+    sumologic = {},
   } = {id: '', name: '', type: SupportedDataStores.JAEGER},
 }: TRawDataStore): DataStore => ({
   id,
@@ -45,6 +46,7 @@ const DataStore = ({
   tempo,
   awsxray,
   azureappinsights,
+  sumologic,
 });
 
 export default DataStore;
