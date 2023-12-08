@@ -15,15 +15,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install Tracetest CLI
-        run: |
-          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+
       - name: Configure Tracetest CLI
-        run: |
-          tracetest configure --token ${{secrets.TRACETEST_POKESHOP_TOKEN}}
+        uses: kubeshop/tracetest-github-action@v1
+        with:
+          token: ${{secrets.TRACETEST_POKESHOP_TOKEN}}
+
       - name: Run synthetic monitoring tests
         run: |
           tracetest run testsuite --file ./testing/synthetic-monitoring/pokeshop/_testsuite.yaml --vars ./testing/synthetic-monitoring/pokeshop/_variableset.yaml
+
       - name: Send message on Slack in case of failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
@@ -59,6 +60,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
   otel-demo-trace-based-tests:
     name: Run trace based tests for Open Telemetry demo
     runs-on: ubuntu-latest
@@ -66,15 +68,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install Tracetest CLI
-        run: |
-          curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
+
       - name: Configure Tracetest CLI
-        run: |
-          tracetest configure --token ${{secrets.TRACETEST_OTELDEMO_TOKEN}}
+        uses: kubeshop/tracetest-github-action@v1
+        with:
+          token: ${{secrets.TRACETEST_OTELDEMO_TOKEN}}
+
       - name: Run synthetic monitoring tests
         run: |
           tracetest run testsuite --file ./testing/synthetic-monitoring/otel-demo/_testsuite.yaml --vars ./testing/synthetic-monitoring/otel-demo/_variableset.yaml
+
       - name: Send message on Slack in case of failure
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
