@@ -73,6 +73,7 @@ func (s *httpServer) Stop() {
 func (s httpServer) Export(w http.ResponseWriter, r *http.Request) {
 	contentType := r.Header.Get("content-type")
 	response := newHttpResponse(w, contentType)
+	r.Header.Set("Access-Control-Allow-Origin", "*")
 
 	s.logger.Debug("Received ExportTraceServiceRequest", zap.String("content-type", contentType))
 
