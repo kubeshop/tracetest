@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/openapi"
 )
@@ -31,6 +32,10 @@ func GetAPIClient(cliConfig Config) *openapi.APIClient {
 			URL: cliConfig.Path(),
 		},
 	}
+
+	retryableHTTPClient := retryablehttp.NewClient()
+	retryableHTTPClient.RetryMax = 10
+	config.HTTPClient = retryableHTTPClient.StandardClient()
 
 	return openapi.NewAPIClient(config)
 }
