@@ -14,7 +14,6 @@ import (
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 	semconv "go.opentelemetry.io/otel/semconv/v1.10.0"
 	"go.opentelemetry.io/otel/trace"
@@ -222,7 +221,6 @@ func (c *customController) instrumentRoute(name string, route string, f http.Han
 
 		if responseWriter.StatusCode() >= 500 {
 			span.RecordError(fmt.Errorf("faulty server response"))
-			span.SetStatus(codes.Error, "status code returned by API is in the server error range")
 
 			attributes = append(attributes, attribute.String("http.response.body", string(responseBody)))
 		}

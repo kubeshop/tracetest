@@ -239,7 +239,6 @@ func (m *manager[T]) instrumentRoute(route *mux.Route) {
 
 		if responseWriter.StatusCode() >= 500 {
 			span.RecordError(fmt.Errorf("faulty server response"))
-			span.SetStatus(codes.Error, "status code returned by API is in the server error range")
 
 			attributes = append(attributes, attribute.String("http.response.body", string(responseBody)))
 		}
