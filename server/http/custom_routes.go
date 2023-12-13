@@ -210,29 +210,24 @@ func (c *customController) instrumentRoute(name string, route string, f http.Han
 
 		responseBody := responseWriter.Body()
 
-		// OpenTelemetry doesn't allow attributes with size bigger than 4095 characters,
-		// so if this exceeds the max size, just truncate the body to prevent the span not being
-		// recorded.
-		if len(responseBody) > 4095 {
-			responseBody = responseBody[0:4094]
-		}
-
-		span.SetAttributes(
+		attributes := []attribute.KeyValue{
 			attribute.String(string(semconv.HTTPMethodKey), r.Method),
 			attribute.String(string(semconv.HTTPRouteKey), route),
 			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
 			attribute.String("http.request.params", string(paramsJson)),
 			attribute.String("http.request.query", string(queryStringJson)),
 			attribute.String("http.request.headers", string(headersJson)),
-			attribute.String("http.response.body", string(responseBody)),
 			attribute.Int("http.response.status_code", responseWriter.StatusCode()),
-		)
+		}
 
 		if responseWriter.StatusCode() >= 500 {
 			span.RecordError(fmt.Errorf("faulty server response"))
 			span.SetStatus(codes.Error, "status code returned by API is in the server error range")
+
+			attributes = append(attributes, attribute.String("http.response.body", string(responseBody)))
 		}
 
+		span.SetAttributes(attributes...)
 	}
 }
 

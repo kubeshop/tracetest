@@ -19,6 +19,7 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/gorilla/mux"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/validation"
 )
@@ -220,16 +221,30 @@ func (m *manager[T]) instrumentRoute(route *mux.Route) {
 		}
 		headersJson, _ := json.Marshal(headers)
 
-		span.SetAttributes(
+		responseWriter := middleware.NewStatusCodeCapturerWriter(w)
+
+		originalHandler.ServeHTTP(responseWriter, r.WithContext(ctx))
+
+		responseBody := responseWriter.Body()
+
+		attributes := []attribute.KeyValue{
 			attribute.String(string(semconv.HTTPMethodKey), r.Method),
 			attribute.String(string(semconv.HTTPRouteKey), pathTemplate),
 			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
 			attribute.String("http.request.params", string(paramsJson)),
 			attribute.String("http.request.query", string(queryStringJson)),
 			attribute.String("http.request.headers", string(headersJson)),
-		)
+			attribute.Int("http.response.status_code", responseWriter.StatusCode()),
+		}
 
-		originalHandler.ServeHTTP(w, r.WithContext(ctx))
+		if responseWriter.StatusCode() >= 500 {
+			span.RecordError(fmt.Errorf("faulty server response"))
+			span.SetStatus(codes.Error, "status code returned by API is in the server error range")
+
+			attributes = append(attributes, attribute.String("http.response.body", string(responseBody)))
+		}
+
+		span.SetAttributes(attributes...)
 	})
 
 	route.Handler(newHandler)
