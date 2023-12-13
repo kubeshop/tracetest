@@ -17,11 +17,11 @@ type triggerJSONV3 struct {
 
 func (v3 triggerJSONV3) valid() bool {
 	// has a valid type and at least one not nil trigger type settings
-	return v3.Type != "" &&
+	return (v3.Type != "" &&
 		(v3.HTTP != nil ||
 			v3.GRPC != nil ||
 			v3.TraceID != nil ||
-			v3.Kafka != nil)
+			v3.Kafka != nil)) || v3.Type == TriggerTypeCypress
 }
 
 type triggerJSONV2 struct {

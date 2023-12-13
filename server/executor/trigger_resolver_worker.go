@@ -133,7 +133,7 @@ func (r triggerResolverWorker) ProcessItem(ctx context.Context, job Job) {
 	}
 
 	if trigger.IsTraceIDBasedTrigger(job.Test.Trigger.Type) {
-		traceIDFromParam, err := trace.TraceIDFromHex(job.Test.Trigger.TraceID.ID)
+		traceIDFromParam, err := trace.TraceIDFromHex(resolvedTest.Trigger.TraceID.ID)
 		if err == nil {
 			run.TraceID = traceIDFromParam
 		}

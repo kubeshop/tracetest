@@ -8,6 +8,8 @@ import (
 	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
+const TRACEID_EXPRESSION = "${env:TRACE_ID}"
+
 func TRACEID() Triggerer {
 	return &traceidTriggerer{}
 }
@@ -30,6 +32,10 @@ func (t *traceidTriggerer) Type() trigger.TriggerType {
 }
 
 func (t *traceidTriggerer) Resolve(ctx context.Context, test test.Test, opts *ResolveOptions) (test.Test, error) {
+	if test.Trigger.Type == trigger.TriggerTypeCypress {
+		test.Trigger.TraceID = &trigger.TraceIDRequest{ID: TRACEID_EXPRESSION}
+	}
+
 	traceid := test.Trigger.TraceID
 	if traceid == nil {
 		return test, fmt.Errorf("no settings provided for TRACEID triggerer")

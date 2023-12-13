@@ -15,32 +15,34 @@ type Trigger = {
   request: TTriggerRequest;
 };
 
+type TRequest = object | null;
+
 const EntryData = {
-  [TriggerTypes.http](request: object) {
+  [TriggerTypes.http](request: TRequest) {
     return {
       entryPoint: get(request, 'url', ''),
       method: get(request, 'method', ''),
     };
   },
-  [TriggerTypes.grpc](request: object) {
+  [TriggerTypes.grpc](request: TRequest) {
     return {
       entryPoint: get(request, 'address', ''),
       method: get(request, 'method', ''),
     };
   },
-  [TriggerTypes.traceid](request: object) {
+  [TriggerTypes.traceid](request: TRequest) {
     return {
       entryPoint: get(request, 'id', ''),
       method: 'TraceID',
     };
   },
-  [TriggerTypes.cypress](request: object) {
+  [TriggerTypes.cypress](request: TRequest) {
     return {
       entryPoint: get(request, 'id', ''),
       method: 'Cypress',
     };
   },
-  [TriggerTypes.kafka](request: object) {
+  [TriggerTypes.kafka](request: TRequest) {
     let entryPoint = '';
 
     const kafkaRequest = request as KafkaRequest;
