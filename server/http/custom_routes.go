@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/openapi"
 	"github.com/kubeshop/tracetest/server/resourcemanager"
 	"go.opentelemetry.io/otel"
@@ -201,18 +202,30 @@ func (c *customController) instrumentRoute(name string, route string, f http.Han
 		}
 		headersJson, _ := json.Marshal(headers)
 
-		span.SetAttributes(
+		newRequest := r.WithContext(ctx)
+		responseWriter := middleware.NewStatusCodeCapturerWriter(w)
+
+		f(responseWriter, newRequest)
+
+		responseBody := responseWriter.Body()
+
+		attributes := []attribute.KeyValue{
 			attribute.String(string(semconv.HTTPMethodKey), r.Method),
 			attribute.String(string(semconv.HTTPRouteKey), route),
 			attribute.String(string(semconv.HTTPTargetKey), r.URL.String()),
 			attribute.String("http.request.params", string(paramsJson)),
 			attribute.String("http.request.query", string(queryStringJson)),
 			attribute.String("http.request.headers", string(headersJson)),
-		)
+			attribute.Int("http.response.status_code", responseWriter.StatusCode()),
+		}
 
-		newRequest := r.WithContext(ctx)
+		if responseWriter.StatusCode() >= 500 {
+			span.RecordError(fmt.Errorf("faulty server response"))
 
-		f(w, newRequest)
+			attributes = append(attributes, attribute.String("http.response.body", string(responseBody)))
+		}
+
+		span.SetAttributes(attributes...)
 	}
 }
 
