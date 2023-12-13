@@ -15,8 +15,9 @@ export interface IPropsComponent {
 const ComponentMap: Record<TriggerTypes, (props: IPropsComponent) => React.ReactElement> = {
   [TriggerTypes.http]: RunDetailTriggerResponse,
   [TriggerTypes.grpc]: RunDetailTriggerResponse,
-  [TriggerTypes.traceid]: RunDetailTriggerData,
   [TriggerTypes.kafka]: RunDetailTriggerResponse,
+  [TriggerTypes.traceid]: RunDetailTriggerData,
+  [TriggerTypes.cypress]: RunDetailTriggerData,
 };
 
 interface IProps extends IPropsComponent {

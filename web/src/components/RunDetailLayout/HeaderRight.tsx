@@ -2,7 +2,9 @@ import CreateButton from 'components/CreateButton';
 import RunActionsMenu from 'components/RunActionsMenu';
 import TestActions from 'components/TestActions';
 import TestState from 'components/TestState';
+import {TriggerTypes} from 'constants/Test.constants';
 import {TestState as TestStateEnum} from 'constants/TestRun.constants';
+import Test from 'models/Test.model';
 import {isRunPollingState, isRunStateFinished, isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
@@ -17,9 +19,10 @@ import useSkipPolling from './hooks/useSkipPolling';
 
 interface IProps {
   testId: string;
+  triggerType: TriggerTypes;
 }
 
-const HeaderRight = ({testId}: IProps) => {
+const HeaderRight = ({testId, triggerType}: IProps) => {
   const {isDraftMode: isTestSpecsDraftMode} = useTestSpecs();
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
@@ -48,7 +51,7 @@ const HeaderRight = ({testId}: IProps) => {
         <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
       )}
       <VariableSetSelector />
-      {!isDraftMode && state && isRunStateFinished(state) && (
+      {!isDraftMode && state && isRunStateFinished(state) && Test.shouldAllowRun(triggerType) && (
         <CreateButton data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
           Run Test
         </CreateButton>

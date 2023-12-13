@@ -1,3 +1,4 @@
+import {TriggerTypes} from 'constants/Test.constants';
 import {load} from 'js-yaml';
 import {Model, TTestSchemas} from 'types/Common.types';
 import TestOutput from './TestOutput.model';
@@ -52,6 +53,10 @@ Test.FromRawTest = ({
 Test.FromDefinition = (definition: string): Test => {
   const raw: TRawTestResource = load(definition);
   return Test(raw);
+};
+
+Test.shouldAllowRun = (triggerType: TriggerTypes): boolean => {
+  return triggerType !== TriggerTypes.cypress;
 };
 
 export default Test;

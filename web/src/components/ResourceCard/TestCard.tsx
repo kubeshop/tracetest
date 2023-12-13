@@ -50,17 +50,19 @@ const TestCard = ({onEdit, onDelete, onDuplicate, onRun, onViewAll, test}: IProp
         <ResourceCardSummary summary={test.summary} />
 
         <S.Row $gap={12}>
-          <CreateButton
-            data-cy={`test-run-button-${test.id}`}
-            ghost
-            onClick={event => {
-              event.stopPropagation();
-              onRun(test, ResourceType.Test);
-            }}
-            type="primary"
-          >
-            Run
-          </CreateButton>
+          {Test.shouldAllowRun(test.trigger.type) && (
+            <CreateButton
+              data-cy={`test-run-button-${test.id}`}
+              ghost
+              onClick={event => {
+                event.stopPropagation();
+                onRun(test, ResourceType.Test);
+              }}
+              type="primary"
+            >
+              Run
+            </CreateButton>
+          )}
           <ResourceCardActions
             id={test.id}
             shouldEdit={shouldEdit}

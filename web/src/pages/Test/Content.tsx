@@ -5,6 +5,7 @@ import TestRunCard from 'components/RunCard/TestRunCard';
 import TestHeader from 'components/TestHeader';
 import useDeleteResource from 'hooks/useDeleteResource';
 import useDocumentTitle from 'hooks/useDocumentTitle';
+import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTest} from 'providers/Test/Test.provider';
@@ -51,15 +52,17 @@ const Content = () => {
         shouldEdit={shouldEdit}
         title={`${test.name} (v${test.version})`}
         runButton={
-          <CreateButton
-            data-cy="test-details-run-test-button"
-            ghost
-            loading={isLoadingRunTest}
-            onClick={() => runTest({test})}
-            type="primary"
-          >
-            Run Test
-          </CreateButton>
+          Test.shouldAllowRun(test.trigger.type) ? (
+            <CreateButton
+              data-cy="test-details-run-test-button"
+              ghost
+              loading={isLoadingRunTest}
+              onClick={() => runTest({test})}
+              type="primary"
+            >
+              Run Test
+            </CreateButton>
+          ) : null
         }
       />
 

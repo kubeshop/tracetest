@@ -228,6 +228,7 @@ export function getDemoByPluginMap(demos: Demo[]) {
       ...((otelDemoMap && otelDemoMap[SupportedPlugins.GRPC]) || []),
     ],
     [SupportedPlugins.TraceID]: [],
+    [SupportedPlugins.Cypress]: [],
     [SupportedPlugins.Kafka]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.Kafka]) || [],
   };
 }

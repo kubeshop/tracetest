@@ -34,6 +34,12 @@ const EntryData = {
       method: 'TraceID',
     };
   },
+  [TriggerTypes.cypress](request: object) {
+    return {
+      entryPoint: get(request, 'id', ''),
+      method: 'Cypress',
+    };
+  },
   [TriggerTypes.kafka](request: object) {
     let entryPoint = '';
 
@@ -49,7 +55,13 @@ const EntryData = {
   },
 };
 
-const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid = {}, kafka = {}}: TRawTrigger): Trigger => {
+const Trigger = ({
+  type: rawType = 'http',
+  httpRequest = {},
+  grpc = {},
+  traceid = {},
+  kafka = {},
+}: TRawTrigger): Trigger => {
   const type = rawType as TriggerTypes;
 
   let request = {} as TTriggerRequest;
@@ -57,7 +69,7 @@ const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid =
     request = HttpRequest(httpRequest);
   } else if (type === TriggerTypes.grpc) {
     request = GrpcRequest(grpc);
-  } else if (type === TriggerTypes.traceid) {
+  } else if ([TriggerTypes.traceid, TriggerTypes.cypress].includes(type)) {
     request = TraceIDRequest(traceid);
   } else if (type === TriggerTypes.kafka) {
     request = KafkaRequest(kafka);

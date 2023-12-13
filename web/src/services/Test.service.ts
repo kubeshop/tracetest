@@ -34,17 +34,23 @@ const TriggerServiceMap = {
   [SupportedPlugins.REST]: HttpService,
   [SupportedPlugins.Kafka]: KafkaService,
   [SupportedPlugins.TraceID]: TraceIDService,
+  [SupportedPlugins.Cypress]: TraceIDService,
 } as const;
 
 const TriggerServiceByTypeMap = {
   [TriggerTypes.grpc]: GrpcService,
   [TriggerTypes.http]: HttpService,
   [TriggerTypes.traceid]: TraceIDService,
+  [TriggerTypes.cypress]: TraceIDService,
   [TriggerTypes.kafka]: KafkaService,
 } as const;
 
 const TestService = () => ({
-  async getRequest({type, name: pluginName}: IPlugin, draft: TDraftTest, original?: Test): Promise<TRawTestResource> {
+  async getRequest(
+    {type, requestType, name: pluginName}: IPlugin,
+    draft: TDraftTest,
+    original?: Test
+  ): Promise<TRawTestResource> {
     const {name, description, skipTraceCollection = false} = draft;
     const triggerService = TriggerServiceMap[pluginName];
     const request = await triggerService.getRequest(draft);
@@ -52,7 +58,7 @@ const TestService = () => ({
     const trigger = {
       type,
       triggerType: type,
-      [type]: request,
+      [requestType ?? type]: request,
     };
 
     return {

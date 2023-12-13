@@ -48,14 +48,33 @@ const TraceID: IPlugin = {
   type: TriggerTypes.traceid,
 };
 
+const Cypress: IPlugin = {
+  name: SupportedPlugins.Cypress,
+  title: 'Cypress',
+  description: 'Define your test via Cypress',
+  isActive: true,
+  demoList: [],
+  type: TriggerTypes.cypress,
+  requestType: TriggerTypes.traceid,
+};
+
 export const Plugins = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: GRPC,
   [SupportedPlugins.Kafka]: Kafka,
   [SupportedPlugins.TraceID]: TraceID,
+  [SupportedPlugins.Cypress]: Cypress,
 } as const;
 
 export const TriggerTypeToPlugin = {
+  [TriggerTypes.http]: Plugins.REST,
+  [TriggerTypes.grpc]: Plugins.GRPC,
+  [TriggerTypes.kafka]: Plugins.Kafka,
+  [TriggerTypes.traceid]: Plugins.TraceID,
+  [TriggerTypes.cypress]: Plugins.Cypress,
+} as const;
+
+export const CreateTriggerTypeToPlugin = {
   [TriggerTypes.http]: Plugins.REST,
   [TriggerTypes.grpc]: Plugins.GRPC,
   [TriggerTypes.kafka]: Plugins.Kafka,

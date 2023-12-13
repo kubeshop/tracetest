@@ -63,7 +63,7 @@ const RunDetailLayout = ({test: {id, name, trigger, skipTraceCollection}, test}:
   const tabBarExtraContent = useMemo(
     () => ({
       left: <HeaderLeft name={name} triggerType={trigger.type.toUpperCase()} origin={runOriginPath} />,
-      right: <HeaderRight testId={id} />,
+      right: <HeaderRight testId={id} triggerType={trigger.type} />,
     }),
     [id, name, trigger.type, runOriginPath]
   );

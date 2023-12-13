@@ -66,6 +66,7 @@ export enum RouterSearchFields {
 export enum SupportedPlugins {
   REST = 'REST',
   GRPC = 'GRPC',
-  TraceID = 'TraceID',
   Kafka = 'Kafka',
+  TraceID = 'TraceID',
+  Cypress = 'Cypress',
 }

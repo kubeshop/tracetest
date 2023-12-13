@@ -10,6 +10,7 @@ export enum TriggerTypes {
   grpc = 'grpc',
   traceid = 'traceid',
   kafka = 'kafka',
+  cypress = 'cypress',
 }
 
 export enum ImportTypes {

@@ -2062,7 +2062,7 @@ export interface external {
       schemas: {
         Trigger: {
           /** @enum {string} */
-          type?: "http" | "grpc" | "traceid" | "kafka";
+          type?: "http" | "grpc" | "traceid" | "kafka" | "cypress";
           httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
           traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
@@ -2070,7 +2070,7 @@ export interface external {
         };
         TriggerResult: {
           /** @enum {string} */
-          type?: "http" | "grpc" | "traceid" | "kafka";
+          type?: "http" | "grpc" | "traceid" | "kafka" | "cypress";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];

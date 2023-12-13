@@ -1,10 +1,10 @@
-import {TriggerTypeToPlugin} from 'constants/Plugins.constants';
+import {CreateTriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import TriggerTypeCard from './TriggerTypeCard';
 import * as S from './TriggerTypeModal.styled';
 
-const pluginList = Object.values(TriggerTypeToPlugin);
+const pluginList = Object.values(CreateTriggerTypeToPlugin);
 
 interface IProps {
   isOpen: boolean;

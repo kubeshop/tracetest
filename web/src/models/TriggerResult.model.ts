@@ -34,6 +34,13 @@ const ResponseData = {
       statusCode: 200,
     };
   },
+  [TriggerTypes.cypress](response: object) {
+    return {
+      body: get(response, 'id', ''),
+      headers: [],
+      statusCode: 200,
+    };
+  },
   [TriggerTypes.kafka](response: object) {
     const kafkaResult = {
       offset: get(response, 'offset', ''),
@@ -59,7 +66,7 @@ const TriggerResult = ({
     request = http;
   } else if (type === TriggerTypes.grpc) {
     request = grpc;
-  } else if (type === TriggerTypes.traceid) {
+  } else if ([TriggerTypes.traceid, TriggerTypes.cypress].includes(type)) {
     request = traceid;
   } else if (type === TriggerTypes.kafka) {
     request = kafka;
