@@ -46,16 +46,34 @@ var _ http.Handler = &httpMetricMiddleware{}
 
 type responseWriter struct {
 	http.ResponseWriter
-	statusCode int
+	responseBody []byte
+	statusCode   int
 }
 
 func NewStatusCodeCapturerWriter(w http.ResponseWriter) *responseWriter {
-	return &responseWriter{w, http.StatusOK}
+	return &responseWriter{
+		w,
+		[]byte{},
+		http.StatusOK,
+	}
 }
 
-func (lrw *responseWriter) WriteHeader(code int) {
-	lrw.statusCode = code
-	lrw.ResponseWriter.WriteHeader(code)
+func (w *responseWriter) WriteHeader(code int) {
+	w.statusCode = code
+	w.ResponseWriter.WriteHeader(code)
+}
+
+func (w *responseWriter) Write(body []byte) (int, error) {
+	w.responseBody = body
+	return w.ResponseWriter.Write(body)
+}
+
+func (w *responseWriter) StatusCode() int {
+	return w.statusCode
+}
+
+func (w *responseWriter) Body() []byte {
+	return w.responseBody
 }
 
 func NewMetricMiddleware(meter metric.Meter) mux.MiddlewareFunc {
