@@ -43,7 +43,7 @@ const TestCard = ({onEdit, onDelete, onDuplicate, onRun, onViewAll, test}: IProp
         <S.TitleContainer>
           <S.Title level={3}>{test.name}</S.Title>
           <S.Text>
-            {test.trigger.method} • {test.trigger.entryPoint}
+            {test.trigger.method} {test.trigger.entryPoint && `• ${test.trigger.entryPoint}`}
           </S.Text>
         </S.TitleContainer>
 

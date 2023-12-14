@@ -3,13 +3,41 @@ import {useState} from 'react';
 import RunDetailAutomateDefinition from 'components/RunDetailAutomateDefinition';
 import RunDetailAutomateMethods from 'components/RunDetailAutomateMethods';
 import CliCommand from 'components/RunDetailAutomateMethods/methods/CLICommand';
+import Cypress from 'components/RunDetailAutomateMethods/methods/Cypress';
 import DeepLink from 'components/RunDetailAutomateMethods/methods/DeepLink';
 import {CLI_RUNNING_TESTS_URL} from 'constants/Common.constants';
+import {TriggerTypes} from 'constants/Test.constants';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
 import {useVariableSet} from 'providers/VariableSet';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './RunDetailAutomate.styled';
+
+function getMethods(triggerType: TriggerTypes) {
+  switch (triggerType) {
+    case TriggerTypes.cypress:
+      return [
+        {
+          id: 'cypress',
+          label: 'Cypress',
+          component: Cypress,
+        },
+      ];
+    default:
+      return [
+        {
+          id: 'cli',
+          label: 'CLI',
+          component: CliCommand,
+        },
+        {
+          id: 'deeplink',
+          label: 'Deep Link',
+          component: DeepLink,
+        },
+      ];
+  }
+}
 
 interface IProps {
   test: Test;
@@ -34,26 +62,21 @@ const RunDetailAutomate = ({test, run}: IProps) => {
       <S.SectionRight>
         <RunDetailAutomateMethods
           resourceType={ResourceType.Test}
-          methods={[
-            {
-              id: 'cli',
-              label: 'CLI',
-              children: (
-                <CliCommand
-                  id={test.id}
-                  variableSetId={variableSetId}
-                  fileName={fileName}
-                  resourceType={ResourceType.Test}
-                  docsUrl={CLI_RUNNING_TESTS_URL}
-                />
-              ),
-            },
-            {
-              id: 'deeplink',
-              label: 'Deep Link',
-              children: <DeepLink test={test} variableSetId={variableSetId} run={run} />,
-            },
-          ]}
+          methods={getMethods(test.trigger.type).map(({id, label, component: Component}) => ({
+            id,
+            label,
+            children: (
+              <Component
+                docsUrl={CLI_RUNNING_TESTS_URL}
+                fileName={fileName}
+                id={test.id}
+                resourceType={ResourceType.Test}
+                run={run}
+                test={test}
+                variableSetId={variableSetId}
+              />
+            ),
+          }))}
         />
       </S.SectionRight>
     </S.Container>

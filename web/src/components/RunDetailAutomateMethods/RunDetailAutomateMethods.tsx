@@ -14,6 +14,14 @@ interface IMethodProps {
   children: React.ReactNode;
 }
 
+export interface IMethodChildrenProps {
+  docsUrl?: string;
+  fileName?: string;
+  id: string;
+  resourceType: ResourceType;
+  variableSetId?: string;
+}
+
 const RunDetailAutomateMethods = ({resourceType, methods = []}: IProps) => {
   const [query, updateQuery] = useSearchParams();
 
@@ -21,7 +29,7 @@ const RunDetailAutomateMethods = ({resourceType, methods = []}: IProps) => {
     <S.Container>
       <S.TitleContainer>
         <S.Title>Running Techniques</S.Title>
-        <S.Subtitle>Methods to automate the running of this {resourceType}</S.Subtitle>
+        <S.Subtitle>Methods to automate the running of this {resourceType.slice(0, -1)}</S.Subtitle>
       </S.TitleContainer>
       <S.TabsContainer>
         <Tabs

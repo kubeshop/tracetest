@@ -44,7 +44,7 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
   const description = useMemo(() => {
     return (
       <>
-        v{testVersion} • {triggerType} • Ran {createdTimeAgo} • {source && <>Run via {source.toUpperCase()}</>}
+        v{testVersion} • {triggerType} • Ran {createdTimeAgo} {source && <>• Run via {source.toUpperCase()}</>}
         {testSuiteId && !!testSuiteRunId && (
           <>
             {' '}
