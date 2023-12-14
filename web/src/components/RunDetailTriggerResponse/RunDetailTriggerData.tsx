@@ -6,9 +6,11 @@ import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service
 import ResponseVariableSet from './ResponseVariableSet';
 import * as S from './RunDetailTriggerResponse.styled';
 import {IPropsComponent} from './RunDetailTriggerResponseFactory';
+import ResponseMetadata from './ResponseMetadata';
 
 const TABS = {
   VariableSet: 'variable-set',
+  Metadata: 'metadata',
 } as const;
 
 const RunDetailTriggerData = ({state, triggerTime = 0}: IPropsComponent) => {
@@ -38,6 +40,9 @@ const RunDetailTriggerData = ({state, triggerTime = 0}: IPropsComponent) => {
         >
           <Tabs.TabPane key={TABS.VariableSet} tab="Variable Set">
             <ResponseVariableSet />
+          </Tabs.TabPane>
+          <Tabs.TabPane key={TABS.Metadata} tab="Metadata">
+            <ResponseMetadata />
           </Tabs.TabPane>
         </Tabs>
       </S.TabsContainer>

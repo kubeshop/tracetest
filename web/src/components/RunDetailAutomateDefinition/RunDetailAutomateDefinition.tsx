@@ -39,7 +39,13 @@ const RunDetailAutomateDefinition = ({id, version, resourceType, fileName, onFil
         value={definition}
         language="yaml"
         actions={
-          <Button data-cy="file-viewer-download" icon={<DownloadOutlined />} onClick={onDownload} type="primary">
+          <Button
+            data-cy="file-viewer-download"
+            icon={<DownloadOutlined />}
+            onClick={onDownload}
+            size="small"
+            type="primary"
+          >
             Download File
           </Button>
         }

@@ -5,11 +5,11 @@ import TestRun from 'models/TestRun.model';
 import Controls from './Controls';
 import * as S from './DeepLink.styled';
 import useDeepLink from './hooks/useDeepLink';
+import {IMethodChildrenProps} from '../../RunDetailAutomateMethods';
 
-interface IProps {
+interface IProps extends IMethodChildrenProps {
   test: Test;
   run: TestRun;
-  variableSetId?: string;
 }
 
 const DeepLink = ({test, variableSetId, run: {variableSet}}: IProps) => {
@@ -32,7 +32,7 @@ const DeepLink = ({test, variableSetId, run: {variableSet}}: IProps) => {
         maxHeight="80px"
         actions={
           <a target="_blank" href={deepLink}>
-            <S.TryItButton ghost type="primary">
+            <S.TryItButton ghost size="small" type="primary">
               Try it
             </S.TryItButton>
           </a>

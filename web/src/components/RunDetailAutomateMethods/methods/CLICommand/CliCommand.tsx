@@ -1,19 +1,11 @@
 import {ReadOutlined} from '@ant-design/icons';
 import {FramedCodeBlock} from 'components/CodeBlock';
-import {ResourceType} from 'types/Resource.type';
 import * as S from './CliCommand.styled';
 import Controls from './Controls';
 import useCliCommand from './hooks/useCliCommand';
+import {IMethodChildrenProps} from '../../RunDetailAutomateMethods';
 
-interface IProps {
-  id: string;
-  variableSetId?: string;
-  fileName?: string;
-  resourceType: ResourceType;
-  docsUrl?: string;
-}
-
-const CLiCommand = ({id, variableSetId, fileName = '', resourceType, docsUrl}: IProps) => {
+const CLiCommand = ({id, variableSetId, fileName = '', resourceType, docsUrl}: IMethodChildrenProps) => {
   const {command, onGetCommand} = useCliCommand();
 
   return (
