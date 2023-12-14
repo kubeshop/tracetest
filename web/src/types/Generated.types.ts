@@ -37,24 +37,14 @@ export interface paths {
   "/tests": {
     /** get tests */
     get: operations["getTests"];
+    /** Upsert new test action */
+    put: operations["upsertTest"];
     /** Create new test action */
     post: operations["createTest"];
   };
   "/tests/{testId}": {
     /** get test */
-    get: {
-      parameters: {};
-      responses: {
-        /** successful operation */
-        200: {
-          content: {
-            "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
-          };
-        };
-        /** problem with getting a test */
-        500: unknown;
-      };
-    };
+    get: operations["getTest"];
     /** update test action */
     put: operations["updateTest"];
     /** delete a test */
@@ -393,13 +383,29 @@ export interface operations {
       500: unknown;
     };
   };
+  /** Upsert new test action */
+  upsertTest: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
+      };
+    };
+  };
   /** Create new test action */
   createTest: {
     responses: {
       /** successful operation */
       200: {
         content: {
-          "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+          "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
         };
       };
       /** trying to create a test with an already existing ID */
@@ -407,8 +413,22 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
       };
+    };
+  };
+  /** get test */
+  getTest: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
+        };
+      };
+      /** problem with getting a test */
+      500: unknown;
     };
   };
   /** update test action */
@@ -422,7 +442,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": external["tests.yaml"]["components"]["schemas"]["Test"];
+        "application/json": external["tests.yaml"]["components"]["schemas"]["TestResource"];
       };
     };
   };

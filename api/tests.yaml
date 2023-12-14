@@ -28,7 +28,6 @@ components:
       properties:
         id:
           type: string
-          readOnly: true
         name:
           type: string
         description:

@@ -272,16 +272,34 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/components/schemas/Test"
+              $ref: "./tests.yaml#/components/schemas/TestResource"
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./tests.yaml#/components/schemas/Test"
+                $ref: "./tests.yaml#/components/schemas/TestResource"
         400:
           description: "trying to create a test with an already existing ID"
+    put:
+      tags:
+        - resource-api
+      summary: "Upsert new test"
+      description: "Upsert new test action"
+      operationId: upsertTest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./tests.yaml#/components/schemas/TestResource"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./tests.yaml#/components/schemas/TestResource"
   /tests/{testId}:
     get:
       tags:
@@ -290,6 +308,7 @@ paths:
         - $ref: "./parameters.yaml#/components/parameters/testId"
       summary: "get test"
       description: "get test"
+      operationId: getTest
       responses:
         200:
           description: successful operation
@@ -311,7 +330,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/components/schemas/Test"
+              $ref: "./tests.yaml#/components/schemas/TestResource"
       responses:
         204:
           description: successful operation
