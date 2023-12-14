@@ -548,6 +548,19 @@ func TestUnmarshalLargeTrace(t *testing.T) {
 	assert.Greater(t, len(trace.Flat), 0)
 }
 
+func TestBrowserSpan(t *testing.T) {
+	span := newSpan("click")
+	span.Attributes = attributesFromMap(map[string]string{
+		"event_type": "click",
+		"http.url":   "http://localhost:1663",
+	})
+
+	spans := []traces.Span{span}
+	trace := traces.NewTrace("trace", spans)
+
+	assert.Equal(t, trace.Spans()[0].Attributes.Get(traces.TracetestMetadataFieldType), "general")
+}
+
 func attributesFromMap(input map[string]string) traces.Attributes {
 	attributes := traces.NewAttributes()
 	for key, value := range input {
