@@ -3,6 +3,7 @@ import AllowButton, {Operation} from 'components/AllowButton';
 import CreateButton from 'components/CreateButton';
 import {TriggerTypes} from 'constants/Test.constants';
 import EntryPointFactory from 'components/TestPlugins/EntryPointFactory';
+import Test from 'models/Test.model';
 import * as S from './CreateTest.styled';
 
 interface IProps {
@@ -21,18 +22,20 @@ const Header = ({isLoading, isValid, triggerType}: IProps) => {
       </S.HeaderLeft>
 
       <S.HeaderRight>
-        <AllowButton
-          block
-          ButtonComponent={CreateButton}
-          data-cy="run-test-submit"
-          disabled={!isValid}
-          loading={isLoading}
-          onClick={() => form.submit()}
-          operation={Operation.Edit}
-          type="primary"
-        >
-          Run
-        </AllowButton>
+        {Test.shouldAllowRun(triggerType) && (
+          <AllowButton
+            block
+            ButtonComponent={CreateButton}
+            data-cy="run-test-submit"
+            disabled={!isValid}
+            loading={isLoading}
+            onClick={() => form.submit()}
+            operation={Operation.Edit}
+            type="primary"
+          >
+            Run
+          </AllowButton>
+        )}
       </S.HeaderRight>
     </S.Header>
   );

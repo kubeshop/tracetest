@@ -15,26 +15,34 @@ type Trigger = {
   request: TTriggerRequest;
 };
 
+type TRequest = object | null;
+
 const EntryData = {
-  [TriggerTypes.http](request: object) {
+  [TriggerTypes.http](request: TRequest) {
     return {
       entryPoint: get(request, 'url', ''),
       method: get(request, 'method', ''),
     };
   },
-  [TriggerTypes.grpc](request: object) {
+  [TriggerTypes.grpc](request: TRequest) {
     return {
       entryPoint: get(request, 'address', ''),
       method: get(request, 'method', ''),
     };
   },
-  [TriggerTypes.traceid](request: object) {
+  [TriggerTypes.traceid](request: TRequest) {
     return {
       entryPoint: get(request, 'id', ''),
       method: 'TraceID',
     };
   },
-  [TriggerTypes.kafka](request: object) {
+  [TriggerTypes.cypress](request: TRequest) {
+    return {
+      entryPoint: get(request, 'id', ''),
+      method: 'Cypress',
+    };
+  },
+  [TriggerTypes.kafka](request: TRequest) {
     let entryPoint = '';
 
     const kafkaRequest = request as KafkaRequest;
@@ -49,7 +57,13 @@ const EntryData = {
   },
 };
 
-const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid = {}, kafka = {}}: TRawTrigger): Trigger => {
+const Trigger = ({
+  type: rawType = 'http',
+  httpRequest = {},
+  grpc = {},
+  traceid = {},
+  kafka = {},
+}: TRawTrigger): Trigger => {
   const type = rawType as TriggerTypes;
 
   let request = {} as TTriggerRequest;
@@ -57,7 +71,7 @@ const Trigger = ({type: rawType = 'http', httpRequest = {}, grpc = {}, traceid =
     request = HttpRequest(httpRequest);
   } else if (type === TriggerTypes.grpc) {
     request = GrpcRequest(grpc);
-  } else if (type === TriggerTypes.traceid) {
+  } else if ([TriggerTypes.traceid, TriggerTypes.cypress].includes(type)) {
     request = TraceIDRequest(traceid);
   } else if (type === TriggerTypes.kafka) {
     request = KafkaRequest(kafka);

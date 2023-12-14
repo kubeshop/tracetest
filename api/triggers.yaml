@@ -6,7 +6,7 @@ components:
       properties:
         type:
           type: string
-          enum: ["http", "grpc", "traceid", "kafka"]
+          enum: ["http", "grpc", "traceid", "kafka", "cypress"]
         httpRequest:
           $ref: "./http.yaml#/components/schemas/HTTPRequest"
         grpc:
@@ -21,7 +21,7 @@ components:
       properties:
         type:
           type: string
-          enum: ["http", "grpc", "traceid", "kafka"]
+          enum: ["http", "grpc", "traceid", "kafka", "cypress"]
         triggerResult:
           type: object
           properties:

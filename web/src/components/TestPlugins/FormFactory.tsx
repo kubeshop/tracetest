@@ -7,8 +7,9 @@ import {TDraftTestForm} from 'types/Test.types';
 const FormFactoryMap = {
   [TriggerTypes.http]: Rest,
   [TriggerTypes.grpc]: Grpc,
-  [TriggerTypes.traceid]: () => null,
   [TriggerTypes.kafka]: Kafka,
+  [TriggerTypes.traceid]: () => null,
+  [TriggerTypes.cypress]: () => null,
 };
 
 export interface IFormProps {

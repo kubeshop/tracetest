@@ -10,6 +10,7 @@ import TestDefinitionService from './TestDefinition.service';
 import GrpcService from './Triggers/Grpc.service';
 import HttpService from './Triggers/Http.service';
 import TraceIDService from './Triggers/TraceID.service';
+import CypressService from './Triggers/Cypress.service';
 import KafkaService from './Triggers/Kafka.service';
 
 const authValidation = ({auth}: TDraftTest): boolean => {
@@ -34,17 +35,23 @@ const TriggerServiceMap = {
   [SupportedPlugins.REST]: HttpService,
   [SupportedPlugins.Kafka]: KafkaService,
   [SupportedPlugins.TraceID]: TraceIDService,
+  [SupportedPlugins.Cypress]: CypressService,
 } as const;
 
 const TriggerServiceByTypeMap = {
   [TriggerTypes.grpc]: GrpcService,
   [TriggerTypes.http]: HttpService,
   [TriggerTypes.traceid]: TraceIDService,
+  [TriggerTypes.cypress]: CypressService,
   [TriggerTypes.kafka]: KafkaService,
 } as const;
 
 const TestService = () => ({
-  async getRequest({type, name: pluginName}: IPlugin, draft: TDraftTest, original?: Test): Promise<TRawTestResource> {
+  async getRequest(
+    {type, requestType, name: pluginName}: IPlugin,
+    draft: TDraftTest,
+    original?: Test
+  ): Promise<TRawTestResource> {
     const {name, description, skipTraceCollection = false} = draft;
     const triggerService = TriggerServiceMap[pluginName];
     const request = await triggerService.getRequest(draft);
@@ -52,7 +59,7 @@ const TestService = () => ({
     const trigger = {
       type,
       triggerType: type,
-      [type]: request,
+      ...(request && {[requestType ?? type]: request}),
     };
 
     return {

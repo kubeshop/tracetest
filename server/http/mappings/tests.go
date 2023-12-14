@@ -465,13 +465,17 @@ func (m Model) TriggerResult(in openapi.TriggerResult) trigger.TriggerResult {
 		Type:  trigger.TriggerType(in.Type),
 		Error: m.TriggerError(in.TriggerResult.Error),
 	}
+
+	if tr.Type.IsTraceIDBased() {
+		tr.TraceID = m.TraceIDResponse(in.TriggerResult.Traceid)
+		return tr
+	}
+
 	switch in.Type {
 	case "http":
 		tr.HTTP = m.HTTPResponse(in.TriggerResult.Http)
 	case "grpc":
 		tr.GRPC = m.GRPCResponse(in.TriggerResult.Grpc)
-	case "traceid":
-		tr.TraceID = m.TraceIDResponse(in.TriggerResult.Traceid)
 	case "kafka":
 		tr.Kafka = m.KafkaResponse(in.TriggerResult.Kafka)
 	}

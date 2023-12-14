@@ -11,7 +11,7 @@ interface IProps {
   onDelete(): void;
   onDuplicate(): void;
   title: string;
-  runButton: React.ReactElement;
+  runButton: React.ReactNode;
 }
 
 const TestHeader = ({description, id, shouldEdit, onEdit, onDelete, onDuplicate, title, runButton}: IProps) => {

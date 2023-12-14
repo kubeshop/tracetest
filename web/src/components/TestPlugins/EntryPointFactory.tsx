@@ -7,8 +7,9 @@ import TriggerHeaderBarKafka from './EntryPoint/Kafka';
 const EntryPointFactoryMap = {
   [TriggerTypes.http]: TriggerHeaderBarHttp,
   [TriggerTypes.grpc]: TriggerHeaderBarGrpc,
-  [TriggerTypes.traceid]: TriggerHeaderBarTraceID,
   [TriggerTypes.kafka]: TriggerHeaderBarKafka,
+  [TriggerTypes.traceid]: TriggerHeaderBarTraceID,
+  [TriggerTypes.cypress]: () => null,
 };
 
 interface IProps {
