@@ -132,7 +132,7 @@ func getRootSpan(allRoots []*Span) *Span {
 
 // TODO: this is temp while we decide what to do with browser spans and how to handle them
 func isBrowserSpan(attrs Attributes) bool {
-	return attrs.Get("event_type") != "" || attrs.Get(TracetestMetadataFieldType) != "documentLoad"
+	return attrs.Get("event_type") != "" || attrs.Get(TracetestMetadataFieldType) == "documentLoad"
 }
 
 func spanType(attrs Attributes) string {
