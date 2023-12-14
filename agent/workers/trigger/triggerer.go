@@ -55,6 +55,10 @@ func (r *Registry) Get(triggererType trigger.TriggerType) (Triggerer, error) {
 	r.Lock()
 	defer r.Unlock()
 
+	if triggererType.IsTraceIDBased() {
+		triggererType = trigger.TriggerTypeTraceID
+	}
+
 	t, found := r.reg[triggererType]
 	if !found {
 		return nil, fmt.Errorf(`cannot get trigger type "%s": %w`, triggererType, ErrTriggererTypeNotRegistered)

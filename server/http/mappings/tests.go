@@ -466,7 +466,7 @@ func (m Model) TriggerResult(in openapi.TriggerResult) trigger.TriggerResult {
 		Error: m.TriggerError(in.TriggerResult.Error),
 	}
 
-	if trigger.IsTraceIDBasedTrigger(tr.Type) {
+	if tr.Type.IsTraceIDBased() {
 		tr.TraceID = m.TraceIDResponse(in.TriggerResult.Traceid)
 		return tr
 	}

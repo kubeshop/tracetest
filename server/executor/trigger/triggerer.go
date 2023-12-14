@@ -61,7 +61,7 @@ func (r *Registry) Get(triggererType trigger.TriggerType) (Triggerer, error) {
 	r.Lock()
 	defer r.Unlock()
 
-	if trigger.IsTraceIDBasedTrigger(triggererType) {
+	if triggererType.IsTraceIDBased() {
 		triggererType = trigger.TriggerTypeTraceID
 	}
 

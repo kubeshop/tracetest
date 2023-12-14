@@ -10,7 +10,6 @@ import (
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -132,7 +131,7 @@ func (r triggerResolverWorker) ProcessItem(ctx context.Context, job Job) {
 		r.handleError(job.Run, err)
 	}
 
-	if trigger.IsTraceIDBasedTrigger(job.Test.Trigger.Type) {
+	if job.Test.Trigger.Type.IsTraceIDBased() {
 		traceIDFromParam, err := trace.TraceIDFromHex(resolvedTest.Trigger.TraceID.ID)
 		if err == nil {
 			run.TraceID = traceIDFromParam

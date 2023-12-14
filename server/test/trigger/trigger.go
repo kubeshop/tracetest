@@ -1,6 +1,10 @@
 package trigger
 
-import "errors"
+import (
+	"errors"
+
+	"golang.org/x/exp/slices"
+)
 
 type (
 	TriggerType string
@@ -32,4 +36,12 @@ type (
 
 func (e TriggerError) Error() error {
 	return errors.New(e.ErrorMessage)
+}
+
+func (t TriggerType) IsTraceIDBased() bool {
+	return slices.Contains(traceIDBasedTriggers, t)
+}
+
+func (t TriggerType) IsFrontendE2EBased() bool {
+	return t == TriggerTypeCypress
 }

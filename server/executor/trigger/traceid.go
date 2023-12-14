@@ -32,7 +32,7 @@ func (t *traceidTriggerer) Type() trigger.TriggerType {
 }
 
 func (t *traceidTriggerer) Resolve(ctx context.Context, test test.Test, opts *ResolveOptions) (test.Test, error) {
-	if test.Trigger.Type == trigger.TriggerTypeCypress {
+	if test.Trigger.Type.IsFrontendE2EBased() {
 		test.Trigger.TraceID = &trigger.TraceIDRequest{ID: TRACEID_EXPRESSION}
 	}
 
