@@ -555,10 +555,27 @@ func TestBrowserSpan(t *testing.T) {
 		"http.url":   "http://localhost:1663",
 	})
 
-	spans := []traces.Span{span}
-	trace := traces.NewTrace("trace", spans)
+	trace := traces.NewTrace("trace", []traces.Span{span})
 
 	assert.Equal(t, trace.Spans()[0].Attributes.Get(traces.TracetestMetadataFieldType), "general")
+
+	span2 := newSpan("documentLoad")
+	span2.Attributes = attributesFromMap(map[string]string{
+		"http.url": "http://localhost:1663",
+	})
+
+	trace2 := traces.NewTrace("trace", []traces.Span{span2})
+
+	assert.Equal(t, trace2.Spans()[0].Attributes.Get(traces.TracetestMetadataFieldType), "general")
+
+	span3 := newSpan("GET /api/v1/trace")
+	span3.Attributes = attributesFromMap(map[string]string{
+		"http.url": "http://localhost:1663",
+	})
+
+	trace3 := traces.NewTrace("trace", []traces.Span{span3})
+
+	assert.Equal(t, trace3.Spans()[0].Attributes.Get(traces.TracetestMetadataFieldType), "http")
 }
 
 func attributesFromMap(input map[string]string) traces.Attributes {
