@@ -3,6 +3,7 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
 import TriggerTypeCard from './TriggerTypeCard';
 import * as S from './TriggerTypeModal.styled';
+import { withCustomization } from '../../providers/Customization';
 
 const pluginList = Object.values(CreateTriggerTypeToPlugin);
 
@@ -42,4 +43,4 @@ const TriggerTypeModal = ({isOpen, onClose}: IProps) => {
   );
 };
 
-export default TriggerTypeModal;
+export default withCustomization(TriggerTypeModal, 'triggerTypeModal');
