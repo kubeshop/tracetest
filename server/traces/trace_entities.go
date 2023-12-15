@@ -130,7 +130,16 @@ func getRootSpan(allRoots []*Span) *Span {
 	return root
 }
 
+// TODO: this is temp while we decide what to do with browser spans and how to handle them
+func isBrowserSpan(attrs Attributes) bool {
+	return attrs.Get("event_type") != "" || attrs.Get(TracetestMetadataFieldName) == "documentLoad"
+}
+
 func spanType(attrs Attributes) string {
+	if isBrowserSpan(attrs) {
+		return "general"
+	}
+
 	// based on https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions
 	// using the first required attribute for each type
 	for key := range attrs.Values() {
@@ -149,6 +158,7 @@ func spanType(attrs Attributes) string {
 			return "exception"
 		}
 	}
+
 	return "general"
 }
 
