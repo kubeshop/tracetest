@@ -1,0 +1,22 @@
+---
+type: PollingProfile
+spec:
+  name: Default
+  strategy: periodic
+  default: true
+  periodic:
+    retryDelay: 5s
+    timeout: 10m
+
+---
+type: DataStore
+spec:
+  name: Sumo Logic
+  type: sumologic
+  sumologic:
+    url: "https://api.sumologic.com"
+    # accessID: "your-access-id"
+    # accessKey: "your-access-key"
+    accessID: "suIbNBmOea3Sty"
+    accessKey: "qo7L9JvHNuIQNRZSIDdpUdjsXDJoVFgJhWqky6MjfrZZ7CDE2NRj6PRK3j7SVsX8"
+    
