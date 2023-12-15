@@ -9,8 +9,7 @@ exporters:
 
 extensions:
   sumologic:
-    installation_token: U1VNT1E1VHl0TFgwMEE2eUZ2d21iYUdqWXpjSXRKTlRodHRwczovL2NvbGxlY3RvcnMuc3Vtb2xvZ2ljLmNvbQ==
-    # installation_token: your-sumologic-installation-token
+    installation_token: <your-sumologic-installation-token>
 
 service:
   extensions: [sumologic]
