@@ -174,11 +174,6 @@ const sidebars = {
             },
             {
               type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
-              label: "Node.js and Elastic APM",
-            },
-            {
-              type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-datadog",
               label: "OpenTelemetry Demo and Datadog",
             },
@@ -196,44 +191,6 @@ const sidebars = {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-signoz-pokeshop",
               label: "Pokeshop API and SigNoz",
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "Jaeger",
-          items: [
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
-              label: "Node.js and Jaeger",
-            },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
-              label: "Serverless Node.js and Jaeger with Terraform",
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "OpenSearch",
-          items: [
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
-              label: "Node.js and OpenSearch",
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "Grafana Tempo",
-          items: [
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-tempo",
-              label: "Node.js and Grafana Tempo",
             },
           ],
         },
@@ -282,6 +239,66 @@ const sidebars = {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-azure-app-insights-pokeshop",
               label: "Pokeshop API and Azure Application Insights with OpenTelemetry Collector",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Elastic",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
+              label: "Node.js and Elastic APM",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Grafana Tempo",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-tempo",
+              label: "Node.js and Grafana Tempo",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Jaeger",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-jaeger",
+              label: "Node.js and Jaeger",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-aws-terraform",
+              label: "Serverless Node.js and Jaeger with Terraform",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "OpenSearch",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-opensearch",
+              label: "Node.js and OpenSearch",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Sumo Logic",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-sumologic",
+              label: "Node.js and Sumo Logic",
             },
           ],
         },
@@ -548,7 +565,7 @@ const sidebars = {
             {
               type: "doc",
               id: "configuration/connecting-to-data-stores/signoz",
-              label: "Signoz",
+              label: "SigNoz",
             },
             {
               type: "doc",

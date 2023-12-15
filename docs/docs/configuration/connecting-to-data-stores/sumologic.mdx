@@ -13,7 +13,31 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 Tracetest fetches traces from [Sumo Logic's API](https://help.sumologic.com/docs/api/tracing/).
 
-## Connect Tracetest to Tempo with the CLI
+:::tip
+Examples of configuring Tracetest can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
+:::
+
+## Configure Tracetest to Use Sumo Logic as a Trace Data Store
+
+Configure Tracetest to fetch trace data from Sumo Logic.
+
+Tracetest uses Sumo Logic's **API** `https://api.sumologic.com` to fetch trace data.
+
+You need to know which **Access ID**, **Access Key** you are using.
+
+Find them in the [preferences settings](https://help.sumologic.com/docs/manage/security/access-keys/) in your Sumo Logic account.
+
+:::tip
+Need help configuring the OpenTelemetry Collector so send trace data from your application to Sumo Logic? Read more in [the reference page here](/configuration/opentelemetry-collector-configuration-file-reference).
+:::
+
+## Connect Tracetest to Sumo Logic with the Web UI
+
+In the Web UI, (1) open Settings and, on the (2) Configure Data Store tab, select (3) Sumo Logic. Add the Sumo Logic **API**, your **Access ID**, and **Access Key**.
+
+![sumo logic](../img/sumologic-settings.png)
+
+## Connect Tracetest to Sumo Logic with the CLI
 
 If you prefer using the CLI, you can use this file config.
 
@@ -25,8 +49,8 @@ spec:
   name: Sumo Logic
   type: sumologic
   sumologic:
-    url: "https://api.sumologic.com",
-    accessID: "your-access-id",
+    url: "https://api.sumologic.com"
+    accessID: "your-access-id"
     accessKey: "your-access-key"
 ```
 
