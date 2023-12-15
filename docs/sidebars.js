@@ -548,7 +548,7 @@ const sidebars = {
             {
               type: "doc",
               id: "configuration/connecting-to-data-stores/signoz",
-              label: "Signoz",
+              label: "SigNoz",
             },
             {
               type: "doc",
