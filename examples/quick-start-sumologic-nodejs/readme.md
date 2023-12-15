@@ -1,6 +1,6 @@
-# Quick Start - Node.js app with SumoLogic and Tracetest
+# Quick Start - Node.js app with Sumo Logic and Tracetest
 
-> [Read the detailed recipe for setting up Tempo with Tractest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-with-sumologic)
+> [Read the detailed recipe for setting up Sumo Logic with Tractest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-with-sumologic)
 
 This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces and Tracetest for enhancing your e2e and integration tests with trace-based testing. The infrastructure will use Sumo Logic as the trace data store, and the Sumo Logic distribution of the OpenTelemetry Collector to receive traces from the Node.js app and send them to Sumo Logic.
 
