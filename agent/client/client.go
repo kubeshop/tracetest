@@ -188,6 +188,7 @@ func (c *Client) handleDisconnectionError(inputErr error) (bool, error) {
 		return false, inputErr
 	}
 
+	log.Printf("Reconnecting agent due to error: %s", inputErr.Error())
 	err := retry.Do(func() error {
 		return c.reconnect()
 	})
