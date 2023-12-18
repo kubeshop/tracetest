@@ -22,7 +22,37 @@ For more detailed information about the K6 Tracetest Binary take a look a the [d
 8. Now you are ready to run your load test, you can achieve this by running the following command: `XK6_TRACETEST_API_TOKEN=<your-environment-token> ./k6 run ./import-pokemon.js -o xk6-tracetest`
 9. After the load test finishes you should be able to see an output like the following:
 
-<iframe src="https://app.warp.dev/block/embed/aPBVIne2tE8fp4Y27xVrmd" title="xk6 trigger" style="width: 1892px; height: 796px; border:0; overflow:hidden;" allow="clipboard-read; clipboard-write"></iframe>
+```bash
+./k6 run ./import-pokemon.js -o xk6-tracetest
+context menu
+
+
+          /\      |‾‾| /‾‾/   /‾‾/
+     /\  /  \     |  |/  /   /  /
+    /  \/    \    |     (   /   ‾‾\
+   /          \   |  |\  \ |  (‾)  |
+  / __________ \  |__| \__\ \_____/ .io
+
+  execution: local
+     script: ./import-pokemon.js
+     output: xk6-tracetest-output (TestRunID: 38055)
+
+  scenarios: (100.00%) 1 scenario, 1 max VUs, 35s max duration (incl. graceful stop):
+           * default: 1 looping VUs for 5s (gracefulStop: 30s)
+
+[TotalRuns=6, SuccessfulRus=1, FailedRuns=5]
+[FAILED]
+[Request=GET - http://localhost:8081/pokemon/import, TraceID=dc0718bcecceeec731b343235eb9c15a, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/11]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718fe83cfeec7315daf10d212d351, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/4]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718a8f4ceeec731e47f13762e61b8, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/8]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718bcecceeec731b343235eb9c15a, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/9]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc071893fcceeec731148270c6671a1e, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/6]
+[SUCCESSFUL]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718cee4ceeec731f3f414bf3a2a16, RunState=FINISHED FailingSpecs=false, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/3]
+
+running (05.0s), 0/1 VUs, 5 complete and 0 interrupted iterations
+default ✓ [======================================] 1 VUs  5s
+```
 
 ## What's Next?
 
