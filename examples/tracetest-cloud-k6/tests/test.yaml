@@ -1,0 +1,23 @@
+type: Test
+spec:
+  id: kc_MgKoVR
+  name: K6
+  description: K6
+  trigger:
+    type: traceid
+    traceid:
+      id: ${env:TRACE_ID}
+  specs:
+    - selector: span[tracetest.span.type="general" name="import pokemon"]
+      name: Should have imported the pokemon
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: |-
+        span[tracetest.span.type="http" net.peer.name="pokeapi.co" http.method="GET"]
+      name: Should trigger a request to the POKEAPI
+      assertions:
+        - attr:http.url   =  "https://pokeapi.co/api/v2/pokemon/6"
+    - selector: span[tracetest.span.type="database" name="create postgres.pokemon"]
+      name: Should insert the pokemon to the DB
+      assertions:
+        - attr:db.result | json_path '.name'  =  "charizard"
