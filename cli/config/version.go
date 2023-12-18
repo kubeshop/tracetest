@@ -7,6 +7,7 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/pterm/pterm"
 )
 
 const defaultVersionExtension = "json"
@@ -33,34 +34,10 @@ Server: Not Configured`, false
 Server: Failed to get the server version - %s`, err.Error()), false
 	}
 
-	versionMatch := false
 	version := meta.GetVersion()
-	if !isSemver(version) || !isSemver(Version) {
-		// if either version is not semver, we can't compare them
-		// do a basic strict compare
-
-		versionMatch = version == Version
-	} else {
-
-		serverVersion, err := semver.NewVersion(version)
-		if err != nil {
-			return result + fmt.Sprintf(`
-Server: Failed to parse the server version - %s`, err.Error()), false
-		}
-
-		cliVersion, err := semver.NewVersion(Version)
-		if err != nil {
-			return result + fmt.Sprintf(`
-Failed to parse the CLI version - %s`, err.Error()), false
-		}
-
-		versionConstrait, err := semver.NewConstraint(fmt.Sprintf(">=%d.%d", cliVersion.Major(), cliVersion.Minor()))
-		if err != nil {
-			return result + fmt.Sprintf(`
-Failed to parse the CLI version constraint - %s`, err.Error()), false
-		}
-
-		versionMatch = versionConstrait.Check(serverVersion)
+	versionMatch, cliOutdated, err := versionMatch(Version, version)
+	if err != nil {
+		return result + err.Error(), false
 	}
 
 	if versionMatch {
@@ -68,8 +45,43 @@ Failed to parse the CLI version constraint - %s`, err.Error()), false
 ✔️ Version match`
 	}
 
+	if cliOutdated {
+		result += pterm.Red(" (outdated)")
+	}
+
 	return result + fmt.Sprintf(`
 Server: %s`, version), versionMatch
+}
+
+func versionMatch(cliVersion, serverVersion string) (bool, bool, error) {
+	if !isSemver(serverVersion) || !isSemver(cliVersion) {
+		// if either version is not semver, we can't compare them
+		// do a basic strict compare
+		return serverVersion == cliVersion, false, nil
+	}
+
+	serverSemVer, err := semver.NewVersion(serverVersion)
+	if err != nil {
+		return false, false, fmt.Errorf("server: Failed to parse the server version - %w`", err)
+	}
+
+	cliSemVer, err := semver.NewVersion(cliVersion)
+	if err != nil {
+		return false, false, fmt.Errorf("failed to parse the CLI version - %w", err)
+	}
+
+	versionConstrait, err := semver.NewConstraint(fmt.Sprintf(">=%d.%d", cliSemVer.Major(), cliSemVer.Minor()))
+	if err != nil {
+		return false, false, fmt.Errorf("failed to parse the CLI version constraint - %w", err)
+	}
+
+	outdated := false
+	serverVersionDifference := serverSemVer.Compare(cliSemVer)
+	if serverVersionDifference > 0 {
+		outdated = true
+	}
+
+	return versionConstrait.Check(serverSemVer), outdated, nil
 }
 
 func isSemver(version string) bool {
