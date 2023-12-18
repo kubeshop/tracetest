@@ -3,6 +3,7 @@ export enum Categories {
   Test = 'test',
   TestRun = 'test-run',
   VariableSet = 'variable-set',
+  TraceAnalyzer = 'trace-analyzer',
   TraceDetail = 'trace-detail',
   TestResults = 'test-results',
   SpanDetail = 'span-detail',

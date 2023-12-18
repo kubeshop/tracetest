@@ -3,7 +3,7 @@ import {useCallback, useState} from 'react';
 import {Dropdown, Form, Menu} from 'antd';
 import {camelCase} from 'lodash';
 import {IBasicValues, TDraftTest} from 'types/Test.types';
-import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
+import CreateTestAnalytics from 'services/Analytics/CreateTest.service';
 import {TooltipQuestion} from 'components/TooltipQuestion/TooltipQuestion';
 import * as S from './DemoSelector.styled';
 
@@ -17,7 +17,7 @@ const BasicDetailsDemoHelper = ({demos}: IProps) => {
 
   const onSelectDemo = useCallback(
     ({key}: {key: string}) => {
-      CreateTestAnalyticsService.onDemoTestClick();
+      CreateTestAnalytics.onDemoClick();
       const demo = demos.find(({name}) => name === key)!;
       form.setFieldsValue(demo);
       setSelectedDemo(demo);

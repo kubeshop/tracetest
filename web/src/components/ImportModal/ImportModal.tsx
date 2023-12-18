@@ -7,6 +7,7 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useCreateTest} from 'providers/CreateTest/CreateTest.provider';
 import {ImportSelector} from 'components/Inputs';
 import ImportFactory from 'components/TestPlugins/ImportFactory';
+import CreateTestAnalytics from 'services/Analytics/CreateTest.service';
 import * as S from './ImportModal.styled';
 import Tip from './Tip';
 
@@ -34,6 +35,7 @@ const ImportModal = ({isOpen, onClose}: IProps) => {
 
   const handleImport = useCallback(
     async (values: TDraftTest) => {
+      CreateTestAnalytics.onImportSelect(type);
       const draft = await ImportService.getRequest(type, values);
       const plugin = await ImportService.getPlugin(type, values);
 

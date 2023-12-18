@@ -9,10 +9,11 @@ import * as S from './CreateTest.styled';
 interface IProps {
   isLoading: boolean;
   isValid: boolean;
+  onRunTest?(): void;
   triggerType: TriggerTypes;
 }
 
-const Header = ({isLoading, isValid, triggerType}: IProps) => {
+const Header = ({isLoading, isValid, onRunTest, triggerType}: IProps) => {
   const form = Form.useFormInstance();
 
   return (
@@ -29,7 +30,10 @@ const Header = ({isLoading, isValid, triggerType}: IProps) => {
             data-cy="run-test-submit"
             disabled={!isValid}
             loading={isLoading}
-            onClick={() => form.submit()}
+            onClick={() => {
+              onRunTest?.();
+              form.submit();
+            }}
             operation={Operation.Edit}
             type="primary"
           >

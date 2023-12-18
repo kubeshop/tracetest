@@ -2,11 +2,12 @@ import {Space, Switch, Typography} from 'antd';
 import {useState} from 'react';
 import {LinterResultPlugin} from 'models/LinterResult.model';
 import Trace from 'models/Trace.model';
+import TraceAnalyzerAnalytics from 'services/Analytics/TraceAnalyzer.service';
 import AnalyzerService from 'services/Analyzer.service';
 import * as S from './AnalyzerResult.styled';
 import AnalyzerScore from '../AnalyzerScore/AnalyzerScore';
 import Rule from './Rule';
-import Collapse, { CollapsePanel } from '../Collapse';
+import Collapse, {CollapsePanel} from '../Collapse';
 
 interface IProps {
   plugins: LinterResultPlugin[];
@@ -24,7 +25,7 @@ const Plugins = ({plugins: rawPlugins, trace}: IProps) => {
         <label htmlFor="only_errors_enabled">Show only errors</label>
       </S.SwitchContainer>
 
-      <Collapse>
+      <Collapse onChange={() => TraceAnalyzerAnalytics.onPluginClick()}>
         {plugins.map(plugin => (
           <CollapsePanel
             header={

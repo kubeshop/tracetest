@@ -1,6 +1,6 @@
 import {CreateTriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import CreateTestAnalyticsService from 'services/Analytics/CreateTestAnalytics.service';
+import CreateTestAnalytics from 'services/Analytics/CreateTest.service';
 import TriggerTypeCard from './TriggerTypeCard';
 import * as S from './TriggerTypeModal.styled';
 
@@ -31,7 +31,7 @@ const TriggerTypeModal = ({isOpen, onClose}: IProps) => {
           <TriggerTypeCard
             key={plugin.name}
             onClick={selectedPlugin => {
-              CreateTestAnalyticsService.onPluginSelected(selectedPlugin.name);
+              CreateTestAnalytics.onTriggerSelect(selectedPlugin.type);
               navigate(`test/create/${selectedPlugin.type}`);
             }}
             plugin={plugin}
