@@ -11,6 +11,7 @@ jobs:
   pokeshop-trace-based-tests:
     name: Run trace based tests for Pokeshop
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -64,6 +65,7 @@ jobs:
   otel-demo-trace-based-tests:
     name: Run trace based tests for Open Telemetry demo
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
