@@ -3,7 +3,7 @@ import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provide
 import CreateTestSuiteProvider from 'providers/CreateTestSuite';
 import Content from './Content';
 
-const Home = () => {
+const TestSuites = () => {
   const {isLoading, shouldDisplayConfigSetup, skipConfigSetup} = useSettingsValues();
 
   return (
@@ -17,4 +17,4 @@ const Home = () => {
   );
 };
 
-export default withAnalytics(Home, 'home');
+export default withAnalytics(TestSuites, 'test-suite');

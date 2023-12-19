@@ -1,6 +1,6 @@
 import {Button} from 'antd';
 import {ICreateTestStep} from 'types/Plugins.types';
-import CreateTestAnalyticsService from '../../../services/Analytics/CreateTestAnalytics.service';
+import CreateTestSuiteAnalytics from 'services/Analytics/CreateTestSuite.service';
 import * as S from './CreateSteps.styled';
 
 interface IProps {
@@ -23,7 +23,7 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
             type="primary"
             ghost
             onClick={() => {
-              CreateTestAnalyticsService.onPrevClick(step.name);
+              CreateTestSuiteAnalytics.onPrevClick(step.name);
               onPrev();
             }}
           >
@@ -39,7 +39,7 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
             data-cy={`${mode}-create-next-button`}
             disabled={!isValid}
             type="primary"
-            onClick={() => CreateTestAnalyticsService.onNextClick(step.name)}
+            onClick={() => CreateTestSuiteAnalytics.onNextClick(step.name)}
           >
             Next
           </Button>
@@ -47,7 +47,7 @@ const CreateStepFooter = ({isValid, stepNumber, step, isLastStep, onPrev, isLoad
           <Button
             htmlType="submit"
             form={step.component}
-            onClick={() => CreateTestAnalyticsService.onCreateTestFormSubmit()}
+            onClick={() => CreateTestSuiteAnalytics.onFormSubmit()}
             data-cy={`${mode}-create-create-button`}
             disabled={!isValid}
             type="primary"

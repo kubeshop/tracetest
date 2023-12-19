@@ -1,5 +1,5 @@
 import {useState} from 'react';
-
+import TraceAnalyzerAnalytics from 'services/Analytics/TraceAnalyzer.service';
 import {TAnalyzerError} from 'types/TestRun.types';
 import AnalyzerErrorsPopover from './AnalyzerErrorsPopover';
 import * as S from './AnalyzerErrors.styled';
@@ -13,7 +13,13 @@ const AnalyzerErrors = ({errors}: IProps) => {
 
   return (
     <>
-      <S.ErrorIcon onClick={() => setIsOpen(true)} $isClickable />
+      <S.ErrorIcon
+        onClick={() => {
+          TraceAnalyzerAnalytics.onSpanErrorsClick();
+          setIsOpen(true);
+        }}
+        $isClickable
+      />
       {isOpen && <AnalyzerErrorsPopover errors={errors} onClose={() => setIsOpen(false)} />}
     </>
   );

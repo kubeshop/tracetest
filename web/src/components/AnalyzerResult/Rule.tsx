@@ -7,6 +7,7 @@ import Span from 'models/Span.model';
 import {LinterRuleErrorLevel} from 'models/Linter.model';
 import {useAppDispatch} from 'redux/hooks';
 import {selectSpan} from 'redux/slices/Trace.slice';
+import TraceAnalyzerAnalytics from 'services/Analytics/TraceAnalyzer.service';
 import * as S from './AnalyzerResult.styled';
 import RuleIcon from './RuleIcon';
 import RuleLink from './RuleLink';
@@ -29,6 +30,7 @@ const Rule = ({
 
   const onSpanResultClick = useCallback(
     (spanId: string) => {
+      TraceAnalyzerAnalytics.onSpanNameClick();
       dispatch(selectSpan({spanId}));
     },
     [dispatch]

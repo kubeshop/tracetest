@@ -2,6 +2,7 @@ import {Empty, Typography} from 'antd';
 import {TriggerTypes} from 'constants/Test.constants';
 import useShortcut from 'components/TestPlugins/hooks/useShortcut';
 import FormFactory from 'components/TestPlugins/FormFactory';
+import CreateTestAnalytics from 'services/Analytics/CreateTest.service';
 import * as S from './CreateTest.styled';
 import Header from './Header';
 
@@ -16,7 +17,12 @@ const CreateTest = ({isLoading, isValid, triggerType}: IProps) => {
 
   return (
     <S.Container>
-      <Header isLoading={isLoading} isValid={isValid} triggerType={triggerType} />
+      <Header
+        isLoading={isLoading}
+        isValid={isValid}
+        onRunTest={() => CreateTestAnalytics.onFormSubmit()}
+        triggerType={triggerType}
+      />
 
       <S.Body>
         <S.SectionLeft>
