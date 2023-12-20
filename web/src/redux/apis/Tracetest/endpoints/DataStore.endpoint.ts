@@ -24,14 +24,6 @@ export const dataStoreEndpoints = (builder: TTestApiEndpointBuilder) => ({
     }),
     invalidatesTags: [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
   }),
-  deleteDataStore: builder.mutation<undefined, void>({
-    query: () => ({
-      url: `/datastores/current`,
-      method: HTTP_METHOD.DELETE,
-      headers: {'content-type': 'application/json'},
-    }),
-    invalidatesTags: [{type: TracetestApiTags.DATA_STORE, id: 'datastore'}],
-  }),
   testConnection: builder.mutation<TConnectionResult, TTestConnectionRequest>({
     query: connectionTest => ({
       url: `/config/connection`,

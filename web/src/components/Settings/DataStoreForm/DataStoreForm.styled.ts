@@ -73,7 +73,7 @@ export const Description = styled(Typography.Text)`
 
 export const ButtonsContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 8px;
   margin-top: 23px;
   padding: 16px 22px;
@@ -81,11 +81,6 @@ export const ButtonsContainer = styled.div`
   position: sticky;
   bottom: 0;
   background: white;
-`;
-
-export const SaveContainer = styled.div`
-  display: flex;
-  gap: 8px;
 `;
 
 export const InfoIcon = styled(CheckCircleOutlined)`

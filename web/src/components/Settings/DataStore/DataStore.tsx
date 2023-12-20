@@ -2,7 +2,7 @@ import {Form} from 'antd';
 import {useDataStore} from 'providers/DataStore/DataStore.provider';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import {useCallback} from 'react';
-import {TDraftDataStore, ConfigMode} from 'types/DataStore.types';
+import {TDraftDataStore} from 'types/DataStore.types';
 import DataStoreForm from '../DataStoreForm';
 import * as S from './DataStore.styled';
 
@@ -15,9 +15,7 @@ const DataStore = () => {
     onSaveConfig,
     isTestConnectionLoading,
     onTestConnection,
-    onDeleteConfig,
   } = useDataStore();
-  const isConfigReady = dataStoreConfig.mode === ConfigMode.READY;
   const [form] = Form.useForm<TDraftDataStore>();
 
   const handleOnSubmit = useCallback(
@@ -40,9 +38,7 @@ const DataStore = () => {
           dataStoreConfig={dataStoreConfig}
           onSubmit={handleOnSubmit}
           onTestConnection={handleTestConnection}
-          isConfigReady={isConfigReady}
           isTestConnectionLoading={isTestConnectionLoading}
-          onDeleteConfig={onDeleteConfig}
           isLoading={isLoading}
           isFormValid={isFormValid}
           onIsFormValid={onIsFormValid}
