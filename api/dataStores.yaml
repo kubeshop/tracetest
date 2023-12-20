@@ -193,7 +193,6 @@ components:
       type: string
       enum:
         [
-          agent,
           jaeger,
           opensearch,
           tempo,

@@ -6,7 +6,7 @@ interface IProps {
 }
 
 const DataStoreComponentFactory = ({dataStoreType = SupportedDataStores.JAEGER}: IProps) => {
-  const FormComponent = DataStorePlugin[dataStoreType];
+  const FormComponent = DataStorePlugin[dataStoreType] || DataStorePlugin[SupportedDataStores.OtelCollector];
 
   return <FormComponent />;
 };

@@ -11,7 +11,6 @@ import AzureAppInsightsService from './DataStores/AzureAppInsights.service';
 import SumoLogicService from './DataStores/SumoLogic.service';
 
 const dataStoreServiceMap = {
-  [SupportedDataStores.Agent]: OtelCollectorService,
   [SupportedDataStores.JAEGER]: JaegerService,
   [SupportedDataStores.TEMPO]: BaseClientService,
   [SupportedDataStores.OpenSearch]: ElasticSearchService,
@@ -39,7 +38,7 @@ interface IDataStoreService {
 
 const DataStoreService = (): IDataStoreService => ({
   _getDataStore(type = SupportedDataStores.JAEGER) {
-    return dataStoreServiceMap[type];
+    return dataStoreServiceMap[type] || OtelCollectorService;
   },
   async getRequest(draft, defaultDataStore) {
     const dataStoreType = draft.dataStoreType || SupportedDataStores.JAEGER;
