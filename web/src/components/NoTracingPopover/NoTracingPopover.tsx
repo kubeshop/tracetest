@@ -10,8 +10,8 @@ const NoTracingPopover = () => {
         <div>
           <S.Title>Tracing is not configured.</S.Title>
           <S.Text>
-            Tracetest needs configuration information about your backend trace data store so it can collect the trace
-            after a test run. Please configure your data store now.
+            Tracetest needs configuration information about your Tracing Backend so it can collect the trace after a
+            test run. Please configure your Tracing Backend now.
           </S.Text>
         </div>
         <S.ButtonContainer>
