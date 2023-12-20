@@ -27,6 +27,14 @@ func (r *Repository) SetID(dataStore DataStore, id id.ID) DataStore {
 
 const DataStoreSingleID id.ID = "current"
 
+var defaultDataStore = DataStore{
+	ID:      DataStoreSingleID,
+	Name:    "OTLP",
+	Type:    DataStoreTypeOTLP,
+	Default: true,
+	Values:  DataStoreValues{},
+}
+
 const insertQuery = `
 INSERT INTO data_stores (
 	"id",
@@ -149,9 +157,9 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (DataStore, error) {
 
 	dataStore, err := r.readRow(row)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		return DataStore{
-			CreatedAt: newCreateAtDateString(),
-		}, nil // Assumes an empty datastore
+		dataStore := defaultDataStore
+		dataStore.CreatedAt = newCreateAtDateString()
+		return dataStore, nil // Assumes default datastore
 	}
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository get sql query: %w", err)

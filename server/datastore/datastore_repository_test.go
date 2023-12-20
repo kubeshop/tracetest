@@ -17,7 +17,6 @@ var (
 	excludedOperations = rmtests.ExcludeOperations(
 		rmtests.OperationUpdateNotFound,
 		rmtests.OperationGetNotFound,
-		rmtests.OperationDeleteNotFound,
 		rmtests.OperationListSortSuccess,
 		rmtests.OperationListNoResults,
 	)
@@ -45,6 +44,7 @@ func registerManagerFn(router *mux.Router, db *sql.DB) resourcemanager.Manager {
 		datastore.ResourceNamePlural,
 		dataStoreRepository,
 		resourcemanager.WithIDGen(id.GenerateID),
+		resourcemanager.DisableDelete(),
 	)
 	manager.RegisterRoutes(router)
 
