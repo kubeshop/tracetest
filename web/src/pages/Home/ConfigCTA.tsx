@@ -15,10 +15,10 @@ const ConfigCTA = ({onSkip}: IProps) => {
     <S.ConfigContainer align="middle">
       <Col span={12} offset={6}>
         <S.ConfigContent>
-          <S.ConfigIcon alt="tracing data stores" src={icon} />
-          <Typography.Title>Configure your trace data store</Typography.Title>
+          <S.ConfigIcon alt="Tracing Backend" src={icon} />
+          <Typography.Title>Configure your Tracing Backend</Typography.Title>
           <Typography.Text>
-            Tracetest utilizes the trace collected by your existing OpenTelemetry compatible trace data store to apply
+            Tracetest utilizes the trace collected by your existing OpenTelemetry compatible Tracing Backend to apply
             assertions against. Do you want to configure this now?
           </Typography.Text>
           <S.ConfigFooter>
