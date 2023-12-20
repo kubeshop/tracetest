@@ -16,7 +16,6 @@ interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
   isTestConnectionLoading: boolean;
-  onDeleteConfig(): void;
   onSaveConfig(draft: TDraftDataStore, defaultDataStore: DataStore): void;
   onTestConnection(draft: TDraftDataStore, defaultDataStore: DataStore): void;
   onIsFormValid(isValid: boolean): void;
@@ -29,7 +28,6 @@ export const Context = createContext<IContext>({
   onSaveConfig: noop,
   onIsFormValid: noop,
   onTestConnection: noop,
-  onDeleteConfig: noop,
 });
 
 interface IProps {
@@ -39,10 +37,9 @@ interface IProps {
 export const useDataStore = () => useContext(Context);
 
 const DataStoreProvider = ({children}: IProps) => {
-  const {useTestConnectionMutation, useUpdateDataStoreMutation, useDeleteDataStoreMutation} = TracetestAPI.instance;
+  const {useTestConnectionMutation, useUpdateDataStoreMutation} = TracetestAPI.instance;
   const {isFetching} = useSettingsValues();
   const [updateDataStore, {isLoading: isLoadingUpdate}] = useUpdateDataStoreMutation();
-  const [deleteDataStore] = useDeleteDataStoreMutation();
   const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
   const {showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
@@ -77,18 +74,6 @@ const DataStoreProvider = ({children}: IProps) => {
     },
     [onOpen, showSuccessNotification, updateDataStore]
   );
-
-  const onDeleteConfig = useCallback(async () => {
-    onOpen({
-      title:
-        "Tracetest will remove the Tracing Backend configuration information and enter the 'No-Tracing Mode'. You can still run tests against the responses until you configure a new Tracing Backend.",
-      heading: 'Save Confirmation',
-      okText: 'Save',
-      onConfirm: async () => {
-        await deleteDataStore().unwrap();
-      },
-    });
-  }, [deleteDataStore, onOpen]);
 
   const onIsFormValid = useCallback((isValid: boolean) => {
     setIsFormValid(isValid);
@@ -125,17 +110,8 @@ const DataStoreProvider = ({children}: IProps) => {
       onSaveConfig,
       onIsFormValid,
       onTestConnection,
-      onDeleteConfig,
     }),
-    [
-      isLoadingUpdate,
-      isFormValid,
-      isTestConnectionLoading,
-      onSaveConfig,
-      onIsFormValid,
-      onTestConnection,
-      onDeleteConfig,
-    ]
+    [isLoadingUpdate, isFormValid, isTestConnectionLoading, onSaveConfig, onIsFormValid, onTestConnection]
   );
 
   return <Context.Provider value={value}>{isFetching ? null : children}</Context.Provider>;

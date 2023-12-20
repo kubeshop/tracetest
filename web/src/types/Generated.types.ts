@@ -163,8 +163,6 @@ export interface paths {
     get: operations["getDataStore"];
     /** Update a Data Store */
     put: operations["updateDataStore"];
-    /** Delete a Data Store */
-    delete: operations["deleteDataStore"];
   };
   "/variableSets": {
     /** List VariableSets available in Tracetest. */
@@ -967,14 +965,6 @@ export interface operations {
       content: {
         "application/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
       };
-    };
-  };
-  /** Delete a Data Store */
-  deleteDataStore: {
-    parameters: {};
-    responses: {
-      /** OK */
-      204: never;
     };
   };
   /** List VariableSets available in Tracetest. */

@@ -4,7 +4,6 @@ import TracetestAPI from './Tracetest.api';
 export {default} from './Tracetest.api';
 
 const {
-  useDeleteDataStoreMutation,
   useGetDataStoreQuery,
   useTestConnectionMutation,
   useUpdateDataStoreMutation,
@@ -69,7 +68,6 @@ const {
 } = TracetestAPI.instance;
 
 export {
-  useDeleteDataStoreMutation,
   useGetDataStoreQuery,
   useTestConnectionMutation,
   useUpdateDataStoreMutation,

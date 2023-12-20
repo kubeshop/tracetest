@@ -4,7 +4,6 @@ import AllowButton, {Operation} from 'components/AllowButton';
 import DataStoreIcon from 'components/DataStoreIcon/DataStoreIcon';
 import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
-import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import {DataStoreSelection} from 'components/Inputs';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
@@ -18,9 +17,7 @@ interface IProps {
   onSubmit(values: TDraftDataStore): Promise<void>;
   onIsFormValid(isValid: boolean): void;
   onTestConnection(): void;
-  isConfigReady: boolean;
   isTestConnectionLoading: boolean;
-  onDeleteConfig(): void;
   isLoading: boolean;
   isFormValid: boolean;
 }
@@ -31,9 +28,7 @@ const DataStoreForm = ({
   dataStoreConfig,
   onIsFormValid,
   onTestConnection,
-  isConfigReady,
   isTestConnectionLoading,
-  onDeleteConfig,
   isLoading,
   isFormValid,
 }: IProps) => {
@@ -93,34 +88,18 @@ const DataStoreForm = ({
             {dataStoreType && <DataStoreComponentFactory dataStoreType={dataStoreType} />}
           </S.TopContainer>
           <S.ButtonsContainer>
-            {isConfigReady ? (
-              <AllowButton
-                operation={Operation.Configure}
-                disabled={isLoading}
-                type="primary"
-                ghost
-                onClick={onDeleteConfig}
-                danger
-              >
-                {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Tracing Backend`}
-              </AllowButton>
-            ) : (
-              <div />
-            )}
-            <S.SaveContainer>
-              <Button loading={isTestConnectionLoading} type="primary" ghost onClick={onTestConnection}>
-                Test Connection
-              </Button>
-              <AllowButton
-                operation={Operation.Configure}
-                disabled={!isFormValid}
-                loading={isLoading}
-                type="primary"
-                onClick={() => form.submit()}
-              >
-                Save and Set as Tracing Backend
-              </AllowButton>
-            </S.SaveContainer>
+            <Button loading={isTestConnectionLoading} type="primary" ghost onClick={onTestConnection}>
+              Test Connection
+            </Button>
+            <AllowButton
+              operation={Operation.Configure}
+              disabled={!isFormValid}
+              loading={isLoading}
+              type="primary"
+              onClick={() => form.submit()}
+            >
+              Save and Set as DataStore
+            </AllowButton>
           </S.ButtonsContainer>
         </S.FactoryContainer>
       </S.FormContainer>
