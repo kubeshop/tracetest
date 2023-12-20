@@ -1,6 +1,6 @@
 import {CheckCircleOutlined} from '@ant-design/icons';
 import {Tabs, Typography} from 'antd';
-import styled, {css} from 'styled-components';
+import styled from 'styled-components';
 
 const defaultHeight = '100vh - 106px - 60px - 40px';
 
