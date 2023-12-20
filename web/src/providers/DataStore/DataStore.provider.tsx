@@ -53,13 +53,13 @@ const DataStoreProvider = ({children}: IProps) => {
         !!defaultDataStore.id && draft.dataStoreType !== defaultDataStore.type
           ? `Saving will delete your previous configuration of the ${
               SupportedDataStoresToName[defaultDataStore.type || SupportedDataStores.JAEGER]
-            } data store`
+            } Tracing Backend.`
           : '';
 
       onOpen({
         title: (
           <>
-            <p>Are you sure you want to save this Data Store configuration?</p>
+            <p>Are you sure you want to save this Tracing Backend configuration?</p>
             <p>{warningMessage}</p>
           </>
         ),

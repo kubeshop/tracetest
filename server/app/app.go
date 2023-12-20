@@ -491,6 +491,7 @@ func registerDataStoreResource(repository *datastore.Repository, router *mux.Rou
 		repository,
 		resourcemanager.DisableDelete(),
 		resourcemanager.WithTracer(tracer),
+		resourcemanager.DisableDelete(),
 	)
 	manager.RegisterRoutes(router)
 	provisioner.AddResourceProvisioner(manager)

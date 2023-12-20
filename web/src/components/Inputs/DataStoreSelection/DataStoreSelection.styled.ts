@@ -1,6 +1,6 @@
 import {CheckCircleOutlined} from '@ant-design/icons';
 import {Tabs, Typography} from 'antd';
-import styled, {css} from 'styled-components';
+import styled from 'styled-components';
 
 const defaultHeight = '100vh - 106px - 60px - 40px';
 
@@ -23,19 +23,12 @@ export const DataStoreListContainer = styled(Tabs)`
   }
 `;
 
-export const DataStoreItemContainer = styled.div<{$isDisabled: boolean; $isSelected: boolean}>`
+export const DataStoreItemContainer = styled.div<{$isSelected: boolean}>`
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 22px;
   cursor: pointer;
-
-  ${({$isDisabled}) =>
-    $isDisabled &&
-    css`
-      cursor: not-allowed;
-      opacity: 0.5;
-    `}
 `;
 
 export const DataStoreName = styled(Typography.Text)<{$isSelected: boolean}>`

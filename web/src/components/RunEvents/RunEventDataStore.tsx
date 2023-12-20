@@ -12,11 +12,11 @@ const RunEventDataStore = ({event}: IPropsEvent) => (
     {!!event.dataStoreConnection && (
       <S.Content>
         {event.dataStoreConnection?.allPassed ? (
-          <Typography.Title level={3}>Data store configuration is valid.</Typography.Title>
+          <Typography.Title level={3}>Tracing Backend configuration is valid.</Typography.Title>
         ) : (
           <S.InvalidDataStoreContainer>
             <Typography.Title level={3} style={{margin: 0}}>
-              Data store configuration is not valid.
+              Tracing Backend configuration is not valid.
             </Typography.Title>
             <Typography.Text>
               You can go to the <Link to="/settings">settings page</Link> to fix it.

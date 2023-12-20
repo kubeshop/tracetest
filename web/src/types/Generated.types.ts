@@ -1413,7 +1413,6 @@ export interface external {
         };
         /** @enum {string} */
         SupportedDataStores:
-          | "agent"
           | "jaeger"
           | "opensearch"
           | "tempo"

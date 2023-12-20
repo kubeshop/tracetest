@@ -238,7 +238,6 @@ jobs:
           - tracetest-jaeger
           - tracetest-opensearch
           - tracetest-tempo
-          - tracetest-no-tracing
           - tracetest-provisioning-env
           - tracetest-signoz
     steps:

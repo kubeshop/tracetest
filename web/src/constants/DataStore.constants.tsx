@@ -1,7 +1,6 @@
 import {SupportedDataStores} from '../types/DataStore.types';
 
 export const SupportedDataStoresToName = {
-  [SupportedDataStores.Agent]: 'Agent',
   [SupportedDataStores.JAEGER]: 'Jaeger',
   [SupportedDataStores.OpenSearch]: 'OpenSearch',
   [SupportedDataStores.SignalFX]: 'SignalFX',
@@ -20,7 +19,6 @@ export const SupportedDataStoresToName = {
 } as const;
 
 export const SupportedDataStoresToDocsLink = {
-  [SupportedDataStores.Agent]: 'https://docs.tracetest.io/configuration/agent',
   [SupportedDataStores.JAEGER]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/jaeger',
   [SupportedDataStores.OpenSearch]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/opensearch',
   [SupportedDataStores.ElasticApm]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/elasticapm',
@@ -41,7 +39,6 @@ export const SupportedDataStoresToDocsLink = {
 } as const;
 
 export const SupportedDataStoresToDefaultEndpoint = {
-  [SupportedDataStores.Agent]: '',
   [SupportedDataStores.JAEGER]: 'jaeger:16685',
   [SupportedDataStores.OpenSearch]: 'http://opensearch:9200',
   [SupportedDataStores.SignalFX]: '',

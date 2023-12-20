@@ -27,6 +27,14 @@ func (r *Repository) SetID(dataStore DataStore, id id.ID) DataStore {
 
 const DataStoreSingleID id.ID = "current"
 
+var defaultDataStore = DataStore{
+	ID:      DataStoreSingleID,
+	Name:    "OTLP",
+	Type:    DataStoreTypeOTLP,
+	Default: true,
+	Values:  DataStoreValues{},
+}
+
 const insertQuery = `
 INSERT INTO data_stores (
 	"id",
@@ -123,27 +131,6 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	return dataStore, nil
 }
 
-func (r *Repository) Delete(ctx context.Context, id id.ID) error {
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	query, params := sqlutil.Tenant(ctx, deleteQuery, id)
-	_, err = tx.ExecContext(ctx, query, params...)
-	if err != nil {
-		return fmt.Errorf("datastore repository sql exec delete: %w", err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return fmt.Errorf("commit: %w", err)
-	}
-
-	return nil
-}
-
 const getQuery = `
 SELECT
 	"id",
@@ -170,9 +157,9 @@ func (r *Repository) Get(ctx context.Context, id id.ID) (DataStore, error) {
 
 	dataStore, err := r.readRow(row)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
-		return DataStore{
-			CreatedAt: newCreateAtDateString(),
-		}, nil // Assumes an empty datastore
+		dataStore := defaultDataStore
+		dataStore.CreatedAt = newCreateAtDateString()
+		return dataStore, nil // Assumes default datastore
 	}
 	if err != nil {
 		return DataStore{}, fmt.Errorf("datastore repository get sql query: %w", err)
