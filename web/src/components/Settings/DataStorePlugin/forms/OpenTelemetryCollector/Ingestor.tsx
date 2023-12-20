@@ -19,7 +19,7 @@ const Ingestor = () => (
     </Col>
     <Col span={16}>
       <S.UrlEntry>
-        HTTP <UrlCodeBlock value="tracetest:4318/v1/traces" minHeight="35px" maxHeight="35px" language="bash" />
+        HTTP <UrlCodeBlock value="http://tracetest:4318" minHeight="35px" maxHeight="35px" language="bash" />
       </S.UrlEntry>
     </Col>
     <Col span={16}>
