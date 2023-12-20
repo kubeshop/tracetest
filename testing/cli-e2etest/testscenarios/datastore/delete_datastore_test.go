@@ -42,18 +42,8 @@ func TestDeleteDatastore(t *testing.T) {
 	require.True(dataStore.Spec.Default)
 
 	// When I try to delete the datastore
-	// Then it should delete with success
+	// Then it should return a error message, showing that we cannot delete a datastore
 	result = tracetestcli.Exec(t, "delete datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
-	helpers.RequireExitCodeEqual(t, result, 0)
-	require.Contains(result.StdOut, "DataStore removed. Defaulting back to no-tracing mode")
-
-	// When I try to get a datastore again
-	// Then it should return an empty datastore
-	result = tracetestcli.Exec(t, "get datastore --id current", tracetestcli.WithCLIConfig(cliConfig))
-	// TODO: we haven't defined a valid output to tell to the user that we are on `no-tracing mode`
-	helpers.RequireExitCodeEqual(t, result, 0)
-
-	dataStore = helpers.UnmarshalYAML[types.DataStoreResource](t, result.StdOut)
-	require.Equal("DataStore", dataStore.Type)
-	require.False(dataStore.Spec.Default)
+	helpers.RequireExitCodeEqual(t, result, 1)
+	require.Contains(result.StdErr, "resource DataStore does not support the action")
 }

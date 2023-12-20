@@ -36,10 +36,17 @@ func TestListDatastore(t *testing.T) {
 		// And I have my server recently created
 
 		// When I try to list datastore on pretty mode and there is no datastore
-		// Then it should print an empty table
+		// Then it should list the default datastore
 		result := tracetestcli.Exec(t, "list datastore --output pretty", tracetestcli.WithCLIConfig(cliConfig))
-		helpers.RequireExitCodeEqual(t, result, 0)
-		require.NotContains(result.StdOut, "current")
+
+		parsedTable := helpers.UnmarshalTable(t, result.StdOut)
+		require.Len(parsedTable, 1)
+
+		singleLine := parsedTable[0]
+
+		require.Equal("current", singleLine["ID"])
+		require.Equal("OTLP", singleLine["NAME"])
+		require.Equal("*", singleLine["DEFAULT"])
 	})
 
 	addListDatastorePreReqs(t, env)
