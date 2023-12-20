@@ -10,7 +10,7 @@ const SetupAlert = () => {
     <S.Container
       message={
         <S.Message>
-          <S.TextBold>No trace data store configured.</S.TextBold>
+          <S.TextBold>No Tracing Backend configured.</S.TextBold>
           <S.Text>Let us know the details of your existing tracing solution so we can gather the trace.</S.Text>
           <Link to="/settings">
             <S.WarningButton>Setup</S.WarningButton>

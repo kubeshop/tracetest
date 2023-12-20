@@ -14,7 +14,7 @@ const useDataStoreNotification = () => {
           type: 'info',
           title: <Typography.Title level={2}>No Automated Test</Typography.Title>,
           description:
-            'Please note that configuring your OpenTelemetry Collector to send spans to Tracetest is just the first step. To enable successful testing, save this data store, and then try running a Tracetest test against your application under test. Note that there is no automated test since the OpenTelemetry Collector sends traces to Tracetest.',
+            'Please note that configuring your OpenTelemetry Collector to send spans to Tracetest is just the first step. To enable successful testing, save this Tracing Backend, and then try running a Tracetest test against your application under test. Note that there is no automated test since the OpenTelemetry Collector sends traces to Tracetest.',
         });
       }
 
@@ -38,7 +38,7 @@ const useDataStoreNotification = () => {
   const showSuccessNotification = useCallback(() => {
     return showNotification({
       type: 'success',
-      title: 'Data Store saved',
+      title: 'Tracing Backend saved',
       description: 'Your configuration was added',
     });
   }, [showNotification]);

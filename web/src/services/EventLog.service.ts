@@ -12,7 +12,9 @@ const eventToString = ({title, description}: TestRunEvent): string => {
 const dataStoreEventToString = (event: TestRunEvent): string => {
   const {dataStoreConnection: {allPassed, ...dataStoreConnection} = ConnectionResult({})} = event;
   const baseText = eventToString(event);
-  const configValidText = allPassed ? 'Data store configuration is valid.' : 'Data store configuration is not valid.';
+  const configValidText = allPassed
+    ? 'Tracing Backend configuration is valid.'
+    : 'Tracing Backend configuration is not valid.';
 
   const connectionStepsDetailsText = Object.entries(dataStoreConnection || {})
     .map(([key, {message, error}]) => `${key.toUpperCase()} - ${message} ${error ? ` - ${error}` : ''}`, '')

@@ -209,6 +209,10 @@ func isConnectionError(err error) bool {
 		"connection refused",
 		"server closed",
 		"token is expired",
+
+		// From time to time, the server can start sending those errors to the
+		// agent. This mitigates the risk of an agent getting stuck in an error state
+		"unexpected HTTP status code received from server: 500",
 	}
 	for _, possibleErr := range possibleErrors {
 		if strings.Contains(err.Error(), possibleErr) {

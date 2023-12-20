@@ -34,18 +34,7 @@ const DataStoreSelection = ({onChange = noop, value = SupportedDataStores.JAEGER
             tab={
               <S.DataStoreItemContainer $isSelected={isSelected} key={dataStore}>
                 <DataStoreIcon dataStoreType={dataStore} color={isSelected ? primary : text} width="22" height="22" />
-
-                <Popover
-                  content={
-                    <div>
-                      In localMode only the Agent data store can be used. <br /> If you want to connect to a different
-                      data store <br /> please create a new environment
-                    </div>
-                  }
-                  placement="right"
-                >
-                  <S.DataStoreName $isSelected={isSelected}>{SupportedDataStoresToName[dataStore]}</S.DataStoreName>
-                </Popover>
+                <S.DataStoreName $isSelected={isSelected}>{SupportedDataStoresToName[dataStore]}</S.DataStoreName>
                 {isConfigured && (
                   <Popover content="This data source is currently configured" placement="right">
                     <S.InfoIcon />
