@@ -2,6 +2,16 @@ import {CopyOutlined} from '@ant-design/icons';
 import {Modal, Typography} from 'antd';
 import styled from 'styled-components';
 
+export const CollapseContainer = styled.div`
+  .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+    padding: 12px 16px 12px 0;
+  }
+
+  .ant-collapse-content > .ant-collapse-content-box {
+    padding: 12px 16px 12px 0;
+  }
+`;
+
 export const CodeContainer = styled.div`
   margin-bottom: 18px;
 `;
@@ -51,4 +61,11 @@ export const SwitchContainer = styled.div`
   display: flex;
   gap: 8px;
   margin-bottom: 18px;
+`;
+
+export const UrlEntry = styled.div`
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 16px;
 `;

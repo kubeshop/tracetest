@@ -1,10 +1,12 @@
-import {Button, Form} from 'antd';
+import {Button, Form, Space, Typography} from 'antd';
 import {useCallback, useEffect, useMemo} from 'react';
 import AllowButton, {Operation} from 'components/AllowButton';
+import DataStoreIcon from 'components/DataStoreIcon/DataStoreIcon';
 import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import {DataStoreSelection} from 'components/Inputs';
+import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
 
@@ -72,6 +74,14 @@ const DataStoreForm = ({
         </Form.Item>
         <S.FactoryContainer>
           <S.TopContainer>
+            <Space>
+              <DataStoreIcon dataStoreType={dataStoreType ?? SupportedDataStores.JAEGER} width="22" height="22" />
+
+              <Typography.Title level={2}>
+                {SupportedDataStoresToName[dataStoreType ?? SupportedDataStores.JAEGER]}
+              </Typography.Title>
+            </Space>
+
             <S.Description>
               Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
               solution. Select your Tracing Backend and enter the configuration info.

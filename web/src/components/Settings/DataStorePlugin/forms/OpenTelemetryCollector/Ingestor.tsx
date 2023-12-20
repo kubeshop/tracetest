@@ -1,43 +1,36 @@
-import {Form, Switch} from 'antd';
+import {Col} from 'antd';
+import UrlCodeBlock from 'components/CodeBlock/UrlCodeBlock';
 import DocsBanner from 'components/DocsBanner/DocsBanner';
 import {INGESTOR_ENDPOINT_URL} from 'constants/Common.constants';
-import {withCustomization} from 'providers/Customization';
-import {TCollectorDataStores, TDraftDataStore} from 'types/DataStore.types';
 import * as S from './OpenTelemetryCollector.styled';
 
-const Ingestor = () => {
-  const form = Form.useFormInstance<TDraftDataStore>();
-  const dataStoreType = Form.useWatch('dataStoreType', form) as TCollectorDataStores;
-  const baseName = ['dataStore', dataStoreType];
+const Ingestor = () => (
+  <S.Container>
+    <S.Title>Ingestor Endpoint</S.Title>
+    <S.Description>
+      Tracetest exposes trace ingestion endpoints on ports 4317 for gRPC and 4318 for HTTP. Use the Tracetest Server’s
+      hostname and port to connect. For example, with Docker use tracetest:4317 for gRPC.
+    </S.Description>
 
-  return (
-    <S.Container>
-      <S.Description>
-        Tracetest easily integrates with any distributed tracing solution via the OpenTelemetry Collector. It allows
-        your current tracing system to send only Tracetest spans while the rest go to your chosen backend.
-      </S.Description>
-      <S.Title>Ingestor Endpoint</S.Title>
-      <S.Description>
-        Tracetest exposes trace ingestion endpoints on ports 4317 for gRPC and 4318 for HTTP. Turn on the Tracetest
-        ingestion endpoint to start sending traces. Use the Tracetest Server’s hostname and port to connect. For
-        example, with Docker use tracetest:4317 for gRPC.
-      </S.Description>
-      <S.SwitchContainer>
-        <Form.Item name={[...baseName, 'isIngestorEnabled']} valuePropName="checked">
-          <Switch />
-        </Form.Item>
-        <label htmlFor={`data-store_dataStore_${dataStoreType}_isIngestorEnabled`}>
-          Enable Tracetest ingestion endpoint
-        </label>
-      </S.SwitchContainer>
+    <Col span={16}>
+      <S.UrlEntry>
+        gRPC <UrlCodeBlock value="tracetest:4317" minHeight="35px" maxHeight="35px" language="bash" />
+      </S.UrlEntry>
+    </Col>
+    <Col span={16}>
+      <S.UrlEntry>
+        HTTP <UrlCodeBlock value="http://tracetest:4318" minHeight="35px" maxHeight="35px" language="bash" />
+      </S.UrlEntry>
+    </Col>
+    <Col span={16}>
       <DocsBanner>
         Need more information about setting up ingestion endpoint?{' '}
         <a target="_blank" href={INGESTOR_ENDPOINT_URL}>
           Go to our docs
         </a>
       </DocsBanner>
-    </S.Container>
-  );
-};
+    </Col>
+  </S.Container>
+);
 
-export default withCustomization(Ingestor, 'ingestorConfiguration');
+export default Ingestor;
