@@ -23,19 +23,12 @@ export const DataStoreListContainer = styled(Tabs)`
   }
 `;
 
-export const DataStoreItemContainer = styled.div<{$isDisabled: boolean; $isSelected: boolean}>`
+export const DataStoreItemContainer = styled.div<{$isSelected: boolean}>`
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 12px 22px;
   cursor: pointer;
-
-  ${({$isDisabled}) =>
-    $isDisabled &&
-    css`
-      cursor: not-allowed;
-      opacity: 0.5;
-    `}
 `;
 
 export const DataStoreName = styled(Typography.Text)<{$isSelected: boolean}>`

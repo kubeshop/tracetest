@@ -16,10 +16,9 @@ export enum ConnectionTypes {
 }
 
 export enum SupportedDataStores {
-  Agent = 'agent',
+  OtelCollector = 'otlp',
   JAEGER = 'jaeger',
   TEMPO = 'tempo',
-  OtelCollector = 'otlp',
   NewRelic = 'newrelic',
   Lightstep = 'lightstep',
   OpenSearch = 'opensearch',
@@ -45,8 +44,7 @@ export type TCollectorDataStores =
   | SupportedDataStores.Lightstep
   | SupportedDataStores.Datadog
   | SupportedDataStores.Signoz
-  | SupportedDataStores.Dynatrace
-  | SupportedDataStores.Agent;
+  | SupportedDataStores.Dynatrace;
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];

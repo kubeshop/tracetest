@@ -268,7 +268,6 @@ export const CollectorConfigMap = {
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights(tracetest),
   [SupportedDataStores.Signoz]: Signoz(tracetest),
   [SupportedDataStores.Dynatrace]: Dynatrace(tracetest),
-  [SupportedDataStores.Agent]: OtelCollector(tracetest),
 } as const;
 
 export const CollectorConfigFunctionMap = {
@@ -280,5 +279,4 @@ export const CollectorConfigFunctionMap = {
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Signoz]: Signoz,
   [SupportedDataStores.Dynatrace]: Dynatrace,
-  [SupportedDataStores.Agent]: OtelCollector,
 } as const;
