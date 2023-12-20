@@ -57,8 +57,8 @@ const DataStoreSelection = ({onChange = noop, value = SupportedDataStores.JAEGER
                   <Popover
                     content={
                       <div>
-                        In localMode only the Agent data store can be used. <br /> If you want to connect to a different
-                        data store <br /> please create a new environment
+                        In localMode only the Agent Tracing Backend can be used. <br /> If you want to connect to a
+                        different Tracing Backend <br /> please create a new environment
                       </div>
                     }
                     placement="right"

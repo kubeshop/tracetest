@@ -88,7 +88,7 @@ const DataStoreForm = ({
 
             <S.Description>
               Tracetest needs configuration information to be able to retrieve your trace from your distributed tracing
-              solution. Select your tracing data store and enter the configuration info.
+              solution. Select your Tracing Backend and enter the configuration info.
             </S.Description>
             {dataStoreType && <DataStoreComponentFactory dataStoreType={dataStoreType} />}
           </S.TopContainer>
@@ -102,7 +102,7 @@ const DataStoreForm = ({
                 onClick={onDeleteConfig}
                 danger
               >
-                {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Data Store`}
+                {`Delete ${SupportedDataStoresToName[dataStoreConfig.defaultDataStore.type]} Tracing Backend`}
               </AllowButton>
             ) : (
               <div />
@@ -118,7 +118,7 @@ const DataStoreForm = ({
                 type="primary"
                 onClick={() => form.submit()}
               >
-                Save and Set as DataStore
+                Save and Set as Tracing Backend
               </AllowButton>
             </S.SaveContainer>
           </S.ButtonsContainer>

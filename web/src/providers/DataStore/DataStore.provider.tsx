@@ -56,13 +56,13 @@ const DataStoreProvider = ({children}: IProps) => {
         !!defaultDataStore.id && draft.dataStoreType !== defaultDataStore.type
           ? `Saving will delete your previous configuration of the ${
               SupportedDataStoresToName[defaultDataStore.type || SupportedDataStores.JAEGER]
-            } data store`
+            } Tracing Backend.`
           : '';
 
       onOpen({
         title: (
           <>
-            <p>Are you sure you want to save this Data Store configuration?</p>
+            <p>Are you sure you want to save this Tracing Backend configuration?</p>
             <p>{warningMessage}</p>
           </>
         ),
@@ -81,7 +81,7 @@ const DataStoreProvider = ({children}: IProps) => {
   const onDeleteConfig = useCallback(async () => {
     onOpen({
       title:
-        "Tracetest will remove the trace data store configuration information and enter the 'No-Tracing Mode'. You can still run tests against the responses until you configure a new trace data store.",
+        "Tracetest will remove the Tracing Backend configuration information and enter the 'No-Tracing Mode'. You can still run tests against the responses until you configure a new Tracing Backend.",
       heading: 'Save Confirmation',
       okText: 'Save',
       onConfirm: async () => {

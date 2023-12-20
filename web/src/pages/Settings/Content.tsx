@@ -36,7 +36,7 @@ const Content = () => {
             setQuery([['tab', newTab]]);
           }}
         >
-          <Tabs.TabPane key={TabsKeys.DataStore} tab="Configure Data Store">
+          <Tabs.TabPane key={TabsKeys.DataStore} tab="Tracing Backend">
             <DataStore />
           </Tabs.TabPane>
           <Tabs.TabPane key={TabsKeys.Analytics} tab="Analytics">
