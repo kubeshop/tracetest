@@ -6,6 +6,7 @@ import DataStoreService from 'services/DataStore.service';
 import {TDraftDataStore, TDataStoreForm, SupportedDataStores} from 'types/DataStore.types';
 import DataStoreConfig from 'models/DataStoreConfig.model';
 import {DataStoreSelection} from 'components/Inputs';
+import {SupportedDataStoresToName} from 'constants/DataStore.constants';
 import DataStoreComponentFactory from '../DataStorePlugin/DataStoreComponentFactory';
 import * as S from './DataStoreForm.styled';
 
