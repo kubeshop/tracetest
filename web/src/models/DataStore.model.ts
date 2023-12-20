@@ -4,7 +4,7 @@ import {Model, TDataStoreSchemas} from 'types/Common.types';
 export type TRawDataStore = TDataStoreSchemas['DataStoreResource'];
 export type TRawAzureAppInsightsDataStore = TDataStoreSchemas['AzureAppInsights'];
 
-export type TRawOtlpDataStore = {isIngestorEnabled?: boolean};
+export type TRawOtlpDataStore = {};
 type DataStore = Model<TRawDataStore, {}>['spec'] & {
   otlp?: TRawOtlpDataStore;
   newrelic?: TRawOtlpDataStore;
