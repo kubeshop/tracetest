@@ -224,7 +224,6 @@ var (
 						return nil
 					},
 				}),
-				resourcemanager.WithDeleteSuccessMessage("DataStore removed. Defaulting back to no-tracing mode"),
 				resourcemanager.WithResourceType("DataStore"),
 			),
 		).

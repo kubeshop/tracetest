@@ -192,6 +192,7 @@ func setup(db *sql.DB) provisioningFixture {
 		datastore.ResourceName,
 		datastore.ResourceNamePlural,
 		f.dataStores,
+		resourcemanager.DisableDelete(),
 	)
 
 	f.provisioner = provisioning.New(provisioning.WithResourceProvisioners(
