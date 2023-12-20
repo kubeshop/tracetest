@@ -123,27 +123,6 @@ func (r *Repository) Update(ctx context.Context, dataStore DataStore) (DataStore
 	return dataStore, nil
 }
 
-func (r *Repository) Delete(ctx context.Context, id id.ID) error {
-	tx, err := r.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-
-	query, params := sqlutil.Tenant(ctx, deleteQuery, id)
-	_, err = tx.ExecContext(ctx, query, params...)
-	if err != nil {
-		return fmt.Errorf("datastore repository sql exec delete: %w", err)
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return fmt.Errorf("commit: %w", err)
-	}
-
-	return nil
-}
-
 const getQuery = `
 SELECT
 	"id",
