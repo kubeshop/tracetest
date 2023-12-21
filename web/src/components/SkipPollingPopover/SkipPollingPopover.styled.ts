@@ -6,6 +6,10 @@ export const StopContainer = styled.div`
 `;
 
 export const GlobalStyle = createGlobalStyle`
+  .ant-popover.ant-popover-placement-bottomRight {
+    z-index: 9999;
+  }
+
   #skip-trace-popover {
     .ant-popover-title {
       padding: 14px;
