@@ -36,7 +36,7 @@ const DataStore = ({
 }: TRawDataStore): DataStore => ({
   id,
   name,
-  type,
+  type: (type as string) === 'agent' ? 'otlp' : type,
   default: isDefault,
   createdAt,
   opensearch,
