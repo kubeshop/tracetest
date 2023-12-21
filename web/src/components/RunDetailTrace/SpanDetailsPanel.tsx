@@ -17,6 +17,7 @@ const panel = {
   name: 'SPAN_DETAILS',
   minSize: 25,
   maxSize: 320,
+  isDefaultOpen: true,
 };
 
 const SpanDetailsPanel = ({run, testId}: IProps) => {
