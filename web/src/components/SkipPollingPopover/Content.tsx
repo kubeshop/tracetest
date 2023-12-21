@@ -1,4 +1,5 @@
 import {Button, Checkbox, Typography} from 'antd';
+import {ForwardOutlined} from '@ant-design/icons';
 import {useState} from 'react';
 import * as S from './SkipPollingPopover.styled';
 
@@ -13,14 +14,22 @@ const Content = ({skipPolling, isLoading}: IProps) => {
   return (
     <>
       <Typography.Paragraph>
-        You can skip the <b>awaiting trace</b> step and use the current state to create test specs.
+        Hit &apos;Skip Trace collection&apos; to create a black box test using trigger response. Handy for testing
+        systems like a GET against <i>https://google.com</i> that won&apos;t send Tracetest a trace!
       </Typography.Paragraph>
       <S.Actions>
         <div>
           <Checkbox onChange={() => setShouldSave(prev => !prev)} value={shouldSave} /> Apply to all runs
         </div>
-        <Button loading={isLoading} type="primary" ghost onClick={() => skipPolling(shouldSave)} size="small">
-          Skip awaiting trace
+        <Button
+          icon={<ForwardOutlined />}
+          loading={isLoading}
+          type="primary"
+          ghost
+          onClick={() => skipPolling(shouldSave)}
+          size="small"
+        >
+          Skip Trace collection
         </Button>
       </S.Actions>
     </>
