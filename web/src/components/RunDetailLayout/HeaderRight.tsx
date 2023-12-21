@@ -14,7 +14,7 @@ import * as S from './RunDetailLayout.styled';
 import EventLogPopover from '../EventLogPopover/EventLogPopover';
 import RunStatusIcon from '../RunStatusIcon/RunStatusIcon';
 import VariableSetSelector from '../VariableSetSelector/VariableSetSelector';
-import TracePollingActions from '../SkipPollingPopover/SkipPollingPopover';
+import SkipPollingPopover from '../SkipPollingPopover';
 import useSkipPolling from './hooks/useSkipPolling';
 
 interface IProps {
@@ -27,7 +27,7 @@ const HeaderRight = ({testId, triggerType}: IProps) => {
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
   const {
-    run: {state, requiredGatesResult, createdAt},
+    run: {state, requiredGatesResult},
     run,
     runEvents,
   } = useTestRun();
@@ -43,7 +43,7 @@ const HeaderRight = ({testId, triggerType}: IProps) => {
           <S.StateText>Test status:</S.StateText>
           <TestState testState={state} />
           {isRunPollingState(state) && (
-            <TracePollingActions startTime={createdAt} isLoading={isLoading} skipPolling={onSkipPolling} />
+            <SkipPollingPopover isLoading={isLoading} skipPolling={onSkipPolling} />
           )}
         </S.StateContainer>
       )}

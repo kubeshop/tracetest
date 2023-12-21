@@ -1,4 +1,4 @@
-import {Typography} from 'antd';
+import {Button, Typography} from 'antd';
 import styled, {createGlobalStyle} from 'styled-components';
 
 export const StopContainer = styled.div`
@@ -16,6 +16,7 @@ export const GlobalStyle = createGlobalStyle`
     .ant-popover-inner-content {
       padding: 14px;
       padding-top: 0;
+      max-width: 520px;
     }
   }
 `;
@@ -33,5 +34,25 @@ export const Title = styled(Typography.Title).attrs({
 })`
   && {
     margin: 0;
+  }
+`;
+
+export const ForwardButton = styled(Button)`
+  && {
+    font-size: ${({theme}) => theme.size.xl};
+  }
+`;
+
+export const ContentContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const CloseIcon = styled(Typography.Text)`
+  && {
+    cursor: pointer;
+    color: ${({theme}) => theme.color.textSecondary};
   }
 `;
