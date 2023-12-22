@@ -128,17 +128,6 @@ const sidebars = {
       items: [
         {
           type: "category",
-          label: "k6",
-          items: [
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-performance-tests-tracetest-cloud-with-k6",
-              label: "Performance Tests using Tracetest Cloud and K6",
-            },
-          ],
-        },
-        {
-          type: "category",
           label: "Streams and Message Queues",
           items: [
             {
@@ -356,7 +345,12 @@ const sidebars = {
         {
           type: "doc",
           id: "tools-and-integrations/k6",
-          label: "K6",
+          label: "k6 & Tracetest",
+        },
+        {
+          type: "doc",
+          id: "tools-and-integrations/k6-core",
+          label: "k6 & Tracetest Core",
         },
         {
           type: "doc",

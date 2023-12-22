@@ -1,45 +1,22 @@
 version: "3"
+
 services:
-  tracetest:
-    image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
-    volumes:
-      - type: bind
-        source: ./tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest-provision.yaml
-        target: /app/provision.yaml
-    ports:
-      - 11633:11633
-    command: --provisioning-file /app/provision.yaml
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
     environment:
       TRACETEST_DEV: ${TRACETEST_DEV}
+      TRACETEST_API_KEY: ${TRACETEST_API_KEY}
 
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
-    ports:
-      - 5432:5432
+  # postgres:
+  #   image: postgres:14
+  #   environment:
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_USER: postgres
+  #   healthcheck:
+  #     test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+  #     interval: 1s
+  #     timeout: 5s
+  #     retries: 60
 
   otel-collector:
     image: otel/opentelemetry-collector:0.54.0
@@ -50,8 +27,6 @@ services:
       - ./collector.config.yaml:/otel-local-config.yaml
     depends_on:
       - jaeger
-    ports:
-      - 4317:4317
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -61,9 +36,6 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
-    ports:
-      - 16685:16685
-      - 16686:16686
 
   cache:
     image: redis:6
@@ -94,13 +66,13 @@ services:
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
       COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: api
-    ports:
-      - "8081:8081"
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:8081"]
       interval: 1s
       timeout: 3s
       retries: 60
+    ports:
+      - 8081:8081
     depends_on:
       postgres:
         condition: service_healthy
@@ -139,8 +111,6 @@ services:
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
       COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: rpc
-    ports:
-      - 8082:8082
     healthcheck:
       test: ["CMD", "lsof", "-i", "8082"]
       interval: 1s
@@ -153,12 +123,3 @@ services:
         condition: service_healthy
       queue:
         condition: service_healthy
-
-  tempo:
-    image: grafana/tempo:2.0.0
-    command: ["-config.file=/etc/tempo.yaml"]
-    volumes:
-      - ./tempo.config.yaml:/etc/tempo.yaml
-    ports:
-      - 9095:9095
-      - 3100:3100
