@@ -339,6 +339,11 @@ const sidebars = {
       items: [
         {
           type: "doc",
+          id: "tools-and-integrations/cypress",
+          label: "Cypress",
+        },
+        {
+          type: "doc",
           id: "tools-and-integrations/keptn",
           label: "Keptn",
         },
