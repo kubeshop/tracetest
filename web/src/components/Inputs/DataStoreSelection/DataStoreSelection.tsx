@@ -23,7 +23,11 @@ const DataStoreSelection = ({onChange = noop, value = SupportedDataStores.JAEGER
   const configuredDataStoreType = dataStoreConfig.defaultDataStore.type;
 
   return (
-    <S.DataStoreListContainer tabPosition="left" onChange={dataStore => onChange(dataStore as SupportedDataStores)}>
+    <S.DataStoreListContainer
+      tabPosition="left"
+      onChange={dataStore => onChange(dataStore as SupportedDataStores)}
+      defaultActiveKey={value}
+    >
       {supportedDataStoreList.map(dataStore => {
         const isSelected = value === dataStore;
         const isConfigured = configuredDataStoreType === dataStore && dataStoreConfig.mode === ConfigMode.READY;
