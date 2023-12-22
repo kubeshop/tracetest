@@ -345,7 +345,12 @@ const sidebars = {
         {
           type: "doc",
           id: "tools-and-integrations/k6",
-          label: "K6",
+          label: "k6 & Tracetest",
+        },
+        {
+          type: "doc",
+          id: "tools-and-integrations/k6-core",
+          label: "k6 & Tracetest Core",
         },
         {
           type: "doc",

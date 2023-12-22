@@ -1,74 +1,61 @@
 # Tracetest + K6
 
-This repository objective is to show how you can configure your Tracetest to run alongside your k6 load tests against an instrumented service.
+This example's objective is to show how you can run load tests enhanced with trace-based testing using Tracetest Cloud and k6 against an instrumented service (Pokeshop API).
 
 For more detailed information about the K6 Tracetest Binary take a look a the [docs](https://docs.tracetest.io/tools-and-integrations/integrations/k6).
 
+## Prerequisites
+
+1. Signing up to [app.tracetest.io](https://app.tracetest.io).
+2. Creating an [environment](https://docs.tracetest.io/concepts/environments).
+3. Having access to the environment's [agent token](https://docs.tracetest.io/configuration/agent).
+
 ## Steps
 
-1. [Install the Tracetest CLI](https://docs.tracetest.io/installing/)
-2. Run `tracetest configure --endpoint http://localhost:11633` on a terminal
-3. Run the project by using docker-compose: `docker-compose up -d` (Linux) or `docker compose up -d` (Mac)
-4. Test if it works by running: `tracetest run test -f tests/test.yaml`. This will create and run a test with trace id as trigger
-5. In as separate folder outside of the the Tracetest repo, build the k6 binary with the extension by using `xk6 build v0.42.0 --with github.com/kubeshop/xk6-tracetest`
-6. Now you are ready to run your load test, you can achieve this by running the following command: `path/to/binary/k6 run import-pokemon.js -o xk6-tracetest`
-7. After the load test finishes you should be able to see an output like the following:
+1. [Install the Tracetest CLI](https://docs.tracetest.io/installing/).
+2. Copy the `.env.template` file into `.env` and add the `TRACETEST_API_KEY`. This is the Agent API token from your environment.
+3. Create a [token from your environment](https://docs.tracetest.io/concepts/environment-tokens).
+4. Run `tracetest configure` on a terminal and select the environment in use.
+5. Run the project by using docker-compose: `docker-compose up -d` (Linux) or `docker compose up -d` (Mac).
+6. Test if it works by running: `tracetest run test -f tests/test.yaml`. This will create and run a test with trace id as the trigger.
+7. Build the k6 binary with the extension by using `xk6 build v0.42.0 --with github.com/kubeshop/xk6-tracetest`.
+8. Now you are ready to run your load test; you can achieve this by running the following command: `XK6_TRACETEST_API_TOKEN=<your-environment-token> ./k6 run ./import-pokemon.js -o xk6-tracetest`.
+9. After the load test finishes you should be able to see an output like the following:
 
-  ```bash
-./k6 run tracetest/examples/tracetest-k6/import-pokemon.js -o xk6-tracetest
+```bash
+./k6 run ./import-pokemon.js -o xk6-tracetest
+context menu
 
-          /\      |‾‾| /‾‾/   /‾‾/   
-     /\  /  \     |  |/  /   /  /    
-    /  \/    \    |     (   /   ‾‾\  
-   /          \   |  |\  \ |  (‾)  | 
+
+          /\      |‾‾| /‾‾/   /‾‾/
+     /\  /  \     |  |/  /   /  /
+    /  \/    \    |     (   /   ‾‾\
+   /          \   |  |\  \ |  (‾)  |
   / __________ \  |__| \__\ \_____/ .io
 
   execution: local
-     script: tracetest/examples/tracetest-k6/import-pokemon.js
-     output: xk6-tracetest-output (TestRunID: 93008)
+     script: ./import-pokemon.js
+     output: xk6-tracetest-output (TestRunID: 38055)
 
-  scenarios: (100.00%) 1 scenario, 1 max VUs, 36s max duration (incl. graceful stop):
-           * default: 1 looping VUs for 6s (gracefulStop: 30s)
+  scenarios: (100.00%) 1 scenario, 1 max VUs, 35s max duration (incl. graceful stop):
+           * default: 1 looping VUs for 5s (gracefulStop: 30s)
 
-ERRO[0017] panic: Tracetest: 5 jobs failed
+[TotalRuns=6, SuccessfulRus=1, FailedRuns=5]
+[FAILED]
+[Request=GET - http://localhost:8081/pokemon/import, TraceID=dc0718bcecceeec731b343235eb9c15a, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/11]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718fe83cfeec7315daf10d212d351, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/4]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718a8f4ceeec731e47f13762e61b8, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/8]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718bcecceeec731b343235eb9c15a, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/9]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc071893fcceeec731148270c6671a1e, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/6]
+[SUCCESSFUL]
+[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718cee4ceeec731f3f414bf3a2a16, RunState=FINISHED FailingSpecs=false, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/3]
 
-Goja stack:
-native 
+running (05.0s), 0/1 VUs, 5 complete and 0 interrupted iterations
+default ✓ [======================================] 1 VUs  5s
+```
 
-running (17.1s), 0/1 VUs, 6 complete and 0 interrupted iterations
-default ✓ [======================================] 1 VUs  6s
+## What's Next?
 
-         ✓ is status 200
-     ✓ body matches de id
+After running the initial set of tests, you can click the run link for any of them, update the assertions and run the scripts once more. This flow enables complete a trace-based TDD flow.
 
-     █ teardown
-
-     checks.........................: 100.00% ✓ 12       ✗ 0  
-     data_received..................: 1.1 kB  67 B/s
-     data_sent......................: 3.3 kB  190 B/s
-     http_req_blocked...............: avg=89µs    min=3µs    med=12.5µs max=476µs  p(90)=249µs  p(95)=362.49µs
-     http_req_connecting............: avg=37µs    min=0s     med=0s     max=222µs  p(90)=111µs  p(95)=166.49µs
-     http_req_duration..............: avg=4.83ms  min=1.86ms med=5.35ms max=7.61ms p(90)=6.77ms p(95)=7.19ms  
-       { expected_response:true }...: avg=4.83ms  min=1.86ms med=5.35ms max=7.61ms p(90)=6.77ms p(95)=7.19ms  
-     http_req_failed................: 0.00%   ✓ 0        ✗ 6  
-     http_req_receiving.............: avg=51µs    min=32µs   med=52.5µs max=74µs   p(90)=68µs   p(95)=71µs    
-     http_req_sending...............: avg=47.83µs min=17µs   med=47µs   max=88µs   p(90)=71µs   p(95)=79.49µs 
-     http_req_tls_handshaking.......: avg=0s      min=0s     med=0s     max=0s     p(90)=0s     p(95)=0s      
-     http_req_waiting...............: avg=4.74ms  min=1.75ms med=5.23ms max=7.56ms p(90)=6.69ms p(95)=7.12ms  
-     http_reqs......................: 6       0.350387/s
-     iteration_duration.............: avg=2.44s   min=1s     med=1s     max=11.08s p(90)=5.03s  p(95)=8.06s   
-     iterations.....................: 6       0.350387/s
-     vus............................: 0       min=0      max=1
-     vus_max........................: 1       min=1      max=1
-    [TotalRuns=6, SuccessfulRus=1, FailedRuns=5] 
-[FAILED] 
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc071893eaaca9de301f2147e2be372e, RunState=FINISHED FailingSpecs=true, TracetestURL= http://localhost:3000/test/kc_MgKoVR/run/272] 
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718fff1aca9de30b702c3a1bfad75, RunState=FINISHED FailingSpecs=true, TracetestURL= http://localhost:3000/test/kc_MgKoVR/run/275] 
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718b8daaca9de301e39889afca15b, RunState=FINISHED FailingSpecs=true, TracetestURL= http://localhost:3000/test/kc_MgKoVR/run/276] 
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718a7e2aca9de30955b5203b162a7, RunState=FINISHED FailingSpecs=true, TracetestURL= http://localhost:3000/test/kc_MgKoVR/run/273] 
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718edf9aca9de305916d7b1e7814c, RunState=FINISHED FailingSpecs=true, TracetestURL= http://localhost:3000/test/kc_MgKoVR/run/274] 
-[SUCCESSFUL] 
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718c9d2aca9de3044a794f7248eab, RunState=FINISHED FailingSpecs=false, TracetestURL= http://localhost:3000/test/kc_MgKoVR/run/271] 
-
-  ERRO[0017] a panic occurred during JS execution: Tracetest: 5 jobs failed
-  ```
+![assertions](assets/assertions.gif)
