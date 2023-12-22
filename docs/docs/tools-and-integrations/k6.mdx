@@ -77,7 +77,17 @@ This is a simple quick start guide on how to run the Tracetest k6 extension to r
 
 - Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
 - Create an [environment](/concepts/environments).
-- Have access to the environment's [agent token](/configuration/agent).
+- Create an [environment token](/concepts/environment-tokens).
+- Have access to the environment's [agent API key](/configuration/agent).
+
+**Tracetest CLI**:
+
+- [Download the CLI](/getting-started/installation#install-the-tracetest-cli).
+- Configure the CLI to connect to your Tracetest environment with the environment token you created in the step above.
+
+    ```bash
+      tracetest configure -t <tttoken_1234567890>
+    ```
 
 **xk6:** To start using the Tracetest k6 binary you need to have the xk6 builder installed on your machine. You can [follow the instructions defined in this page](https://github.com/grafana/xk6/) to do that.
 
@@ -141,6 +151,12 @@ spec:
       name: Should insert the pokemon to the DB
       assertions:
         - attr:db.result | json_path '.name'  =  "charizard"
+```
+
+Create the test using the following command:
+
+```bash
+tracetest apply test -f ./tests/test.yaml
 ```
 
 ## Creating Your k6 Script
@@ -208,7 +224,7 @@ export function teardown() {
 
 ## Tracetest Agent Connects to Tracetest
 
-The `docker-compose.yaml` file includes the [Tracetest Agent](/concepts/agent) image, which is going to fetch traces from the Jaeger all-in-one instance and send them to Tracetest Cloud.
+The `docker-compose.yaml` file includes the [Tracetest Agent](/concepts/agent) image, which is going to fetch traces from the Jaeger all-in-one instance and send them to Tracetest.
 
 ```yaml
 version: "3"
@@ -221,7 +237,26 @@ services:
       TRACETEST_API_KEY: ${TRACETEST_API_KEY}
 ```
 
-Do not forget to set the `TRACETEST_API_KEY` environment variable in the `.env` file to your [Tracetest Agent API key](/concepts/environment-tokens) available on the settings page of your environment.
+Do not forget to set the `TRACETEST_API_KEY` environment variable in the `.env` file to your Tracetest Agent. The API key available on the `Settings > Agent` page of your environment as you can see [here](/configuration/agent).
+
+Configure Tracetest Agent to connect to the Jaeger instance running in Docker.
+
+```yaml title=tracetest-datastore.yaml
+---
+type: DataStore
+spec:
+  id: current
+  name: jaeger
+  type: jaeger
+  jaeger:
+    endpoint: jaeger:16685
+    tls:
+      insecure: true
+```
+
+```bash
+tracetest apply datastore -f ./tracetest-datastore.yaml
+```
 
 ## Run the Pokeshop Demo App and the Tracetest Agent
 

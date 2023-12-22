@@ -7,16 +7,16 @@ services:
       TRACETEST_DEV: ${TRACETEST_DEV}
       TRACETEST_API_KEY: ${TRACETEST_API_KEY}
 
-  # postgres:
-  #   image: postgres:14
-  #   environment:
-  #     POSTGRES_PASSWORD: postgres
-  #     POSTGRES_USER: postgres
-  #   healthcheck:
-  #     test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-  #     interval: 1s
-  #     timeout: 5s
-  #     retries: 60
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
 
   otel-collector:
     image: otel/opentelemetry-collector:0.54.0
