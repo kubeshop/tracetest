@@ -85,7 +85,7 @@ const (
 	) as ltr ON ltr.test_id = t.id AND ltr.tenant_id = t.tenant_id
 	LEFT OUTER JOIN
 		test_runs last_test_run
-	ON last_test_run.test_id = ltr.test_id AND last_test_run.id = ltr.id
+	ON last_test_run.test_id = ltr.test_id AND last_test_run.id = ltr.id AND last_test_run.tenant_id = ltr.tenant_id
 `
 
 	testMaxVersionQuery = `
