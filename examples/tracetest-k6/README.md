@@ -1,4 +1,4 @@
-# Tracetest + K6
+# Tracetest + k6
 
 This example's objective is to show how you can run load tests enhanced with trace-based testing using Tracetest Cloud and k6 against an instrumented service (Pokeshop API).
 

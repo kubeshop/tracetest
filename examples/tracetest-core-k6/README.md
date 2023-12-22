@@ -1,4 +1,4 @@
-# Tracetest + K6
+# Tracetest + k6
 
 This repository objective is to show how you can configure your Tracetest to run alongside your k6 load tests against an instrumented service.
 
