@@ -1,0 +1,12 @@
+type: Test
+spec:
+  id: p00W82OIR
+  name: Test API
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: http://next-app:3000/api/pokemon
+      headers:
+      - key: Content-Type
+        value: application/json

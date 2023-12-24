@@ -1,6 +1,6 @@
 # Tracetesting Event-driven systems
 
-> [Read the detailed recipe for setting up OpenTelemetry Collector with Tractest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-without-a-trace-data-store)
+> [Read the detailed recipe for setting up OpenTelemetry Collector with Tracetest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-without-a-trace-data-store)
 
 This is a simple example from the article "Testing Event-driven Systems with OpenTelemetry" showing how to test an event-driven system using [Apache Kafka](https://kafka.apache.org/) as a event backbone.
 

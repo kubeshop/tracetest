@@ -1,0 +1,56 @@
+# Integration Testing Vercel Functions with Distributed Tracing
+
+This example is from the article [**Integration Testing Vercel Functions**](add link) showing how to run integration tests against Vercel Functions using [OpenTelemetry](https://opentelemetry.io/) and Distributed Tracing.
+
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+It's using Vercel Functions via `/pages/api`, with [OpenTelemetry configured as explained in the Vercel docs](https://nextjs.org/docs/pages/building-your-application/optimizing/open-telemetry#manual-opentelemetry-configuration).
+
+
+## Getting Started Locally
+
+1. Install Node Packages
+
+    ```bash
+    npm i
+    ```
+
+2. Run Development Server
+
+    ```bash
+    npm run dev
+    ```
+
+3. Start Tracetest Agent
+
+    ```bash
+    tracetest start --api-key ttagent_<id>
+    ```
+
+4. Trigger Tracetest Tests via CLI
+
+    ```bash
+    tracetest run test -f ./test-api.development.yaml
+    ```
+
+(Optional. Trigger Tracetest Tests via `app.tracetest.io` against `http://localhost:3000`)
+
+## Getting Started with Docker
+
+1. Run Docker Compose
+
+    ```bash
+    docker compose up -d --build
+    ```
+
+2. Run Integration Tests
+
+    ```bash
+    docker compose run integration-tests
+    ```
+
+(Optional. Trigger Tracetest Tests via `app.tracetest.io` against `http://next-app:3000`)
+
+## Learn more
+
+Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
