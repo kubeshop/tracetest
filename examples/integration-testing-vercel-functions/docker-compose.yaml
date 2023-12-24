@@ -17,7 +17,7 @@ services:
   tracetest-agent:
     image: kubeshop/tracetest-agent:latest
     environment:
-      - TRACETEST_API_KEY=ttagent_8ea2f344ade33cb8
+      - TRACETEST_API_KEY=ttagent_<key> # Add your key
     ports:
       - 4317:4317
       - 4318:4318
