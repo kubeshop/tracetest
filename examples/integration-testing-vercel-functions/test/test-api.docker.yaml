@@ -10,3 +10,8 @@ spec:
       headers:
       - key: Content-Type
         value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http"]
+    name: "All HTTP Spans: Status code is 200"
+    assertions:
+    - attr:http.status_code = 200
