@@ -2,7 +2,7 @@
 
 Thank you for looking at this. We, at Tracetest, are really excited to have you contribute on the project with us.
 
-The main lines of communication with our team are through [Github issues](https://github.com/kubeshop/tracetest/issues/new/choose) or [Discord](https://discord.gg/eBvEQRVyKX). Feel free to ask any questions!
+The main lines of communication with our team are through [Github issues](https://github.com/kubeshop/tracetest/issues/new/choose) or [Slack](https://dub.sh/tracetest-community). Feel free to ask any questions!
 
 ## Developing 
 

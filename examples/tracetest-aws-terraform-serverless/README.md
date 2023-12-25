@@ -10,4 +10,4 @@ This is a simple quick start on how to configure a Node.js lambda function API t
 4. From the terraform outputs, grab the `api_endpoint` and update the `<your_api_endpoint>` section from `tests/test.yaml`
 5. Test if it works by running: `tracetest run test -f tests/test.yaml`. This would execute a test against the Node.js API Gateway endpoint that will send spans to Jaeger to be fetched from the Tracetest server.
 
-Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Slack Community](https://dub.sh/tracetest-community) for more info!
