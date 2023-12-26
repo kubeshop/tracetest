@@ -26,7 +26,7 @@ and configuring your system with all the requirements, so you can start TraceTes
 To get more info about TraceTest, you can check our docs at https://kubeshop.github.io/tracetest/
 
 If you have any issues, please let us know by creating an issue (https://github.com/kubeshop/tracetest/issues/new/choose)
-or reach us on Discord https://discord.gg/6zupCZFQbe
+or reach us on Slack https://dub.sh/tracetest-community
 
 `)
 

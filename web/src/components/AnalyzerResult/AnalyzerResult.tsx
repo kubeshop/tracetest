@@ -1,6 +1,6 @@
 import BetaBadge from 'components/BetaBadge/BetaBadge';
 import Link from 'components/Link';
-import {DISCORD_URL, OCTOLIINT_ISSUE_URL} from 'constants/Common.constants';
+import {COMMUNITY_SLACK_URL, OCTOLIINT_ISSUE_URL} from 'constants/Common.constants';
 import LinterResult from 'models/LinterResult.model';
 import Trace from 'models/Trace.model';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
@@ -31,7 +31,7 @@ const AnalyzerResult = ({result: {score, minimumScore, plugins = [], passed}, tr
             It can be globally disabled for all tests in <Link to="/settings?tab=analyzer">the settings page</Link>.{' '}
           </>
         )}
-        We value your feedback on this beta release. Share your thoughts on <a href={DISCORD_URL}>Discord</a> or add
+        We value your feedback on this beta release. Share your thoughts on <a href={COMMUNITY_SLACK_URL}>Slack</a> or add
         them to this <a href={OCTOLIINT_ISSUE_URL}>Issue</a>.
       </S.Description>
       {plugins.length ? (

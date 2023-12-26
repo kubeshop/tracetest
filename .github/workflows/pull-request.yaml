@@ -208,7 +208,7 @@ jobs:
         if: steps.cache-docker-build.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: v1.22.0
+          version: v1.23.0
           args: release --skip=announce --snapshot -f .goreleaser.dev.yaml
       - name: Move binaries to known location
         if: steps.cache-docker-build.outputs.cache-hit != 'true'

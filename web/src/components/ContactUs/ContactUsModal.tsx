@@ -15,7 +15,7 @@ const ContactUsModal = ({isOpen, onClose}: IProps) => {
       </S.Header>
       <S.Message>
         Technical glitches can be tricky, even for the best of us. Don&apos;t fret! We&apos;re here to save your day.
-        Create an Issue or contact us via Discord and our tech-savvy team are ready to lend a helping hand.
+        Create an Issue or contact us via Slack and our tech-savvy team are ready to lend a helping hand.
       </S.Message>
     </S.Modal>
   );
