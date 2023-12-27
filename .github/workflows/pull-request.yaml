@@ -172,7 +172,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: v1.22.0
+          version: v1.22.1
           args: release --skip=announce --snapshot -f .goreleaser.dev.yaml
 
       - name: Move binaries to known location
