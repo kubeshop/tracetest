@@ -163,7 +163,7 @@ jobs:
 
       - name: Setup node
         # if cache miss
-        if: steps.cache-web-build.outputs.cache-hit != 'true'
+        # if: steps.cache-web-build.outputs.cache-hit != 'true'
         uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -173,7 +173,7 @@ jobs:
       - name: Cache dependencies
         id: cache-nodemodules
         # if cache miss
-        if: steps.cache-web-build.outputs.cache-hit != 'true'
+        # if: steps.cache-web-build.outputs.cache-hit != 'true'
         uses: actions/cache@v3
         with:
           path: |
@@ -185,10 +185,10 @@ jobs:
       - name: Install dependencies
         run: cd web/; npm ci
         # if cache miss for build and deps
-        if: steps.cache-web-build.outputs.cache-hit != 'true' &&  steps.cache-nodemodules.outputs.cache-hit != 'true'
+        # if: steps.cache-web-build.outputs.cache-hit != 'true' &&  steps.cache-nodemodules.outputs.cache-hit != 'true'
 
       - run: cd web; CI= npm run build
-        if: steps.cache-web-build.outputs.cache-hit != 'true'
+        # if: steps.cache-web-build.outputs.cache-hit != 'true'
 
       # go+docker
       - name: Cache Build
