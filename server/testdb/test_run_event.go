@@ -9,6 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
 )
 
 const insertTestRunEventQuery = `
@@ -22,23 +23,30 @@ const insertTestRunEventQuery = `
 		"created_at",
 		"data_store_connection",
 		"polling",
-		"outputs"
+		"outputs",
+		"tenant_id"
 	) VALUES (
-		$1, -- test_id
-		$2, -- run_id
-		$3, -- type
-		$4, -- stage
-		$5, -- title
-		$6, -- description
-		$7, -- created_at
-		$8, -- data_store_connection
-		$9, -- polling
-		$10  -- outputs
+		$1,  -- test_id
+		$2,  -- run_id
+		$3,  -- type
+		$4,  -- stage
+		$5,  -- title
+		$6,  -- description
+		$7,  -- created_at
+		$8,  -- data_store_connection
+		$9,  -- polling
+		$10, -- outputs
+		$11  -- tenant_id
 	)
-	RETURNING "id"
 `
 
 func (td *postgresDB) CreateTestRunEvent(ctx context.Context, event model.TestRunEvent) error {
+	stmt, err := td.db.Prepare(insertTestRunEventQuery)
+	if err != nil {
+		return fmt.Errorf("sql prepare: %w", err)
+	}
+	defer stmt.Close()
+
 	dataStoreConnectionJSON, err := json.Marshal(event.DataStoreConnection)
 	if err != nil {
 		return fmt.Errorf("could not marshal data store connection into JSON: %w", err)
@@ -58,9 +66,7 @@ func (td *postgresDB) CreateTestRunEvent(ctx context.Context, event model.TestRu
 		event.CreatedAt = time.Now()
 	}
 
-	err = td.db.QueryRowContext(
-		ctx,
-		insertTestRunEventQuery,
+	params := sqlutil.TenantInsert(ctx,
 		event.TestID,
 		event.RunID,
 		event.Type,
@@ -71,7 +77,9 @@ func (td *postgresDB) CreateTestRunEvent(ctx context.Context, event model.TestRu
 		dataStoreConnectionJSON,
 		pollingJSON,
 		outputsJSON,
-	).Scan(&event.ID)
+	)
+
+	_, err = stmt.ExecContext(ctx, params...)
 
 	if err != nil {
 		return fmt.Errorf("could not insert event into database: %w", err)
@@ -97,7 +105,8 @@ const getTestRunEventsQuery = `
 `
 
 func (td *postgresDB) GetTestRunEvents(ctx context.Context, testID id.ID, runID int) ([]model.TestRunEvent, error) {
-	rows, err := td.db.QueryContext(ctx, getTestRunEventsQuery, testID, runID)
+	query, params := sqlutil.Tenant(ctx, getTestRunEventsQuery, testID, runID)
+	rows, err := td.db.QueryContext(ctx, query, params...)
 	if err != nil {
 		return []model.TestRunEvent{}, fmt.Errorf("could not query test runs: %w", err)
 	}
