@@ -45,7 +45,7 @@ build() {
 }
 
 up() {
-  docker compose $opts up -d --remove-orphans
+  docker compose $opts up --detach --remove-orphans --quiet-pull
 }
 
 stop() {
