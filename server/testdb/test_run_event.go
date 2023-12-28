@@ -101,12 +101,17 @@ const getTestRunEventsQuery = `
 		"data_store_connection",
 		"polling",
 		"outputs"
-	FROM test_run_events WHERE "test_id" = $1 AND "run_id" = $2 ORDER BY "created_at" ASC;
+	FROM test_run_events
+	WHERE
+		"test_id" = $1
+		AND "run_id" = $2
+		AND "tenant_id" = $3
+	ORDER BY "created_at" ASC;
 `
 
 func (td *postgresDB) GetTestRunEvents(ctx context.Context, testID id.ID, runID int) ([]model.TestRunEvent, error) {
-	query, params := sqlutil.Tenant(ctx, getTestRunEventsQuery, testID, runID)
-	rows, err := td.db.QueryContext(ctx, query, params...)
+	params := sqlutil.TenantInsert(ctx, testID, runID)
+	rows, err := td.db.QueryContext(ctx, getTestRunEventsQuery, params...)
 	if err != nil {
 		return []model.TestRunEvent{}, fmt.Errorf("could not query test runs: %w", err)
 	}
