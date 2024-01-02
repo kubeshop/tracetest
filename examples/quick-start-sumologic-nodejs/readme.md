@@ -18,6 +18,14 @@ Once started, Tracetest Agent will:
 - Be able to trigger test runs in the environment where it is running.
 - Be able to connect to a trace data store that is not accessible outside of your environment. Eg. a Sumo Logic OpenTelemetry Collector instance running in the cluster without an ingress controller.
 
+Configure Sumo Logic as a Tracing Backend:
+
+```bash
+tracetest apply datastore -f ./tracetest.datastore.yaml
+```
+
+> Note: Here's a guide which Sumo Logic API endpoint to use: https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use
+
 ### 2. Start Node.js App
 
 You can run the example with Docker.

@@ -1,12 +1,14 @@
 type: Test
 spec:
   id: W656Q0c4g
-  name: http://app:8080
-  description: akadlkasjdf
+  name: Test API
+  description: Test the App.
   trigger:
     type: http
     httpRequest:
-      url: http://app:8080
+      url: http://localhost:8080
+      # OR for Tracetest Core
+      # url: http://app:8080
       method: GET
       headers:
       - key: Content-Type
