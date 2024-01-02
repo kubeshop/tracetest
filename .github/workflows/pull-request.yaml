@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths-ignore:
-      - "docs/**"
+      - 'docs/**'
   pull_request:
 
 env:
@@ -334,7 +334,7 @@ jobs:
       fail-fast: false
       matrix:
         total_splits: [8]
-        index: [0, 1, 2, 3, 4, 5, 6, 7]
+        index: [0,1,2,3,4,5,6,7]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -403,15 +403,15 @@ jobs:
     outputs:
       CYPRESS_CONTAINERS: ${{ steps.configure-cypress-containers.outputs.CYPRESS_CONTAINERS }}
     steps:
-      - name: Configure Cypress containers
-        id: configure-cypress-containers
-        run: |
-          # env.CYPRESS_RECORD_KEY is required for parallelization, so if it's empty run a single container
-          if [ "${{env.CYPRESS_RECORD_KEY}}" = "" ]; then
-            echo "CYPRESS_CONTAINERS=[1]" >> $GITHUB_OUTPUT
-          else
-            echo "CYPRESS_CONTAINERS=[1,2,3,4,5,6,7,8]" >> $GITHUB_OUTPUT
-          fi
+    - name: Configure Cypress containers
+      id: configure-cypress-containers
+      run: |
+        # env.CYPRESS_RECORD_KEY is required for parallelization, so if it's empty run a single container
+        if [ "${{env.CYPRESS_RECORD_KEY}}" = "" ]; then
+          echo "CYPRESS_CONTAINERS=[1]" >> $GITHUB_OUTPUT
+        else
+          echo "CYPRESS_CONTAINERS=[1,2,3,4,5,6,7,8]" >> $GITHUB_OUTPUT
+        fi
 
   e2e:
     needs: [build-docker, config-e2e]
