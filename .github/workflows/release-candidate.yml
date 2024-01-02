@@ -102,3 +102,4 @@ jobs:
             TRACETEST_VERSION=${{ env.VERSION }}
         env:
           VERSION: ${{ github.ref_name }}
+
