@@ -82,7 +82,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: v1.23.0
+          version: v1.22.1
           args: release --clean -f .goreleaser.rc.yaml
         env:
           VERSION: ${{ github.ref_name}}
@@ -102,4 +102,3 @@ jobs:
             TRACETEST_VERSION=${{ env.VERSION }}
         env:
           VERSION: ${{ github.ref_name }}
-
