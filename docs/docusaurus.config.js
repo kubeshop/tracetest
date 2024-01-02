@@ -344,8 +344,8 @@ const config = {
                 href: 'https://tracetest.io/pricing',
               },
               {
-                label: 'Talk to us in Discord',
-                href: 'https://discord.gg/6zupCZFQbe',
+                label: 'Talk to us in Slack',
+                href: 'https://dub.sh/tracetest-community',
               },
               {
                 label: 'Open an issue in GitHub',
@@ -394,8 +394,8 @@ const config = {
             title: "Community",
             items: [
               {
-                label: "Discord",
-                href: "https://discord.gg/6zupCZFQbe",
+                label: "Slack",
+                href: "https://dub.sh/tracetest-community",
               },
               {
                 label: "Twitter",

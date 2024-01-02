@@ -6,7 +6,7 @@ This is a simple example from the article "Testing Event-driven Systems with Ope
 
 If you want to run this example, just execute `docker compose up` on this folder.
 
-Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Slack Community](https://dub.sh/tracetest-community) for more info!
 
 ## Test Scenarios
 

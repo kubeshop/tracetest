@@ -28,7 +28,7 @@
     <a href="https://docs.tracetest.io/examples-tutorials/overview">Tutorials</a>&nbsp;|&nbsp;
     <a href="https://docs.tracetest.io/examples-tutorials/recipes">Recipes</a>&nbsp;|&nbsp;
     <a href="https://github.com/kubeshop/tracetest/tree/main/examples">Examples</a>&nbsp;|&nbsp;
-    <a href="https://discord.gg/eBvEQRVyKX">Discord</a>&nbsp;|&nbsp;
+    <a href="https://dub.sh/tracetest-community">Slack</a>&nbsp;|&nbsp;
     <a href="https://tracetest.io/blog">Blog</a>&nbsp;|&nbsp;
     <a href="https://tracetest.io">Website</a>
   </p>
@@ -63,8 +63,8 @@
   <a href="https://tracetest.io/community">
     <img src="https://img.shields.io/badge/Join-Community!-purple" alt="Join our Community!" />
   </a>
-  <a href="https://discord.gg/8MtcMrQNbX">
-    <img src="https://img.shields.io/badge/Chat-on Discord!-red" alt="Talk to us on Discord!" />
+  <a href="https://dub.sh/tracetest-community">
+    <img src="https://img.shields.io/badge/Chat-on Slack!-red" alt="Talk to us on Slack!" />
   </a>
   <a href="https://hub.docker.com/r/kubeshop/tracetest"><img title="Docker Pulls" src="https://img.shields.io/docker/pulls/kubeshop/tracetest?logo=docker"/></a>
   <a href="https://hub.docker.com/r/kubeshop/tracetest/tags?page=1&name=latest"><img title="Docker Image Size" src="https://img.shields.io/docker/image-size/kubeshop/tracetest/latest?logo=docker&label='kubeshop/tracetest:latest' image size"/></a>
@@ -275,7 +275,7 @@ Have an idea to improve Tracetest?
 You can:
 
 - [Create an issue here](https://github.com/kubeshop/tracetest/issues/new/choose)!
-- Join our [Discord](https://discord.gg/eBvEQRVyKX), and ask us any questions there.
+- Join our [Slack](https://dub.sh/tracetest-community), and ask us any questions there.
 - Follow us on [Twitter at @tracetest_io](https://twitter.com/tracetest_io) for updates.
 - Give us a ⭐️ on Github if you like what we're doing!
 

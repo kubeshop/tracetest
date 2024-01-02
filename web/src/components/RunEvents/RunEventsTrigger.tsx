@@ -1,6 +1,6 @@
 import {Typography} from 'antd';
 
-import {DISCORD_URL, GITHUB_ISSUES_URL} from 'constants/Common.constants';
+import {COMMUNITY_SLACK_URL, GITHUB_ISSUES_URL} from 'constants/Common.constants';
 import RunEvent from './RunEvent';
 import {IPropsComponent} from './RunEvents';
 import * as S from './RunEvents.styled';
@@ -24,8 +24,8 @@ const RunEventsTrigger = ({events}: IPropsComponent) => (
         Create an issue
       </S.Link>{' '}
       or contact us via{' '}
-      <S.Link href={DISCORD_URL} target="_blank">
-        Discord
+      <S.Link href={COMMUNITY_SLACK_URL} target="_blank">
+        Slack
       </S.Link>
       . We will check it out and will help you rectify the issue.
     </S.Paragraph>

@@ -4,4 +4,4 @@
 
 This repository objective is to show how you can configure your Tracetest instance to connect to Elastic stack instance and use it as its tracing backend.
 
-Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Slack Community](https://dub.sh/tracetest-community) for more info!

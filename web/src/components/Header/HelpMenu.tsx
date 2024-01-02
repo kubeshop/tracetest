@@ -3,8 +3,8 @@ import {Dropdown, Menu, MenuProps, Space} from 'antd';
 import {useMemo} from 'react';
 import {useLocation} from 'react-router-dom';
 
-import discordIcon from 'assets/discord.svg';
-import {DISCORD_URL, DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
+import slackIcon from 'assets/slack.svg';
+import {COMMUNITY_SLACK_URL, DOCUMENTATION_URL, GITHUB_URL} from 'constants/Common.constants';
 import {useGuidedTour} from 'providers/GuidedTour/GuidedTour.provider';
 import GuidedTourService from 'services/GuidedTour.service';
 import Env from 'utils/Env';
@@ -41,11 +41,11 @@ function getMenuItems({
     {
       key: '3',
       label: (
-        <a target="_blank" href={DISCORD_URL}>
-          Join our Discord community
+        <a target="_blank" href={COMMUNITY_SLACK_URL}>
+          Join our Slack community
         </a>
       ),
-      icon: <img src={discordIcon} width={12} />,
+      icon: <img src={slackIcon} width={12} />,
     },
     {
       key: '4',
