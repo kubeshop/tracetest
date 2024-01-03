@@ -17,6 +17,6 @@ spec:
     # The URL will differ based on your location. View this
     # docs page to figure out which URL you need:
     # https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use
-    url: "https://api.sumologic.com"
+    url: "https://api.sumologic.com/api/"
     accessID: "your-access-id"
     accessKey: "your-access-key"

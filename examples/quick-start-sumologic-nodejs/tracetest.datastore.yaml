@@ -7,7 +7,7 @@ spec:
     # The URL will differ based on your location. View this
     # docs page to figure out which URL you need:
     # https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use
-    url: "https://api.sumologic.com"
+    url: "https://api.sumologic.com/api/"
     # Create your ID and Key under Administration > Security > Access Keys
     # in your Sumo Logic account:
     # https://help.sumologic.com/docs/manage/security/access-keys/#create-your-access-key

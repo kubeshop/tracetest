@@ -55,6 +55,35 @@ Once started, Tracetest Agent will:
 - Be able to trigger test runs in the environment where it is running.
 - Be able to connect to a trace data store that is not accessible outside of your environment.
 
+Configure Sumo Logic as a Tracing Backend:
+
+```yaml title=tracetest.datastore.yaml
+---
+type: DataStore
+spec:
+  name: Sumo Logic
+  type: sumologic
+  sumologic:
+    # The URL will differ based on your location. View this
+    # docs page to figure out which URL you need:
+    # https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use
+    url: "https://api.sumologic.com/api/"
+    # Create your ID and Key under Administration > Security > Access Keys
+    # in your Sumo Logic account:
+    # https://help.sumologic.com/docs/manage/security/access-keys/#create-your-access-key
+    accessID: "your-access-id"
+    accessKey: "your-access-key"
+```
+
+:::note Configure Sumo Logic API and Access
+- Your Sumo Logic URL will differ based on which region you are using. [Here's a guide which Sumo Logic API endpoint to use](https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use).
+- [Create your ID and Key under Administration > Security > Access Keys in your Sumo Logic account](https://help.sumologic.com/docs/manage/security/access-keys/#create-your-access-key).
+:::
+
+```bash
+tracetest apply datastore -f ./tracetest.datastore.yaml
+```
+
 ### 2. Node.js App
 
 The Node.js app is a simple Express app, contained in the `app.js` file.
@@ -144,7 +173,11 @@ services:
 
 Traces sent to Sumo Logic from the OpenTelemetry Collector.
 
-The `collector.config.yaml` configures the OpenTelemetry Collector. It receives traces via either `grpc` or `http`. Then, exports them to Sumo Logic via the Sumo Logic `extension` and an `installation_token`. View the [Sumo Logic docs here](https://help.sumologic.com/docs/manage/security/installation-tokens/) to learn more about installation tokens.
+The `collector.config.yaml` configures the OpenTelemetry Collector. It receives traces via either `grpc` or `http`. Then, exports them to Sumo Logic via the Sumo Logic `extension` and an `installation_token`.
+
+:::note Configure Sumo Logic Installation Token
+View the [Sumo Logic docs here](https://help.sumologic.com/docs/manage/security/installation-tokens/) to learn more about installation tokens.
+:::
 
 ```yaml
 receivers:
@@ -179,9 +212,32 @@ This will start the Node.js app and Sumo Logic OpenTelemetry Collector and send 
 
 ## Run Tracetest Tests
 
-Open [Tracetest](https://app.tracetest.io/) and [configure Sumo Logic as a trace data store](/configuration/connecting-to-data-stores/sumologic).
+1. Open [Tracetest](https://app.tracetest.io/)
+2. [Configure Sumo Logic as a trace data store](/configuration/connecting-to-data-stores/sumologic) if you have not already as explained in ["1. Tracetest Agent"](#1-tracetest-agent).
+3. Start creating tests! Make sure to use the `http://localhost:8080/` URL in your test creation.
 
-Next, start creating tests! Make sure to use the `http://localhost:8080/` URL in your test creation.
+    Alternatively, you can import this test as a quick start!
+
+    ```yaml
+    type: Test
+    spec:
+      id: W656Q0c4g
+      name: Test API
+      description: Test the App.
+      trigger:
+        type: http
+        httpRequest:
+          url: http://localhost:8080
+          method: GET
+          headers:
+          - key: Content-Type
+            value: application/json
+      specs:
+      - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+        assertions:
+        - attr:http.status_code  =  200
+        - attr:tracetest.span.duration  <  500ms
+    ```
 
 ```mdx-code-block
   </TabItem>
@@ -290,7 +346,11 @@ services:
 
 Traces sent to Sumo Logic from the OpenTelemetry Collector.
 
-The `collector.config.yaml` configures the OpenTelemetry Collector. It receives traces via either `grpc` or `http`. Then, exports them to Sumo Logic via the Sumo Logic `extension` and an `installation_token`. View the [Sumo Logic docs here](https://help.sumologic.com/docs/manage/security/installation-tokens/) to learn more about installation tokens.
+The `collector.config.yaml` configures the OpenTelemetry Collector. It receives traces via either `grpc` or `http`. Then, exports them to Sumo Logic via the Sumo Logic `extension` and an `installation_token`. 
+
+:::note Configure Sumo Logic Installation Token
+View the [Sumo Logic docs here](https://help.sumologic.com/docs/manage/security/installation-tokens/) to learn more about installation tokens.
+:::
 
 ```yaml title="collector.config.yaml"
 receivers:
@@ -398,10 +458,15 @@ The `tracetest-provision.yaml` file provisions the trace data store and polling 
 
 You'll need to set Sumo Logic:
 
+- URL
 - Access ID
 - Access Key
 
-View the [Sumo Logic configuration docs](http://localhost:3000/configuration/connecting-to-data-stores/sumologic) for guidance.
+:::note Configure Sumo Logic API and Access
+- Your Sumo Logic URL will differ based on which region you are using. [Here's a guide which Sumo Logic API endpoint to use](https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use).
+- [Create your ID and Key under Administration > Security > Access Keys in your Sumo Logic account](https://help.sumologic.com/docs/manage/security/access-keys/#create-your-access-key).
+- View the [Sumo Logic configuration docs](/configuration/connecting-to-data-stores/sumologic) for guidance.
+:::
 
 ```yaml title="tracetest-provision.yaml"
 ---
@@ -420,7 +485,7 @@ spec:
   name: Sumo Logic
   type: sumologic
   sumologic:
-    url: "https://api.sumologic.com"
+    url: "https://api.sumologic.com/api/"
     accessID: "your-access-id"
     accessKey: "your-access-key"    
 ```
