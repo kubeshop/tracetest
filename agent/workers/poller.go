@@ -237,6 +237,11 @@ func convertProtoToDataStore(r *proto.DataStore) (*datastore.DataStore, error) {
 		deepcopy.DeepCopy(r.Azureappinsights, &ds.Values.AzureAppInsights)
 	}
 
+	if r.Sumologic != nil {
+		ds.Values.SumoLogic = &datastore.SumoLogicConfig{}
+		deepcopy.DeepCopy(r.Sumologic, &ds.Values.SumoLogic)
+	}
+
 	ds.Type = datastore.DataStoreType(r.Type)
 	return &ds, nil
 }

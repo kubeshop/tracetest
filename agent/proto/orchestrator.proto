@@ -224,6 +224,7 @@ message DataStore {
     SignalfxConfig signalfx = 6;
     AwsXRayConfig awsxray = 7;
     AzureAppInsightsConfig azureappinsights = 8;
+    SumoLogicConfig sumologic = 9;
 }
 
 message JaegerConfig {
@@ -263,6 +264,12 @@ message AzureAppInsightsConfig{
     string accessToken = 2;
     string connectionType = 3;
     string resourceArmId = 4;
+}
+
+message SumoLogicConfig{
+    string URL = 1;
+    string accessID = 2;
+    string accessKey = 3;
 }
 
 message HttpClientSettings {

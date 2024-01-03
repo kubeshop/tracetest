@@ -117,7 +117,7 @@ func (db *sumologicDB) getTraceSpans(ctx context.Context, traceID string, token 
 }
 
 func (db *sumologicDB) getSpansPage(ctx context.Context, traceID string, token string) (*getTraceSpansResponse, error) {
-	url := fmt.Sprintf("/api/v1/tracing/traces/%s/spans?limit=100", traceID)
+	url := fmt.Sprintf("/v1/tracing/traces/%s/spans?limit=100", traceID)
 	if token != "" {
 		url = fmt.Sprintf("%s&token=%s", url, token)
 	}
@@ -155,7 +155,8 @@ func (db *sumologicDB) getSpansPage(ctx context.Context, traceID string, token s
 }
 
 func (db *sumologicDB) newRequest(method string, path string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%s", db.URL, path), nil)
+	base := strings.TrimSuffix(db.URL, "/")
+	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s%s", base, path), nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not create getTraceRequest: %w", err)
 	}
@@ -245,7 +246,7 @@ type eventAttribute struct {
 }
 
 func (db *sumologicDB) getAugmentedSpan(ctx context.Context, traceID string, spanID string) (*traces.Span, error) {
-	req, err := db.newRequest(http.MethodGet, fmt.Sprintf("/api/v1/tracing/traces/%s/spans/%s", traceID, spanID), nil)
+	req, err := db.newRequest(http.MethodGet, fmt.Sprintf("/v1/tracing/traces/%s/spans/%s", traceID, spanID), nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not create request: %w", err)
 	}
