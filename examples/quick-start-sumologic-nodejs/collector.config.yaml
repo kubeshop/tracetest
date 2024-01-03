@@ -9,6 +9,9 @@ exporters:
 
 extensions:
   sumologic:
+    # Create an Installation Token in your account at
+    # Administration > Security > Installation Tokens:
+    # https://help.sumologic.com/docs/manage/security/installation-tokens/
     installation_token: <your-sumologic-installation-token>
 
 service:
