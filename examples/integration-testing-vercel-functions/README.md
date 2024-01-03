@@ -1,6 +1,6 @@
-# Testing Vercel Functions with Tracetest and OpenTelemetry
+# Integration Testing Vercel Functions with Tracetest and OpenTelemetry
 
-This example is from the article [**Testing Vercel Serverless Functions**](add link) showing how to run integration tests against Vercel Functions using [OpenTelemetry](https://opentelemetry.io/) and Tracetest.
+This example is from the article [**Integration Testing Vercel Serverless Functions**](add link) showing how to run integration tests against Vercel Functions using [OpenTelemetry](https://opentelemetry.io/) and Tracetest.
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
@@ -8,9 +8,9 @@ It's using Vercel Functions via `/pages/api`, with [OpenTelemetry configured as 
 
 ## Prerequisites
 
-- Tracetest Account
-- Tracetest Agent API Key
-- Tracetest Environment Token
+- [Tracetest Account](https://app.tracetest.io/)
+- [Tracetest Agent API Key](https://docs.tracetest.io/configuration/agent)
+- [Tracetest Environment Token](https://docs.tracetest.io/concepts/environment-tokens)
 
 ## Getting Started with Docker
 
