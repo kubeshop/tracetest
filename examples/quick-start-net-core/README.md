@@ -11,4 +11,4 @@ This is a simple quick start on how to configure a .NET Core API to use OpenTele
 3. Run the project by using docker-compose: `docker-compose up -d` (Linux) or `docker compose up -d` (Mac)
 4. Test if it works by running: `tracetest run test -f tests/test.yaml`. This would execute a test against the .NET Core API that will send spans to Jaeger to be fetched from the Tracetest server.
 
-Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Discord Community](https://discord.gg/8MtcMrQNbX) for more info!
+Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Slack Community](https://dub.sh/tracetest-community) for more info!

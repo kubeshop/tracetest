@@ -45,7 +45,7 @@ build() {
 }
 
 up() {
-  docker compose $opts up -d --remove-orphans
+  docker compose $opts up --detach --remove-orphans --quiet-pull
 }
 
 stop() {
@@ -53,9 +53,7 @@ stop() {
 }
 
 cypress-ci() {
-
   echo "Running cypress"
-
 
   export CYPRESS_BASE_URL=http://localhost:11633
   export POKEMON_HTTP_ENDPOINT=http://demo-api:8081
@@ -65,9 +63,7 @@ cypress-ci() {
 }
 
 cypress() {
-
   echo "Running cypress"
-
 
   export CYPRESS_BASE_URL=http://localhost:11633
   export POKEMON_HTTP_ENDPOINT=http://demo-api:8081

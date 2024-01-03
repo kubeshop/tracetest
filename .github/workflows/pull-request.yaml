@@ -146,80 +146,45 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: set cache keys
-        shell: bash
-        run: |
-          echo "WEB_CACHE_KEY=$(git log --pretty=tformat:"%H" -n1 web)" >> $GITHUB_ENV
-          echo "SERVER_CACHE_KEY=$(git log --pretty=tformat:"%H" -n1 server)" >> $GITHUB_ENV
-          echo "CLI_CACHE_KEY=$(git log --pretty=tformat:"%H" -n1 cli)" >> $GITHUB_ENV
-
       # web
-      - name: Cache Web Build
-        id: cache-web-build
-        uses: actions/cache@v3
-        with:
-          path: web/build/
-          key: web-build-${{ env.WEB_CACHE_KEY }}
-
       - name: Setup node
-        # if cache miss
-        if: steps.cache-web-build.outputs.cache-hit != 'true'
         uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: npm
           cache-dependency-path: web/package-lock.json
 
-      - name: Cache dependencies
-        id: cache-nodemodules
-        # if cache miss
-        if: steps.cache-web-build.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
-        with:
-          path: |
-            web/node_modules
-            /home/runner/.cache/Cypress
-          key: npm--${{ hashFiles('web/package-lock.json') }}
-          restore-keys: npm-
-
       - name: Install dependencies
         run: cd web/; npm ci
-        # if cache miss for build and deps
-        if: steps.cache-web-build.outputs.cache-hit != 'true' &&  steps.cache-nodemodules.outputs.cache-hit != 'true'
 
-      - run: cd web; CI= npm run build
-        if: steps.cache-web-build.outputs.cache-hit != 'true'
+      - name: Build UI
+        run: cd web; CI= npm run build
 
       # go+docker
-      - name: Cache Build
-        id: cache-docker-build
-        uses: actions/cache@v3
-        with:
-          path: dist/
-          key: dist-${{env.SERVER_CACHE_KEY }}-${{env.CLI_CACHE_KEY }}-${{ hashFiles('.goreleaser.dev.yaml', 'Dockerfile') }}
       - name: Setup go
-        if: steps.cache-docker-build.outputs.cache-hit != 'true'
         uses: actions/setup-go@v3
         with:
           go-version-file: "go.mod"
           cache: true
           cache-dependency-path: "go.mod"
-      - uses: goreleaser/goreleaser-action@v4
-        if: steps.cache-docker-build.outputs.cache-hit != 'true'
+
+      - name: Release Go binaries
+        uses: goreleaser/goreleaser-action@v4
         with:
           distribution: goreleaser-pro
-          version: v1.22.0
+          version: v1.22.1
           args: release --skip=announce --snapshot -f .goreleaser.dev.yaml
+
       - name: Move binaries to known location
-        if: steps.cache-docker-build.outputs.cache-hit != 'true'
         run: |
           find ./dist -name 'tracetest' -exec cp {} ./dist \;
           find ./dist -name 'tracetest-server' -exec cp {} ./dist \;
           chmod +x ./dist/tracetest ./dist/tracetest-server
+
       - name: Export docker image
-        if: steps.cache-docker-build.outputs.cache-hit != 'true'
         run: |
           docker save --output dist/image.tar "kubeshop/tracetest:$TAG"
+
       - name: Upload assets
         uses: actions/upload-artifact@v3
         with:
