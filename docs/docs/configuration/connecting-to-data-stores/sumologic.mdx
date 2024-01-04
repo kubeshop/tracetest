@@ -21,11 +21,9 @@ Examples of configuring Tracetest can be found in the [`examples` folder of the 
 
 Configure Tracetest to fetch trace data from Sumo Logic.
 
-Tracetest uses Sumo Logic's **API** `https://api.sumologic.com` to fetch trace data.
+- Tracetest uses Sumo Logic's **API** `https://api.sumologic.com/api/` to fetch trace data. Your Sumo Logic URL will differ based on which region you are using. [Here's a guide which Sumo Logic API endpoint to use](https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use).
 
-You need to know which **Access ID**, **Access Key** you are using.
-
-Find them in the [preferences settings](https://help.sumologic.com/docs/manage/security/access-keys/) in your Sumo Logic account.
+- You need to know which **Access ID**, **Access Key** you are using. [Create your ID and Key under Administration > Security > Access Keys in your Sumo Logic account](https://help.sumologic.com/docs/manage/security/access-keys/#create-your-access-key).
 
 :::tip
 Need help configuring the OpenTelemetry Collector so send trace data from your application to Sumo Logic? Read more in [the reference page here](/configuration/opentelemetry-collector-configuration-file-reference).
@@ -41,22 +39,23 @@ In the Web UI, (1) open Settings and, on the (2) Configure Data Store tab, selec
 
 If you prefer using the CLI, you can use this file config.
 
-For gRPC:
-
 ```yaml
+---
 type: DataStore
 spec:
   name: Sumo Logic
   type: sumologic
   sumologic:
-    url: "https://api.sumologic.com"
+    # The URL will differ based on your location. View this
+    # docs page to figure out which URL you need:
+    # https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use
+    url: "https://api.sumologic.com/api/"
+    # Create your ID and Key under Administration > Security > Access Keys
+    # in your Sumo Logic account:
+    # https://help.sumologic.com/docs/manage/security/access-keys/#create-your-access-key
     accessID: "your-access-id"
     accessKey: "your-access-key"
 ```
-
-:::tip
-The URL for Sumo Logic changes depending on the region your Sumo Logic account is deployed on. Take a look at their [documentation](https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use) to understand more about it.
-:::
 
 Proceed to run this command in the terminal, and specify the file above.
 
