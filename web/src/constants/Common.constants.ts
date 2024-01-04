@@ -31,6 +31,7 @@ export const ANALYZER_RULES_DOCUMENTATION_URL = 'https://docs.tracetest.io/analy
 export const EXPRESSIONS_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/expressions';
 export const VARIABLE_SET_DOCUMENTATION_URL = 'https://docs.tracetest.io/concepts/variable-sets';
 export const GITHUB_ACTION_URL = 'https://github.com/kubeshop/tracetest-github-action/tree/main/examples/tracetest-cli-with-tracetest-core';
+export const CLI_DOCS_URL = 'https://docs.tracetest.io/cli/cli-installation-reference';
 
 export const SELECTOR_LANGUAGE_CHEAT_SHEET_URL = `${process.env.PUBLIC_URL}/SL_cheat_sheet.pdf`;
 
