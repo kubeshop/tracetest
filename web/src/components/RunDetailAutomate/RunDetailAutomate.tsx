@@ -5,6 +5,7 @@ import RunDetailAutomateMethods from 'components/RunDetailAutomateMethods';
 import CliCommand from 'components/RunDetailAutomateMethods/methods/CLICommand';
 import Cypress from 'components/RunDetailAutomateMethods/methods/Cypress';
 import DeepLink from 'components/RunDetailAutomateMethods/methods/DeepLink';
+import GithubActions from 'components/RunDetailAutomateMethods/methods/GithubActions';
 import {CLI_RUNNING_TESTS_URL} from 'constants/Common.constants';
 import {TriggerTypes} from 'constants/Test.constants';
 import Test from 'models/Test.model';
@@ -34,6 +35,11 @@ function getMethods(triggerType: TriggerTypes) {
           id: 'deeplink',
           label: 'Deep Link',
           component: DeepLink,
+        },
+        {
+          id: 'githubAction',
+          label: 'GitHub Actions',
+          component: GithubActions,
         },
       ];
   }
