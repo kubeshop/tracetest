@@ -36,6 +36,7 @@ Currently, Tracetest supports the following data stores. Click on the respective
 - [OpenSearch](/configuration/connecting-to-data-stores/opensearch)
 - [SignalFX](/configuration/connecting-to-data-stores/signalfx)
 - [SigNoz](/configuration/connecting-to-data-stores/signoz)
+- [Sumo Logic](/configuration/connecting-to-data-stores/sumologic)
 
 Continue reading below to learn how to configure the OpenTelemetry Collector to send trace data from your application to any of the trace data stores above.
 
@@ -259,4 +260,37 @@ service:
     traces/appinsights:
       receivers: [otlp] # your receiver
       exporters: [azuremonitor] # your exporter pointing to your Azure App Insights instance
+```
+
+## Configure OpenTelemetry Collector to Send Traces to Sumo Logic
+
+You'll configure the OpenTelemetry Collector to receive traces from your system and then send them to Sumo Logic. You'll use the [Sumo Logic OpenTelemetry Collector](https://github.com/SumoLogic/sumologic-otel-collector/blob/main/docs/installation.md#installation).
+
+In your OpenTelemetry Collector config file, make sure to set the `exporter` to `sumologic`. Then add an `extensions` section with `sumologic` and an `installation_token` using your [Sumo Logic Installation Token](https://help.sumologic.com/docs/manage/security/installation-tokens/).
+
+```yaml
+# collector.config.yaml
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  sumologic:
+
+extensions:
+  sumologic:
+    # Create an Installation Token in your account at
+    # Administration > Security > Installation Tokens:
+    # https://help.sumologic.com/docs/manage/security/installation-tokens/
+    installation_token: <your-sumologic-installation-token>
+
+service:
+  extensions: [sumologic]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [sumologic]
 ```
