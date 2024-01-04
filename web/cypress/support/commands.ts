@@ -114,7 +114,6 @@ Cypress.Commands.add('makeSureUserIsOnTestDetailPage', () => {
 
 Cypress.Commands.add('makeSureUserIsOnTracePage', () => {
   cy.matchTestRunPageUrl();
-  cy.cancelOnBoarding();
 });
 
 Cypress.Commands.add('cancelOnBoarding', () => {
