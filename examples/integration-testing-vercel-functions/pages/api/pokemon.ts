@@ -1,8 +1,6 @@
-import { trace, SpanStatusCode /*, diag, DiagConsoleLogger, DiagLogLevel*/ } from '@opentelemetry/api'
+import { trace, SpanStatusCode } from '@opentelemetry/api'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { sql } from '@vercel/postgres'
-
-// diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
 
 export async function addPokemon(pokemon: any) {
   return await sql`
