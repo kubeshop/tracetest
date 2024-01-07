@@ -24,9 +24,8 @@ export default async function handler(
     const response = await fetch(requestUrl)
     const resPokemon = await response.json()
     
-    const { rowCount, rows: [addedPokemon, ...addedPokemonRest] } = await addPokemon(resPokemon)
-    const { rows: [fetchedPokemon, ...fetchedPokemonRest] } = await getPokemon(addedPokemon)    
-    res.status(200).json(fetchedPokemon)
+    const { rowCount, rows: [addedPokemon, ...addedPokemonRest] } = await addPokemon(resPokemon) 
+    res.status(200).json(addedPokemon)
 
   } catch (err) {
     res.status(500).json({ error: 'failed to load data' })
