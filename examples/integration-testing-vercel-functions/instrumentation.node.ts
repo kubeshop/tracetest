@@ -16,7 +16,7 @@ const sdk = new NodeSDK({
     new FetchInstrumentation(),
   ],
   resource: new Resource({
-    [SemanticResourceAttributes.SERVICE_NAME]: 'next-app',
+    [SemanticResourceAttributes.SERVICE_NAME]: 'integration-testing-vercel-functions',
   }),
 })
 sdk.start()

@@ -1,4 +1,6 @@
 #/bin/bash
 
-tracetest configure -t tttoken_<token> # Add your token
-tracetest run test -f ./test-api.docker.yaml --required-gates test-specs --output pretty
+# Add a Tracetest token here
+# https://docs.tracetest.io/concepts/environment-tokens
+tracetest configure -t tttoken_<token>
+tracetest run test -f ./api.pokemon.spec.docker.yaml --required-gates test-specs --output pretty

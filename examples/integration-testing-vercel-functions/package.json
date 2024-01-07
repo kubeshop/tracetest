@@ -20,6 +20,7 @@
     "@opentelemetry/semantic-conventions": "^1.19.0",
     "@vercel/node": "^3.0.12",
     "@vercel/otel": "^0.3.0",
+    "@vercel/postgres": "^0.5.1",
     "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18"

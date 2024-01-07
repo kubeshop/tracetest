@@ -1,14 +1,10 @@
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 FROM base AS builder
 WORKDIR /app
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
-  # Allow install without lockfile, so example works even without Node.js installed locally
-  else echo "Warning: Lockfile not found. It is recommended to commit lockfiles to version control." && yarn install; \
-  fi
+RUN apk add --no-cache g++ make py3-pip
+
+COPY package.json package-lock.json ./
+RUN npm i
 
 COPY app ./app
 COPY pages ./pages
@@ -18,12 +14,7 @@ COPY tsconfig.json .
 COPY instrumentation.ts .
 COPY instrumentation.node.ts .
 
-RUN \
-  if [ -f yarn.lock ]; then yarn build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then pnpm build; \
-  else yarn build; \
-  fi
+RUN npm run build
 
 # Step 2. Production image, copy all the files and run next
 FROM base AS runner

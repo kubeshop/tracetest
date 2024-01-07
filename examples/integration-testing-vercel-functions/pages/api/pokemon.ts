@@ -1,36 +1,61 @@
-import { trace, SpanStatusCode, Exception } from '@opentelemetry/api'
+import { trace, SpanStatusCode /*, diag, DiagConsoleLogger, DiagLogLevel*/ } from '@opentelemetry/api'
 import type { NextApiRequest, NextApiResponse } from 'next'
- 
-export async function getTracer() {
-  return await trace.getTracer('next-app')
+import { sql } from '@vercel/postgres'
+
+// diag.setLogger(new DiagConsoleLogger(), DiagLogLevel.DEBUG)
+
+export async function addPokemon(pokemon: any) {
+  return await sql`
+    INSERT INTO pokemon (name)
+    VALUES (${pokemon.name})
+    RETURNING *;
+  `
+}
+
+export async function getPokemon(pokemon: any) {
+  return await sql`
+    SELECT * FROM pokemon where id=${pokemon.id};
+  `
 }
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const tracer = await getTracer()
-  tracer.startActiveSpan('GET Pokemon API', async (span) => {
-    try {
-      const requestUrl = `https://pokeapi.co/api/v2/pokemon/${req.query.id || '6'}`
-      const response = await fetch(requestUrl)
-      const data = await response.json()
-
-      span.setStatus({ code: SpanStatusCode.OK, message: String("Pokemon fetched successfully!") })
-      span.setAttribute('pokemon.name', data.name)
-      span.setAttribute('pokemon.id', data.id)
-
-      res.status(200).json({
-        name: data.name,
-      })
+  const activeSpan = trace.getActiveSpan()
+  const tracer = await trace.getTracer('integration-testing-vercel-functions')
   
-    } catch (err) {
-      span.setAttribute('error', String(err))
-      span.recordException(String(err))
-      span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) })
-      res.status(500).json({ error: 'failed to load data' })
-    } finally {
-      span.end()
-    }
-  })
+  try {
+
+    const externalPokemon = await tracer.startActiveSpan('GET Pokemon from pokeapi.co', async (externalPokemonSpan) => {
+      const requestUrl = `https://pokeapi.co/api/v2/pokemon/${req.body.id || '6'}`
+      const response = await fetch(requestUrl)
+      const { id, name } = await response.json()
+
+      externalPokemonSpan.setStatus({ code: SpanStatusCode.OK, message: String("Pokemon fetched successfully!") })
+      externalPokemonSpan.setAttribute('pokemon.name', name)
+      externalPokemonSpan.setAttribute('pokemon.id', id)
+      externalPokemonSpan.end()
+
+      return { id, name }
+    })
+
+    const addedPokemon = await tracer.startActiveSpan('Add Pokemon to Vercel Postgres', async (addedPokemonSpan) => {
+      const { rowCount, rows: [addedPokemon, ...rest] } = await addPokemon(externalPokemon)
+      addedPokemonSpan.setAttribute('pokemon.isAdded', rowCount === 1)
+      addedPokemonSpan.setAttribute('pokemon.added.name', addedPokemon.name)
+      addedPokemonSpan.end()
+      return addedPokemon
+    })
+    
+    res.status(200).json(addedPokemon)
+
+  } catch (err) {
+    activeSpan?.setAttribute('error', String(err))
+    activeSpan?.recordException(String(err))
+    activeSpan?.setStatus({ code: SpanStatusCode.ERROR, message: String(err) })
+    res.status(500).json({ error: 'failed to load data' })
+  } finally {
+    activeSpan?.end()
+  }
 }

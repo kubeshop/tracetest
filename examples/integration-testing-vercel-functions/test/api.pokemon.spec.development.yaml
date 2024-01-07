@@ -1,17 +1,18 @@
 type: Test
 spec:
-  id: -gjd4idIR
+  id: kv8C-hOSR
   name: Test API
   trigger:
     type: http
     httpRequest:
-      method: GET
+      method: POST
       url: http://localhost:3000/api/pokemon
+      body: "{\n  \"id\": \"6\"\n}"
       headers:
       - key: Content-Type
         value: application/json
   specs:
   - selector: span[tracetest.span.type="http"]
-    name: "All HTTP Spans: Status code is 200"
+    name: "All HTTP Spans: Status  code is 200"
     assertions:
     - attr:http.status_code = 200

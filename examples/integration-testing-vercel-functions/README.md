@@ -11,10 +11,12 @@ It's using Vercel Functions via `/pages/api`, with [OpenTelemetry configured as 
 - [Tracetest Account](https://app.tracetest.io/)
 - [Tracetest Agent API Key](https://docs.tracetest.io/configuration/agent)
 - [Tracetest Environment Token](https://docs.tracetest.io/concepts/environment-tokens)
+- [Vercel Account](https://vercel.com/)
+- [Vercel Postgres Database](https://vercel.com/docs/storage/vercel-postgres)
 
 ## Getting Started with Docker
 
-0. Set Tracetest Agent API Key in `docker-compose.yaml`, and set Tracetest Environment Token in `test/run.bash`.
+0. Set Tracetest Agent API Key in `docker-compose.yaml`, and set Tracetest Environment Token in `test/run.bash`. Set the Vercel Postgres credentials in the `.env*` files.
 
 1. Run Docker Compose
 
@@ -31,6 +33,8 @@ It's using Vercel Functions via `/pages/api`, with [OpenTelemetry configured as 
 (Optional. Trigger Tracetest Tests via `app.tracetest.io` against `http://next-app:3000`)
 
 ## Getting Started Locally
+
+0. Set the Vercel Postgres credentials in the `.env*` files.
 
 1. Install Node Packages
 
