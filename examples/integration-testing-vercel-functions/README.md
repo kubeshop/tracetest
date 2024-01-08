@@ -57,7 +57,7 @@ It's using Vercel Functions via `/pages/api`, with [OpenTelemetry configured as 
 4. Trigger Tracetest Tests via CLI
 
     ```bash
-    tracetest run test -f ./test-api.development.yaml
+    tracetest run test -f ./api.pokemon.spec.development.yaml
     ```
 
 (Optional. Trigger Tracetest Tests via `app.tracetest.io` against `http://localhost:3000`)
