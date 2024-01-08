@@ -1,6 +1,6 @@
 # Integration Testing Vercel Functions with Tracetest and OpenTelemetry
 
-This example is from the article [**Integration Testing Vercel Serverless Functions**](add link) showing how to run integration tests against Vercel Functions using [OpenTelemetry](https://opentelemetry.io/) and Tracetest.
+This example is from the article [**Integration Testing Vercel Serverless Functions and OpenTelemetry**](https://tracetest.io/blog/integration-testing-vercel-serverless-functions-with-opentelemetry) showing how to run integration tests against Vercel Functions using [OpenTelemetry](https://opentelemetry.io/) and Tracetest.
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
@@ -57,7 +57,7 @@ It's using Vercel Functions via `/pages/api`, with [OpenTelemetry configured as 
 4. Trigger Tracetest Tests via CLI
 
     ```bash
-    tracetest run test -f ./test-api.development.yaml
+    tracetest run test -f ./api.pokemon.spec.development.yaml
     ```
 
 (Optional. Trigger Tracetest Tests via `app.tracetest.io` against `http://localhost:3000`)
