@@ -168,6 +168,9 @@ func (ui ptermUI) Select(prompt string, options []Option, defaultIndex int) (sel
 		MaxHeight:     5,
 		Selector:      ">",
 		SelectorStyle: &pterm.ThemeDefault.SecondaryStyle,
+		OnInterruptFunc: func() {
+			os.Exit(0)
+		},
 	}).
 		Show()
 	if err != nil {
