@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  next-app:
+    image: adnanrahic/next-app:v1
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env.docker
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - tracetest
+  
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      - TRACETEST_API_KEY=ttagent_<apikey> # Add your key
+    ports:
+      - 4317:4317
+      - 4318:4318
+    networks:
+      - tracetest
+
+  integration-tests:
+    image: adnanrahic/integration-tests:v1
+    profiles:
+      - tests
+    build:
+      context: ./
+      dockerfile: ./test/Dockerfile
+    volumes:
+      - ./test/:/app/test/
+    depends_on:
+      tracetest-agent:
+        condition: service_started
+    networks:
+      - tracetest
+
+networks:
+  tracetest:
