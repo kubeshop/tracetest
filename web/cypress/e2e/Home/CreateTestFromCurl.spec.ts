@@ -22,7 +22,6 @@ describe('Create test from CURL Command', () => {
     cy.get(`[data-cy="import-test-submit"]`).click();
     cy.submitCreateForm();
     cy.matchTestRunPageUrl();
-    cy.cancelOnBoarding();
     cy.get('[data-cy=overlay-input-overlay]').should('contain.text', POKEMON_HTTP_ENDPOINT);
     cy.deleteTest(true);
   });

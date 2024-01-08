@@ -1,14 +1,4 @@
 ---
-type: PollingProfile
-spec:
-  name: Default
-  strategy: periodic
-  default: true
-  periodic:
-    retryDelay: 5s
-    timeout: 10m
-
----
 type: DataStore
 spec:
   name: Sumo Logic
@@ -18,5 +8,8 @@ spec:
     # docs page to figure out which URL you need:
     # https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use
     url: "https://api.sumologic.com/api/"
+    # Create your ID and Key under Administration > Security > Access Keys
+    # in your Sumo Logic account:
+    # https://help.sumologic.com/docs/manage/security/access-keys/#create-your-access-key
     accessID: "your-access-id"
     accessKey: "your-access-key"

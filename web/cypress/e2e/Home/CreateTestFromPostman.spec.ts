@@ -14,7 +14,6 @@ describe('Create test from Postman Collection', () => {
     cy.get(`[data-cy="import-test-submit"]`).click();
     cy.submitCreateForm();
     cy.matchTestRunPageUrl();
-    cy.cancelOnBoarding();
     cy.get('[data-cy=overlay-input-overlay]').should('contain.text', 'create Test');
     cy.deleteTest(true);
   });

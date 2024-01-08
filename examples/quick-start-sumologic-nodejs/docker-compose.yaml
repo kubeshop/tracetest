@@ -6,13 +6,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Local Tracetest Agent: GRPC
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4317
-      # Local Tracetest Agent: HTTP
-      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4318/v1/traces
-      # Tracetest Core: GRPC
-      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
-      # Tracetest Core: HTTP
+      # GRPC
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
+      # HTTP
       # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4318/v1/traces
 
   otel-collector:
