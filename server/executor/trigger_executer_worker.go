@@ -62,6 +62,12 @@ func (r triggerExecuterWorker) ProcessItem(ctx context.Context, job Job) {
 		return
 	}
 
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	err := r.eventEmitter.Emit(ctx, events.TriggerExecutionStart(job.Run.TestID, job.Run.ID))
 	if err != nil {
 		r.handleError(job.Run, err)

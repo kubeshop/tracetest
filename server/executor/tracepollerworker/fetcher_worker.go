@@ -53,6 +53,12 @@ func (w *traceFetcherWorker) ProcessItem(ctx context.Context, job executor.Job) 
 		return
 	}
 
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	ctx, span := w.state.tracer.Start(ctx, "Fetching trace")
 	defer span.End()
 

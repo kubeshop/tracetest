@@ -61,6 +61,12 @@ func (w *tracePollerEvaluatorWorker) SetOutputQueue(queue pipeline.Enqueuer[exec
 }
 
 func (w *tracePollerEvaluatorWorker) ProcessItem(ctx context.Context, job executor.Job) {
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	ctx, span := w.state.tracer.Start(ctx, "Evaluating trace")
 	defer span.End()
 
