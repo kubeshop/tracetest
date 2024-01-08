@@ -109,7 +109,7 @@ sdk.start()
 Choosing the `tracing.otel.grpc.js` file will send traces to Tracetest Agent's `GRPC`.
 
 Configure it an environment variable:
-- Running in Docker: `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4317`
+- Running in Docker: `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317`
 
 Enabling the tracer is done by preloading the trace file.
 
@@ -163,7 +163,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4317
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
 
   otel-collector:
     image: public.ecr.aws/sumologic/sumologic-otel-collector:0.75.0-sumo-0
@@ -288,7 +288,7 @@ sdk.start()
 Choosing the `tracing.otel.grpc.js` file will send traces to Tracetest Agent's `GRPC`.
 
 Configure it an environment variable:
-- Running in Docker: `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4317`
+- Running in Docker: `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317`
 
 ```bash
 node -r ./tracing.otel.grpc.js app.js
@@ -336,7 +336,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4317
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
 
   otel-collector:
     image: public.ecr.aws/sumologic/sumologic-otel-collector:0.75.0-sumo-0
