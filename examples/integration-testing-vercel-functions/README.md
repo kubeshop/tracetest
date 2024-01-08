@@ -1,6 +1,6 @@
 # Integration Testing Vercel Functions with Tracetest and OpenTelemetry
 
-This example is from the article [**Integration Testing Vercel Serverless Functions and OpenTelemetry**](add link) showing how to run integration tests against Vercel Functions using [OpenTelemetry](https://opentelemetry.io/) and Tracetest.
+This example is from the article [**Integration Testing Vercel Serverless Functions and OpenTelemetry**](https://tracetest.io/blog/integration-testing-vercel-serverless-functions-with-opentelemetry) showing how to run integration tests against Vercel Functions using [OpenTelemetry](https://opentelemetry.io/) and Tracetest.
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
