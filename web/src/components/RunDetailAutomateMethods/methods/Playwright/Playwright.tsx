@@ -15,7 +15,7 @@ const Playwright = ({test}: IProps) => (
       <S.Title>Playwright Integration</S.Title>
     </S.TitleContainer>
     <Typography.Paragraph>The code snippet below enables you to run this test via a Playwright run.</Typography.Paragraph>
-    <FramedCodeBlock title="Cypress code snippet:" language="javascript" value={PlaywrightCodeSnippet(test.name)} />
+    <FramedCodeBlock title="Playwright code snippet:" language="javascript" value={PlaywrightCodeSnippet(test.name)} />
   </S.Container>
 );
 
