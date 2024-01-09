@@ -45,6 +45,12 @@ func (e *defaultLinterRunner) SetOutputQueue(queue pipeline.Enqueuer[Job]) {
 }
 
 func (e *defaultLinterRunner) ProcessItem(ctx context.Context, job Job) {
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	lintResource := e.analyzerGetter.GetDefault(ctx)
 
 	shouldSkip := lintResource.ShouldSkip()

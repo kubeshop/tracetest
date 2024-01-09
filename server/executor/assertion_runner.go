@@ -45,6 +45,12 @@ func (e *defaultAssertionRunner) SetOutputQueue(pipeline.Enqueuer[Job]) {
 }
 
 func (e *defaultAssertionRunner) ProcessItem(ctx context.Context, job Job) {
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	run, err := e.runAssertionsAndUpdateResult(ctx, job)
 
 	log.Printf("[AssertionRunner] Test %s Run %d: update channel start\n", job.Test.ID, job.Run.ID)

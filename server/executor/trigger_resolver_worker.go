@@ -77,6 +77,12 @@ func (r triggerResolverWorker) traceDB(ctx context.Context) (tracedb.TraceDB, er
 }
 
 func (r triggerResolverWorker) ProcessItem(ctx context.Context, job Job) {
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	ctx, pollingSpan := r.tracer.Start(ctx, "Resolve trigger")
 	defer pollingSpan.End()
 

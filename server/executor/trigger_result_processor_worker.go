@@ -58,6 +58,12 @@ func (r triggerResultProcessorWorker) handleError(run test.Run, err error) {
 }
 
 func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) {
+	select {
+	default:
+	case <-ctx.Done():
+		return
+	}
+
 	ctx, pollingSpan := r.tracer.Start(ctx, "Start processing trigger response")
 	defer pollingSpan.End()
 
