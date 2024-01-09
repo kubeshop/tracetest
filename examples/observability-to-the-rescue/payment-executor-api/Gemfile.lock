@@ -7,7 +7,7 @@ GEM
       google-protobuf (~> 3.14)
     mustermann (3.0.0)
       ruby2_keywords (~> 0.0.1)
-    nio4r (2.5.9)
+    nio4r (2.7.0)
     opentelemetry-api (1.1.0)
     opentelemetry-common (0.19.6)
       opentelemetry-api (~> 1.0)
@@ -202,7 +202,7 @@ GEM
       opentelemetry-semantic_conventions
     opentelemetry-semantic_conventions (1.8.0)
       opentelemetry-api (~> 1.0)
-    puma (6.3.1)
+    puma (6.4.2)
       nio4r (~> 2.0)
     rack (2.2.6.4)
     rack-protection (3.0.5)
@@ -223,7 +223,7 @@ DEPENDENCIES
   opentelemetry-exporter-otlp
   opentelemetry-instrumentation-all
   opentelemetry-sdk
-  puma (~> 6.3.1)
+  puma (~> 6.4.2)
   sinatra (~> 3.0.5)
 
 BUNDLED WITH
