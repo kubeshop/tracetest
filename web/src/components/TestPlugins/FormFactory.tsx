@@ -10,6 +10,7 @@ const FormFactoryMap = {
   [TriggerTypes.kafka]: Kafka,
   [TriggerTypes.traceid]: () => null,
   [TriggerTypes.cypress]: () => null,
+  [TriggerTypes.playwright]: () => null,
 };
 
 export interface IFormProps {

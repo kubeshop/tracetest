@@ -11,6 +11,7 @@ export enum TriggerTypes {
   traceid = 'traceid',
   kafka = 'kafka',
   cypress = 'cypress',
+  playwright = 'playwright',
 }
 
 export enum ImportTypes {

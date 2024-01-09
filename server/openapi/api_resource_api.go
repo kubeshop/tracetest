@@ -81,12 +81,6 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateVariableSet,
 		},
 		{
-			"DeleteDataStore",
-			strings.ToUpper("Delete"),
-			"/api/datastores/{dataStoreId}",
-			c.DeleteDataStore,
-		},
-		{
 			"DeleteDemo",
 			strings.ToUpper("Delete"),
 			"/api/demos/{demoId}",
@@ -145,6 +139,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/pollingprofiles/{pollingProfileId}",
 			c.GetPollingProfile,
+		},
+		{
+			"GetTest",
+			strings.ToUpper("Get"),
+			"/api/tests/{testId}",
+			c.GetTest,
 		},
 		{
 			"GetTestSuite",
@@ -207,12 +207,6 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.ListVariableSets,
 		},
 		{
-			"TestsTestIdGet",
-			strings.ToUpper("Get"),
-			"/api/tests/{testId}",
-			c.TestsTestIdGet,
-		},
-		{
 			"UpdateConfiguration",
 			strings.ToUpper("Put"),
 			"/api/configs/{configId}",
@@ -259,6 +253,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/variableSets/{variableSetId}",
 			c.UpdateVariableSet,
+		},
+		{
+			"UpsertTest",
+			strings.ToUpper("Put"),
+			"/api/tests",
+			c.UpsertTest,
 		},
 	}
 }
@@ -313,18 +313,18 @@ func (c *ResourceApiApiController) CreateLinter(w http.ResponseWriter, r *http.R
 
 // CreateTest - Create new test
 func (c *ResourceApiApiController) CreateTest(w http.ResponseWriter, r *http.Request) {
-	testParam := Test{}
+	testResourceParam := TestResource{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&testParam); err != nil {
+	if err := d.Decode(&testResourceParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTestRequired(testParam); err != nil {
+	if err := AssertTestResourceRequired(testResourceParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.CreateTest(r.Context(), testParam)
+	result, err := c.service.CreateTest(r.Context(), testResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -373,22 +373,6 @@ func (c *ResourceApiApiController) CreateVariableSet(w http.ResponseWriter, r *h
 		return
 	}
 	result, err := c.service.CreateVariableSet(r.Context(), variableSetResourceParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// DeleteDataStore - Delete a Data Store
-func (c *ResourceApiApiController) DeleteDataStore(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	dataStoreIdParam := params["dataStoreId"]
-
-	result, err := c.service.DeleteDataStore(r.Context(), dataStoreIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -549,6 +533,22 @@ func (c *ResourceApiApiController) GetPollingProfile(w http.ResponseWriter, r *h
 	pollingProfileIdParam := params["pollingProfileId"]
 
 	result, err := c.service.GetPollingProfile(r.Context(), pollingProfileIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetTest - get test
+func (c *ResourceApiApiController) GetTest(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	result, err := c.service.GetTest(r.Context(), testIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -801,22 +801,6 @@ func (c *ResourceApiApiController) ListVariableSets(w http.ResponseWriter, r *ht
 
 }
 
-// TestsTestIdGet - get test
-func (c *ResourceApiApiController) TestsTestIdGet(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	testIdParam := params["testId"]
-
-	result, err := c.service.TestsTestIdGet(r.Context(), testIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
 // UpdateConfiguration - Update Tracetest configuration
 func (c *ResourceApiApiController) UpdateConfiguration(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -957,18 +941,18 @@ func (c *ResourceApiApiController) UpdateTest(w http.ResponseWriter, r *http.Req
 	params := mux.Vars(r)
 	testIdParam := params["testId"]
 
-	testParam := Test{}
+	testResourceParam := TestResource{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&testParam); err != nil {
+	if err := d.Decode(&testResourceParam); err != nil {
 		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
 		return
 	}
-	if err := AssertTestRequired(testParam); err != nil {
+	if err := AssertTestResourceRequired(testResourceParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateTest(r.Context(), testIdParam, testParam)
+	result, err := c.service.UpdateTest(r.Context(), testIdParam, testResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1023,6 +1007,30 @@ func (c *ResourceApiApiController) UpdateVariableSet(w http.ResponseWriter, r *h
 		return
 	}
 	result, err := c.service.UpdateVariableSet(r.Context(), variableSetIdParam, variableSetResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpsertTest - Upsert new test
+func (c *ResourceApiApiController) UpsertTest(w http.ResponseWriter, r *http.Request) {
+	testResourceParam := TestResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&testResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTestResourceRequired(testResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpsertTest(r.Context(), testResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

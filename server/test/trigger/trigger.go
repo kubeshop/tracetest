@@ -43,5 +43,5 @@ func (t TriggerType) IsTraceIDBased() bool {
 }
 
 func (t TriggerType) IsFrontendE2EBased() bool {
-	return t == TriggerTypeCypress
+	return t == TriggerTypeCypress || t == TriggerTypePlaywright
 }

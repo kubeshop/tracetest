@@ -14,7 +14,7 @@ const Cypress = ({test}: IProps) => (
     <S.TitleContainer>
       <S.Title>Cypress Integration</S.Title>
     </S.TitleContainer>
-    <Typography.Paragraph>The code snippet below enables you to run this test via a cypress run.</Typography.Paragraph>
+    <Typography.Paragraph>The code snippet below enables you to run this test via a Cypress run.</Typography.Paragraph>
     <FramedCodeBlock title="Cypress code snippet:" language="javascript" value={CypressCodeSnippet(test.name)} />
   </S.Container>
 );
