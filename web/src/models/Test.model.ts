@@ -56,7 +56,7 @@ Test.FromDefinition = (definition: string): Test => {
 };
 
 Test.shouldAllowRun = (triggerType: TriggerTypes): boolean => {
-  return triggerType !== TriggerTypes.cypress;
+  return ![TriggerTypes.cypress, TriggerTypes.playwright].includes(triggerType);
 };
 
 export default Test;

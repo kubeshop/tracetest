@@ -5,6 +5,7 @@ import RunDetailAutomateMethods from 'components/RunDetailAutomateMethods';
 import CliCommand from 'components/RunDetailAutomateMethods/methods/CLICommand';
 import Cypress from 'components/RunDetailAutomateMethods/methods/Cypress';
 import DeepLink from 'components/RunDetailAutomateMethods/methods/DeepLink';
+import Playwright from 'components/RunDetailAutomateMethods/methods/Playwright';
 import GithubActions from 'components/RunDetailAutomateMethods/methods/GithubActions';
 import {CLI_RUNNING_TESTS_URL} from 'constants/Common.constants';
 import {TriggerTypes} from 'constants/Test.constants';
@@ -22,6 +23,14 @@ function getMethods(triggerType: TriggerTypes) {
           id: 'cypress',
           label: 'Cypress',
           component: Cypress,
+        },
+      ];
+    case TriggerTypes.playwright:
+      return [
+        {
+          id: 'playwright',
+          label: 'playwright',
+          component: Playwright,
         },
       ];
     default:

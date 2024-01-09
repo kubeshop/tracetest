@@ -55,12 +55,12 @@ func (s *ResourceApiApiService) CreateLinter(ctx context.Context, linterResource
 }
 
 // CreateTest - Create new test
-func (s *ResourceApiApiService) CreateTest(ctx context.Context, test Test) (ImplResponse, error) {
+func (s *ResourceApiApiService) CreateTest(ctx context.Context, testResource TestResource) (ImplResponse, error) {
 	// TODO - update CreateTest with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, Test{}) or use other options such as http.Ok ...
-	//return Response(200, Test{}), nil
+	//TODO: Uncomment the next line to return response Response(200, TestResource{}) or use other options such as http.Ok ...
+	//return Response(200, TestResource{}), nil
 
 	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
 	//return Response(400, nil),nil
@@ -97,17 +97,6 @@ func (s *ResourceApiApiService) CreateVariableSet(ctx context.Context, variableS
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateVariableSet method not implemented")
-}
-
-// DeleteDataStore - Delete a Data Store
-func (s *ResourceApiApiService) DeleteDataStore(ctx context.Context, dataStoreId string) (ImplResponse, error) {
-	// TODO - update DeleteDataStore with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
-	//return Response(204, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("DeleteDataStore method not implemented")
 }
 
 // DeleteDemo - Delete a Demonstration setting
@@ -280,6 +269,20 @@ func (s *ResourceApiApiService) GetPollingProfile(ctx context.Context, pollingPr
 	return Response(http.StatusNotImplemented, nil), errors.New("GetPollingProfile method not implemented")
 }
 
+// GetTest - get test
+func (s *ResourceApiApiService) GetTest(ctx context.Context, testId string) (ImplResponse, error) {
+	// TODO - update GetTest with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, TestResource{}) or use other options such as http.Ok ...
+	//return Response(200, TestResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetTest method not implemented")
+}
+
 // GetTestSuite - get TestSuite
 func (s *ResourceApiApiService) GetTestSuite(ctx context.Context, testSuiteId string) (ImplResponse, error) {
 	// TODO - update GetTestSuite with the required logic for this service method.
@@ -441,20 +444,6 @@ func (s *ResourceApiApiService) ListVariableSets(ctx context.Context, take int32
 	return Response(http.StatusNotImplemented, nil), errors.New("ListVariableSets method not implemented")
 }
 
-// TestsTestIdGet - get test
-func (s *ResourceApiApiService) TestsTestIdGet(ctx context.Context, testId string) (ImplResponse, error) {
-	// TODO - update TestsTestIdGet with the required logic for this service method.
-	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	//TODO: Uncomment the next line to return response Response(200, TestResource{}) or use other options such as http.Ok ...
-	//return Response(200, TestResource{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
-	//return Response(500, nil),nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("TestsTestIdGet method not implemented")
-}
-
 // UpdateConfiguration - Update Tracetest configuration
 func (s *ResourceApiApiService) UpdateConfiguration(ctx context.Context, configId string, configurationResource ConfigurationResource) (ImplResponse, error) {
 	// TODO - update UpdateConfiguration with the required logic for this service method.
@@ -547,7 +536,7 @@ func (s *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollin
 }
 
 // UpdateTest - update test
-func (s *ResourceApiApiService) UpdateTest(ctx context.Context, testId string, test Test) (ImplResponse, error) {
+func (s *ResourceApiApiService) UpdateTest(ctx context.Context, testId string, testResource TestResource) (ImplResponse, error) {
 	// TODO - update UpdateTest with the required logic for this service method.
 	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
@@ -598,4 +587,15 @@ func (s *ResourceApiApiService) UpdateVariableSet(ctx context.Context, variableS
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdateVariableSet method not implemented")
+}
+
+// UpsertTest - Upsert new test
+func (s *ResourceApiApiService) UpsertTest(ctx context.Context, testResource TestResource) (ImplResponse, error) {
+	// TODO - update UpsertTest with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, TestResource{}) or use other options such as http.Ok ...
+	//return Response(200, TestResource{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("UpsertTest method not implemented")
 }

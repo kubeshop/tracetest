@@ -41,6 +41,13 @@ const ResponseData = {
       statusCode: 200,
     };
   },
+  [TriggerTypes.playwright](response: object) {
+    return {
+      body: get(response, 'id', ''),
+      headers: [],
+      statusCode: 200,
+    };
+  },
   [TriggerTypes.kafka](response: object) {
     const kafkaResult = {
       offset: get(response, 'offset', ''),
@@ -66,7 +73,7 @@ const TriggerResult = ({
     request = http;
   } else if (type === TriggerTypes.grpc) {
     request = grpc;
-  } else if ([TriggerTypes.traceid, TriggerTypes.cypress].includes(type)) {
+  } else if ([TriggerTypes.traceid, TriggerTypes.cypress, TriggerTypes.playwright].includes(type)) {
     request = traceid;
   } else if (type === TriggerTypes.kafka) {
     request = kafka;

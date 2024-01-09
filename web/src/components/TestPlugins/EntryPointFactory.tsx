@@ -10,6 +10,7 @@ const EntryPointFactoryMap = {
   [TriggerTypes.kafka]: TriggerHeaderBarKafka,
   [TriggerTypes.traceid]: TriggerHeaderBarTraceID,
   [TriggerTypes.cypress]: () => null,
+  [TriggerTypes.playwright]: () => null,
 };
 
 interface IProps {

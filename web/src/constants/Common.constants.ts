@@ -71,4 +71,5 @@ export enum SupportedPlugins {
   Kafka = 'Kafka',
   TraceID = 'TraceID',
   Cypress = 'Cypress',
+  Playwright = 'Playwright',
 }

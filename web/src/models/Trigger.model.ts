@@ -42,6 +42,12 @@ const EntryData = {
       method: 'Cypress',
     };
   },
+  [TriggerTypes.playwright](request: TRequest) {
+    return {
+      entryPoint: get(request, 'id', ''),
+      method: 'Playwright',
+    };
+  },
   [TriggerTypes.kafka](request: TRequest) {
     let entryPoint = '';
 
@@ -71,7 +77,7 @@ const Trigger = ({
     request = HttpRequest(httpRequest);
   } else if (type === TriggerTypes.grpc) {
     request = GrpcRequest(grpc);
-  } else if ([TriggerTypes.traceid, TriggerTypes.cypress].includes(type)) {
+  } else if ([TriggerTypes.traceid, TriggerTypes.cypress, TriggerTypes.playwright].includes(type)) {
     request = TraceIDRequest(traceid);
   } else if (type === TriggerTypes.kafka) {
     request = KafkaRequest(kafka);

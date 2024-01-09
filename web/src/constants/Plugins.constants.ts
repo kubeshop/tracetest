@@ -58,12 +58,23 @@ const Cypress: IPlugin = {
   requestType: TriggerTypes.traceid,
 };
 
+const Playwright: IPlugin = {
+  name: SupportedPlugins.Playwright,
+  title: 'Playwright',
+  description: 'Define your test via Playwright',
+  isActive: true,
+  demoList: [],
+  type: TriggerTypes.playwright,
+  requestType: TriggerTypes.traceid,
+};
+
 export const Plugins = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: GRPC,
   [SupportedPlugins.Kafka]: Kafka,
   [SupportedPlugins.TraceID]: TraceID,
   [SupportedPlugins.Cypress]: Cypress,
+  [SupportedPlugins.Playwright]: Playwright,
 } as const;
 
 export const TriggerTypeToPlugin = {
@@ -72,6 +83,7 @@ export const TriggerTypeToPlugin = {
   [TriggerTypes.kafka]: Plugins.Kafka,
   [TriggerTypes.traceid]: Plugins.TraceID,
   [TriggerTypes.cypress]: Plugins.Cypress,
+  [TriggerTypes.playwright]: Plugins.Playwright,
 } as const;
 
 export const CreateTriggerTypeToPlugin = {
