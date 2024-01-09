@@ -29,7 +29,7 @@ function getMethods(triggerType: TriggerTypes) {
       return [
         {
           id: 'playwright',
-          label: 'playwright',
+          label: 'Playwright',
           component: Playwright,
         },
       ];
