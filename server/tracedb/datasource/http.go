@@ -27,6 +27,10 @@ type HttpClient struct {
 
 func NewHttpClient(name string, config *datastore.HttpClientConfig, callback HttpCallback) DataSource {
 	endpoint, _ := urlx.Parse(config.Url)
+	if endpoint.Port() == "443" {
+		endpoint.Scheme = "https"
+	}
+
 	client := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: getTlsConfig(config.TLS),
