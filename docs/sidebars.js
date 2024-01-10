@@ -344,6 +344,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "tools-and-integrations/playwright",
+          label: "Playwright",
+        },
+        {
+          type: "doc",
           id: "tools-and-integrations/keptn",
           label: "Keptn",
         },
