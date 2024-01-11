@@ -213,6 +213,7 @@ func isConnectionError(err error) bool {
 		// From time to time, the server can start sending those errors to the
 		// agent. This mitigates the risk of an agent getting stuck in an error state
 		"unexpected HTTP status code received from server: 500",
+		"the client connection is closing",
 	}
 	for _, possibleErr := range possibleErrors {
 		if strings.Contains(err.Error(), possibleErr) {
