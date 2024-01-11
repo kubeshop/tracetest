@@ -5,7 +5,7 @@ describe('Create test', () => {
   beforeEach(() => {
     cy.interceptHomeApiCall();
     cy.enableDemo();
-    cy.visit('/');
+    cy.visit('/tests');
   });
   afterEach(() => cy.deleteTest(true));
 
