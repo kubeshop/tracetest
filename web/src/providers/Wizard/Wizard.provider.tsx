@@ -30,7 +30,6 @@ const initialSteps: IWizardStep[] = [
     name: 'Step 1',
     description: 'Step 1 description',
     component: 'Step1',
-    status: 'complete',
   },
   {
     id: 'step2',

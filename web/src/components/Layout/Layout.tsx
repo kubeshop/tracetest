@@ -1,4 +1,4 @@
-import {AppstoreAddOutlined, ClusterOutlined, GlobalOutlined, SettingOutlined} from '@ant-design/icons';
+import {AppstoreAddOutlined, ClusterOutlined, GlobalOutlined, HomeOutlined, SettingOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -28,7 +28,7 @@ interface IProps {
 const menuItems = [
   {
     key: '0',
-    icon: <ClusterOutlined />,
+    icon: <HomeOutlined />,
     label: <Link to="/">Home</Link>,
     path: '/',
   },
