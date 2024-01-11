@@ -30,14 +30,12 @@ The following is a high-level sequence diagram of how Playwright and Tracetest i
 ```mermaid
 sequenceDiagram
   Playwright->>+Scripts: Execute tests
-  Scripts->>+@tracetest/playwright: Configures library
+  Scripts->>+@tracetest/playwright: Createst instance
   @tracetest/playwright-->>-Scripts: Ok
   Scripts->>+Scripts: Visits website
   Scripts->>+@tracetest/playwright: captures and injects traceparent meta tag
-  @tracetest/playwright-->-Scripts: Ok
-  Scripts->>+Scripts: Executes test
-  Scripts->>+@tracetest/playwright: Runs test
-  @tracetest/playwright-->-Scripts: Ok
+  @tracetest/playwright->>+@tracetest/playwright: Executes test
+  @tracetest/playwright-->>-Scripts: Ok
   Scripts->>@tracetest/playwright: Waits for results and shows the summary
 ```
 
@@ -100,6 +98,8 @@ export default defineConfig({
 });
 ```
 
+Before moving forward, run `npm i` in the root folder to install the dependencies.
+
 ### The `home.spec.ts` Test Script
 
 The `home.spec.ts` test script contains three different tests based on the Pokeshop Demo UI fetures, which are:
@@ -114,16 +114,25 @@ If you go to the `package.json` file you will find the inclusion of a Tracetest 
 The first thing the test script does is import the package, grab the Tracetest API token from the environment variables and create the Tracetest instance.
 
 ```typescript
-import Tracetest from "@tracetest/playwright";
+import { test, expect } from "@playwright/test";
+import Tracetest, { Types } from "@tracetest/playwright";
 const { TRACETEST_API_TOKEN = "" } = process.env;
-const tracetest = Tracetest();
+
+let tracetest: Types.TracetestPlaywright | undefined = undefined;
 ```
 
-Afterward, during the `beforeAll` hook, the test script **configures** the Tracetest instance with the API token.
+Afterward, during the `beforeAll` hook, create the Tracetest instance with the API token.
 
 ```typescript
 test.beforeAll(async () => {
-  await tracetest.configure(TRACETEST_API_TOKEN);
+  tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN });
+
+  // optional, set the definition files and run info for the tests
+  tracetest.setOptions({
+    "Playwright: imports a pokemon": {
+      definition,
+    },
+  });
 });
 ```
 
@@ -132,16 +141,7 @@ Then, during the `beforeEach` hook, the script **captures** the document to inje
 ```typescript
 test.beforeEach(async ({ page }, { title }) => {
   await page.goto("/");
-  await tracetest.capture(title, page);
-});
-```
-
-Lastly, during the `afterEach` hook, the script **runs** the test with an optional definition string.
-
-```typescript
-test.afterEach(async ({}, { title, config }) => {
-  await tracetest.runTest(title, config.metadata.definition ?? "");
-  config.metadata.definition = "";
+  await tracetest?.capture(title, page);
 });
 ```
 
@@ -158,44 +158,12 @@ The rest of the test script is the Playwright test definitions for the test case
 
 ```typescript
 import { test, expect } from "@playwright/test";
-import Tracetest from "@tracetest/playwright";
+import Tracetest, { Types } from "@tracetest/playwright";
 const { TRACETEST_API_TOKEN = "" } = process.env;
-const tracetest = Tracetest();
+
+let tracetest: Types.TracetestPlaywright | undefined = undefined;
 
 test.describe.configure({ mode: "serial" });
-
-test.beforeAll(async () => {
-  await tracetest.configure(TRACETEST_API_TOKEN);
-});
-
-test.beforeEach(async ({ page }, { title }) => {
-  await page.goto("/");
-  await tracetest.capture(title, page);
-});
-
-test.afterEach(async ({}, { title, config }) => {
-  await tracetest.runTest(title, config.metadata.definition ?? "");
-  config.metadata.definition = "";
-});
-
-// optional step to break the playwright script in case a Tracetest test fails
-test.afterAll(async ({}, testInfo) => {
-  testInfo.setTimeout(60000);
-  await tracetest.summary();
-});
-
-test("Playwright: creates a pokemon", async ({ page }) => {
-  expect(await page.getByText("Pokeshop")).toBeTruthy();
-
-  await page.click("text=Add");
-
-  await page.getByLabel("Name").fill("Charizard");
-  await page.getByLabel("Type").fill("Flying");
-  await page
-    .getByLabel("Image URL")
-    .fill("https://upload.wikimedia.org/wikipedia/en/1/1f/Pok%C3%A9mon_Charizard_art.png");
-  await page.getByRole("button", { name: "OK", exact: true }).click();
-});
 
 const definition = `
   type: Test
@@ -219,9 +187,40 @@ const definition = `
       value: attr:name
     `;
 
-test("Playwright: imports a pokemon", async ({ page }, { config: { metadata } }) => {
-  // set the definition for the tracetest test
-  metadata.definition = definition;
+test.beforeAll(async () => {
+  tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN });
+  tracetest.setOptions({
+    "Playwright: imports a pokemon": {
+      definition,
+    },
+  });
+});
+
+test.beforeEach(async ({ page }, { title }) => {
+  await page.goto("/");
+  await tracetest?.capture(title, page);
+});
+
+// optional step to break the playwright script in case a Tracetest test fails
+test.afterAll(async ({}, testInfo) => {
+  testInfo.setTimeout(60000);
+  await tracetest?.summary();
+});
+
+test("Playwright: creates a pokemon", async ({ page }) => {
+  expect(await page.getByText("Pokeshop")).toBeTruthy();
+
+  await page.click("text=Add");
+
+  await page.getByLabel("Name").fill("Charizard");
+  await page.getByLabel("Type").fill("Flying");
+  await page
+    .getByLabel("Image URL")
+    .fill("https://upload.wikimedia.org/wikipedia/en/1/1f/Pok%C3%A9mon_Charizard_art.png");
+  await page.getByRole("button", { name: "OK", exact: true }).click();
+});
+
+test("Playwright: imports a pokemon", async ({ page }) => {
   expect(await page.getByText("Pokeshop")).toBeTruthy();
 
   await page.click("text=Import");
@@ -259,14 +258,14 @@ Next, you can run the tests by using both the Playwright CLI and the Playwright 
 To run the tests using the Playwright CLI, run the following command from the root directory:
 
 ```bash
-npm run pr:run
+npm run pw:run
 ```
 
 You should see the following output:
 
 ```bash
 
-> pokeshop@1.0.0 pr:run
+> pokeshop@1.0.0 pw:run
 > playwright test
 
 
@@ -303,7 +302,7 @@ npx playwright show-report
 To run the tests using the Playwright UI, run the following command from the root directory:
 
 ```bash
-npm run pr:open
+npm run pw:open
 ```
 
 Then, click the play button at the top.
