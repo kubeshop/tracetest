@@ -88,5 +88,15 @@ func parsePort(url string) string {
 		return ""
 	}
 
-	return regexGroups[1]
+	port := regexGroups[1]
+
+	if port == "1" {
+		if strings.Contains(url, "http") {
+			return "80"
+		} else {
+			return "443"
+		}
+	}
+
+	return port
 }
