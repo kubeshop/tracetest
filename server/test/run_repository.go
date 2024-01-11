@@ -169,7 +169,9 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		return Run{}, fmt.Errorf("sql beginTx: %w", err)
 	}
 
-	_, err = tx.ExecContext(ctx, replaceRunSequenceName(createSequeceQuery, test.ID))
+	tenantID := sqlutil.TenantIDString(ctx)
+
+	_, err = tx.ExecContext(ctx, replaceRunSequenceName(createSequeceQuery, test.ID, tenantID))
 	if err != nil {
 		tx.Rollback()
 		return Run{}, fmt.Errorf("sql exec: %w", err)
@@ -196,7 +198,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 	)
 
 	var runID int
-	err = tx.QueryRowContext(ctx, replaceRunSequenceName(createRunQuery, test.ID), params...).Scan(&runID)
+	err = tx.QueryRowContext(ctx, replaceRunSequenceName(createRunQuery, test.ID, tenantID), params...).Scan(&runID)
 	if err != nil {
 		tx.Rollback()
 		return Run{}, fmt.Errorf("sql exec: %w", err)

@@ -93,12 +93,12 @@ func md5Hash(text string) string {
 	return hex.EncodeToString(hash[:])
 }
 
-func replaceTestSuiteRunSequenceName(sql string, ID id.ID) string {
+func replaceTestSuiteRunSequenceName(sql string, ID id.ID, tenantID string) string {
 	// postgres doesn't like uppercase chars in sequence names.
 	// transactionID might contain uppercase chars, and we cannot lowercase them
 	// because they might lose their uniqueness.
 	// md5 creates a unique, lowercase hash.
-	seqName := "runs_test_suite_" + md5Hash(ID.String()) + "_seq"
+	seqName := "runs_test_suite_" + md5Hash(ID.String()+tenantID) + "_seq"
 	return strings.ReplaceAll(sql, runSequenceName, seqName)
 }
 
@@ -118,12 +118,6 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSu
 		return TestSuiteRun{}, fmt.Errorf("sql beginTx: %w", err)
 	}
 
-	_, err = tx.ExecContext(ctx, replaceTestSuiteRunSequenceName(createSequenceQuery, tr.TestSuiteID))
-	if err != nil {
-		tx.Rollback()
-		return TestSuiteRun{}, fmt.Errorf("sql exec: %w", err)
-	}
-
 	params := sqlutil.TenantInsert(ctx,
 		tr.TestSuiteID,
 		tr.TestSuiteVersion,
@@ -134,10 +128,18 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSu
 		jsonVariableSet,
 	)
 
+	tenantID := sqlutil.TenantIDString(ctx)
+
+	_, err = tx.ExecContext(ctx, replaceTestSuiteRunSequenceName(createSequenceQuery, tr.TestSuiteID, tenantID))
+	if err != nil {
+		tx.Rollback()
+		return TestSuiteRun{}, fmt.Errorf("sql exec: %w", err)
+	}
+
 	var runID int
 	err = tx.QueryRowContext(
 		ctx,
-		replaceTestSuiteRunSequenceName(createTestSuiteRunQuery, tr.TestSuiteID),
+		replaceTestSuiteRunSequenceName(createTestSuiteRunQuery, tr.TestSuiteID, tenantID),
 		params...,
 	).Scan(&runID)
 	if err != nil {
