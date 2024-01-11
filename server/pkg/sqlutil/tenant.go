@@ -44,6 +44,15 @@ func TenantInsert(ctx context.Context, params ...any) []any {
 	return append(params, *tenantID)
 }
 
+func TenantIDString(ctx context.Context) string {
+	tenantID := TenantID(ctx)
+	if tenantID == nil {
+		return ""
+	}
+
+	return *tenantID
+}
+
 func TenantID(ctx context.Context) *string {
 	tenantID := ctx.Value(middleware.TenantIDKey)
 
