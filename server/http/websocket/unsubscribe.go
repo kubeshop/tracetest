@@ -14,10 +14,10 @@ type unsubscribeMessage struct {
 }
 
 type unsubscribeCommandExecutor struct {
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 }
 
-func NewUnsubscribeCommandExecutor(manager *subscription.Manager) MessageExecutor {
+func NewUnsubscribeCommandExecutor(manager subscription.Manager) MessageExecutor {
 	return unsubscribeCommandExecutor{
 		subscriptionManager: manager,
 	}

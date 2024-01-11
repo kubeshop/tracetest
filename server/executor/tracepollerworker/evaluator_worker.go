@@ -36,7 +36,7 @@ func NewEvaluatorWorker(
 	newTraceDBFn tracedb.FactoryFunc,
 	dsRepo resourcemanager.Current[datastore.DataStore],
 	updater executor.RunUpdater,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 	stopStrategy PollingStopStrategy,
 	tracer trace.Tracer,
 ) *tracePollerEvaluatorWorker {

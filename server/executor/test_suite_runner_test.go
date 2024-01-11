@@ -26,7 +26,7 @@ import (
 
 type fakeTestRunner struct {
 	db                  test.RunRepository
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 	returnErr           bool
 	uid                 int
 }

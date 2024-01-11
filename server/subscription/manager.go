@@ -2,36 +2,44 @@ package subscription
 
 import "sync"
 
-type Manager struct {
-	subscriptions map[string][]Subscriber
-	mutex         sync.Mutex
+type Manager interface {
+	Subscribe(resourceID string, subscriber Subscriber)
+	Unsubscribe(resourceID string, subscriptionID string)
+
+	PublishUpdate(message Message)
+	Publish(resourceID string, message any)
 }
 
-func NewManager() *Manager {
-	return &Manager{
+func NewManager() Manager {
+	return &manager{
 		subscriptions: make(map[string][]Subscriber),
 		mutex:         sync.Mutex{},
 	}
 }
 
-func (m *Manager) getSubscribers(resourceID string) []Subscriber {
+type manager struct {
+	subscriptions map[string][]Subscriber
+	mutex         sync.Mutex
+}
+
+func (m *manager) getSubscribers(resourceID string) []Subscriber {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	return m.subscriptions[resourceID]
 }
 
-func (m *Manager) setSubscribers(resourceID string, subscribers []Subscriber) {
+func (m *manager) setSubscribers(resourceID string, subscribers []Subscriber) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	m.subscriptions[resourceID] = subscribers
 }
 
-func (m *Manager) Subscribe(resourceID string, subscriber Subscriber) {
+func (m *manager) Subscribe(resourceID string, subscriber Subscriber) {
 	subscribers := append(m.getSubscribers(resourceID), subscriber)
 	m.setSubscribers(resourceID, subscribers)
 }
 
-func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
+func (m *manager) Unsubscribe(resourceID string, subscriptionID string) {
 	subscribers := m.getSubscribers(resourceID)
 
 	updated := make([]Subscriber, 0, len(subscribers)-1)
@@ -44,7 +52,7 @@ func (m *Manager) Unsubscribe(resourceID string, subscriptionID string) {
 	m.setSubscribers(resourceID, updated)
 }
 
-func (m *Manager) PublishUpdate(message Message) {
+func (m *manager) PublishUpdate(message Message) {
 	subscribers := m.getSubscribers(message.ResourceID)
 
 	for _, subscriber := range subscribers {
@@ -52,7 +60,7 @@ func (m *Manager) PublishUpdate(message Message) {
 	}
 }
 
-func (m *Manager) Publish(resourceID string, message any) {
+func (m *manager) Publish(resourceID string, message any) {
 	m.PublishUpdate(Message{
 		ResourceID: resourceID,
 		Content:    message,

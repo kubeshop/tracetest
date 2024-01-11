@@ -65,7 +65,7 @@ type TraceFetcher interface {
 func NewTracePoller(
 	pe pollerExecutor,
 	updater RunUpdater,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 	eventEmitter EventEmitter,
 ) *tracePoller {
 	return &tracePoller{
@@ -79,7 +79,7 @@ func NewTracePoller(
 type tracePoller struct {
 	updater             RunUpdater
 	pollerExecutor      pollerExecutor
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 	eventEmitter        EventEmitter
 	inputQueue          pipeline.Enqueuer[Job]
 	outputQueue         pipeline.Enqueuer[Job]

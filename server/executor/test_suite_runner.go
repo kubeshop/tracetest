@@ -26,7 +26,7 @@ type testRunner interface {
 func NewTestSuiteRunner(
 	testRunner testRunner,
 	transactionRuns testSuiteRunRepository,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 ) *persistentTransactionRunner {
 	updater := (CompositeTransactionUpdater{}).
 		Add(NewDBTranasctionUpdater(transactionRuns)).
@@ -44,7 +44,7 @@ type persistentTransactionRunner struct {
 	testRunner          testRunner
 	transactionRuns     testSuiteRunRepository
 	updater             TestSuiteRunUpdater
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 }
 
 func (r *persistentTransactionRunner) SetOutputQueue(_ pipeline.Enqueuer[Job]) {

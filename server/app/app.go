@@ -120,7 +120,7 @@ func provision(provisioner *provisioning.Provisioner, file string) {
 	fmt.Println("[Provisioning]: success")
 }
 
-func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
+func (app *App) subscribeToConfigChanges(sm subscription.Manager) {
 	sm.Subscribe(config.ResourceID, subscription.NewSubscriberFunction(
 		func(m subscription.Message) error {
 			configFromDB, ok := m.Content.(config.Config)
@@ -527,7 +527,7 @@ type httpServerConfig interface {
 	ExperimentalFeatures() []string
 }
 
-func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscriptionManager *subscription.Manager) {
+func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscriptionManager subscription.Manager) {
 	wsRouter := websocket.NewRouter()
 	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager, mappers))
 	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))

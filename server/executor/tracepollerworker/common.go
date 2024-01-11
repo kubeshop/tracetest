@@ -24,7 +24,7 @@ type workerState struct {
 	newTraceDBFn        tracedb.FactoryFunc
 	dsRepo              resourcemanager.Current[datastore.DataStore]
 	updater             executor.RunUpdater
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 	tracer              trace.Tracer
 	inputQueue          pipeline.Enqueuer[executor.Job]
 }

@@ -141,7 +141,7 @@ func (s *testRunEventSubscriber) Notify(message subscription.Message) error {
 	return nil
 }
 
-func getSubscriptionManagerMock(t *testing.T, event model.TestRunEvent) (*subscription.Manager, *testRunEventSubscriber) {
+func getSubscriptionManagerMock(t *testing.T, event model.TestRunEvent) (subscription.Manager, *testRunEventSubscriber) {
 	t.Helper()
 
 	subscriptionManager := subscription.NewManager()
