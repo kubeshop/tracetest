@@ -1,6 +1,10 @@
 package subscription
 
-import "sync"
+import (
+	"encoding/json"
+	"log"
+	"sync"
+)
 
 type inMemoryManager struct {
 	subscriptions map[string][]Subscriber
@@ -40,8 +44,23 @@ func (m *inMemoryManager) Unsubscribe(resourceID string, subscriptionID string) 
 func (m *inMemoryManager) PublishUpdate(message Message) {
 	subscribers := m.getSubscribers(message.ResourceID)
 
+	// in order to keep compatibility with the nats manager
+	// we need to transcode the messages so that the Content
+	// is a map[string]any and can be converted using mapstructure.
+	encoded, err := json.Marshal(message)
+	if err != nil {
+		log.Printf("cannot marshal message to publish: %s", err.Error())
+		return
+	}
+	transcoded := Message{}
+	err = json.Unmarshal(encoded, &transcoded)
+	if err != nil {
+		log.Printf("cannot unmarshal message to publish: %s", err.Error())
+		return
+	}
+
 	for _, subscriber := range subscribers {
-		subscriber.Notify(message)
+		subscriber.Notify(transcoded)
 	}
 }
 
