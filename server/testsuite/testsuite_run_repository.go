@@ -128,7 +128,7 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSu
 		jsonVariableSet,
 	)
 
-	tenantID := params[len(params)-1].(string)
+	tenantID := sqlutil.TenantIDString(ctx)
 
 	_, err = tx.ExecContext(ctx, replaceTestSuiteRunSequenceName(createSequenceQuery, tr.TestSuiteID, tenantID))
 	if err != nil {
