@@ -17,6 +17,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
+	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -366,9 +367,10 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 
 	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		cancelCtx(nil)
-		request, ok := m.Content.(UserRequest)
-		if !ok {
-			return nil
+		request := UserRequest{}
+		err := mapstructure.Decode(m.Content, &request)
+		if err != nil {
+			return fmt.Errorf("cannot decode UserRequest message: %w", err)
 		}
 
 		run, err := q.runs.GetRun(ctx, request.TestID, request.RunID)
@@ -384,9 +386,10 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 	})
 
 	spfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		request, ok := m.Content.(UserRequest)
-		if !ok {
-			return nil
+		request := UserRequest{}
+		err := mapstructure.Decode(m.Content, &request)
+		if err != nil {
+			return fmt.Errorf("cannot decode UserRequest message: %w", err)
 		}
 
 		run, err := q.runs.GetRun(ctx, request.TestID, request.RunID)
@@ -416,7 +419,8 @@ func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuit
 		return testsuite.TestSuite{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve TestSuite: %w", err)
+		return testsuite.TestSuite{}
 	}
 
 	return tran
@@ -431,7 +435,8 @@ func (q Queue) resolveTestSuiteRun(ctx context.Context, job Job) testsuite.TestS
 		return testsuite.TestSuiteRun{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve TestSuiteRun: %w", err)
+		return testsuite.TestSuiteRun{}
 	}
 
 	return tranRun
@@ -447,7 +452,8 @@ func (q Queue) resolveTest(ctx context.Context, job Job) test.Test {
 		return test.Test{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve Test: %w", err)
+		return test.Test{}
 	}
 
 	return t
@@ -463,7 +469,8 @@ func (q Queue) resolveTestRun(ctx context.Context, job Job) test.Run {
 		return test.Run{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve test run: %w", err)
+		return test.Run{}
 	}
 
 	return run
@@ -479,7 +486,8 @@ func (q Queue) resolvePollingProfile(ctx context.Context, job Job) pollingprofil
 		return pollingprofile.PollingProfile{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve PollingProfile: %w", err)
+		return pollingprofile.PollingProfile{}
 	}
 
 	return profile
@@ -495,7 +503,8 @@ func (q Queue) resolveDataStore(ctx context.Context, job Job) datastore.DataStor
 		return datastore.DataStore{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve DataStore: %w", err)
+		return datastore.DataStore{}
 	}
 
 	return ds

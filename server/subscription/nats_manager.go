@@ -16,9 +16,12 @@ func (m *natsManager) Subscribe(resourceID string, subscriber Subscriber) {
 		decoded := Message{}
 		err := json.Unmarshal(msg.Data, &decoded)
 		if err != nil {
-			panic(err)
+			panic(fmt.Errorf("cannot unmarshall incoming nats message: %w", err))
 		}
-		subscriber.Notify(decoded)
+		err = subscriber.Notify(decoded)
+		if err != nil {
+			panic(fmt.Errorf("cannot handle notification of nats message: %w", err))
+		}
 	})
 	if err != nil {
 		panic(fmt.Errorf("cannot subscribe to nats topic: %w", err))

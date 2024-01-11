@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/variableset"
+	"github.com/mitchellh/mapstructure"
 )
 
 type testSuiteRunRepository interface {
@@ -104,7 +105,11 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 	// listen for updates and propagate them as if they were transaction updates
 	r.subscriptionManager.Subscribe(testRun.ResourceID(), subscription.NewSubscriberFunction(
 		func(m subscription.Message) error {
-			testRun := m.Content.(test.Run)
+			testRun := test.Run{}
+			err := mapstructure.Decode(m.Content, &testRun)
+			if err != nil {
+				return fmt.Errorf("cannot decode Run message: %w", err)
+			}
 			if testRun.LastError != nil {
 				tr.State = testsuite.TestSuiteStateFailed
 				tr.LastError = testRun.LastError

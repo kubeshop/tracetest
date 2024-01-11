@@ -19,6 +19,7 @@ import (
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/kubeshop/tracetest/server/variableset"
+	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/metric/noop"
@@ -181,7 +182,11 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 	done := make(chan testsuite.TestSuiteRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		tr := m.Content.(testsuite.TestSuiteRun)
+		tr := testsuite.TestSuiteRun{}
+		err := mapstructure.Decode(m.Content, &tr)
+		if err != nil {
+			return fmt.Errorf("cannot decode TestSuiteRun message: %w", err)
+		}
 		if tr.State.IsFinal() {
 			done <- tr
 		}
