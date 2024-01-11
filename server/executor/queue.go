@@ -419,7 +419,7 @@ func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuit
 		return testsuite.TestSuite{}
 	}
 	if err != nil {
-		log.Printf("cannot resolve TestSuite: %w", err)
+		log.Printf("cannot resolve TestSuite: %s", err.Error())
 		return testsuite.TestSuite{}
 	}
 
@@ -435,7 +435,7 @@ func (q Queue) resolveTestSuiteRun(ctx context.Context, job Job) testsuite.TestS
 		return testsuite.TestSuiteRun{}
 	}
 	if err != nil {
-		log.Printf("cannot resolve TestSuiteRun: %w", err)
+		log.Printf("cannot resolve TestSuiteRun: %s", err.Error())
 		return testsuite.TestSuiteRun{}
 	}
 
@@ -452,7 +452,7 @@ func (q Queue) resolveTest(ctx context.Context, job Job) test.Test {
 		return test.Test{}
 	}
 	if err != nil {
-		log.Printf("cannot resolve Test: %w", err)
+		log.Printf("cannot resolve Test: %s", err.Error())
 		return test.Test{}
 	}
 
@@ -469,7 +469,7 @@ func (q Queue) resolveTestRun(ctx context.Context, job Job) test.Run {
 		return test.Run{}
 	}
 	if err != nil {
-		log.Printf("cannot resolve test run: %w", err)
+		log.Printf("cannot resolve test run: %s", err.Error())
 		return test.Run{}
 	}
 
@@ -486,7 +486,7 @@ func (q Queue) resolvePollingProfile(ctx context.Context, job Job) pollingprofil
 		return pollingprofile.PollingProfile{}
 	}
 	if err != nil {
-		log.Printf("cannot resolve PollingProfile: %w", err)
+		log.Printf("cannot resolve PollingProfile: %s", err.Error())
 		return pollingprofile.PollingProfile{}
 	}
 
@@ -503,7 +503,7 @@ func (q Queue) resolveDataStore(ctx context.Context, job Job) datastore.DataStor
 		return datastore.DataStore{}
 	}
 	if err != nil {
-		log.Printf("cannot resolve DataStore: %w", err)
+		log.Printf("cannot resolve DataStore: %s", err.Error())
 		return datastore.DataStore{}
 	}
 
