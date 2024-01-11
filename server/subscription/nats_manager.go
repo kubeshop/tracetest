@@ -2,7 +2,7 @@ package subscription
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 
 	"github.com/nats-io/nats.go"
 )
@@ -16,15 +16,18 @@ func (m *natsManager) Subscribe(resourceID string, subscriber Subscriber) {
 		decoded := Message{}
 		err := json.Unmarshal(msg.Data, &decoded)
 		if err != nil {
-			panic(fmt.Errorf("cannot unmarshall incoming nats message: %w", err))
+			log.Printf("cannot unmarshall incoming nats message: %s", err.Error())
+			return
 		}
 		err = subscriber.Notify(decoded)
 		if err != nil {
-			panic(fmt.Errorf("cannot handle notification of nats message: %w", err))
+			log.Printf("cannot handle notification of nats message: %s", err.Error())
+			return
 		}
 	})
 	if err != nil {
-		panic(fmt.Errorf("cannot subscribe to nats topic: %w", err))
+		log.Printf("cannot subscribe to nats topic: %s", err.Error())
+		return
 	}
 }
 
@@ -35,12 +38,14 @@ func (m *natsManager) Unsubscribe(resourceID string, subscriptionID string) {
 func (m *natsManager) PublishUpdate(message Message) {
 	bytes, err := json.Marshal(message)
 	if err != nil {
-		panic(err)
+		log.Printf("cannot marshal message to publish nats message: %s", err.Error())
+		return
 	}
 
 	err = m.conn.Publish(message.ResourceID, bytes)
 	if err != nil {
-		panic(err)
+		log.Printf("cannot publish nats message: %s", err.Error())
+		return
 	}
 }
 
