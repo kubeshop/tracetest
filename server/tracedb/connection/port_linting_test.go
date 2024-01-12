@@ -58,6 +58,18 @@ func TestPortLinter(t *testing.T) {
 			ExpectedPorts:  []string{"443"},
 			ExpectedStatus: model.StatusPassed,
 		},
+		{
+			Name:           "shouldGetSpecifiedInHTTP",
+			Endpoints:      []string{"http://tempo-us-central1.grafana.net:8081"},
+			ExpectedPorts:  []string{"8081"},
+			ExpectedStatus: model.StatusPassed,
+		},
+		{
+			Name:           "shouldGetPort443InHTTPS",
+			Endpoints:      []string{"https://tempo-us-central1.grafana.net:8082"},
+			ExpectedPorts:  []string{"8082"},
+			ExpectedStatus: model.StatusPassed,
+		},
 	}
 
 	for _, testCase := range testCases {
