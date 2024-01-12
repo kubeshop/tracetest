@@ -236,7 +236,7 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		encodedRun.JsonTestResults,
 		encodedRun.JsonTrace,
 		encodedRun.JsonOutputs,
-		encodedRun.LastError,
+		encodedRun.EncodedLastError,
 		pass,
 		fail,
 		encodedRun.JsonMetadata,
@@ -433,6 +433,8 @@ func (r *runRepository) readRunRows(ctx context.Context, rows *sql.Rows) ([]Run,
 func readRunRow(row scanner) (Run, error) {
 	encodedRun := EncodedRun{}
 
+	var lastErr *string
+
 	err := row.Scan(
 		&encodedRun.ID,
 		&encodedRun.TestID,
@@ -450,7 +452,7 @@ func readRunRow(row scanner) (Run, error) {
 		&encodedRun.JsonTestResults,
 		&encodedRun.JsonTrace,
 		&encodedRun.JsonOutputs,
-		&encodedRun.LastError,
+		&lastErr,
 		&encodedRun.JsonMetadata,
 		&encodedRun.JsonVariableSet,
 		&encodedRun.TestSuiteRunID,
@@ -462,6 +464,10 @@ func readRunRow(row scanner) (Run, error) {
 
 	if err != nil {
 		return Run{}, err
+	}
+
+	if lastErr != nil {
+		encodedRun.EncodedLastError = *lastErr
 	}
 
 	return encodedRun.ToRun()
@@ -519,7 +525,7 @@ type EncodedRun struct {
 	JsonGatesResult,
 	JsonMetadata []byte
 
-	LastError *string
+	EncodedLastError string
 	TraceID,
 	SpanID string
 
@@ -611,8 +617,8 @@ func (er EncodedRun) ToRun() (Run, error) {
 		}
 	}
 
-	if er.LastError != nil && *er.LastError != "" {
-		r.LastError = fmt.Errorf(*er.LastError)
+	if er.EncodedLastError != "" {
+		r.LastError = fmt.Errorf(er.EncodedLastError)
 	}
 
 	if er.TestSuiteID.Valid && er.TestSuiteRunID.Valid {
@@ -694,8 +700,7 @@ func EncodeRun(run Run) (EncodedRun, error) {
 	}
 
 	if run.LastError != nil {
-		e := run.LastError.Error()
-		er.LastError = &e
+		er.EncodedLastError = run.LastError.Error()
 	}
 
 	return er, nil

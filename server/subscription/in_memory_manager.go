@@ -1,7 +1,6 @@
 package subscription
 
 import (
-	"fmt"
 	"log"
 	"sync"
 )
@@ -51,10 +50,12 @@ func (m *inMemoryManager) PublishUpdate(message Message) {
 		log.Printf("cannot transcode message to publish: %s", err.Error())
 		return
 	}
-	fmt.Println("ACA", string(transcoded.Content.([]byte)))
 
 	for _, subscriber := range subscribers {
-		subscriber.Notify(transcoded)
+		err := subscriber.Notify(transcoded)
+		if err != nil {
+			log.Println("error notifying subscriber: ", err.Error())
+		}
 	}
 }
 

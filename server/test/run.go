@@ -20,8 +20,8 @@ var (
 	IDGen = id.NewRandGenerator()
 )
 
-func (r *Run) MarshalJSON() ([]byte, error) {
-	encoded, err := EncodeRun(*r)
+func (r Run) MarshalJSON() ([]byte, error) {
+	encoded, err := EncodeRun(r)
 	if err != nil {
 		return nil, err
 	}

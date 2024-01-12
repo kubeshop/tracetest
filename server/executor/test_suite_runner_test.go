@@ -93,13 +93,13 @@ func TestTestSuiteRunner(t *testing.T) {
 		})
 	})
 
-	// t.Run("WithErrors", func(t *testing.T) {
-	// 	runTestSuiteRunnerTest(t, true, func(t *testing.T, actual testsuite.TestSuiteRun) {
-	// 		assert.Equal(t, testsuite.TestSuiteStateFailed, actual.State)
-	// 		require.Len(t, actual.Steps, 1)
-	// 		assert.Equal(t, test.RunStateTriggerFailed, actual.Steps[0].State)
-	// 	})
-	// })
+	t.Run("WithErrors", func(t *testing.T) {
+		runTestSuiteRunnerTest(t, true, func(t *testing.T, actual testsuite.TestSuiteRun) {
+			assert.Equal(t, testsuite.TestSuiteStateFailed, actual.State)
+			require.Len(t, actual.Steps, 1)
+			assert.Equal(t, test.RunStateTriggerFailed, actual.Steps[0].State)
+		})
+	})
 
 }
 
@@ -181,13 +181,11 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 	done := make(chan testsuite.TestSuiteRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		// spew.Dump(m.Content)
 		tr := testsuite.TestSuiteRun{}
 		err := m.DecodeContent(&tr)
 		if err != nil {
 			panic(fmt.Errorf("cannot decode TestSuiteRun message: %w", err))
 		}
-		fmt.Println(tr.State, tr.State.IsFinal())
 		if tr.State.IsFinal() {
 			done <- tr
 		}
