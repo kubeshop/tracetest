@@ -14,7 +14,7 @@ import VariableSetProvider from 'providers/VariableSet';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import MissingVariablesModalProvider from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import NotificationProvider from 'providers/Notification/Notification.provider';
-import WizardProvider from 'providers/Wizard';
+import WizardWrapper from 'components/Wizard/Wrapper';
 import {ConfigMode} from 'types/DataStore.types';
 import * as S from './Layout.styled';
 import MenuBottom from './MenuBottom';
@@ -69,7 +69,7 @@ const Layout = ({hasMenu = false}: IProps) => {
 
   return (
     <NotificationProvider>
-      <WizardProvider>
+      <WizardWrapper>
         <MissingVariablesModalProvider>
           <FileViewerModalProvider>
             <ConfirmationModalProvider>
@@ -125,7 +125,7 @@ const Layout = ({hasMenu = false}: IProps) => {
             </ConfirmationModalProvider>
           </FileViewerModalProvider>
         </MissingVariablesModalProvider>
-      </WizardProvider>
+      </WizardWrapper>
     </NotificationProvider>
   );
 };

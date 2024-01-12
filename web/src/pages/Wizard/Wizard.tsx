@@ -1,12 +1,12 @@
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import Header from 'components/Wizard/Header';
-import StepFactory from 'components/Wizard/StepFactory';
-import Steps from 'components/Wizard/Steps';
+import Steps from 'components/Wizard/Content';
 import {useWizard} from 'providers/Wizard';
 import * as S from './Wizard.styled';
 
 const Wizard = () => {
-  const {activeStep, activeStepId, steps} = useWizard();
+  const {activeStepId, steps, onGoTo} = useWizard();
+  const completedSteps = steps.filter(({status}) => status === 'complete').length;
 
   return (
     <S.Container>
@@ -18,8 +18,8 @@ const Wizard = () => {
       </S.Header>
 
       <S.Body>
-        <Header activeStep={activeStep} totalSteps={steps.length} />
-        <Steps activeStepId={activeStepId} componentFactory={StepFactory} steps={steps} />
+        <Header activeStep={completedSteps} totalCompleteSteps={steps.length} />
+        <Steps activeStepId={activeStepId} steps={steps} onChange={onGoTo} />
       </S.Body>
     </S.Container>
   );
