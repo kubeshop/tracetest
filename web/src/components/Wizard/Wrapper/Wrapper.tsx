@@ -1,6 +1,8 @@
 import {useMemo} from 'react';
 import {IWizardStep} from 'types/Wizard.types';
 import WizardProvider from 'providers/Wizard/Wizard.provider';
+import DataStoreProvider from 'providers/DataStore/DataStore.provider';
+import SettingsProvider from 'providers/Settings/Settings.provider';
 import TracingBackend from '../Steps/TracingBackend/TracingBackend';
 import RunTest from '../Steps/RunTest';
 
@@ -29,7 +31,13 @@ const Wrapper = ({children}: IProps) => {
     []
   );
 
-  return <WizardProvider steps={steps}>{children}</WizardProvider>;
+  return (
+    <DataStoreProvider>
+      <SettingsProvider>
+        <WizardProvider steps={steps}>{children}</WizardProvider>
+      </SettingsProvider>
+    </DataStoreProvider>
+  );
 };
 
 export default Wrapper;

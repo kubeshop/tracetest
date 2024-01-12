@@ -17,7 +17,7 @@ const SumoLogicService = (): TDataStoreService => ({
 
     return Promise.resolve(true);
   },
-  getInitialValues({defaultDataStore: {sumologic = {}} = {}}) {
+  getInitialValues({sumologic = {}}) {
     const {url = '', accessID = '', accessKey = ''} = sumologic;
 
     return {

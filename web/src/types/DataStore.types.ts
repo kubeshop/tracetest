@@ -2,7 +2,6 @@ import {FormInstance} from 'antd';
 import {Model, TDataStoreSchemas, TConfigSchemas} from 'types/Common.types';
 import ConnectionTestStep from 'models/ConnectionResultStep.model';
 import DataStore, {TRawOtlpDataStore} from 'models/DataStore.model';
-import DataStoreConfig from 'models/DataStoreConfig.model';
 import {THeader} from './Test.types';
 
 export enum ConfigMode {
@@ -114,7 +113,7 @@ export type TDataStoreService = {
   getRequest(values: TDraftDataStore, dataStoreType?: SupportedDataStores): Promise<DataStore>;
   validateDraft(draft: TDraftDataStore): Promise<boolean>;
   getInitialValues(
-    draft: DataStoreConfig,
+    draft: DataStore,
     dataStoreType?: SupportedDataStores,
     configuredDataStore?: SupportedDataStores
   ): TDraftDataStore;

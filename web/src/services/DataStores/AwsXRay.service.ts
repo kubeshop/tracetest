@@ -25,7 +25,7 @@ const AwsXRayService = (): TDataStoreService => ({
 
     return Promise.resolve(true);
   },
-  getInitialValues({defaultDataStore: {awsxray = {}} = {}}) {
+  getInitialValues({awsxray = {}}) {
     const {region = '', secretAccessKey = '', accessKeyId = '', sessionToken = '', useDefaultAuth = false} = awsxray;
 
     return {

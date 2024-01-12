@@ -13,6 +13,10 @@ export const Container = styled.div`
   .ant-tabs-tab .anticon {
     margin-right: 0;
   }
+
+  .ant-tabs-left > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
+    padding: 16px;
+  }
 `;
 
 export const StepTabContainer = styled.div<{$isActive: boolean}>`

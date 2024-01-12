@@ -38,7 +38,7 @@ const AzureAppInsightsService = (): TDataStoreService => ({
 
     return Promise.resolve(true);
   },
-  getInitialValues({defaultDataStore: {azureappinsights = {}} = {}}) {
+  getInitialValues({azureappinsights = {}}) {
     const {
       resourceArmId = '',
       connectionType = ConnectionTypes.Direct,

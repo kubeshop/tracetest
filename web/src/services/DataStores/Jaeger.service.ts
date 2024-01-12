@@ -6,7 +6,6 @@ import {
   TDataStoreService,
   TRawGRPCClientSettings,
 } from 'types/DataStore.types';
-import DataStore from 'models/DataStore.model';
 import GrpcClientService from './GrpcClient.service';
 
 const JaegerService = (): TDataStoreService => ({
@@ -24,7 +23,7 @@ const JaegerService = (): TDataStoreService => ({
     const {grpc = {}} = dataStore[SupportedDataStores.JAEGER] as IBaseClientSettings;
     return GrpcClientService.validateDraft(grpc as IGRPCClientSettings);
   },
-  getInitialValues({defaultDataStore = {name: '', type: SupportedDataStores.JAEGER} as DataStore}) {
+  getInitialValues(defaultDataStore = {name: '', type: SupportedDataStores.JAEGER}) {
     const values = defaultDataStore[SupportedDataStores.JAEGER] as TRawGRPCClientSettings;
 
     return {

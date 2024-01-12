@@ -16,9 +16,11 @@ interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
   isTestConnectionLoading: boolean;
+  testConnectionResponse?: TConnectionResult;
   onSaveConfig(draft: TDraftDataStore, defaultDataStore: DataStore): void;
   onTestConnection(draft: TDraftDataStore, defaultDataStore: DataStore): void;
   onIsFormValid(isValid: boolean): void;
+  resetTestConnection(): void;
 }
 
 export const Context = createContext<IContext>({
@@ -28,6 +30,7 @@ export const Context = createContext<IContext>({
   onSaveConfig: noop,
   onIsFormValid: noop,
   onTestConnection: noop,
+  resetTestConnection: noop,
 });
 
 interface IProps {
@@ -40,7 +43,10 @@ const DataStoreProvider = ({children}: IProps) => {
   const {useTestConnectionMutation, useUpdateDataStoreMutation} = TracetestAPI.instance;
   const {isFetching} = useSettingsValues();
   const [updateDataStore, {isLoading: isLoadingUpdate}] = useUpdateDataStoreMutation();
-  const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
+  const [
+    testConnection,
+    {isLoading: isTestConnectionLoading, data: testConnectionResponse, reset: resetTestConnection},
+  ] = useTestConnectionMutation();
   const [isFormValid, setIsFormValid] = useState(false);
   const {showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
   const {onOpen} = useConfirmationModal();
@@ -110,8 +116,19 @@ const DataStoreProvider = ({children}: IProps) => {
       onSaveConfig,
       onIsFormValid,
       onTestConnection,
+      testConnectionResponse,
+      resetTestConnection,
     }),
-    [isLoadingUpdate, isFormValid, isTestConnectionLoading, onSaveConfig, onIsFormValid, onTestConnection]
+    [
+      isLoadingUpdate,
+      isFormValid,
+      isTestConnectionLoading,
+      onSaveConfig,
+      onIsFormValid,
+      onTestConnection,
+      testConnectionResponse,
+      resetTestConnection,
+    ]
   );
 
   return <Context.Provider value={value}>{isFetching ? null : children}</Context.Provider>;
