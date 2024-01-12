@@ -7,7 +7,7 @@ export interface IWizardStep {
   id: string;
   name: string;
   description: string;
-  component: string;
+  component: React.FC;
   status?: TWizardStepStatus;
 }
 

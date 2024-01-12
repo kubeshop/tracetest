@@ -7,15 +7,15 @@ function calculatePercent(activeStep: number, totalSteps: number) {
 
 interface IProps {
   activeStep: number;
-  totalSteps: number;
+  totalCompleteSteps: number;
 }
 
-const Header = ({activeStep, totalSteps}: IProps) => (
+const Header = ({activeStep, totalCompleteSteps}: IProps) => (
   <S.Container>
     <S.Title>🚀 Setup guide</S.Title>
-    <Progress percent={calculatePercent(activeStep, totalSteps)} showInfo={false} />
+    <Progress percent={calculatePercent(activeStep, totalCompleteSteps)} showInfo={false} />
     <S.Text>
-      {activeStep} of {totalSteps} steps completed
+      {activeStep} of {totalCompleteSteps} steps completed
     </S.Text>
   </S.Container>
 );
