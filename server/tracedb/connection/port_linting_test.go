@@ -46,6 +46,18 @@ func TestPortLinter(t *testing.T) {
 			ExpectedPorts:  []string{"9200", "9250", "9300"},
 			ExpectedStatus: model.StatusWarning,
 		},
+		{
+			Name:           "shouldSupportHTTPNoPort",
+			Endpoints:      []string{"http://us2.endpoint"},
+			ExpectedPorts:  []string{"443"},
+			ExpectedStatus: model.StatusWarning,
+		},
+		{
+			Name:           "shouldSupportHTTPSNoPort",
+			Endpoints:      []string{"https://us2.endpoint"},
+			ExpectedPorts:  []string{"443"},
+			ExpectedStatus: model.StatusPassed,
+		},
 	}
 
 	for _, testCase := range testCases {

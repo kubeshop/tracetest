@@ -74,15 +74,32 @@ func formatAvailablePortsMessage(ports []string) string {
 	return fmt.Sprintf("%s, or %s", portsSeparatedByComma, lastPort)
 }
 
-var extractPortRegex = regexp.MustCompile("([0-9]+).*")
+var extractPortRegex = regexp.MustCompile(":([0-9]+).*")
 
 func parsePort(url string) string {
+	port := extractPort(url)
+	if port != "" {
+		return port
+	}
+
+	if strings.HasPrefix(url, "https://") {
+		return "443"
+	}
+
+	if strings.HasPrefix(url, "http://") {
+		return "80"
+	}
+
+	return ""
+}
+
+func extractPort(url string) string {
 	index := strings.LastIndex(url, ":")
 	if index < 0 {
 		return ""
 	}
 
-	substring := url[index+1:]
+	substring := url[index:]
 	regexGroups := extractPortRegex.FindStringSubmatch(substring)
 	if len(regexGroups) < 2 {
 		return ""
