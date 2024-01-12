@@ -17,7 +17,6 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
-	"github.com/mitchellh/mapstructure"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -368,7 +367,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		cancelCtx(nil)
 		request := UserRequest{}
-		err := mapstructure.Decode(m.Content, &request)
+		err := m.DecodeContent(&request)
 		if err != nil {
 			return fmt.Errorf("cannot decode UserRequest message: %w", err)
 		}
@@ -387,7 +386,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 
 	spfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		request := UserRequest{}
-		err := mapstructure.Decode(m.Content, &request)
+		err := m.DecodeContent(&request)
 		if err != nil {
 			return fmt.Errorf("cannot decode UserRequest message: %w", err)
 		}

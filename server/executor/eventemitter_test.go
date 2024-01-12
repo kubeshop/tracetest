@@ -13,7 +13,6 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testdb"
-	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -139,9 +138,9 @@ func (s *testRunEventSubscriber) ID() string {
 
 func (s *testRunEventSubscriber) Notify(m subscription.Message) error {
 	event := model.TestRunEvent{}
-	err := mapstructure.Decode(m.Content, &event)
+	err := m.DecodeContent(&event)
 	if err != nil {
-		return fmt.Errorf("cannot read testRunEvent: %w", err)
+		panic(fmt.Errorf("cannot read testRunEvent: %w", err))
 	}
 	s.events = append(s.events, event)
 	return nil

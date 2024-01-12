@@ -1,7 +1,6 @@
 package subscription
 
 import (
-	"encoding/json"
 	"log"
 
 	"github.com/nats-io/nats.go"
@@ -13,8 +12,7 @@ type natsManager struct {
 
 func (m *natsManager) Subscribe(resourceID string, subscriber Subscriber) {
 	_, err := m.conn.Subscribe(resourceID, func(msg *nats.Msg) {
-		decoded := Message{}
-		err := json.Unmarshal(msg.Data, &decoded)
+		decoded, err := DecodeMessage(msg.Data)
 		if err != nil {
 			log.Printf("cannot unmarshall incoming nats message: %s", err.Error())
 			return
@@ -36,7 +34,7 @@ func (m *natsManager) Unsubscribe(resourceID string, subscriptionID string) {
 }
 
 func (m *natsManager) PublishUpdate(message Message) {
-	bytes, err := json.Marshal(message)
+	bytes, err := message.Encode()
 	if err != nil {
 		log.Printf("cannot marshal message to publish nats message: %s", err.Error())
 		return

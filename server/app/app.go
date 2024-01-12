@@ -42,7 +42,6 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/kubeshop/tracetest/server/version"
-	"github.com/mitchellh/mapstructure"
 	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
@@ -125,7 +124,7 @@ func (app *App) subscribeToConfigChanges(sm subscription.Manager) {
 	sm.Subscribe(config.ResourceID, subscription.NewSubscriberFunction(
 		func(m subscription.Message) error {
 			configFromDB := config.Config{}
-			err := mapstructure.Decode(m.Content, &configFromDB)
+			err := m.DecodeContent(&configFromDB)
 			if err != nil {
 				return fmt.Errorf("cannot read update to configFromDB: %w", err)
 			}

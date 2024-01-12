@@ -129,39 +129,9 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		run.CreatedAt = time.Now()
 	}
 
-	jsonResolvedTrigger, err := json.Marshal(run.ResolvedTrigger)
+	encodedRun, err := EncodeRun(run)
 	if err != nil {
-		return Run{}, fmt.Errorf("resolved trigger encoding error: %w", err)
-	}
-
-	jsonTriggerResults, err := json.Marshal(run.TriggerResult)
-	if err != nil {
-		return Run{}, fmt.Errorf("trigger results encoding error: %w", err)
-	}
-
-	jsonTrace, err := json.Marshal(run.Trace)
-	if err != nil {
-		return Run{}, fmt.Errorf("trace encoding error: %w", err)
-	}
-
-	jsonMetadata, err := json.Marshal(run.Metadata)
-	if err != nil {
-		return Run{}, fmt.Errorf("metadata encoding error: %w", err)
-	}
-
-	jsonVariableSet, err := json.Marshal(run.VariableSet)
-	if err != nil {
-		return Run{}, fmt.Errorf("VariableSet encoding error: %w", err)
-	}
-
-	jsonlinter, err := json.Marshal(run.Linter)
-	if err != nil {
-		return Run{}, fmt.Errorf("linter encoding error: %w", err)
-	}
-
-	jsonGatesResult, err := json.Marshal(run.RequiredGatesResult)
-	if err != nil {
-		return Run{}, fmt.Errorf("required gates result encoding error: %w", err)
+		return Run{}, fmt.Errorf("cannot encode run: %w", err)
 	}
 
 	tx, err := r.db.BeginTx(ctx, nil)
@@ -185,13 +155,13 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 		run.State,
 		run.TraceID.String(),
 		run.SpanID.String(),
-		jsonResolvedTrigger,
-		jsonTriggerResults,
-		jsonTrace,
-		jsonMetadata,
-		jsonVariableSet,
-		jsonlinter,
-		jsonGatesResult,
+		encodedRun.JsonResolvedTrigger,
+		encodedRun.JsonTriggerResults,
+		encodedRun.JsonTrace,
+		encodedRun.JsonMetadata,
+		encodedRun.JsonVariableSet,
+		encodedRun.JsonLinter,
+		encodedRun.JsonGatesResult,
 		run.SkipTraceCollection,
 	)
 
@@ -244,55 +214,9 @@ WHERE id = $17 AND test_id = $18
 `
 
 func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
-	jsonResolvedTrigger, err := json.Marshal(run.ResolvedTrigger)
+	encodedRun, err := EncodeRun(run)
 	if err != nil {
-		return fmt.Errorf("resolved trigger encoding error: %w", err)
-	}
-
-	jsonTriggerResults, err := json.Marshal(run.TriggerResult)
-	if err != nil {
-		return fmt.Errorf("trigger results encoding error: %w", err)
-	}
-
-	jsonTestResults, err := json.Marshal(run.Results)
-	if err != nil {
-		return fmt.Errorf("test results encoding error: %w", err)
-	}
-
-	jsonTrace, err := json.Marshal(run.Trace)
-	if err != nil {
-		return fmt.Errorf("trace encoding error: %w", err)
-	}
-
-	jsonOutputs, err := json.Marshal(run.Outputs)
-	if err != nil {
-		return fmt.Errorf("outputs encoding error: %w", err)
-	}
-
-	jsonMetadata, err := json.Marshal(run.Metadata)
-	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
-	}
-
-	jsonVariableSet, err := json.Marshal(run.VariableSet)
-	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
-	}
-
-	jsonLinter, err := json.Marshal(run.Linter)
-	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
-	}
-
-	jsonGatesResult, err := json.Marshal(run.RequiredGatesResult)
-	if err != nil {
-		return fmt.Errorf("encoding error: %w", err)
-	}
-
-	var lastError *string
-	if run.LastError != nil {
-		e := run.LastError.Error()
-		lastError = &e
+		return fmt.Errorf("cannot encode run: %w", err)
 	}
 
 	pass, fail := run.ResultsCount()
@@ -305,22 +229,22 @@ func (r *runRepository) UpdateRun(ctx context.Context, run Run) error {
 		run.ObtainedTraceAt,
 		run.CompletedAt,
 		run.State,
-		run.TraceID.String(),
-		run.SpanID.String(),
-		jsonResolvedTrigger,
-		jsonTriggerResults,
-		jsonTestResults,
-		jsonTrace,
-		jsonOutputs,
-		lastError,
+		encodedRun.TraceID,
+		encodedRun.SpanID,
+		encodedRun.JsonResolvedTrigger,
+		encodedRun.JsonTriggerResults,
+		encodedRun.JsonTestResults,
+		encodedRun.JsonTrace,
+		encodedRun.JsonOutputs,
+		encodedRun.LastError,
 		pass,
 		fail,
-		jsonMetadata,
+		encodedRun.JsonMetadata,
 		run.ID,
 		run.TestID,
-		jsonVariableSet,
-		jsonLinter,
-		jsonGatesResult,
+		encodedRun.JsonVariableSet,
+		encodedRun.JsonLinter,
+		encodedRun.JsonGatesResult,
 	)
 
 	_, err = r.db.ExecContext(
@@ -507,150 +431,40 @@ func (r *runRepository) readRunRows(ctx context.Context, rows *sql.Rows) ([]Run,
 }
 
 func readRunRow(row scanner) (Run, error) {
-	r := Run{}
-
-	var (
-		jsonResolvedTrigger,
-		jsonTriggerResults,
-		jsonTestResults,
-		jsonTrace,
-		jsonOutputs,
-		jsonVariableSet,
-		jsonLinter,
-		jsonGatesResult,
-		jsonMetadata []byte
-
-		lastError *string
-		traceID,
-		spanID string
-
-		testSuiteID,
-		testSuiteRunID sql.NullString
-	)
+	encodedRun := EncodedRun{}
 
 	err := row.Scan(
-		&r.ID,
-		&r.TestID,
-		&r.TestVersion,
-		&r.CreatedAt,
-		&r.ServiceTriggeredAt,
-		&r.ServiceTriggerCompletedAt,
-		&r.ObtainedTraceAt,
-		&r.CompletedAt,
-		&r.State,
-		&traceID,
-		&spanID,
-		&jsonResolvedTrigger,
-		&jsonTriggerResults,
-		&jsonTestResults,
-		&jsonTrace,
-		&jsonOutputs,
-		&lastError,
-		&jsonMetadata,
-		&jsonVariableSet,
-		&testSuiteRunID,
-		&testSuiteID,
-		&jsonLinter,
-		&jsonGatesResult,
-		&r.SkipTraceCollection,
+		&encodedRun.ID,
+		&encodedRun.TestID,
+		&encodedRun.TestVersion,
+		&encodedRun.CreatedAt,
+		&encodedRun.ServiceTriggeredAt,
+		&encodedRun.ServiceTriggerCompletedAt,
+		&encodedRun.ObtainedTraceAt,
+		&encodedRun.CompletedAt,
+		&encodedRun.State,
+		&encodedRun.TraceID,
+		&encodedRun.SpanID,
+		&encodedRun.JsonResolvedTrigger,
+		&encodedRun.JsonTriggerResults,
+		&encodedRun.JsonTestResults,
+		&encodedRun.JsonTrace,
+		&encodedRun.JsonOutputs,
+		&encodedRun.LastError,
+		&encodedRun.JsonMetadata,
+		&encodedRun.JsonVariableSet,
+		&encodedRun.TestSuiteRunID,
+		&encodedRun.TestSuiteID,
+		&encodedRun.JsonLinter,
+		&encodedRun.JsonGatesResult,
+		&encodedRun.SkipTraceCollection,
 	)
 
 	if err != nil {
 		return Run{}, err
 	}
 
-	err = json.Unmarshal(jsonTriggerResults, &r.TriggerResult)
-	if err != nil {
-		return Run{}, fmt.Errorf("cannot parse TriggerResult: %w", err)
-	}
-
-	err = json.Unmarshal(jsonResolvedTrigger, &r.ResolvedTrigger)
-	if err != nil {
-		return Run{}, fmt.Errorf("cannot parse ResolvedTrigger: %w", err)
-	}
-
-	err = json.Unmarshal(jsonTestResults, &r.Results)
-	if err != nil {
-		return Run{}, fmt.Errorf("cannot parse Results: %w", err)
-	}
-
-	if jsonTrace != nil && string(jsonTrace) != "null" {
-		err = json.Unmarshal(jsonTrace, &r.Trace)
-		if err != nil {
-			return Run{}, fmt.Errorf("cannot parse Trace: %w", err)
-		}
-	}
-
-	if jsonLinter != nil {
-		err = json.Unmarshal(jsonLinter, &r.Linter)
-		if err != nil {
-			return Run{}, fmt.Errorf("cannot parse linter: %w", err)
-		}
-	}
-
-	err = json.Unmarshal(jsonOutputs, &r.Outputs)
-	if err != nil {
-		// try with raw outputs
-		var rawOutputs []variableset.VariableSetValue
-		err = json.Unmarshal(jsonOutputs, &rawOutputs)
-
-		for _, value := range rawOutputs {
-			r.Outputs.Add(value.Key, RunOutput{
-				Name:   value.Key,
-				Value:  value.Value,
-				SpanID: "",
-			})
-		}
-
-		if err != nil {
-			return Run{}, fmt.Errorf("cannot parse Outputs: %w", err)
-		}
-	}
-
-	err = json.Unmarshal(jsonMetadata, &r.Metadata)
-	if err != nil {
-		return Run{}, fmt.Errorf("cannot parse Metadata: %w", err)
-	}
-
-	err = json.Unmarshal(jsonVariableSet, &r.VariableSet)
-	if err != nil {
-		return Run{}, fmt.Errorf("cannot parse VariableSet: %w", err)
-	}
-
-	if jsonGatesResult != nil {
-		err = json.Unmarshal(jsonGatesResult, &r.RequiredGatesResult)
-		if err != nil {
-			return Run{}, fmt.Errorf("cannot parse required gates result: %w", err)
-		}
-	} else {
-		// fallback for retro-compatibility
-		r.RequiredGatesResult = r.GenerateRequiredGateResult(testrunner.DefaultTestRunner.RequiredGates)
-	}
-
-	if traceID != "" {
-		r.TraceID, err = trace.TraceIDFromHex(traceID)
-		if err != nil {
-			return Run{}, fmt.Errorf("cannot parse TraceID: %w", err)
-		}
-	}
-
-	if spanID != "" {
-		r.SpanID, err = trace.SpanIDFromHex(spanID)
-		if err != nil {
-			return Run{}, fmt.Errorf("cannot parse SpanID: %w", err)
-		}
-	}
-
-	if lastError != nil && *lastError != "" {
-		r.LastError = fmt.Errorf(*lastError)
-	}
-
-	if testSuiteID.Valid && testSuiteRunID.Valid {
-		r.TestSuiteID = testSuiteID.String
-		r.TestSuiteRunID = testSuiteRunID.String
-	}
-
-	return r, nil
+	return encodedRun.ToRun()
 }
 
 func (r *runRepository) GetTestSuiteRunSteps(ctx context.Context, id id.ID, runID int) ([]Run, error) {
@@ -677,4 +491,212 @@ WHERE test_suite_run_steps.test_suite_run_id = $1 AND test_suite_run_steps.test_
 	}
 
 	return steps, nil
+}
+
+type EncodedRun struct {
+	ID                  int
+	TestID              string
+	TestVersion         int
+	State               string
+	Pass                int
+	Fail                int
+	SkipTraceCollection bool
+
+	// Timestamps
+	CreatedAt                 time.Time
+	ServiceTriggeredAt        time.Time
+	ServiceTriggerCompletedAt time.Time
+	ObtainedTraceAt           time.Time
+	CompletedAt               time.Time
+
+	JsonResolvedTrigger,
+	JsonTriggerResults,
+	JsonTestResults,
+	JsonTrace,
+	JsonOutputs,
+	JsonVariableSet,
+	JsonLinter,
+	JsonGatesResult,
+	JsonMetadata []byte
+
+	LastError *string
+	TraceID,
+	SpanID string
+
+	TestSuiteID,
+	TestSuiteRunID sql.NullString
+}
+
+func (er EncodedRun) ToRun() (Run, error) {
+	r := Run{}
+	err := json.Unmarshal(er.JsonTriggerResults, &r.TriggerResult)
+	if err != nil {
+		return Run{}, fmt.Errorf("cannot parse TriggerResult: %w", err)
+	}
+
+	err = json.Unmarshal(er.JsonResolvedTrigger, &r.ResolvedTrigger)
+	if err != nil {
+		return Run{}, fmt.Errorf("cannot parse ResolvedTrigger: %w", err)
+	}
+
+	err = json.Unmarshal(er.JsonTestResults, &r.Results)
+	if err != nil {
+		return Run{}, fmt.Errorf("cannot parse Results: %w", err)
+	}
+
+	if er.JsonTrace != nil && string(er.JsonTrace) != "null" {
+		err = json.Unmarshal(er.JsonTrace, &r.Trace)
+		if err != nil {
+			return Run{}, fmt.Errorf("cannot parse Trace: %w", err)
+		}
+	}
+
+	if er.JsonLinter != nil {
+		err = json.Unmarshal(er.JsonLinter, &r.Linter)
+		if err != nil {
+			return Run{}, fmt.Errorf("cannot parse linter: %w", err)
+		}
+	}
+
+	err = json.Unmarshal(er.JsonOutputs, &r.Outputs)
+	if err != nil {
+		// try with raw outputs
+		var rawOutputs []variableset.VariableSetValue
+		err = json.Unmarshal(er.JsonOutputs, &rawOutputs)
+
+		for _, value := range rawOutputs {
+			r.Outputs.Add(value.Key, RunOutput{
+				Name:   value.Key,
+				Value:  value.Value,
+				SpanID: "",
+			})
+		}
+
+		if err != nil {
+			return Run{}, fmt.Errorf("cannot parse Outputs: %w", err)
+		}
+	}
+
+	err = json.Unmarshal(er.JsonMetadata, &r.Metadata)
+	if err != nil {
+		return Run{}, fmt.Errorf("cannot parse Metadata: %w", err)
+	}
+
+	err = json.Unmarshal(er.JsonVariableSet, &r.VariableSet)
+	if err != nil {
+		return Run{}, fmt.Errorf("cannot parse VariableSet: %w", err)
+	}
+
+	if er.JsonGatesResult != nil {
+		err = json.Unmarshal(er.JsonGatesResult, &r.RequiredGatesResult)
+		if err != nil {
+			return Run{}, fmt.Errorf("cannot parse required gates result: %w", err)
+		}
+	} else {
+		// fallback for retro-compatibility
+		r.RequiredGatesResult = r.GenerateRequiredGateResult(testrunner.DefaultTestRunner.RequiredGates)
+	}
+
+	if er.TraceID != "" {
+		r.TraceID, err = trace.TraceIDFromHex(er.TraceID)
+		if err != nil {
+			return Run{}, fmt.Errorf("cannot parse TraceID: %w", err)
+		}
+	}
+
+	if er.SpanID != "" {
+		r.SpanID, err = trace.SpanIDFromHex(er.SpanID)
+		if err != nil {
+			return Run{}, fmt.Errorf("cannot parse SpanID: %w", err)
+		}
+	}
+
+	if er.LastError != nil && *er.LastError != "" {
+		r.LastError = fmt.Errorf(*er.LastError)
+	}
+
+	if er.TestSuiteID.Valid && er.TestSuiteRunID.Valid {
+		r.TestSuiteID = er.TestSuiteID.String
+		r.TestSuiteRunID = er.TestSuiteRunID.String
+	}
+
+	r.ID = er.ID
+	r.TestID = id.ID(er.TestID)
+	r.TestVersion = er.TestVersion
+	r.CreatedAt = er.CreatedAt
+	r.ServiceTriggeredAt = er.ServiceTriggeredAt
+	r.ServiceTriggerCompletedAt = er.ServiceTriggerCompletedAt
+	r.ObtainedTraceAt = er.ObtainedTraceAt
+	r.CompletedAt = er.CompletedAt
+	r.State = RunState(er.State)
+	r.SkipTraceCollection = er.SkipTraceCollection
+
+	return r, nil
+}
+
+func EncodeRun(run Run) (EncodedRun, error) {
+	er := EncodedRun{
+		TraceID:             run.TraceID.String(),
+		SpanID:              run.SpanID.String(),
+		ID:                  run.ID,
+		TestID:              string(run.TestID),
+		TestVersion:         run.TestVersion,
+		State:               string(run.State),
+		Pass:                run.Pass,
+		Fail:                run.Fail,
+		SkipTraceCollection: run.SkipTraceCollection,
+	}
+
+	var err error
+	er.JsonResolvedTrigger, err = json.Marshal(run.ResolvedTrigger)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("resolved trigger encoding error: %w", err)
+	}
+
+	er.JsonTriggerResults, err = json.Marshal(run.TriggerResult)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("trigger results encoding error: %w", err)
+	}
+
+	er.JsonTestResults, err = json.Marshal(run.Results)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("test results encoding error: %w", err)
+	}
+
+	er.JsonTrace, err = json.Marshal(run.Trace)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("trace encoding error: %w", err)
+	}
+
+	er.JsonOutputs, err = json.Marshal(run.Outputs)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("outputs encoding error: %w", err)
+	}
+
+	er.JsonMetadata, err = json.Marshal(run.Metadata)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	er.JsonVariableSet, err = json.Marshal(run.VariableSet)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	er.JsonLinter, err = json.Marshal(run.Linter)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	er.JsonGatesResult, err = json.Marshal(run.RequiredGatesResult)
+	if err != nil {
+		return EncodedRun{}, fmt.Errorf("encoding error: %w", err)
+	}
+
+	if run.LastError != nil {
+		e := run.LastError.Error()
+		er.LastError = &e
+	}
+
+	return er, nil
 }
