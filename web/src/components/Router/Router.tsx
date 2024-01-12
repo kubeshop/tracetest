@@ -12,6 +12,7 @@ import TestSuiteRunOverview from 'pages/TestSuiteRunOverview';
 import TestSuiteRunAutomate from 'pages/TestSuiteRunAutomate';
 import AutomatedTestRun from 'pages/AutomatedTestRun';
 import CreateTest from 'pages/CreateTest';
+import Wizard from 'pages/Wizard';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 
 const Router = () => {
@@ -20,7 +21,8 @@ const Router = () => {
   return (
     <Routes>
       <Route element={<Layout hasMenu />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Wizard />} />
+        <Route path="/tests" element={<Home />} />
         <Route path="/testsuites" element={<TestSuites />} />
         <Route path="/variablesets" element={<VariableSet />} />
         <Route path="/settings" element={<Settings />} />
