@@ -105,15 +105,5 @@ func extractPort(url string) string {
 		return ""
 	}
 
-	port := regexGroups[1]
-
-	if port == "1" {
-		if strings.Contains(url, "http") {
-			return "80"
-		} else {
-			return "443"
-		}
-	}
-
-	return port
+	return regexGroups[1]
 }
