@@ -42,6 +42,7 @@ type ApiApiRouter interface {
 	SkipTraceCollection(http.ResponseWriter, *http.Request)
 	StopTestRun(http.ResponseWriter, *http.Request)
 	TestConnection(http.ResponseWriter, *http.Request)
+	TestOTLPConnection(http.ResponseWriter, *http.Request)
 	UpdateTestRun(http.ResponseWriter, *http.Request)
 }
 
@@ -115,6 +116,7 @@ type ApiApiServicer interface {
 	SkipTraceCollection(context.Context, string, int32) (ImplResponse, error)
 	StopTestRun(context.Context, string, int32) (ImplResponse, error)
 	TestConnection(context.Context, DataStore) (ImplResponse, error)
+	TestOTLPConnection(context.Context) (ImplResponse, error)
 	UpdateTestRun(context.Context, string, int32, TestRun) (ImplResponse, error)
 }
 

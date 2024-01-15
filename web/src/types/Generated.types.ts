@@ -120,6 +120,10 @@ export interface paths {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
   };
+  "/config/connection/otlp": {
+    /** Tests if the server is receiving spans via OTLP endpoint */
+    post: operations["testOTLPConnection"];
+  };
   "/configs": {
     /** List Tracetest configuration */
     get: operations["listConfiguration"];
@@ -713,6 +717,13 @@ export interface operations {
       content: {
         "text/json": external["dataStores.yaml"]["components"]["schemas"]["DataStore"];
       };
+    };
+  };
+  /** Tests if the server is receiving spans via OTLP endpoint */
+  testOTLPConnection: {
+    responses: {
+      /** Request was accepted */
+      200: unknown;
     };
   };
   /** List Tracetest configuration */

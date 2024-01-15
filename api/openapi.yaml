@@ -720,6 +720,16 @@ paths:
             application/json:
               schema:
                 $ref: "./config.yaml#/components/schemas/TestConnectionResponse"
+  /config/connection/otlp:
+    post:
+      tags:
+        - api
+      summary: "Tests if the server is receiving spans via OTLP endpoint"
+      description: "Tests if the server is receiving spans via OTLP endpoint"
+      operationId: testOTLPConnection
+      responses:
+        200:
+          description: Request was accepted
   /configs:
     get:
       tags:

@@ -717,6 +717,10 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	return openapi.Response(http.StatusOK, c.mappers.Out.ConnectionTestResult(job.TestResult)), nil
 }
 
+func (*controller) TestOTLPConnection(context.Context) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusNotImplemented, nil), nil
+}
+
 func (c *controller) GetVersion(ctx context.Context, fileExtension string) (openapi.ImplResponse, error) {
 	version := openapi.Version{
 		Version:       c.version,
