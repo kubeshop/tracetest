@@ -68,11 +68,11 @@ const Layout = ({hasMenu = false}: IProps) => {
   const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 
   return (
-    <NotificationProvider>
-      <WizardWrapper>
-        <MissingVariablesModalProvider>
-          <FileViewerModalProvider>
-            <ConfirmationModalProvider>
+    <ConfirmationModalProvider>
+      <NotificationProvider>
+        <WizardWrapper>
+          <MissingVariablesModalProvider>
+            <FileViewerModalProvider>
               <VariableSetProvider>
                 <GuidedTourProvider>
                   <CreateTestProvider>
@@ -122,11 +122,11 @@ const Layout = ({hasMenu = false}: IProps) => {
                   </CreateTestProvider>
                 </GuidedTourProvider>
               </VariableSetProvider>
-            </ConfirmationModalProvider>
-          </FileViewerModalProvider>
-        </MissingVariablesModalProvider>
-      </WizardWrapper>
-    </NotificationProvider>
+            </FileViewerModalProvider>
+          </MissingVariablesModalProvider>
+        </WizardWrapper>
+      </NotificationProvider>
+    </ConfirmationModalProvider>
   );
 };
 

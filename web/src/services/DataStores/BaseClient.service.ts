@@ -9,7 +9,6 @@ import {
   TRawGRPCClientSettings,
   TRawHttpClientSettings,
 } from 'types/DataStore.types';
-import DataStore from 'models/DataStore.model';
 import HttpClientService from './HttpClient.service';
 import GrpcClientService from './GrpcClient.service';
 
@@ -52,7 +51,7 @@ const BaseClientService = (): TDataStoreService => ({
     }
   },
   getInitialValues(
-    {defaultDataStore = {name: '', type: SupportedDataStores.JAEGER} as DataStore},
+    defaultDataStore = {name: '', type: SupportedDataStores.JAEGER},
     dataStoreType = SupportedDataStores.TEMPO
   ) {
     const {

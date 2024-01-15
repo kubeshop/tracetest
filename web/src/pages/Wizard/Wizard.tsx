@@ -1,6 +1,6 @@
 import withAnalytics from 'components/WithAnalytics/WithAnalytics';
 import Header from 'components/Wizard/Header';
-import Steps from 'components/Wizard/Content';
+import Content from 'components/Wizard/Content';
 import {useWizard} from 'providers/Wizard';
 import * as S from './Wizard.styled';
 
@@ -19,7 +19,7 @@ const Wizard = () => {
 
       <S.Body>
         <Header activeStep={completedSteps} totalCompleteSteps={steps.length} />
-        <Steps activeStepId={activeStepId} steps={steps} onChange={onGoTo} />
+        <Content activeStepId={activeStepId} steps={steps} onChange={onGoTo} />
       </S.Body>
     </S.Container>
   );

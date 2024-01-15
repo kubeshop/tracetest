@@ -15,6 +15,7 @@ const DataStore = () => {
     onSaveConfig,
     isTestConnectionLoading,
     onTestConnection,
+    resetTestConnection,
   } = useDataStore();
   const [form] = Form.useForm<TDraftDataStore>();
 
@@ -42,6 +43,7 @@ const DataStore = () => {
           isLoading={isLoading}
           isFormValid={isFormValid}
           onIsFormValid={onIsFormValid}
+          resetTestConnection={resetTestConnection}
         />
       </S.FormContainer>
     </S.Wrapper>
