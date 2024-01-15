@@ -196,7 +196,6 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 	select {
 	case finalRun := <-done:
-		fmt.Println("final")
 		subscriptionManager.Unsubscribe(transactionRun.ResourceID(), sf.ID()) //cleanup to avoid race conditions
 		assert(t, finalRun)
 	case <-time.After(10 * time.Second):
