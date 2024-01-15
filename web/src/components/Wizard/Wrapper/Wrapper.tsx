@@ -1,9 +1,10 @@
 import {useMemo} from 'react';
 import {IWizardStep} from 'types/Wizard.types';
 import WizardProvider from 'providers/Wizard/Wizard.provider';
+import {withCustomization} from 'providers/Customization';
 import DataStoreProvider from 'providers/DataStore/DataStore.provider';
 import SettingsProvider from 'providers/Settings/Settings.provider';
-import TracingBackend from '../Steps/TracingBackend/TracingBackend';
+import TracingBackend from '../Steps/TracingBackend';
 import RunTest from '../Steps/RunTest';
 
 interface IProps {
@@ -40,4 +41,4 @@ const Wrapper = ({children}: IProps) => {
   );
 };
 
-export default Wrapper;
+export default withCustomization(Wrapper, 'wizardWrapper');
