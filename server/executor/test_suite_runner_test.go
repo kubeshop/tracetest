@@ -26,7 +26,7 @@ import (
 
 type fakeTestRunner struct {
 	db                  test.RunRepository
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 	returnErr           bool
 	uid                 int
 }
@@ -181,7 +181,11 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 	done := make(chan testsuite.TestSuiteRun, 1)
 	sf := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		tr := m.Content.(testsuite.TestSuiteRun)
+		tr := testsuite.TestSuiteRun{}
+		err := m.DecodeContent(&tr)
+		if err != nil {
+			panic(fmt.Errorf("cannot decode TestSuiteRun message: %w", err))
+		}
 		if tr.State.IsFinal() {
 			done <- tr
 		}

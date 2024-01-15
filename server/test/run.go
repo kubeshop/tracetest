@@ -1,6 +1,7 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"time"
@@ -18,6 +19,32 @@ import (
 var (
 	IDGen = id.NewRandGenerator()
 )
+
+func (r Run) MarshalJSON() ([]byte, error) {
+	encoded, err := EncodeRun(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(encoded)
+}
+
+func (r *Run) UnmarshalJSON(data []byte) error {
+	var encoded EncodedRun
+
+	if err := json.Unmarshal(data, &encoded); err != nil {
+		return err
+	}
+
+	decoded, err := encoded.ToRun()
+	if err != nil {
+		return err
+	}
+
+	*r = decoded
+
+	return nil
+}
 
 func NewRun() Run {
 	return Run{

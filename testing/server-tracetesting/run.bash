@@ -85,11 +85,11 @@ echo "Starting tests..."
 EXIT_STATUS=0
 
 # add more test suites here
-run_test_suite_for_feature 'http_test' || EXIT_STATUS=$?
-run_test_suite_for_feature 'grpc_test' || EXIT_STATUS=$?
-run_test_suite_for_feature 'kafka_test' || EXIT_STATUS=$?
-run_test_suite_for_feature 'variableset' || EXIT_STATUS=$?
-run_test_suite_for_feature 'testsuite' || EXIT_STATUS=$?
+run_test_suite_for_feature 'http_test' || (EXIT_STATUS=$? && echo "HTTP Test suite failed")
+run_test_suite_for_feature 'grpc_test' || (EXIT_STATUS=$? && echo "GRPC Test suite failed")
+run_test_suite_for_feature 'kafka_test' || (EXIT_STATUS=$? && echo "Kafka Test suite failed")
+run_test_suite_for_feature 'variableset' || (EXIT_STATUS=$? && echo "VariableSet Test suite failed")
+run_test_suite_for_feature 'testsuite' || (EXIT_STATUS=$? && echo "TestSuite Test suite failed")
 
 echo ""
 echo "Tests done! Exit code: $EXIT_STATUS"

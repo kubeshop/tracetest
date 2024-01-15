@@ -50,10 +50,10 @@ func (u dbTransactionUpdater) Update(ctx context.Context, run testsuite.TestSuit
 }
 
 type subscriptionTransactionUpdater struct {
-	manager *subscription.Manager
+	manager subscription.Manager
 }
 
-func NewSubscriptionTransactionUpdater(manager *subscription.Manager) TestSuiteRunUpdater {
+func NewSubscriptionTransactionUpdater(manager subscription.Manager) TestSuiteRunUpdater {
 	return subscriptionTransactionUpdater{manager}
 }
 

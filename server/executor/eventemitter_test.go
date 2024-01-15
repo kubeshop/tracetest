@@ -3,6 +3,7 @@ package executor_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/kubeshop/tracetest/server/executor"
@@ -135,13 +136,17 @@ func (s *testRunEventSubscriber) ID() string {
 	return "some-id"
 }
 
-func (s *testRunEventSubscriber) Notify(message subscription.Message) error {
-	event := message.Content.(model.TestRunEvent)
+func (s *testRunEventSubscriber) Notify(m subscription.Message) error {
+	event := model.TestRunEvent{}
+	err := m.DecodeContent(&event)
+	if err != nil {
+		panic(fmt.Errorf("cannot read testRunEvent: %w", err))
+	}
 	s.events = append(s.events, event)
 	return nil
 }
 
-func getSubscriptionManagerMock(t *testing.T, event model.TestRunEvent) (*subscription.Manager, *testRunEventSubscriber) {
+func getSubscriptionManagerMock(t *testing.T, event model.TestRunEvent) (subscription.Manager, *testRunEventSubscriber) {
 	t.Helper()
 
 	subscriptionManager := subscription.NewManager()
