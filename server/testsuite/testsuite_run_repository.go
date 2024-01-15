@@ -447,8 +447,9 @@ func (r EncodedTestSuiteRun) ToTestSuiteRun() (TestSuiteRun, error) {
 		CreatedAt:   r.CreatedAt,
 		CompletedAt: r.CompletedAt,
 
-		State:       r.State,
-		CurrentTest: r.CurrentTest,
+		State:                       r.State,
+		CurrentTest:                 r.CurrentTest,
+		AllStepsRequiredGatesPassed: r.AllStepsRequiredGatesPassed,
 	}
 
 	if r.Pass.Valid {
