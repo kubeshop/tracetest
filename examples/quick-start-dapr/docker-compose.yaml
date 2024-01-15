@@ -1,0 +1,17 @@
+version: '3'
+services:
+  app:
+    image: bookstore-app
+    build: ./src/app
+    ports:
+      - "8080:8080"
+  availability:
+    image: bookstore-availability
+    build: ./src/availability
+    ports:
+      - "8080"
+  stock:
+    image: bookstore-stock
+    build: ./src/stock
+    ports:
+      - "8080"
