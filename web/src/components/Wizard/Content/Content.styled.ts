@@ -17,6 +17,11 @@ export const Container = styled.div`
   .ant-tabs-left > .ant-tabs-content-holder > .ant-tabs-content > .ant-tabs-tabpane {
     padding: 16px;
   }
+
+  .ant-tabs-left > .ant-tabs-content-holder,
+  .ant-tabs-left > div > .ant-tabs-content-holder {
+    margin-left: 0;
+  }
 `;
 
 export const StepTabContainer = styled.div<{$isActive: boolean}>`
@@ -24,7 +29,7 @@ export const StepTabContainer = styled.div<{$isActive: boolean}>`
   display: flex;
   gap: 8px;
   padding: 16px;
-  min-width: 300px;
+  min-width: 360px;
 `;
 
 export const StepTabNumber = styled.div`

@@ -66,8 +66,6 @@ const Configuration = ({dataStore, onBack}: IProps) => {
         <Button ghost type="link" icon={<LeftOutlined />} onClick={onBack}>
           Back
         </Button>
-
-        <TestConnectionStatus />
       </S.Header>
       <Form.Item name="dataStoreType" hidden>
         <Input type="hidden" />
