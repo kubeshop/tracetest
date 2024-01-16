@@ -21,7 +21,7 @@ type RunResult struct {
 
 func NewTriggerResultProcessorWorker(
 	tracer trace.Tracer,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 	eventEmitter EventEmitter,
 	updater RunUpdater,
 ) *triggerResultProcessorWorker {
@@ -35,7 +35,7 @@ func NewTriggerResultProcessorWorker(
 
 type triggerResultProcessorWorker struct {
 	tracer              trace.Tracer
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 	eventEmitter        EventEmitter
 	outputQueue         pipeline.Enqueuer[Job]
 	updater             RunUpdater

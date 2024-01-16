@@ -30,14 +30,12 @@ The following is a high-level sequence diagram of how Cypress and Tracetest inte
 ```mermaid
 sequenceDiagram
   Cypress->>+Scripts: Execute tests
-  Scripts->>+@tracetest/cypress: Configures library
+  Scripts->>+@tracetest/cypress: Createst instance
   @tracetest/cypress-->>-Scripts: Ok
   Scripts->>+Scripts: Visits website
   Scripts->>+@tracetest/cypress: captures and injects traceparent meta tag
-  @tracetest/cypress-->-Scripts: Ok
-  Scripts->>+Scripts: Executes test
-  Scripts->>+@tracetest/cypress: Runs test
-  @tracetest/cypress-->-Scripts: Ok
+  @tracetest/cypress->>+@tracetest/cypress: Executes test
+  @tracetest/cypress-->>-Scripts: Ok
   Scripts->>@tracetest/cypress: Waits for results and shows the summary
 ```
 
@@ -95,13 +93,15 @@ module.exports = defineConfig({
 });
 ```
 
+Before moving forward, run `npm i` in the root folder to install the dependencies.
+
 ### The `home.cy` Test Script
 
 The `home.cy` test script contains three different tests based on the Pokeshop Demo UI fetures, which are:
 
-1. Creates a Pokemon
-2. Imports a Pokemon (using an async process)
-3. Deletes a Pokemon
+1. Create a Pokemon
+2. Import a Pokemon (using an async process)
+3. Delete a Pokemon
 
 ### Tracetest Library Setup
 
@@ -109,16 +109,28 @@ If you go to the `package.json` file you will find the inclusion of a Tracetest 
 The first thing the test script does is import the package, grab the Tracetest API token from the environment variables and create the Tracetest instance.
 
 ```typescript
-import Tracetest from "@tracetest/cypress";
+import Tracetest, { Types } from "@tracetest/cypress";
+
 const TRACETEST_API_TOKEN = Cypress.env("TRACETEST_API_TOKEN") || "";
-const tracetest = Tracetest();
+let tracetest: Types.TracetestCypress | undefined = undefined;
 ```
 
-Afterward, during the `before` hook, the test script **configures** the Tracetest instance with the API token.
+Afterward, during the `before` hook, create the Tracetest instance with the API token.
 
 ```typescript
 before((done) => {
-  tracetest.configure(TRACETEST_API_TOKEN).then(() => done());
+  Tracetest({ apiToken: TRACETEST_API_TOKEN }).then((instance) => {
+    tracetest = instance;
+
+    // optional, set the definition files and run info for the tests
+    tracetest
+      .setOptions({
+        "imports a pokemon": {
+          definition,
+        },
+      })
+      .then(() => done());
+  });
 });
 ```
 
@@ -129,15 +141,6 @@ beforeEach(() => {
   cy.visit("/", {
     onBeforeLoad: (win) => tracetest.capture(win.document),
   });
-});
-```
-
-Lastly, during the `afterEach` hook, the script **runs** the test with an optional definition string.
-
-```typescript
-afterEach((done) => {
-  const definition = Cypress.env("definition") || "";
-  tracetest.runTest(definition).then(() => done());
 });
 ```
 
@@ -152,44 +155,12 @@ after((done) => {
 The rest of the test script is the Cypress test definitions for the test cases mentioned above. The complete test script looks like this:
 
 ```typescript
-import Tracetest from "@tracetest/cypress";
-const TRACETEST_API_TOKEN = Cypress.env("TRACETEST_API_TOKEN") || "";
-const tracetest = Tracetest();
+import Tracetest, { Types } from '@tracetest/cypress';
 
-// trace-based tests can take a little bit longer than regular cypress scripts, this why we set the `defaultCommandTimeout` to 1 minute
-describe("Home", { defaultCommandTimeout: 60000 }, () => {
-  before((done) => {
-    tracetest.configure(TRACETEST_API_TOKEN).then(() => done());
-  });
+const TRACETEST_API_TOKEN = Cypress.env('TRACETEST_API_TOKEN') || '';
+let tracetest: Types.TracetestCypress | undefined = undefined;
 
-  beforeEach(() => {
-    cy.visit("/", {
-      onBeforeLoad: (win) => tracetest.capture(win.document),
-    });
-  });
-
-  afterEach((done) => {
-    const definition = Cypress.env("definition") || "";
-    tracetest.runTest(definition).then(() => done());
-  });
-
-  // uncomment to wait for trace tests to be done
-  after((done) => {
-    tracetest.summary().then(() => done());
-  });
-
-  it("create a pokemon", () => {
-    cy.get('[data-cy="create-pokemon-button"]').should("be.visible").click();
-    cy.get('[data-cy="create-pokemon-modal"]').should("be.visible");
-    cy.get("#name").type("Pikachu");
-    cy.get("#type").type("Electric");
-    cy.get("#imageUrl").type("https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-blue-version/8/89/Pikachu.jpg");
-
-    cy.get("button").contains("OK").click();
-  });
-
-  /// optional definition string used for TDD
-  const definition = `
+const definition = `
   type: Test
   spec:
     id: aW1wb3J0cyBhIHBva2Vtb24=
@@ -204,25 +175,60 @@ describe("Home", { defaultCommandTimeout: 60000 }, () => {
     - selector: span[tracetest.span.type="database"]
       name: "All Database Spans: Processing time is less than 100ms"
       assertions:
-      - attr:tracetest.span.duration < 100ms
+      - attr:tracetest.span.duration < 2s
     outputs:
     - name: MY_OUTPUT
       selector: span[tracetest.span.type="general" name="Tracetest trigger"]
       value: attr:name
     `;
 
-  it("imports a pokemon", { env: { definition } }, () => {
+describe('Home', { defaultCommandTimeout: 60000 }, () => {
+  before(done => {
+    Tracetest({ apiToken: TRACETEST_API_TOKEN }).then(instance => {
+      tracetest = instance;
+      tracetest
+        .setOptions({
+          'imports a pokemon': {
+            definition,
+          },
+        })
+        .then(() => done());
+    });
+  });
+
+  beforeEach(() => {
+    cy.visit('/', {
+      onBeforeLoad: win => tracetest.capture(win.document),
+    });
+  });
+
+  // uncomment to wait for trace tests to be done
+  after(done => {
+    tracetest.summary().then(() => done());
+  });
+
+  it('create a pokemon', () => {
+    cy.get('[data-cy="create-pokemon-button"]').should('be.visible').click();
+    cy.get('[data-cy="create-pokemon-modal"]').should('be.visible');
+    cy.get('#name').type('Pikachu');
+    cy.get('#type').type('Electric');
+    cy.get('#imageUrl').type('https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-blue-version/8/89/Pikachu.jpg');
+
+    cy.get('button').contains('OK').click();
+  });
+
+  it('imports a pokemon', () => {
     cy.get('[data-cy="import-pokemon-button"]').click();
-    cy.get('[data-cy="import-pokemon-form"]').should("be.visible");
+    cy.get('[data-cy="import-pokemon-form"]').should('be.visible');
 
     cy.get('[id="id"]')
       .last()
       .type(Math.floor(Math.random() * 101).toString());
-    cy.get("button").contains("OK").click({ force: true });
+    cy.get('button').contains('OK').click({ force: true });
   });
 
-  it("deletes a pokemon (2)", () => {
-    cy.get('[data-cy="pokemon-list"]').should("be.visible");
+  it('deletes a pokemon', () => {
+    cy.get('[data-cy="pokemon-list"]').should('be.visible');
     cy.get('[data-cy="pokemon-card"]').first().click().get('[data-cy="delete-pokemon-button"]').first().click();
   });
 });
@@ -230,14 +236,14 @@ describe("Home", { defaultCommandTimeout: 60000 }, () => {
 
 ### Setting the Environment Variables
 
-Copy the `.env.example` file to `.env` and add the Tracetest API token and agent tokens to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
+Copy the `.env.template` file to `.env` and add the Tracetest API token and agent tokens to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
 
 ### Starting the Pokeshop Demo App
 
 To start the Pokeshop Demo App, run the following command from the root directory:
 
 ```bash
-docker compose up -f docker-compose.yml -f docker-compose.e2e.yml
+docker compose -f docker-compose.yml -f docker-compose.e2e.yml up
 ```
 
 ### Running the Tests
@@ -337,7 +343,7 @@ And by looking at the browser console log you can find the statuses and results 
 
 Then, you can follow any of the result links in the console log to the Tracetest App and see the results of the tests.
 
-The Tracetest library uses the spec name for the trace-based tests. That way you can identify them more easily and it also fills some of the metadata directly from the Cypress execution. 
+The Tracetest library uses the spec name for the trace-based tests. That way you can identify them more easily and it also fills some of the metadata directly from the Cypress execution.
 
 ![Tracetest App](./img/cypress-tracetest-tests.png)
 
@@ -346,4 +352,3 @@ Lastly, you can now create assertions based on the trace data that was captured 
 Starting with the click events and the fetch request from the client side, to the HTTP requests and database queries from the backend services, including async processes like the one showcased during the import pokemon test.
 
 ![Tracetest App](./img/cypress-tracetest-import-pokemon-test.png)
-

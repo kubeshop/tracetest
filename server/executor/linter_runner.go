@@ -20,7 +20,7 @@ type AnalyzerGetter interface {
 
 type defaultLinterRunner struct {
 	updater             RunUpdater
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 	eventEmitter        EventEmitter
 	analyzerGetter      AnalyzerGetter
 	outputQueue         pipeline.Enqueuer[Job]
@@ -28,7 +28,7 @@ type defaultLinterRunner struct {
 
 func NewLinterRunner(
 	updater RunUpdater,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 	eventEmitter EventEmitter,
 	analyzerGetter AnalyzerGetter,
 ) *defaultLinterRunner {

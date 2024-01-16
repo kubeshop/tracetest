@@ -1,12 +1,11 @@
 export function CypressCodeSnippet(testName: string) {
-  return `import Tracetest from '@tracetest/cypress';
-
+  return `import Tracetest, { Types } from '@tracetest/cypress';
 const TRACETEST_API_TOKEN = Cypress.env('TRACETEST_API_TOKEN') || '';
-const tracetest = Tracetest();
+let tracetest: Types.TracetestCypress | undefined = undefined;
 
-describe('Cypress Test', () => {
+describe('Home', { defaultCommandTimeout: 60000 }, () => {
   before(done => {
-    tracetest.configure(TRACETEST_API_TOKEN).then(() => done());
+    Tracetest({ apiToken: TRACETEST_API_TOKEN }).then(() => done());
   });
 
   beforeEach(() => {
@@ -15,8 +14,9 @@ describe('Cypress Test', () => {
     });
   });
 
-  afterEach(done => {
-    tracetest.runTest('').then(() => done());
+  // uncomment to wait for trace tests to be done
+  after(done => {
+    tracetest.summary().then(() => done());
   });
 
   it('${testName}', () => {
@@ -27,31 +27,24 @@ describe('Cypress Test', () => {
 
 export function PlaywrightCodeSnippet(testName: string) {
   return `import { test, expect } from '@playwright/test';
-import Tracetest from '@tracetest/playwright';
-
+import Tracetest, { Types } from '@tracetest/playwright';
 const { TRACETEST_API_TOKEN = '' } = process.env;
-
-const tracetest = Tracetest();
+let tracetest: Types.TracetestPlaywright | undefined = undefined;
 
 test.describe.configure({ mode: 'serial' });
-
 test.beforeAll(async () => {
-  await tracetest.configure(TRACETEST_API_TOKEN);
+  tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN });
 });
 
 test.beforeEach(async ({ page }, { title }) => {
   await page.goto('/');
-  await tracetest.capture(title, page);
-});
-
-test.afterEach(async ({}, { title, config }) => {
-  await tracetest.runTest(title, config.metadata.definition ?? '');
+  await tracetest?.capture(title, page);
 });
 
 // optional step to break the playwright script in case a Tracetest test fails
 test.afterAll(async ({}, testInfo) => {
   testInfo.setTimeout(60000);
-  await tracetest.summary();
+  await tracetest?.summary();
 });
 
 test('${testName}', () => {

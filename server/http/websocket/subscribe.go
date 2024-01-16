@@ -17,11 +17,11 @@ type subscriptionMessage struct {
 }
 
 type subscribeCommandExecutor struct {
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 	mappers             mappings.Mappings
 }
 
-func NewSubscribeCommandExecutor(manager *subscription.Manager, mappers mappings.Mappings) MessageExecutor {
+func NewSubscribeCommandExecutor(manager subscription.Manager, mappers mappings.Mappings) MessageExecutor {
 	return subscribeCommandExecutor{
 		subscriptionManager: manager,
 		mappers:             mappers,

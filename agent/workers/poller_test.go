@@ -7,7 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/client/mocks"
 	"github.com/kubeshop/tracetest/agent/collector"
@@ -71,8 +70,6 @@ func TestPollerWorker(t *testing.T) {
 			spans[1] = span
 		}
 	}
-
-	spew.Dump(pollingResponse)
 
 	assert.Len(t, spans, 2)
 	assert.Equal(t, "", spans[0].ParentId)

@@ -366,9 +366,10 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 
 	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		cancelCtx(nil)
-		request, ok := m.Content.(UserRequest)
-		if !ok {
-			return nil
+		request := UserRequest{}
+		err := m.DecodeContent(&request)
+		if err != nil {
+			return fmt.Errorf("cannot decode UserRequest message: %w", err)
 		}
 
 		run, err := q.runs.GetRun(ctx, request.TestID, request.RunID)
@@ -384,9 +385,10 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 	})
 
 	spfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		request, ok := m.Content.(UserRequest)
-		if !ok {
-			return nil
+		request := UserRequest{}
+		err := m.DecodeContent(&request)
+		if err != nil {
+			return fmt.Errorf("cannot decode UserRequest message: %w", err)
 		}
 
 		run, err := q.runs.GetRun(ctx, request.TestID, request.RunID)
@@ -416,7 +418,8 @@ func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuit
 		return testsuite.TestSuite{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve TestSuite: %s", err.Error())
+		return testsuite.TestSuite{}
 	}
 
 	return tran
@@ -431,7 +434,8 @@ func (q Queue) resolveTestSuiteRun(ctx context.Context, job Job) testsuite.TestS
 		return testsuite.TestSuiteRun{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve TestSuiteRun: %s", err.Error())
+		return testsuite.TestSuiteRun{}
 	}
 
 	return tranRun
@@ -447,7 +451,8 @@ func (q Queue) resolveTest(ctx context.Context, job Job) test.Test {
 		return test.Test{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve Test: %s", err.Error())
+		return test.Test{}
 	}
 
 	return t
@@ -463,7 +468,8 @@ func (q Queue) resolveTestRun(ctx context.Context, job Job) test.Run {
 		return test.Run{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve test run: %s", err.Error())
+		return test.Run{}
 	}
 
 	return run
@@ -479,7 +485,8 @@ func (q Queue) resolvePollingProfile(ctx context.Context, job Job) pollingprofil
 		return pollingprofile.PollingProfile{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve PollingProfile: %s", err.Error())
+		return pollingprofile.PollingProfile{}
 	}
 
 	return profile
@@ -495,7 +502,8 @@ func (q Queue) resolveDataStore(ctx context.Context, job Job) datastore.DataStor
 		return datastore.DataStore{}
 	}
 	if err != nil {
-		panic(err)
+		log.Printf("cannot resolve DataStore: %s", err.Error())
+		return datastore.DataStore{}
 	}
 
 	return ds

@@ -517,7 +517,7 @@ func (r *repository) Delete(ctx context.Context, id id.ID) error {
 		}
 	}
 
-	dropSequence(ctx, tx, id)
+	dropSequence(ctx, tx, id, sqlutil.TenantIDString(ctx))
 
 	err = tx.Commit()
 	if err != nil {
@@ -533,10 +533,10 @@ const (
 	runSequenceName     = "%sequence_name%"
 )
 
-func dropSequence(ctx context.Context, tx *sql.Tx, testID id.ID) error {
+func dropSequence(ctx context.Context, tx *sql.Tx, testID id.ID, tenantID string) error {
 	_, err := tx.ExecContext(
 		ctx,
-		replaceRunSequenceName(dropSequenceQuery, testID),
+		replaceRunSequenceName(dropSequenceQuery, testID, tenantID),
 	)
 
 	return err
@@ -547,12 +547,12 @@ func md5Hash(text string) string {
 	return hex.EncodeToString(hash[:])
 }
 
-func replaceRunSequenceName(sql string, testID id.ID) string {
+func replaceRunSequenceName(sql string, testID id.ID, tenantID string) string {
 	// postgres doesn't like uppercase chars in sequence names.
 	// testID might contain uppercase chars, and we cannot lowercase them
 	// because they might lose their uniqueness.
 	// md5 creates a unique, lowercase hash.
-	seqName := "runs_test_" + md5Hash(testID.String()) + "_seq"
+	seqName := "runs_test_" + md5Hash(testID.String()+tenantID) + "_seq"
 	return strings.ReplaceAll(sql, runSequenceName, seqName)
 }
 
