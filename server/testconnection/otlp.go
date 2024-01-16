@@ -30,6 +30,7 @@ func GetSpanCountTopicName(opts ...TopicNameOption) string {
 
 	return fmt.Sprintf("otlp_connection_test_get_span_count_%s", config.TenantID)
 }
+
 func PostSpanCountTopicName(opts ...TopicNameOption) string {
 	var config topicNameConfig
 	for _, opt := range opts {
@@ -38,6 +39,7 @@ func PostSpanCountTopicName(opts ...TopicNameOption) string {
 
 	return fmt.Sprintf("otlp_connection_test_span_count_%s", config.TenantID)
 }
+
 func ResetSpanCountTopicName(opts ...TopicNameOption) string {
 	var config topicNameConfig
 	for _, opt := range opts {
@@ -65,6 +67,7 @@ func NewOTLPConnectionTester(subscriptionManager subscription.Manager) *OTLPConn
 }
 
 type GetSpanCountOption func(*getSpanCountConfig)
+
 type getSpanCountConfig struct {
 	timeout time.Duration
 }
