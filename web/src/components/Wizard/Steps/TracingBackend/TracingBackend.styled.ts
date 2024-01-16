@@ -22,6 +22,7 @@ export const Card = styled.div`
   width: 142px;
   font-size: ${({theme}) => theme.size.sm};
   font-weight: 700;
+  transition: 0.3s;
 
   &:hover {
     border-color: ${({theme}) => theme.color.primary};

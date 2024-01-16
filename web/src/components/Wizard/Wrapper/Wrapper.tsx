@@ -13,7 +13,7 @@ const steps: TWizardMap = {
     component: () => <div>Agent</div>,
   },
   tracing_backend: {
-    name: 'Setup your Tracing Backend',
+    name: 'Configure access to your OTel traces',
     description: '',
     component: TracingBackend,
   },
@@ -28,14 +28,12 @@ interface IProps {
   children: React.ReactNode;
 }
 
-const Wrapper = ({children}: IProps) => {
-  return (
-    <DataStoreProvider>
-      <SettingsProvider>
-        <WizardProvider stepsMap={steps}>{children}</WizardProvider>
-      </SettingsProvider>
-    </DataStoreProvider>
-  );
-};
+const Wrapper = ({children}: IProps) => (
+  <DataStoreProvider>
+    <SettingsProvider>
+      <WizardProvider stepsMap={steps}>{children}</WizardProvider>
+    </SettingsProvider>
+  </DataStoreProvider>
+);
 
 export default withCustomization(Wrapper, 'wizardWrapper');

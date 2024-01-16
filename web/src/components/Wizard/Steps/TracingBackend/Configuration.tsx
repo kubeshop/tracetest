@@ -5,7 +5,6 @@ import {SupportedDataStores, TDraftDataStore} from 'types/DataStore.types';
 import DataStoreConfiguration from 'components/DataStoreConfiguration/DataStoreConfiguration';
 import {useDataStore} from 'providers/DataStore/DataStore.provider';
 import DataStore from 'models/DataStore.model';
-import TestConnectionStatus from 'components/TestConnectionStatus';
 import DataStoreService from 'services/DataStore.service';
 import * as S from './TracingBackend.styled';
 
@@ -66,8 +65,6 @@ const Configuration = ({dataStore, onBack}: IProps) => {
         <Button ghost type="link" icon={<LeftOutlined />} onClick={onBack}>
           Back
         </Button>
-
-        <TestConnectionStatus />
       </S.Header>
       <Form.Item name="dataStoreType" hidden>
         <Input type="hidden" />

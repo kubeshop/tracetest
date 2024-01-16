@@ -12,11 +12,16 @@ interface IProps {
 
 const Header = ({activeStep, totalCompleteSteps}: IProps) => (
   <S.Container>
-    <S.Title>🚀 Setup guide</S.Title>
-    <Progress percent={calculatePercent(activeStep, totalCompleteSteps)} showInfo={false} />
-    <S.Text>
-      {activeStep} of {totalCompleteSteps} steps completed
-    </S.Text>
+    <div>
+      <S.Title>🚀 Get Started</S.Title>
+      <S.Text>Use this guide to get your environment up and running.</S.Text>
+    </div>
+    <S.ProgressContainer>
+      <Progress percent={calculatePercent(activeStep, totalCompleteSteps)} width={300} showInfo={false} />
+      <S.Text>
+        {activeStep} of {totalCompleteSteps} steps completed
+      </S.Text>
+    </S.ProgressContainer>
   </S.Container>
 );
 
