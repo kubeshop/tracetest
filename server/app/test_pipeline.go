@@ -30,7 +30,7 @@ func buildTestPipeline(
 	testRepo test.Repository,
 	runRepo test.RunRepository,
 	tracer trace.Tracer,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 	triggerRegistry *trigger.Registry,
 	tracedbFactory tracedb.FactoryFunc,
 	appConfig *config.AppConfig,

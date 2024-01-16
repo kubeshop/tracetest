@@ -26,7 +26,7 @@ type testRunner interface {
 func NewTestSuiteRunner(
 	testRunner testRunner,
 	transactionRuns testSuiteRunRepository,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 ) *persistentTransactionRunner {
 	updater := (CompositeTransactionUpdater{}).
 		Add(NewDBTranasctionUpdater(transactionRuns)).
@@ -44,7 +44,7 @@ type persistentTransactionRunner struct {
 	testRunner          testRunner
 	transactionRuns     testSuiteRunRepository
 	updater             TestSuiteRunUpdater
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 }
 
 func (r *persistentTransactionRunner) SetOutputQueue(_ pipeline.Enqueuer[Job]) {
@@ -104,7 +104,11 @@ func (r persistentTransactionRunner) runTransactionStep(ctx context.Context, tr 
 	// listen for updates and propagate them as if they were transaction updates
 	r.subscriptionManager.Subscribe(testRun.ResourceID(), subscription.NewSubscriberFunction(
 		func(m subscription.Message) error {
-			testRun := m.Content.(test.Run)
+			testRun := test.Run{}
+			err := m.DecodeContent(&testRun)
+			if err != nil {
+				return fmt.Errorf("cannot decode Run message: %w", err)
+			}
 			if testRun.LastError != nil {
 				tr.State = testsuite.TestSuiteStateFailed
 				tr.LastError = testRun.LastError

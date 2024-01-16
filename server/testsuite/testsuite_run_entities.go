@@ -1,6 +1,7 @@
 package testsuite
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -76,4 +77,30 @@ func (tr TestSuiteRun) RunMetadata(step int) test.RunMetadata {
 	tr.Metadata["testsuite_version"] = fmt.Sprintf("%d", tr.TestSuiteVersion)
 
 	return tr.Metadata
+}
+
+func (r TestSuiteRun) MarshalJSON() ([]byte, error) {
+	encoded, err := EncodeRun(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(encoded)
+}
+
+func (r *TestSuiteRun) UnmarshalJSON(data []byte) error {
+	var encoded EncodedTestSuiteRun
+
+	if err := json.Unmarshal(data, &encoded); err != nil {
+		return err
+	}
+
+	decoded, err := encoded.ToTestSuiteRun()
+	if err != nil {
+		return err
+	}
+
+	*r = decoded
+
+	return nil
 }
