@@ -6,7 +6,7 @@ import * as S from './Wizard.styled';
 
 const Wizard = () => {
   const {activeStepId, steps, onGoTo} = useWizard();
-  const completedSteps = steps.filter(({status}) => status === 'complete').length;
+  const completedSteps = steps.filter(({state}) => state === 'completed').length;
 
   return (
     <S.Container>

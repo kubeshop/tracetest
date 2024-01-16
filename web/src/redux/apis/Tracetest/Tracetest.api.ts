@@ -11,6 +11,7 @@ import {testSuiteRunEndpoints} from './endpoints/TestSuiteRun.endpoint';
 import {resourceEndpoints} from './endpoints/Resource.endpoint';
 import {variableSetEndpoints} from './endpoints/VariableSet.endpoint';
 import {settingsEndpoints} from './endpoints/Setting.endpoint';
+import {wizardEndpoints} from './endpoints/Wizard.endpoint';
 
 export type TTestApiEndpointBuilder = EndpointBuilder<
   BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError>,
@@ -22,11 +23,7 @@ export type TBaseQueryFn = BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 
 type TTracetestAPI = ReturnType<typeof generateAPI>;
 
-const defaultBaseQuery: TBaseQueryFn = async (
-  args,
-  api,
-  extraOptions
-) => {
+const defaultBaseQuery: TBaseQueryFn = async (args, api, extraOptions) => {
   const baseUrl = Env.get('baseApiUrl');
 
   return fetchBaseQuery({
@@ -57,6 +54,7 @@ const generateAPI = (customBaseQuery = defaultBaseQuery) => {
       ...resourceEndpoints(builder),
       ...variableSetEndpoints(builder),
       ...settingsEndpoints(builder),
+      ...wizardEndpoints(builder),
     }),
   });
 };

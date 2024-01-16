@@ -35,6 +35,7 @@ type ApiApiRouter interface {
 	GetTestSuiteVersion(http.ResponseWriter, *http.Request)
 	GetTestVersion(http.ResponseWriter, *http.Request)
 	GetVersion(http.ResponseWriter, *http.Request)
+	GetWizard(http.ResponseWriter, *http.Request)
 	ImportTestRun(http.ResponseWriter, *http.Request)
 	RerunTestRun(http.ResponseWriter, *http.Request)
 	RunTest(http.ResponseWriter, *http.Request)
@@ -43,6 +44,7 @@ type ApiApiRouter interface {
 	StopTestRun(http.ResponseWriter, *http.Request)
 	TestConnection(http.ResponseWriter, *http.Request)
 	UpdateTestRun(http.ResponseWriter, *http.Request)
+	UpdateWizard(http.ResponseWriter, *http.Request)
 }
 
 // ResourceApiApiRouter defines the required methods for binding the api requests to a responses for the ResourceApiApi
@@ -108,6 +110,7 @@ type ApiApiServicer interface {
 	GetTestSuiteVersion(context.Context, string, int32) (ImplResponse, error)
 	GetTestVersion(context.Context, string, int32) (ImplResponse, error)
 	GetVersion(context.Context, string) (ImplResponse, error)
+	GetWizard(context.Context) (ImplResponse, error)
 	ImportTestRun(context.Context, ExportedTestInformation) (ImplResponse, error)
 	RerunTestRun(context.Context, string, int32) (ImplResponse, error)
 	RunTest(context.Context, string, RunInformation) (ImplResponse, error)
@@ -116,6 +119,7 @@ type ApiApiServicer interface {
 	StopTestRun(context.Context, string, int32) (ImplResponse, error)
 	TestConnection(context.Context, DataStore) (ImplResponse, error)
 	UpdateTestRun(context.Context, string, int32, TestRun) (ImplResponse, error)
+	UpdateWizard(context.Context, Wizard) (ImplResponse, error)
 }
 
 // ResourceApiApiServicer defines the api actions for the ResourceApiApi service

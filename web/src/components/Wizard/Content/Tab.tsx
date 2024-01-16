@@ -10,7 +10,7 @@ interface IProps {
 
 const Tab = ({index, isActive, step}: IProps) => (
   <S.StepTabContainer $isActive={isActive}>
-    {step.status === 'complete' ? (
+    {step.state === 'completed' ? (
       <S.StepTabCheck>
         <CheckOutlined />
       </S.StepTabCheck>

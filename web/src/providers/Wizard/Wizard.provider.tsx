@@ -1,6 +1,8 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import {IWizardState, IWizardStep} from 'types/Wizard.types';
+import {IWizardState, IWizardStep, TWizardMap} from 'types/Wizard.types';
+import Wizard from 'models/Wizard.model';
+import Tracetest from 'redux/apis/Tracetest';
 
 interface IContext extends IWizardState {
   activeStepId: string;
@@ -22,21 +24,30 @@ export const Context = createContext<IContext>({
 
 interface IProps {
   children: React.ReactNode;
-  steps: IWizardStep[];
+  stepsMap: TWizardMap;
 }
 
 export const useWizard = () => useContext(Context);
 
-const WizardProvider = ({children, steps = []}: IProps) => {
+const WizardProvider = ({children, stepsMap}: IProps) => {
+  const {useGetWizardQuery} = Tracetest.instance;
+  const {data: wizard = Wizard()} = useGetWizardQuery({});
+  const steps = useMemo<IWizardStep[]>(
+    () =>
+      wizard.steps.map(step => ({
+        ...step,
+        ...(stepsMap[step.id] || {}),
+      })),
+    [stepsMap, wizard.steps]
+  );
+
   const [activeStep, setActiveStep] = useState(0);
 
   const activeStepId = steps[activeStep]?.id;
   const isFinalStep = activeStep === steps.length - 1;
 
   const onNext = useCallback(() => {
-    if (!isFinalStep) {
-      setActiveStep(step => step + 1);
-    }
+    if (!isFinalStep) setActiveStep(step => step + 1);
   }, [isFinalStep]);
 
   const onPrev = useCallback(() => {
