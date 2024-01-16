@@ -1,11 +1,6 @@
-import {CreateTriggerTypeToPlugin} from 'constants/Plugins.constants';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
-import CreateTestAnalytics from 'services/Analytics/CreateTest.service';
-import TriggerTypeCard from './TriggerTypeCard';
+import TriggerTypeList from './TriggerTypeList';
 import * as S from './TriggerTypeModal.styled';
-import { withCustomization } from '../../providers/Customization';
-
-const pluginList = Object.values(CreateTriggerTypeToPlugin);
 
 interface IProps {
   isOpen: boolean;
@@ -27,20 +22,9 @@ const TriggerTypeModal = ({isOpen, onClose}: IProps) => {
         What kind of trigger do you want to use to initiate this Tracetest?
       </S.Title>
 
-      <S.CardList>
-        {pluginList.map(plugin => (
-          <TriggerTypeCard
-            key={plugin.name}
-            onClick={selectedPlugin => {
-              CreateTestAnalytics.onTriggerSelect(selectedPlugin.type);
-              navigate(`test/create/${selectedPlugin.type}`);
-            }}
-            plugin={plugin}
-          />
-        ))}
-      </S.CardList>
+      <TriggerTypeList onClick={type => navigate(`test/create/${type}`)} />
     </S.Modal>
   );
 };
 
-export default withCustomization(TriggerTypeModal, 'triggerTypeModal');
+export default TriggerTypeModal;

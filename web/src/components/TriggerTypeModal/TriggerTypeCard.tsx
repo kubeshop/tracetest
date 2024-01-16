@@ -5,13 +5,15 @@ import * as S from './TriggerTypeModal.styled';
 interface IProps {
   onClick(plugin: IPlugin): void;
   plugin: IPlugin;
+  isSelected: boolean;
 }
 
-const TriggerTypeCard = ({plugin: {name, title, description, isActive}, plugin, onClick}: IProps) => (
+const TriggerTypeCard = ({plugin: {name, title, description, isActive}, plugin, onClick, isSelected}: IProps) => (
   <S.CardContainer
     data-cy={`${name.toLowerCase()}-plugin`}
     onClick={() => isActive && onClick(plugin)}
     $isActive={isActive}
+    $isSelected={isSelected}
   >
     <S.Circle $isActive={isActive}>
       <S.Check className="check" />
