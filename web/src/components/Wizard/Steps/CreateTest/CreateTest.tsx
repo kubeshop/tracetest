@@ -31,7 +31,7 @@ const CreateTest = () => {
         Choose the kind of trigger to initiate the trace is presented you will be redirected to the test page
       </Typography.Title>
       <Row>
-        <Col span={14}>
+        <Col span={18}>
           <TriggerTypeList onClick={setSelectedType} />
         </Col>
       </Row>
