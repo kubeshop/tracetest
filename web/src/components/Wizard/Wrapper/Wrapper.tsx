@@ -16,7 +16,7 @@ const Wrapper = ({children}: IProps) => {
     () => [
       {
         id: 'tracing-backend',
-        name: 'Setup your Tracing Backend',
+        name: 'Configure access to your OTel traces',
         description: '',
         component: TracingBackend,
         status: 'pending', // grab status from somewhere else

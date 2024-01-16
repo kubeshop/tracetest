@@ -13,10 +13,10 @@ interface IProps {
 const Selector = ({onSelect}: IProps) => {
   return (
     <S.Container>
-      <Typography.Title level={1}>Select Tracing Backend you would like to use</Typography.Title>
+      <Typography.Title level={1}>How should Tracetest receive telemetry from your application?</Typography.Title>
 
       <Typography.Paragraph type="secondary">
-        Tracetest requires configuration details to retrieve traces from your distributed tracing solution.
+        Tell us how Tracetest should get or receive traces from your application
       </Typography.Paragraph>
 
       <S.BackendSelector>
@@ -26,9 +26,9 @@ const Selector = ({onSelect}: IProps) => {
       </S.BackendSelector>
 
       <Typography.Paragraph type="secondary">
-        Don&apos;t see the Data Stores you need?{' '}
+        Don&apos;t see the Tracing Backend you need?{' '}
         <a href={COMMUNITY_SLACK_URL} target="__blank">
-          Submit a request
+          Submit a request.
         </a>
       </Typography.Paragraph>
     </S.Container>
