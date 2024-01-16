@@ -236,14 +236,14 @@ describe('Home', { defaultCommandTimeout: 60000 }, () => {
 
 ### Setting the Environment Variables
 
-Copy the `.env.example` file to `.env` and add the Tracetest API token and agent tokens to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
+Copy the `.env.template` file to `.env` and add the Tracetest API token and agent tokens to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
 
 ### Starting the Pokeshop Demo App
 
 To start the Pokeshop Demo App, run the following command from the root directory:
 
 ```bash
-docker compose up -f docker-compose.yml -f docker-compose.e2e.yml
+docker compose -f docker-compose.yml -f docker-compose.e2e.yml up
 ```
 
 ### Running the Tests

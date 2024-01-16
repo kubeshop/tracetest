@@ -7,8 +7,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/sqlutil"
@@ -103,14 +105,9 @@ func replaceTestSuiteRunSequenceName(sql string, ID id.ID, tenantID string) stri
 }
 
 func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSuiteRun, error) {
-	jsonMetadata, err := json.Marshal(tr.Metadata)
+	encodedRun, err := EncodeRun(tr)
 	if err != nil {
-		return TestSuiteRun{}, fmt.Errorf("failed to marshal test_suite run metadata: %w", err)
-	}
-
-	jsonVariableSet, err := json.Marshal(tr.VariableSet)
-	if err != nil {
-		return TestSuiteRun{}, fmt.Errorf("failed to marshal test_suite run variable set: %w", err)
+		return TestSuiteRun{}, fmt.Errorf("cannot encode TestSuiteRun: %w", err)
 	}
 
 	tx, err := td.db.BeginTx(ctx, nil)
@@ -119,13 +116,13 @@ func (td *RunRepository) CreateRun(ctx context.Context, tr TestSuiteRun) (TestSu
 	}
 
 	params := sqlutil.TenantInsert(ctx,
-		tr.TestSuiteID,
-		tr.TestSuiteVersion,
-		tr.CreatedAt,
-		tr.State,
-		tr.CurrentTest,
-		jsonMetadata,
-		jsonVariableSet,
+		encodedRun.TestSuiteID,
+		encodedRun.TestSuiteVersion,
+		encodedRun.CreatedAt,
+		encodedRun.State,
+		encodedRun.CurrentTest,
+		encodedRun.JsonMetadata,
+		encodedRun.JsonVariableSet,
 	)
 
 	tenantID := sqlutil.TenantIDString(ctx)
@@ -187,19 +184,9 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TestSuiteRun) error {
 		return fmt.Errorf("sql beginTx: %w", err)
 	}
 
-	jsonMetadata, err := json.Marshal(tr.Metadata)
+	encodedRun, err := EncodeRun(tr)
 	if err != nil {
-		return fmt.Errorf("failed to marshal test_suite run metadata: %w", err)
-	}
-
-	jsonVariableSet, err := json.Marshal(tr.VariableSet)
-	if err != nil {
-		return fmt.Errorf("failed to marshal test_suite run variableSet: %w", err)
-	}
-	var lastError *string
-	if tr.LastError != nil {
-		e := tr.LastError.Error()
-		lastError = &e
+		return fmt.Errorf("cannot encode TestSuiteRun: %w", err)
 	}
 
 	pass, fail := tr.ResultsCount()
@@ -208,17 +195,17 @@ func (td *RunRepository) UpdateRun(ctx context.Context, tr TestSuiteRun) error {
 	query, params := sqlutil.Tenant(
 		ctx,
 		updateTestSuiteRunQuery,
-		tr.CompletedAt,
-		tr.State,
-		tr.CurrentTest,
-		lastError,
+		encodedRun.CompletedAt,
+		encodedRun.State,
+		encodedRun.CurrentTest,
+		encodedRun.LastError,
 		pass,
 		fail,
 		allStepsRequiredGatesPassed,
-		jsonMetadata,
-		jsonVariableSet,
-		strconv.Itoa(tr.ID),
-		tr.TestSuiteID,
+		encodedRun.JsonMetadata,
+		encodedRun.JsonVariableSet,
+		strconv.Itoa(encodedRun.ID),
+		encodedRun.TestSuiteID,
 	)
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -398,67 +385,168 @@ func (td *RunRepository) GetTestSuiteRuns(ctx context.Context, ID id.ID, take, s
 }
 
 func (td *RunRepository) readRunRow(row scanner) (TestSuiteRun, error) {
-	r := TestSuiteRun{}
+	encodedRun := EncodedTestSuiteRun{}
 
-	var (
-		jsonVariableSet,
-		jsonMetadata []byte
-
-		lastError *string
-		pass      sql.NullInt32
-		fail      sql.NullInt32
-
-		allStepsRequiredGatesPassed *bool
-	)
+	var lastErr *string
 
 	err := row.Scan(
-		&r.ID,
-		&r.TestSuiteID,
-		&r.TestSuiteVersion,
-		&r.CreatedAt,
-		&r.CompletedAt,
-		&r.State,
-		&r.CurrentTest,
-		&lastError,
-		&pass,
-		&fail,
-		&allStepsRequiredGatesPassed,
-		&jsonMetadata,
-		&jsonVariableSet,
+		&encodedRun.ID,
+		&encodedRun.TestSuiteID,
+		&encodedRun.TestSuiteVersion,
+		&encodedRun.CreatedAt,
+		&encodedRun.CompletedAt,
+		&encodedRun.State,
+		&encodedRun.CurrentTest,
+		&lastErr,
+		&encodedRun.Pass,
+		&encodedRun.Fail,
+		&encodedRun.AllStepsRequiredGatesPassed,
+		&encodedRun.JsonMetadata,
+		&encodedRun.JsonVariableSet,
 	)
+
 	if err != nil {
 		return TestSuiteRun{}, fmt.Errorf("cannot read row: %w", err)
 	}
 
-	err = json.Unmarshal(jsonMetadata, &r.Metadata)
+	if lastErr != nil {
+		encodedRun.LastError = *lastErr
+	}
+
+	return encodedRun.ToTestSuiteRun()
+}
+
+type EncodedTestSuiteRun struct {
+	ID               int
+	TestSuiteID      id.ID
+	TestSuiteVersion int
+
+	CreatedAt   time.Time
+	CompletedAt time.Time
+
+	State       TestSuiteRunState
+	CurrentTest int
+
+	JsonSteps,
+	JsonStepIDs,
+	JsonVariableSet,
+	JsonMetadata []byte
+
+	LastError string
+
+	Pass,
+	Fail sql.NullInt32
+
+	AllStepsRequiredGatesPassed bool
+}
+
+func (r EncodedTestSuiteRun) ToTestSuiteRun() (TestSuiteRun, error) {
+	tr := TestSuiteRun{
+		ID:               r.ID,
+		TestSuiteID:      r.TestSuiteID,
+		TestSuiteVersion: r.TestSuiteVersion,
+
+		CreatedAt:   r.CreatedAt,
+		CompletedAt: r.CompletedAt,
+
+		State:                       r.State,
+		CurrentTest:                 r.CurrentTest,
+		AllStepsRequiredGatesPassed: r.AllStepsRequiredGatesPassed,
+	}
+
+	if r.Pass.Valid {
+		tr.Pass = int(r.Pass.Int32)
+	}
+
+	if r.Fail.Valid {
+		tr.Fail = int(r.Fail.Int32)
+	}
+
+	err := json.Unmarshal(r.JsonMetadata, &tr.Metadata)
 	if err != nil {
 		return TestSuiteRun{}, fmt.Errorf("cannot parse Metadata: %w", err)
 	}
 
-	err = json.Unmarshal(jsonVariableSet, &r.VariableSet)
+	err = json.Unmarshal(r.JsonVariableSet, &tr.VariableSet)
 	if err != nil {
 		return TestSuiteRun{}, fmt.Errorf("cannot parse VariableSet: %w", err)
 	}
 
-	if lastError != nil && *lastError != "" {
-		r.LastError = fmt.Errorf(*lastError)
+	if !isValidSliceJSON(r.JsonSteps) {
+		err = json.Unmarshal(r.JsonSteps, &tr.Steps)
+		if err != nil {
+			return TestSuiteRun{}, fmt.Errorf("cannot parse Steps: %w", err)
+		}
 	}
 
-	if pass.Valid {
-		r.Pass = int(pass.Int32)
+	if !isValidSliceJSON(r.JsonSteps) {
+		err = json.Unmarshal(r.JsonStepIDs, &tr.StepIDs)
+		if err != nil {
+			return TestSuiteRun{}, fmt.Errorf("cannot parse StepIDs: %w", err)
+		}
 	}
 
-	if fail.Valid {
-		r.Fail = int(fail.Int32)
+	if r.LastError != "" {
+		tr.LastError = fmt.Errorf(r.LastError)
 	}
 
-	// checks if the flag exists, if it doesn't we use the fail field to determine if all steps passed
-	if allStepsRequiredGatesPassed == nil {
-		failed := r.Fail == 0
-		allStepsRequiredGatesPassed = &failed
+	return tr, nil
+}
+
+func isValidSliceJSON(j []byte) bool {
+	return slices.Contains([]string{"[]", "", "null"}, string(j))
+}
+
+func EncodeRun(run TestSuiteRun) (EncodedTestSuiteRun, error) {
+	jsonMetadata, err := json.Marshal(run.Metadata)
+	if err != nil {
+		return EncodedTestSuiteRun{}, fmt.Errorf("failed to marshal TestSuiteRun metadata: %w", err)
 	}
 
-	r.AllStepsRequiredGatesPassed = *allStepsRequiredGatesPassed
+	jsonVariableSet, err := json.Marshal(run.VariableSet)
+	if err != nil {
+		return EncodedTestSuiteRun{}, fmt.Errorf("failed to marshal TestSuiteRun variable set: %w", err)
+	}
 
-	return r, nil
+	jsonSteps, err := json.Marshal(run.Steps)
+	if err != nil {
+		return EncodedTestSuiteRun{}, fmt.Errorf("failed to marshal TestSuiteRun steps: %w", err)
+	}
+
+	jsonStepIDs, err := json.Marshal(run.StepIDs)
+	if err != nil {
+		return EncodedTestSuiteRun{}, fmt.Errorf("failed to marshal TestSuiteRun step IDs: %w", err)
+	}
+
+	var lastError string
+	if run.LastError != nil {
+		lastError = run.LastError.Error()
+	}
+
+	pass := sql.NullInt32{Int32: int32(run.Pass), Valid: true}
+	fail := sql.NullInt32{Int32: int32(run.Fail), Valid: true}
+
+	return EncodedTestSuiteRun{
+		ID:               run.ID,
+		TestSuiteID:      run.TestSuiteID,
+		TestSuiteVersion: run.TestSuiteVersion,
+
+		CreatedAt:   run.CreatedAt,
+		CompletedAt: run.CompletedAt,
+
+		State:       run.State,
+		CurrentTest: run.CurrentTest,
+
+		JsonSteps:       jsonSteps,
+		JsonStepIDs:     jsonStepIDs,
+		JsonMetadata:    jsonMetadata,
+		JsonVariableSet: jsonVariableSet,
+
+		LastError: lastError,
+
+		Pass: pass,
+		Fail: fail,
+
+		AllStepsRequiredGatesPassed: run.AllStepsRequiredGatesPassed,
+	}, nil
 }

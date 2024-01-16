@@ -50,10 +50,10 @@ func (u dbUpdater) Update(ctx context.Context, run test.Run) error {
 }
 
 type subscriptionUpdater struct {
-	manager *subscription.Manager
+	manager subscription.Manager
 }
 
-func NewSubscriptionUpdater(manager *subscription.Manager) RunUpdater {
+func NewSubscriptionUpdater(manager subscription.Manager) RunUpdater {
 	return subscriptionUpdater{manager}
 }
 

@@ -120,12 +120,13 @@ func provision(provisioner *provisioning.Provisioner, file string) {
 	fmt.Println("[Provisioning]: success")
 }
 
-func (app *App) subscribeToConfigChanges(sm *subscription.Manager) {
+func (app *App) subscribeToConfigChanges(sm subscription.Manager) {
 	sm.Subscribe(config.ResourceID, subscription.NewSubscriberFunction(
 		func(m subscription.Message) error {
-			configFromDB, ok := m.Content.(config.Config)
-			if !ok {
-				return fmt.Errorf("cannot read update to configFromDB. unexpected type %T", m.Content)
+			configFromDB := config.Config{}
+			err := m.DecodeContent(&configFromDB)
+			if err != nil {
+				return fmt.Errorf("cannot read update to configFromDB: %w", err)
 			}
 
 			return app.initAnalytics(configFromDB)
@@ -174,7 +175,12 @@ func (app *App) Start(opts ...appOption) error {
 		log.Fatal(err)
 	}
 
-	subscriptionManager := subscription.NewManager()
+	natsConn, err := nats.Connect(app.cfg.NATSEndpoint())
+	if err != nil {
+		log.Printf("could not connect to NATS: %s. Defaulting to InMemory Queues", err)
+	}
+
+	subscriptionManager := subscription.NewManager(subscription.WithNats(natsConn))
 	app.subscribeToConfigChanges(subscriptionManager)
 
 	configRepo := config.NewRepository(db, config.WithPublisher(subscriptionManager))
@@ -239,11 +245,6 @@ func (app *App) Start(opts ...appOption) error {
 	if app.cfg.OtlpServerEnabled() {
 		eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
 		registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, tracer)
-	}
-
-	natsConn, err := nats.Connect(app.cfg.NATSEndpoint())
-	if err != nil {
-		log.Printf("could not connect to NATS: %s. Defaulting to InMemory Queues", err)
 	}
 
 	executorDriverFactory := pipeline.NewDriverFactory[executor.Job](natsConn)
@@ -535,7 +536,7 @@ type httpServerConfig interface {
 	ExperimentalFeatures() []string
 }
 
-func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscriptionManager *subscription.Manager) {
+func registerWSHandler(router *mux.Router, mappers mappings.Mappings, subscriptionManager subscription.Manager) {
 	wsRouter := websocket.NewRouter()
 	wsRouter.Add("subscribe", websocket.NewSubscribeCommandExecutor(subscriptionManager, mappers))
 	wsRouter.Add("unsubscribe", websocket.NewUnsubscribeCommandExecutor(subscriptionManager))

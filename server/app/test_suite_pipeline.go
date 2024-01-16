@@ -12,7 +12,7 @@ func buildTestSuitePipeline(
 	tranRepo *testsuite.Repository,
 	runRepo *testsuite.RunRepository,
 	testRunner *executor.TestPipeline,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 	meter metric.Meter,
 ) *executor.TestSuitesPipeline {
 	tranRunner := executor.NewTestSuiteRunner(testRunner, runRepo, subscriptionManager)

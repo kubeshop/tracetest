@@ -7,17 +7,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func decodeMessage(message subscription.Message) subscription.Message {
+	str := ""
+	message.DecodeContent(&str)
+
+	message.Content = str
+	return message
+}
+
 func TestManagerSubscriptionDifferentResources(t *testing.T) {
 	manager := subscription.NewManager()
 	var messageReceivedBySubscriber1, messageReceivedBySubscriber2 subscription.Message
 
 	subscriber1 := subscription.NewSubscriberFunction(func(message subscription.Message) error {
-		messageReceivedBySubscriber1 = message
+		messageReceivedBySubscriber1 = decodeMessage(message)
 		return nil
 	})
 
 	subscriber2 := subscription.NewSubscriberFunction(func(message subscription.Message) error {
-		messageReceivedBySubscriber2 = message
+		messageReceivedBySubscriber2 = decodeMessage(message)
 		return nil
 	})
 
@@ -77,7 +85,7 @@ func TestManagerUnsubscribe(t *testing.T) {
 	var receivedMessage subscription.Message
 
 	subscriber := subscription.NewSubscriberFunction(func(message subscription.Message) error {
-		receivedMessage = message
+		receivedMessage = decodeMessage(message)
 		return nil
 	})
 

@@ -20,7 +20,7 @@ type defaultAssertionRunner struct {
 	updater             RunUpdater
 	assertionExecutor   AssertionExecutor
 	outputsProcessor    OutputsProcessorFn
-	subscriptionManager *subscription.Manager
+	subscriptionManager subscription.Manager
 	eventEmitter        EventEmitter
 }
 
@@ -28,7 +28,7 @@ func NewAssertionRunner(
 	updater RunUpdater,
 	assertionExecutor AssertionExecutor,
 	op OutputsProcessorFn,
-	subscriptionManager *subscription.Manager,
+	subscriptionManager subscription.Manager,
 	eventEmitter EventEmitter,
 ) *defaultAssertionRunner {
 	return &defaultAssertionRunner{
