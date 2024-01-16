@@ -77,7 +77,6 @@ type ingester struct {
 	subManager     subscription.Manager
 	tracer         trace.Tracer
 
-	testingConnection bool
 	spanCount         int
 	lastSpanTimestamp time.Time
 }
@@ -87,7 +86,6 @@ func (i *ingester) startTesterListener() {
 		i.mutex.Lock()
 		defer i.mutex.Unlock()
 
-		i.testingConnection = true
 		var response testconnection.OTLPConnectionTestResponse
 		response.NumberSpans = i.spanCount
 		response.LastSpanTimestamp = i.lastSpanTimestamp
@@ -107,13 +105,10 @@ func (i *ingester) startTesterListener() {
 }
 
 func (i *ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
-	ds, err := i.dsRepo.Current(ctx)
-	if err != nil {
-		i.log("could not get current datastore")
-		return &pb.ExportTraceServiceResponse{}, nil
-	}
+	i.increaseSpanCount(countSpans(request.ResourceSpans))
 
-	if !ds.IsOTLPBasedProvider() && !i.testingConnection {
+	ds, err := i.dsRepo.Current(ctx)
+	if err != nil || !ds.IsOTLPBasedProvider() {
 		i.log("OTLP server is not enabled. Ignoring request")
 		return &pb.ExportTraceServiceResponse{}, nil
 	}
@@ -131,7 +126,6 @@ func (i *ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceReq
 	// each request can have different traces so we need to go over each individual trace
 	for ix, modelTrace := range receivedTraces {
 		i.log("processing trace %d/%d traceID %s", ix+1, len(receivedTraces), modelTrace.ID.String())
-		i.increaseSpanCount(len(modelTrace.Flat))
 		err = i.processTrace(ctx, modelTrace, ix, requestType)
 		if err != nil {
 			span.RecordError(err, trace.WithAttributes(attribute.String("tracetest.ingestor.trace_id", modelTrace.ID.String())))
@@ -152,6 +146,17 @@ func (i *ingester) increaseSpanCount(newSpansCount int) {
 
 	i.spanCount += newSpansCount
 	i.lastSpanTimestamp = time.Now()
+}
+
+func countSpans(resourceSpans []*v1.ResourceSpans) int {
+	count := 0
+	for _, resourceSpan := range resourceSpans {
+		for _, scopeSpan := range resourceSpan.ScopeSpans {
+			count += len(scopeSpan.Spans)
+		}
+	}
+
+	return count
 }
 
 func (i *ingester) processTrace(ctx context.Context, modelTrace traces.Trace, ix int, requestType RequestType) error {

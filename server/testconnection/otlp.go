@@ -89,10 +89,9 @@ func (t *OTLPConnectionTester) GetSpanCount(ctx context.Context, opts ...GetSpan
 
 	semaphore := semaphore.NewWeighted(1)
 	tenantID := middleware.TenantIDFromContext(ctx)
-	t.subscriptionManager.Publish(GetSpanCountTopicName(WithTenantID(tenantID)), OTLPConnectionTestRequest{})
+	semaphore.Acquire(ctx, 1)
 
 	var response OTLPConnectionTestResponse
-	semaphore.Acquire(ctx, 1)
 	topicName := PostSpanCountTopicName(WithTenantID(tenantID))
 	subscriber := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		m.DecodeContent(&response)
@@ -103,6 +102,8 @@ func (t *OTLPConnectionTester) GetSpanCount(ctx context.Context, opts ...GetSpan
 	t.subscriptionManager.Subscribe(topicName, subscriber)
 	defer t.subscriptionManager.Unsubscribe(topicName, subscriber.ID())
 
+	t.subscriptionManager.Publish(GetSpanCountTopicName(WithTenantID(tenantID)), OTLPConnectionTestRequest{})
+
 	// Acts as a WaitGroup.Wait() that is canceled with the context in case of timeout.
 	err := semaphore.Acquire(ctx, 1)
 	if err != nil {
@@ -110,4 +111,9 @@ func (t *OTLPConnectionTester) GetSpanCount(ctx context.Context, opts ...GetSpan
 	}
 
 	return response, nil
+}
+
+func (t *OTLPConnectionTester) ResetSpanCount(ctx context.Context) {
+	tenantID := middleware.TenantIDFromContext(ctx)
+	t.subscriptionManager.Publish(ResetSpanCountTopicName(WithTenantID(tenantID)), nil)
 }

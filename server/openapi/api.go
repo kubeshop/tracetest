@@ -23,6 +23,7 @@ type ApiApiRouter interface {
 	DryRunAssertion(http.ResponseWriter, *http.Request)
 	ExportTestRun(http.ResponseWriter, *http.Request)
 	ExpressionResolve(http.ResponseWriter, *http.Request)
+	GetOTLPConnectionInformation(http.ResponseWriter, *http.Request)
 	GetResources(http.ResponseWriter, *http.Request)
 	GetRunResultJUnit(http.ResponseWriter, *http.Request)
 	GetTestResultSelectedSpans(http.ResponseWriter, *http.Request)
@@ -37,12 +38,12 @@ type ApiApiRouter interface {
 	GetVersion(http.ResponseWriter, *http.Request)
 	ImportTestRun(http.ResponseWriter, *http.Request)
 	RerunTestRun(http.ResponseWriter, *http.Request)
+	ResetOTLPConnectionInformation(http.ResponseWriter, *http.Request)
 	RunTest(http.ResponseWriter, *http.Request)
 	RunTestSuite(http.ResponseWriter, *http.Request)
 	SkipTraceCollection(http.ResponseWriter, *http.Request)
 	StopTestRun(http.ResponseWriter, *http.Request)
 	TestConnection(http.ResponseWriter, *http.Request)
-	TestOTLPConnection(http.ResponseWriter, *http.Request)
 	UpdateTestRun(http.ResponseWriter, *http.Request)
 }
 
@@ -97,6 +98,7 @@ type ApiApiServicer interface {
 	DryRunAssertion(context.Context, string, int32, TestSpecs) (ImplResponse, error)
 	ExportTestRun(context.Context, string, int32) (ImplResponse, error)
 	ExpressionResolve(context.Context, ResolveRequestInfo) (ImplResponse, error)
+	GetOTLPConnectionInformation(context.Context) (ImplResponse, error)
 	GetResources(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	GetRunResultJUnit(context.Context, string, int32) (ImplResponse, error)
 	GetTestResultSelectedSpans(context.Context, string, int32, string) (ImplResponse, error)
@@ -111,12 +113,12 @@ type ApiApiServicer interface {
 	GetVersion(context.Context, string) (ImplResponse, error)
 	ImportTestRun(context.Context, ExportedTestInformation) (ImplResponse, error)
 	RerunTestRun(context.Context, string, int32) (ImplResponse, error)
+	ResetOTLPConnectionInformation(context.Context) (ImplResponse, error)
 	RunTest(context.Context, string, RunInformation) (ImplResponse, error)
 	RunTestSuite(context.Context, string, RunInformation) (ImplResponse, error)
 	SkipTraceCollection(context.Context, string, int32) (ImplResponse, error)
 	StopTestRun(context.Context, string, int32) (ImplResponse, error)
 	TestConnection(context.Context, DataStore) (ImplResponse, error)
-	TestOTLPConnection(context.Context) (ImplResponse, error)
 	UpdateTestRun(context.Context, string, int32, TestRun) (ImplResponse, error)
 }
 

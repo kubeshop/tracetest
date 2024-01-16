@@ -36,4 +36,4 @@ services:
         depends_on:
             - jaeger
         ports:
-            - 4317:4317
+            - 44317:4317

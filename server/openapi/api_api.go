@@ -81,6 +81,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.ExpressionResolve,
 		},
 		{
+			"GetOTLPConnectionInformation",
+			strings.ToUpper("Get"),
+			"/api/config/connection/otlp",
+			c.GetOTLPConnectionInformation,
+		},
+		{
 			"GetResources",
 			strings.ToUpper("Get"),
 			"/api/resources",
@@ -165,6 +171,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RerunTestRun,
 		},
 		{
+			"ResetOTLPConnectionInformation",
+			strings.ToUpper("Post"),
+			"/api/config/connection/otlp/reset",
+			c.ResetOTLPConnectionInformation,
+		},
+		{
 			"RunTest",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run",
@@ -193,12 +205,6 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Post"),
 			"/api/config/connection",
 			c.TestConnection,
-		},
-		{
-			"TestOTLPConnection",
-			strings.ToUpper("Post"),
-			"/api/config/connection/otlp",
-			c.TestOTLPConnection,
 		},
 		{
 			"UpdateTestRun",
@@ -322,6 +328,19 @@ func (c *ApiApiController) ExpressionResolve(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.ExpressionResolve(r.Context(), resolveRequestInfoParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetOTLPConnectionInformation - get information about the OTLP connection
+func (c *ApiApiController) GetOTLPConnectionInformation(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetOTLPConnectionInformation(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -647,6 +666,19 @@ func (c *ApiApiController) RerunTestRun(w http.ResponseWriter, r *http.Request) 
 
 }
 
+// ResetOTLPConnectionInformation - reset the OTLP connection span count
+func (c *ApiApiController) ResetOTLPConnectionInformation(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.ResetOTLPConnectionInformation(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // RunTest - run test
 func (c *ApiApiController) RunTest(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -759,19 +791,6 @@ func (c *ApiApiController) TestConnection(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.TestConnection(r.Context(), dataStoreParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// TestOTLPConnection - Tests if the server is receiving spans via OTLP endpoint
-func (c *ApiApiController) TestOTLPConnection(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.TestOTLPConnection(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
