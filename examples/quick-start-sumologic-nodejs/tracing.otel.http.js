@@ -6,6 +6,6 @@ const sdk = new opentelemetry.NodeSDK({
   // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT is passed into "new OTLPTraceExporter" automatically
   traceExporter: new OTLPTraceExporter(),
   instrumentations: [getNodeAutoInstrumentations()],
-  serviceName: 'quick-start-nodejs',
+  serviceName: 'quick-start-sumologic-nodejs',
 })
 sdk.start()
