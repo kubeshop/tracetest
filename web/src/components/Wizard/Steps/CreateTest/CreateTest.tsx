@@ -1,8 +1,10 @@
-import {Button, Col, Row, Typography} from 'antd';
+import {Col, Row, Typography} from 'antd';
 import {TriggerTypeList} from 'components/TriggerTypeModal';
 import {useCallback, useState} from 'react';
 import {TriggerTypes} from 'constants/Test.constants';
 import {ADD_TEST_URL} from 'constants/Common.constants';
+import AllowButton, {Operation} from 'components/AllowButton';
+import CreateButton from 'components/CreateButton';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import * as S from './CreateTest.styled';
 
@@ -34,9 +36,16 @@ const CreateTest = () => {
         </Col>
       </Row>
       <S.ButtonContainer>
-        <Button disabled={!selectedType} onClick={handleNext} type="primary">
+        <AllowButton
+          ButtonComponent={CreateButton}
+          data-cy="wizard-create-test-button"
+          disabled={!selectedType}
+          onClick={handleNext}
+          operation={Operation.Edit}
+          type="primary"
+        >
           Next
-        </Button>
+        </AllowButton>
       </S.ButtonContainer>
     </>
   );
