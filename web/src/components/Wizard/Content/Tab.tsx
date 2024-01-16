@@ -1,4 +1,5 @@
 import {CheckOutlined} from '@ant-design/icons';
+import {isStepCompleted} from 'models/Wizard.model';
 import {IWizardStep} from 'types/Wizard.types';
 import * as S from './Content.styled';
 
@@ -10,7 +11,7 @@ interface IProps {
 
 const Tab = ({index, isActive, step}: IProps) => (
   <S.StepTabContainer $isActive={isActive}>
-    {step.status === 'complete' ? (
+    {isStepCompleted(step) ? (
       <S.StepTabCheck>
         <CheckOutlined />
       </S.StepTabCheck>

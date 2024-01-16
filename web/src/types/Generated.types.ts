@@ -196,6 +196,12 @@ export interface paths {
     /** Delete an Linter from Tracetest */
     delete: operations["deleteLinter"];
   };
+  "/wizard": {
+    /** Get the configured Wizard */
+    get: operations["getWizard"];
+    /** Update a Wizard used on Tracetest */
+    put: operations["updateWizard"];
+  };
 }
 
 export interface components {}
@@ -1168,6 +1174,43 @@ export interface operations {
       404: unknown;
       /** problem deleting an Linter */
       500: unknown;
+    };
+  };
+  /** Get the configured Wizard */
+  getWizard: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["wizards.yaml"]["components"]["schemas"]["Wizard"];
+        };
+      };
+      /** Wizard not found */
+      404: unknown;
+      /** problem getting a Wizard */
+      500: unknown;
+    };
+  };
+  /** Update a Wizard used on Tracetest */
+  updateWizard: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["wizards.yaml"]["components"]["schemas"]["Wizard"];
+        };
+      };
+      /** invalid Wizard, some data was sent in incorrect format. */
+      400: unknown;
+      /** Wizard not found */
+      404: unknown;
+      /** problem updating an Wizard */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["wizards.yaml"]["components"]["schemas"]["Wizard"];
+      };
     };
   };
 }
@@ -2172,6 +2215,25 @@ export interface external {
           uiEndpoint?: string;
           agentEndpoint?: string;
           apiEndpoint?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "wizards.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        Wizard: {
+          steps?: external["wizards.yaml"]["components"]["schemas"]["WizardStep"][];
+        };
+        WizardStep: {
+          /** @enum {string} */
+          id?: "tracing_backend" | "create_test" | "agent";
+          /** @enum {string} */
+          state?: "inProgress" | "completed" | "pending";
+          /** Format: date-time */
+          completedAt?: string;
         };
       };
     };

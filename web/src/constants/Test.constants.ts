@@ -65,6 +65,7 @@ export enum TracetestApiTags {
   EXPRESSION = 'expression',
   RESOURCE = 'resource',
   DATA_STORE = 'dataStore',
+  WIZARD = 'wizard',
   SETTING = 'setting',
 }
 
