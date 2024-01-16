@@ -14,7 +14,7 @@ telemetry:
       exporter:
         type: collector
         collector:
-          endpoint: localhost:44317
+          endpoint: localhost:4317
 
 server:
   telemetry:
