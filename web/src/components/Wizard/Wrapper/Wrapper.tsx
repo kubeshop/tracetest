@@ -24,24 +24,6 @@ const steps: TWizardMap = {
   },
 };
 
-const steps: TWizardMap = {
-  agent: {
-    name: '',
-    description: '',
-    component: () => <div>Agent</div>,
-  },
-  tracing_backend: {
-    name: 'Configure access to your OTel traces',
-    description: '',
-    component: TracingBackend,
-  },
-  create_test: {
-    name: 'Run your first test',
-    description: '',
-    component: RunTest,
-  },
-};
-
 interface IProps {
   children: React.ReactNode;
 }
