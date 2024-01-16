@@ -1,7 +1,7 @@
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 import {Modal as AntModal, Typography} from 'antd';
 
-export const CardContainer = styled.div<{$isActive: boolean}>`
+export const CardContainer = styled.div<{$isActive: boolean; $isSelected: boolean}>`
   align-items: center;
   background: ${({theme}) => theme.color.white};
   border: 1px solid ${({theme}) => theme.color.borderLight};
@@ -21,6 +21,17 @@ export const CardContainer = styled.div<{$isActive: boolean}>`
       opacity: 1;
     }
   }
+
+  ${({$isSelected}) =>
+    $isSelected &&
+    css`
+      background: ${({theme}) => theme.color.background};
+      border: 1px solid ${({theme}) => theme.color.primary};
+
+      .check {
+        opacity: 1;
+      }
+    `}
 `;
 
 export const CardContent = styled.div`

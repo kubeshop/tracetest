@@ -4,7 +4,7 @@ import {withCustomization} from 'providers/Customization';
 import DataStoreProvider from 'providers/DataStore/DataStore.provider';
 import SettingsProvider from 'providers/Settings/Settings.provider';
 import TracingBackend from '../Steps/TracingBackend';
-import RunTest from '../Steps/RunTest';
+import CreateTest from '../Steps/CreateTest';
 
 const steps: TWizardMap = {
   agent: {
@@ -20,7 +20,7 @@ const steps: TWizardMap = {
   create_test: {
     name: 'Run your first test',
     description: '',
-    component: RunTest,
+    component: CreateTest,
   },
 };
 
