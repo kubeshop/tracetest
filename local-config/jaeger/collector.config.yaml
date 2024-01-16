@@ -14,8 +14,8 @@ processors:
     sampling_percentage: 100
 
 exporters:
-  otlp:
-    endpoint: 172.17.0.1:4317
+  jaeger:
+    endpoint: jaeger:14250
     tls:
       insecure: true
 
@@ -24,4 +24,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
-      exporters: [otlp]
+      exporters: [jaeger]
