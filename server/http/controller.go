@@ -717,7 +717,7 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	return openapi.Response(http.StatusOK, c.mappers.Out.ConnectionTestResult(job.TestResult)), nil
 }
 
-func (*controller) TestOTLPConnection(context.Context) (openapi.ImplResponse, error) {
+func (c *controller) TestOTLPConnection(ctx context.Context) (openapi.ImplResponse, error) {
 	return openapi.Response(http.StatusNotImplemented, nil), nil
 }
 

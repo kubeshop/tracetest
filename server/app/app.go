@@ -386,8 +386,16 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 		)
 }
 
-func registerOtlpServer(app *App, tracesRepo *traces.TraceRepository, runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository, tracer trace.Tracer) {
-	ingester := otlp.NewIngester(tracesRepo, runRepository, eventEmitter, dsRepo, tracer)
+func registerOtlpServer(
+	app *App,
+	tracesRepo *traces.TraceRepository,
+	runRepository test.RunRepository,
+	eventEmitter executor.EventEmitter,
+	dsRepo *datastore.Repository,
+	subManager subscription.Manager,
+	tracer trace.Tracer,
+) {
+	ingester := otlp.NewIngester(tracesRepo, runRepository, eventEmitter, dsRepo, subManager, tracer)
 	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester, tracer)
 	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()

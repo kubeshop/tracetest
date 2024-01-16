@@ -11,7 +11,9 @@ import (
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model/events"
+	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/testconnection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -38,8 +40,15 @@ type tracePersister interface {
 	UpdateTraceSpans(context.Context, *traces.Trace) error
 }
 
-func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository, tracer trace.Tracer) ingester {
-	return ingester{
+func NewIngester(
+	tracePersister tracePersister,
+	runRepository runGetter,
+	eventEmitter executor.EventEmitter,
+	dsRepo *datastore.Repository,
+	subManager subscription.Manager,
+	tracer trace.Tracer,
+) ingester {
+	ingester := ingester{
 		log: func(format string, args ...interface{}) {
 			log.Printf("[OTLP] "+format, args...)
 		},
@@ -47,8 +56,13 @@ func NewIngester(tracePersister tracePersister, runRepository runGetter, eventEm
 		runGetter:      runRepository,
 		eventEmitter:   eventEmitter,
 		dsRepo:         dsRepo,
+		subManager:     subManager,
 		tracer:         tracer,
 	}
+
+	ingester.startTesterListener()
+
+	return ingester
 }
 
 type ingester struct {
@@ -57,7 +71,22 @@ type ingester struct {
 	runGetter      runGetter
 	eventEmitter   executor.EventEmitter
 	dsRepo         *datastore.Repository
+	subManager     subscription.Manager
 	tracer         trace.Tracer
+
+	captureTracesForConnectionTest bool
+}
+
+func (i *ingester) startTesterListener() {
+	i.subManager.Subscribe("start_otlp_connection_test_", subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		i.captureTracesForConnectionTest = true
+		return nil
+	}))
+
+	i.subManager.Subscribe("end_otlp_connection_test_", subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		i.captureTracesForConnectionTest = false
+		return nil
+	}))
 }
 
 func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
@@ -77,6 +106,12 @@ func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 	defer span.End()
 	receivedTraces := i.traces(request.ResourceSpans)
 	i.log("received %d traces", len(receivedTraces))
+
+	if i.captureTracesForConnectionTest {
+		i.subManager.Publish("otlp_connection_test_spans_incoming", testconnection.OTLPConnectionTestResponse{
+			NumberTraces: len(receivedTraces),
+		})
+	}
 
 	// each request can have different traces so we need to go over each individual trace
 	for ix, modelTrace := range receivedTraces {
