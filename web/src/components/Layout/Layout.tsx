@@ -1,4 +1,4 @@
-import {AppstoreAddOutlined, ClusterOutlined, GlobalOutlined, SettingOutlined} from '@ant-design/icons';
+import {AppstoreAddOutlined, ClusterOutlined, GlobalOutlined, HomeOutlined, SettingOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -14,6 +14,7 @@ import VariableSetProvider from 'providers/VariableSet';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import MissingVariablesModalProvider from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import NotificationProvider from 'providers/Notification/Notification.provider';
+import WizardWrapper from 'components/Wizard/Wrapper';
 import {ConfigMode} from 'types/DataStore.types';
 import * as S from './Layout.styled';
 import MenuBottom from './MenuBottom';
@@ -27,18 +28,24 @@ interface IProps {
 const menuItems = [
   {
     key: '0',
-    icon: <ClusterOutlined />,
-    label: <Link to="/">Tests</Link>,
-    path: '/tests',
+    icon: <HomeOutlined />,
+    label: <Link to="/">Home</Link>,
+    path: '/',
   },
   {
     key: '1',
+    icon: <ClusterOutlined />,
+    label: <Link to="/tests">Tests</Link>,
+    path: '/tests',
+  },
+  {
+    key: '2',
     icon: <AppstoreAddOutlined />,
     label: <Link to="/testsuites">Test Suites</Link>,
     path: '/testsuites',
   },
   {
-    key: '2',
+    key: '3',
     icon: <GlobalOutlined />,
     label: <Link to="/variablesets">Variable Sets</Link>,
     path: '/variablesets',
@@ -61,63 +68,65 @@ const Layout = ({hasMenu = false}: IProps) => {
   const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 
   return (
-    <NotificationProvider>
-      <MissingVariablesModalProvider>
-        <FileViewerModalProvider>
-          <ConfirmationModalProvider>
-            <VariableSetProvider>
-              <GuidedTourProvider>
-                <CreateTestProvider>
-                  <S.Layout hasSider>
-                    {hasMenu && (
-                      <S.Sider width={256}>
-                        <S.LogoContainer>
-                          <Link to="/">
-                            <img alt="Tracetest logo" src={logoAsset} />
-                          </Link>
-                        </S.LogoContainer>
+    <ConfirmationModalProvider>
+      <NotificationProvider>
+        <WizardWrapper>
+          <MissingVariablesModalProvider>
+            <FileViewerModalProvider>
+              <VariableSetProvider>
+                <GuidedTourProvider>
+                  <CreateTestProvider>
+                    <S.Layout hasSider>
+                      {hasMenu && (
+                        <S.Sider width={256}>
+                          <S.LogoContainer>
+                            <Link to="/">
+                              <img alt="Tracetest logo" src={logoAsset} />
+                            </Link>
+                          </S.LogoContainer>
 
-                        <S.SiderContent>
-                          <S.MenuContainer>
-                            <Menu
-                              defaultSelectedKeys={[
-                                menuItems.findIndex(value => value.path === pathname).toString() || '0',
-                              ]}
-                              items={menuItems}
-                              mode="inline"
-                              theme="dark"
-                            />
-                          </S.MenuContainer>
+                          <S.SiderContent>
+                            <S.MenuContainer>
+                              <Menu
+                                defaultSelectedKeys={[
+                                  menuItems.findIndex(value => value.path === pathname).toString() || '0',
+                                ]}
+                                items={menuItems}
+                                mode="inline"
+                                theme="dark"
+                              />
+                            </S.MenuContainer>
 
-                          <S.MenuContainer>
-                            <MenuBottom />
-                            <Menu
-                              defaultSelectedKeys={[
-                                footerMenuItems.findIndex(value => value.path === pathname).toString() || '0',
-                              ]}
-                              items={footerMenuItems}
-                              mode="inline"
-                              theme="dark"
-                            />
-                          </S.MenuContainer>
-                        </S.SiderContent>
-                      </S.Sider>
-                    )}
+                            <S.MenuContainer>
+                              <MenuBottom />
+                              <Menu
+                                defaultSelectedKeys={[
+                                  footerMenuItems.findIndex(value => value.path === pathname).toString() || '0',
+                                ]}
+                                items={footerMenuItems}
+                                mode="inline"
+                                theme="dark"
+                              />
+                            </S.MenuContainer>
+                          </S.SiderContent>
+                        </S.Sider>
+                      )}
 
-                    <S.Layout>
-                      <Header hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
-                      <S.Content $hasMenu={hasMenu}>
-                        <Outlet />
-                      </S.Content>
+                      <S.Layout>
+                        <Header hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
+                        <S.Content $hasMenu={hasMenu}>
+                          <Outlet />
+                        </S.Content>
+                      </S.Layout>
                     </S.Layout>
-                  </S.Layout>
-                </CreateTestProvider>
-              </GuidedTourProvider>
-            </VariableSetProvider>
-          </ConfirmationModalProvider>
-        </FileViewerModalProvider>
-      </MissingVariablesModalProvider>
-    </NotificationProvider>
+                  </CreateTestProvider>
+                </GuidedTourProvider>
+              </VariableSetProvider>
+            </FileViewerModalProvider>
+          </MissingVariablesModalProvider>
+        </WizardWrapper>
+      </NotificationProvider>
+    </ConfirmationModalProvider>
   );
 };
 

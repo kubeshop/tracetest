@@ -49,4 +49,13 @@ const DataStore = ({
   sumologic,
 });
 
+export const fromType = (type: SupportedDataStores): DataStore =>
+  DataStore({
+    spec: {
+      type,
+      name: 'current',
+      id: 'current',
+    },
+  });
+
 export default DataStore;

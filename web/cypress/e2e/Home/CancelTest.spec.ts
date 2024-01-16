@@ -1,5 +1,5 @@
 describe('Cancel Create test', () => {
-  beforeEach(() => cy.visit('/'));
+  beforeEach(() => cy.visit('/tests'));
 
   it('should cancel a create test flow', () => {
     cy.openTestCreationModal();

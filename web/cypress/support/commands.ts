@@ -10,13 +10,13 @@ export const getComparatorListId = (number: number) => `#assertion-form_assertio
 export const getValueFromList = (number: number) => `.cm-tooltip-autocomplete li:nth-child(${number})`;
 
 Cypress.Commands.add('createMultipleTestRuns', (id: string, count: number) => {
-  cy.visit('/');
+  cy.visit('/tests');
 
   for (let i = 0; i < count; i += 1) {
     cy.get(`[data-cy=test-run-button-${id}]`).click();
     cy.matchTestRunPageUrl();
 
-    cy.visit('/');
+    cy.visit('/tests');
   }
 });
 
@@ -33,7 +33,7 @@ Cypress.Commands.add('deleteTest', (shouldIntercept = false) => {
     if (shouldIntercept) {
       cy.interceptHomeApiCall();
     }
-    cy.visit(`/`);
+    cy.visit('/tests');
     cy.wait('@testList');
     cy.get('[data-cy=test-list]').should('exist', {timeout: 10000});
     cy.get(`[data-cy=test-actions-button-${localTestId}]`, {timeout: 10000}).should('be.visible');
@@ -195,7 +195,7 @@ Cypress.Commands.add('createTest', () => {
   cy.enableDemo();
   cy.interceptHomeApiCall();
   cy.clearLocalStorage();
-  cy.visit('/');
+  cy.visit('/tests');
   cy.clearLocalStorage();
   cy.openTestCreationModal();
   cy.clickNextOnCreateTestWizard();
@@ -260,7 +260,7 @@ Cypress.Commands.add('deleteTestSuite', () => {
 });
 
 Cypress.Commands.add('enableDemo', () => {
-  cy.visit(`/settings`);
+  cy.visit('/settings');
 
   cy.get('[id*=tab-demo]').click();
   cy.get('#demo_pokeshop_enabled').then(element => {
@@ -272,6 +272,6 @@ Cypress.Commands.add('enableDemo', () => {
       cy.get('[data-cy=demo-form-save-button]').click();
     }
 
-    cy.visit(`/`);
+    cy.visit('/tests');
   });
 });

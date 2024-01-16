@@ -105,7 +105,7 @@ describe('VariableSets', () => {
   it.only('should create a test using variables from variableSet', () => {
     createVariableSet(variableSet1);
 
-    cy.visit('/');
+    cy.visit('/tests');
     cy.interceptHomeApiCall();
 
     // Select created variableSet
