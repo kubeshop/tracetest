@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"sync"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
@@ -47,7 +49,7 @@ func NewIngester(
 	dsRepo *datastore.Repository,
 	subManager subscription.Manager,
 	tracer trace.Tracer,
-) ingester {
+) *ingester {
 	ingester := ingester{
 		log: func(format string, args ...interface{}) {
 			log.Printf("[OTLP] "+format, args...)
@@ -62,10 +64,11 @@ func NewIngester(
 
 	ingester.startTesterListener()
 
-	return ingester
+	return &ingester
 }
 
 type ingester struct {
+	mutex          sync.Mutex
 	log            func(string, ...interface{})
 	tracePersister tracePersister
 	runGetter      runGetter
@@ -74,22 +77,31 @@ type ingester struct {
 	subManager     subscription.Manager
 	tracer         trace.Tracer
 
-	captureTracesForConnectionTest bool
+	spanCount         int
+	lastSpanTimestamp time.Time
 }
 
 func (i *ingester) startTesterListener() {
-	i.subManager.Subscribe("start_otlp_connection_test_", subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		i.captureTracesForConnectionTest = true
+	i.subManager.Subscribe(testconnection.GetSpanCountTopicName(), subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		var response testconnection.OTLPConnectionTestResponse
+		response.NumberSpans = i.spanCount
+		response.LastSpanTimestamp = i.lastSpanTimestamp
+
+		i.subManager.Publish(testconnection.PostSpanCountTopicName(), response)
 		return nil
 	}))
 
-	i.subManager.Subscribe("end_otlp_connection_test_", subscription.NewSubscriberFunction(func(m subscription.Message) error {
-		i.captureTracesForConnectionTest = false
+	i.subManager.Subscribe(testconnection.ResetSpanCountTopicName(), subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		i.mutex.Lock()
+		defer i.mutex.Unlock()
+
+		i.lastSpanTimestamp = time.Time{}
+		i.spanCount = 0
 		return nil
 	}))
 }
 
-func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
+func (i *ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
 	ds, err := i.dsRepo.Current(ctx)
 
 	if err != nil || !ds.IsOTLPBasedProvider() {
@@ -107,15 +119,10 @@ func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 	receivedTraces := i.traces(request.ResourceSpans)
 	i.log("received %d traces", len(receivedTraces))
 
-	if i.captureTracesForConnectionTest {
-		i.subManager.Publish("otlp_connection_test_spans_incoming", testconnection.OTLPConnectionTestResponse{
-			NumberTraces: len(receivedTraces),
-		})
-	}
-
 	// each request can have different traces so we need to go over each individual trace
 	for ix, modelTrace := range receivedTraces {
 		i.log("processing trace %d/%d traceID %s", ix+1, len(receivedTraces), modelTrace.ID.String())
+		i.increaseSpanCount(len(modelTrace.Flat))
 		err = i.processTrace(ctx, modelTrace, ix, requestType)
 		if err != nil {
 			span.RecordError(err, trace.WithAttributes(attribute.String("tracetest.ingestor.trace_id", modelTrace.ID.String())))
@@ -130,7 +137,15 @@ func (i ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequ
 	}, nil
 }
 
-func (i ingester) processTrace(ctx context.Context, modelTrace traces.Trace, ix int, requestType RequestType) error {
+func (i *ingester) increaseSpanCount(newSpansCount int) {
+	i.mutex.Lock()
+	defer i.mutex.Unlock()
+
+	i.spanCount += newSpansCount
+	i.lastSpanTimestamp = time.Now()
+}
+
+func (i *ingester) processTrace(ctx context.Context, modelTrace traces.Trace, ix int, requestType RequestType) error {
 	ctx, span := i.tracer.Start(ctx, "process otlp trace")
 	span.SetAttributes(
 		attribute.String("tracetest.ingestor.trace_id", modelTrace.ID.String()),
@@ -168,7 +183,7 @@ func (i ingester) processTrace(ctx context.Context, modelTrace traces.Trace, ix 
 	return nil
 }
 
-func (i ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
+func (i *ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
 	spansByTrace := map[string][]*v1.Span{}
 
 	for _, rs := range input {
@@ -197,7 +212,7 @@ func (i ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
 
 var errNoTestRun = errors.New("no test run")
 
-func (i ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Trace) (test.Run, error) {
+func (i *ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Trace) (test.Run, error) {
 	run, err := i.runGetter.GetRunByTraceID(ctx, trace.ID)
 	if errors.Is(err, sql.ErrNoRows) {
 		// trace is not part of any known test run, no need to notify
@@ -215,7 +230,7 @@ func (i ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Tra
 	return run, nil
 }
 
-func (i ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType RequestType) error {
+func (i *ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType RequestType) error {
 	evt := events.TraceOtlpServerReceivedSpans(
 		run.TestID,
 		run.ID,
