@@ -1359,7 +1359,7 @@ paths:
       tags:
         - api
       summary: "Get a specific wizard"
-      description: "Get the configured Wizard"
+      description: "Get the configured Wizard, showing the state of each step."
       operationId: getWizard
       responses:
         200:

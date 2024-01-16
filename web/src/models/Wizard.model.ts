@@ -19,4 +19,6 @@ function Wizard({steps = []} = defaultWizard): Wizard {
   };
 }
 
+export const isStepCompleted = (step: WizardStep) => step.state === 'completed';
+
 export default Wizard;
