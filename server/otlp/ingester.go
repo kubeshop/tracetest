@@ -77,12 +77,17 @@ type ingester struct {
 	subManager     subscription.Manager
 	tracer         trace.Tracer
 
+	testingConnection bool
 	spanCount         int
 	lastSpanTimestamp time.Time
 }
 
 func (i *ingester) startTesterListener() {
 	i.subManager.Subscribe(testconnection.GetSpanCountTopicName(), subscription.NewSubscriberFunction(func(m subscription.Message) error {
+		i.mutex.Lock()
+		defer i.mutex.Unlock()
+
+		i.testingConnection = true
 		var response testconnection.OTLPConnectionTestResponse
 		response.NumberSpans = i.spanCount
 		response.LastSpanTimestamp = i.lastSpanTimestamp
@@ -103,8 +108,12 @@ func (i *ingester) startTesterListener() {
 
 func (i *ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
 	ds, err := i.dsRepo.Current(ctx)
+	if err != nil {
+		i.log("could not get current datastore")
+		return &pb.ExportTraceServiceResponse{}, nil
+	}
 
-	if err != nil || !ds.IsOTLPBasedProvider() {
+	if !ds.IsOTLPBasedProvider() && !i.testingConnection {
 		i.log("OTLP server is not enabled. Ignoring request")
 		return &pb.ExportTraceServiceResponse{}, nil
 	}
