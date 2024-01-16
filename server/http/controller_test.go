@@ -133,6 +133,7 @@ func setupController(t *testing.T) controllerFixture {
 			runRepo,
 			nil,
 			nil,
+			nil,
 			mappings.New(traces.NewConversionConfig(), comparator.DefaultRegistry()),
 			"unit-test",
 		),
