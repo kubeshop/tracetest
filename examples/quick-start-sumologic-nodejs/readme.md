@@ -8,12 +8,12 @@ This is a simple quick start on how to configure a Node.js app to use OpenTeleme
 
 ### 1. Start the Tracetest Agent locally
 
-- Sign up on [`app.tracetest.io`](https://app.tracetest.io)
-- Create a new environment
-- Copy the start command under `Settings > Agent`
+- Sign up on [`app.tracetest.io`](https://app.tracetest.io).
+- Create a new environment.
+- Copy the start command under `Settings > Agent`.
 
 ```bash
-tracetest start --api-key ttagent_1234567890
+tracetest start --api-key <YOUR_API_KEY>
 ```
 
 Once started, Tracetest Agent will:
@@ -24,10 +24,10 @@ Once started, Tracetest Agent will:
 
 Configure Sumo Logic as a Tracing Backend:
 
-- Configure the Tracetest CLI by creating an environment token under `Settings > Tokens`
+- Configure the Tracetest CLI by creating an environment token under `Settings > Tokens`.
 
 ```bash
-tracetest configure -t tttoken_1234567890
+tracetest configure -t <YOUR_API_TOKEN>
 ```
 
 - Add your Sumo Logic AccessID and AccessKey to `tracetest.datastore.yaml`
@@ -37,7 +37,7 @@ tracetest configure -t tttoken_1234567890
 tracetest apply datastore -f ./tracetest.datastore.yaml
 ```
 
-- Configure the OpenTelemetry Collector (`collector.config.yaml`) with a Sumo Logic installation token
+- Configure the OpenTelemetry Collector (`collector.config.yaml`) with a Sumo Logic installation token.
 
 > Note: Here's a guide which Sumo Logic API endpoint to use: https://help.sumologic.com/docs/api/getting-started/#which-endpoint-should-i-should-use
 
@@ -57,8 +57,8 @@ docker compose up --build
 
 ### 3. Run tests
 
-- Create and run a test against `http://localhost:8080` on [`https://app.tracetest.io/`](https://app.tracetest.io/)
-- View the `./test-api.yaml` for reference
+- Create and run a test against `http://localhost:8080` on [`https://app.tracetest.io/`](https://app.tracetest.io/).
+- View the `./test-api.yaml` for reference.
 
 ```bash
 tracetest run test -f ./test-api.yaml
