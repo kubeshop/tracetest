@@ -757,24 +757,14 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 }
 
 func (c *controller) UpdateWizard(ctx context.Context, update openapi.Wizard) (openapi.ImplResponse, error) {
-	existingWizard, err := c.wizardRepository.Get(ctx)
-	if err != nil {
-		return openapi.Response(http.StatusNotFound, err.Error()), err
-	}
-
 	wizard := c.mappers.In.Wizard(update)
-	if err != nil {
-		return openapi.Response(http.StatusBadRequest, err.Error()), err
-	}
 
-	existingWizard.Steps = wizard.Steps
-
-	err = c.wizardRepository.Update(ctx, existingWizard)
+	err := c.wizardRepository.Upsert(ctx, &wizard)
 	if err != nil {
 		return openapi.Response(http.StatusInternalServerError, err.Error()), err
 	}
 
-	return openapi.Response(http.StatusOK, c.mappers.Out.Wizard(existingWizard)), err
+	return openapi.Response(http.StatusOK, c.mappers.Out.Wizard(&wizard)), err
 }
 
 func (c *controller) GetWizard(ctx context.Context) (openapi.ImplResponse, error) {

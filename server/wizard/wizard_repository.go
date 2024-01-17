@@ -12,7 +12,7 @@ import (
 
 type Repository interface {
 	Get(context.Context) (*Wizard, error)
-	Update(context.Context, *Wizard) error
+	Upsert(context.Context, *Wizard) error
 }
 
 type wizardRepository struct {
@@ -42,12 +42,11 @@ var (
 
 	selectQuery = `SELECT steps FROM "wizards"`
 	updateQuery = `UPDATE "wizards" SET steps = $1`
+	insertQuery = `INSERT INTO "wizards" (steps, tenant_id) VALUES ($1, $2)`
 )
 
 func (wr *wizardRepository) Get(ctx context.Context) (*Wizard, error) {
-	query, params := sqlutil.Tenant(ctx, selectQuery)
-
-	wizard, err := readRow(wr.db.QueryRowContext(ctx, query, params...))
+	wizard, err := wr.get(ctx)
 	if err != nil && errors.Is(err, sql.ErrNoRows) {
 		return defaultWizard, nil
 	}
@@ -55,7 +54,39 @@ func (wr *wizardRepository) Get(ctx context.Context) (*Wizard, error) {
 	return &wizard, nil
 }
 
-func (wr *wizardRepository) Update(ctx context.Context, wizard *Wizard) error {
+func (wr *wizardRepository) Upsert(ctx context.Context, wizard *Wizard) error {
+	_, err := wr.get(ctx)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		return wr.insert(ctx, wizard)
+	}
+
+	return wr.update(ctx, wizard)
+}
+
+func (wr *wizardRepository) get(ctx context.Context) (Wizard, error) {
+	query, params := sqlutil.Tenant(ctx, selectQuery)
+
+	wizard, err := readRow(wr.db.QueryRowContext(ctx, query, params...))
+	return wizard, err
+}
+
+func (wr *wizardRepository) insert(ctx context.Context, wizard *Wizard) error {
+	jsonSteps, err := json.Marshal(wizard.Steps)
+	if err != nil {
+		return fmt.Errorf("cannot marshal steps: %w", err)
+	}
+
+	params := sqlutil.TenantInsert(ctx, jsonSteps)
+
+	_, err = wr.db.ExecContext(ctx, insertQuery, params...)
+	if err != nil {
+		return fmt.Errorf("cannot insert wizard: %w", err)
+	}
+
+	return nil
+}
+
+func (wr *wizardRepository) update(ctx context.Context, wizard *Wizard) error {
 	jsonSteps, err := json.Marshal(wizard.Steps)
 	if err != nil {
 		return fmt.Errorf("cannot marshal steps: %w", err)
