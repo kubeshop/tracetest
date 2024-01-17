@@ -14,7 +14,7 @@ export const FormContainer = styled.div`
 export const FactoryContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 22px 0;
+  padding: 22px;
   justify-content: space-between;
   height: calc(${defaultHeight} - 25px);
   overflow-y: scroll;

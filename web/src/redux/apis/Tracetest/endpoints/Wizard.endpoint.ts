@@ -10,15 +10,15 @@ export const wizardEndpoints = (builder: TTestApiEndpointBuilder) => ({
       method: HTTP_METHOD.GET,
       headers: {'content-type': 'application/json'},
     }),
-    providesTags: () => [{type: TracetestApiTags.WIZARD, id: 'wizard'}],
+    providesTags: () => [{type: TracetestApiTags.WIZARD, id: 'LIST'}],
     transformResponse: (raw: TRawWizard) => Wizard(raw),
   }),
-  updateWizard: builder.mutation<undefined, {wizard: TRawWizard}>({
-    query: ({wizard}) => ({
+  updateWizard: builder.mutation<undefined, TRawWizard>({
+    query: wizard => ({
       url: `/wizard`,
       method: HTTP_METHOD.PUT,
       body: wizard,
     }),
-    invalidatesTags: [{type: TracetestApiTags.WIZARD, id: 'wizard'}],
+    invalidatesTags: [{type: TracetestApiTags.WIZARD, id: 'LIST'}],
   }),
 });

@@ -62,9 +62,9 @@ const Configuration = ({dataStore, onBack}: IProps) => {
       initialValues={initialValues}
     >
       <S.Header>
-        <Button ghost type="link" icon={<LeftOutlined />} onClick={onBack}>
+        <S.NoPaddingButton ghost type="link" icon={<LeftOutlined />} onClick={onBack}>
           Back
-        </Button>
+        </S.NoPaddingButton>
       </S.Header>
       <Form.Item name="dataStoreType" hidden>
         <Input type="hidden" />
