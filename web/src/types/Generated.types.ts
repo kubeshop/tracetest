@@ -120,6 +120,14 @@ export interface paths {
     /** Tests the config data store/exporter connection */
     post: operations["testConnection"];
   };
+  "/config/connection/otlp": {
+    /** get information about the OTLP connection */
+    get: operations["getOTLPConnectionInformation"];
+  };
+  "/config/connection/otlp/reset": {
+    /** reset the OTLP connection span count */
+    post: operations["resetOTLPConnectionInformation"];
+  };
   "/configs": {
     /** List Tracetest configuration */
     get: operations["listConfiguration"];
@@ -715,6 +723,26 @@ export interface operations {
       };
     };
   };
+  /** get information about the OTLP connection */
+  getOTLPConnectionInformation: {
+    responses: {
+      /** The connection information was retrieved successfully */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["OTLPTestConnectionResponse"];
+        };
+      };
+      /** The connection information was not available and the connection timed out */
+      408: unknown;
+    };
+  };
+  /** reset the OTLP connection span count */
+  resetOTLPConnectionInformation: {
+    responses: {
+      /** Ok */
+      200: unknown;
+    };
+  };
   /** List Tracetest configuration */
   listConfiguration: {
     parameters: {};
@@ -1300,6 +1328,10 @@ export interface external {
         DemoList: {
           count?: number;
           items?: external["config.yaml"]["components"]["schemas"]["Demo"][];
+        };
+        OTLPTestConnectionResponse: {
+          spanCount?: number;
+          lastSpanTimestamp?: string;
         };
       };
     };

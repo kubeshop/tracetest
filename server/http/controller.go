@@ -48,6 +48,8 @@ type controller struct {
 	newTraceDBFn      func(ds datastore.DataStore) (tracedb.TraceDB, error)
 	mappers           mappings.Mappings
 	version           string
+
+	otlpConnectionTester *testconnection.OTLPConnectionTester
 }
 
 type testSuiteRepository interface {
@@ -109,6 +111,8 @@ func NewController(
 	testRunRepository test.RunRepository,
 	variableSetGetter variableSetGetter,
 
+	otlpConnectionTester *testconnection.OTLPConnectionTester,
+
 	newTraceDBFn func(ds datastore.DataStore) (tracedb.TraceDB, error),
 	mappers mappings.Mappings,
 	version string,
@@ -123,8 +127,9 @@ func NewController(
 
 		dsTestPipeline: dsTestPipeline,
 
-		testRunner:        testRunner,
-		transactionRunner: transactionRunner,
+		testRunner:           testRunner,
+		transactionRunner:    transactionRunner,
+		otlpConnectionTester: otlpConnectionTester,
 
 		tracer:       tracer,
 		newTraceDBFn: newTraceDBFn,
@@ -715,6 +720,29 @@ func (c *controller) TestConnection(ctx context.Context, dataStore openapi.DataS
 	}
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.ConnectionTestResult(job.TestResult)), nil
+}
+
+// GetOTLPConnectionInformation implements openapi.ApiApiServicer.
+func (c *controller) GetOTLPConnectionInformation(ctx context.Context) (openapi.ImplResponse, error) {
+	response, err := c.otlpConnectionTester.GetSpanCount(ctx)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return openapi.Response(http.StatusRequestTimeout, nil), err
+		}
+
+		return openapi.Response(http.StatusInternalServerError, nil), err
+	}
+
+	return openapi.Response(http.StatusOK, openapi.OtlpTestConnectionResponse{
+		SpanCount:         int32(response.NumberSpans),
+		LastSpanTimestamp: response.LastSpanTimestamp.String(),
+	}), nil
+}
+
+// ResetOTLPConnectionInformation implements openapi.ApiApiServicer.
+func (c *controller) ResetOTLPConnectionInformation(ctx context.Context) (openapi.ImplResponse, error) {
+	c.otlpConnectionTester.ResetSpanCount(ctx)
+	return openapi.Response(http.StatusOK, nil), nil
 }
 
 func (c *controller) GetVersion(ctx context.Context, fileExtension string) (openapi.ImplResponse, error) {

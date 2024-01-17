@@ -81,6 +81,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.ExpressionResolve,
 		},
 		{
+			"GetOTLPConnectionInformation",
+			strings.ToUpper("Get"),
+			"/api/config/connection/otlp",
+			c.GetOTLPConnectionInformation,
+		},
+		{
 			"GetResources",
 			strings.ToUpper("Get"),
 			"/api/resources",
@@ -163,6 +169,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run/{runId}/rerun",
 			c.RerunTestRun,
+		},
+		{
+			"ResetOTLPConnectionInformation",
+			strings.ToUpper("Post"),
+			"/api/config/connection/otlp/reset",
+			c.ResetOTLPConnectionInformation,
 		},
 		{
 			"RunTest",
@@ -316,6 +328,19 @@ func (c *ApiApiController) ExpressionResolve(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.ExpressionResolve(r.Context(), resolveRequestInfoParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetOTLPConnectionInformation - get information about the OTLP connection
+func (c *ApiApiController) GetOTLPConnectionInformation(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetOTLPConnectionInformation(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -631,6 +656,19 @@ func (c *ApiApiController) RerunTestRun(w http.ResponseWriter, r *http.Request) 
 	}
 
 	result, err := c.service.RerunTestRun(r.Context(), testIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ResetOTLPConnectionInformation - reset the OTLP connection span count
+func (c *ApiApiController) ResetOTLPConnectionInformation(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.ResetOTLPConnectionInformation(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

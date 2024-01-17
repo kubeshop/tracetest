@@ -194,3 +194,10 @@ components:
           type: array
           items:
             $ref: "./config.yaml#/components/schemas/Demo"
+    OTLPTestConnectionResponse:
+      type: object
+      properties:
+        spanCount:
+          type: integer
+        lastSpanTimestamp:
+          type: date
