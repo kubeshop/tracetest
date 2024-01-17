@@ -25,7 +25,6 @@ services:
       retries: 60
     environment:
       TRACETEST_DEV: ${TRACETEST_DEV}
-
   postgres:
     image: postgres:14
     environment:
