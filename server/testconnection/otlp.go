@@ -10,6 +10,8 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
+const defaultTimeout = 30 * time.Second
+
 type TopicNameOption func(*topicNameConfig)
 
 type topicNameConfig struct {
@@ -80,7 +82,7 @@ func WithTimeout(timeout time.Duration) GetSpanCountOption {
 
 func (t *OTLPConnectionTester) GetSpanCount(ctx context.Context, opts ...GetSpanCountOption) (OTLPConnectionTestResponse, error) {
 	config := getSpanCountConfig{
-		timeout: 30 * time.Second,
+		timeout: defaultTimeout,
 	}
 
 	for _, opt := range opts {
