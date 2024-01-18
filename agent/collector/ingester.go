@@ -26,6 +26,7 @@ type ingester interface {
 	stoppable
 
 	Statistics() Statistics
+	ResetStatistics()
 }
 
 func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, startRemoteServer bool) (ingester, error) {

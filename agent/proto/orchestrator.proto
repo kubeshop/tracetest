@@ -189,6 +189,9 @@ message Error {
 
 message OTLPConnectionTestRequest {
     string requestID = 1;
+    // If set as true, the agent needs to reset the span counter and doesn't need to
+    // report the number of spans back to the server.
+    bool resetCounter = 2;
 }
 
 message OTLPConnectionTestResponse {

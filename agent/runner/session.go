@@ -53,6 +53,11 @@ func StartSession(ctx context.Context, cfg config.Config, observer event.Observe
 	}
 
 	controlPlaneClient.OnOTLPConnectionTest(func(ctx context.Context, otr *proto.OTLPConnectionTestRequest) error {
+		if otr.ResetCounter {
+			agentCollector.ResetStatistics()
+			return nil
+		}
+
 		statistics := agentCollector.Statistics()
 		controlPlaneClient.SendOTLPConnectionResult(ctx, &proto.OTLPConnectionTestResponse{
 			RequestID:         otr.RequestID,

@@ -59,6 +59,7 @@ type Collector interface {
 	stoppable
 
 	Statistics() Statistics
+	ResetStatistics()
 }
 
 // Stop implements stoppable.
@@ -69,6 +70,10 @@ func (c *collector) Stop() {
 
 func (c *collector) Statistics() Statistics {
 	return c.ingester.Statistics()
+}
+
+func (c *collector) ResetStatistics() {
+	c.ingester.ResetStatistics()
 }
 
 func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) (Collector, error) {
