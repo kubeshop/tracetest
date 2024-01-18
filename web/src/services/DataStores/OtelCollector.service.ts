@@ -20,8 +20,8 @@ const OtelCollectorService = (): TDataStoreService => ({
       dataStoreType,
     };
   },
-  shouldTestConnection() {
-    return false;
+  getIsOtlpBased() {
+    return true;
   },
 });
 

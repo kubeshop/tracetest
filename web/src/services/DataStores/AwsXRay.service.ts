@@ -37,8 +37,8 @@ const AwsXRayService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.AWSXRay,
     };
   },
-  shouldTestConnection() {
-    return true;
+  getIsOtlpBased() {
+    return false;
   },
 });
 

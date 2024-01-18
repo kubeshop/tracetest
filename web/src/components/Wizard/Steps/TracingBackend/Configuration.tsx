@@ -14,7 +14,7 @@ interface IProps {
 }
 
 const Configuration = ({dataStore, onBack}: IProps) => {
-  const {isLoading, isFormValid, onIsFormValid, onSaveConfig, isTestConnectionLoading, onTestConnection} =
+  const {isLoading, isFormValid, onIsFormValid, onSaveConfig, onTestConnection} =
     useDataStore();
   const [form] = Form.useForm<TDraftDataStore>();
 
@@ -76,7 +76,6 @@ const Configuration = ({dataStore, onBack}: IProps) => {
         isSubmitLoading={isLoading}
         isValid={isFormValid}
         withColor
-        isTestConnectionLoading={isTestConnectionLoading}
       />
     </Form>
   );

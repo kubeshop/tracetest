@@ -15,8 +15,6 @@ interface IProps {
   onSubmit(values: TDraftDataStore): Promise<void>;
   onIsFormValid(isValid: boolean): void;
   onTestConnection(): void;
-  isTestConnectionLoading: boolean;
-  resetTestConnection(): void;
   isLoading: boolean;
   isFormValid: boolean;
 }
@@ -27,8 +25,6 @@ const DataStoreForm = ({
   dataStoreConfig,
   onIsFormValid,
   onTestConnection,
-  resetTestConnection,
-  isTestConnectionLoading,
   isLoading,
   isFormValid,
 }: IProps) => {
@@ -44,10 +40,6 @@ const DataStoreForm = ({
       dataStore: {name: '', type: SupportedDataStores.JAEGER, ...initialValues.dataStore},
     });
   }, [dataStoreType, form, initialValues.dataStore]);
-
-  useEffect(() => {
-    resetTestConnection();
-  }, [dataStoreType]);
 
   const onValidation = useCallback(
     async (_: any, draft: TDraftDataStore) => {
@@ -80,7 +72,6 @@ const DataStoreForm = ({
             onSubmit={() => form.submit()}
             onTestConnection={onTestConnection}
             isValid={isFormValid}
-            isTestConnectionLoading={isTestConnectionLoading}
             isSubmitLoading={isLoading}
             dataStoreType={dataStoreType ?? SupportedDataStores.JAEGER}
           />

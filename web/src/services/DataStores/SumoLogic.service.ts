@@ -29,8 +29,8 @@ const SumoLogicService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.SumoLogic,
     };
   },
-  shouldTestConnection() {
-    return true;
+  getIsOtlpBased() {
+    return false;
   },
 });
 

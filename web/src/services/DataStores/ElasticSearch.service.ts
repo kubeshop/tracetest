@@ -65,8 +65,8 @@ const ElasticSearchService = (): TDataStoreService => ({
       dataStoreType,
     };
   },
-  shouldTestConnection() {
-    return true;
+  getIsOtlpBased() {
+    return false;
   },
 });
 

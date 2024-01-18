@@ -73,8 +73,8 @@ const BaseClientService = (): TDataStoreService => ({
       dataStoreType,
     };
   },
-  shouldTestConnection() {
-    return true;
+  getIsOtlpBased() {
+    return false;
   },
 });
 

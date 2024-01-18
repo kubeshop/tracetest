@@ -8,15 +8,7 @@ import * as S from './DataStore.styled';
 
 const DataStore = () => {
   const {dataStoreConfig} = useSettingsValues();
-  const {
-    isLoading,
-    isFormValid,
-    onIsFormValid,
-    onSaveConfig,
-    isTestConnectionLoading,
-    onTestConnection,
-    resetTestConnection,
-  } = useDataStore();
+  const {isLoading, isFormValid, onIsFormValid, onSaveConfig, onTestConnection} = useDataStore();
   const [form] = Form.useForm<TDraftDataStore>();
 
   const handleOnSubmit = useCallback(
@@ -39,11 +31,9 @@ const DataStore = () => {
           dataStoreConfig={dataStoreConfig}
           onSubmit={handleOnSubmit}
           onTestConnection={handleTestConnection}
-          isTestConnectionLoading={isTestConnectionLoading}
           isLoading={isLoading}
           isFormValid={isFormValid}
           onIsFormValid={onIsFormValid}
-          resetTestConnection={resetTestConnection}
         />
       </S.FormContainer>
     </S.Wrapper>
