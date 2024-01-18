@@ -108,7 +108,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		w.logger.Error("Invalid datastore", zap.Error(err))
 		return err
 	}
-	w.logger.Debug("Converted datastore", zap.Any("datastore", datastoreConfig))
+	w.logger.Debug("Converted datastore", zap.Any("datastore", datastoreConfig), zap.Any("originalDatastore", request.Datastore))
 
 	if datastoreConfig == nil {
 		w.logger.Error("Invalid datastore: nil")
