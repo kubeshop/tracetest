@@ -49,4 +49,3 @@ func DecodeMessage(data []byte) (Message, error) {
 
 	return m, nil
 }
-

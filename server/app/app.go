@@ -246,7 +246,7 @@ func (app *App) Start(opts ...appOption) error {
 
 	if app.cfg.OtlpServerEnabled() {
 		eventEmitter := executor.NewEventEmitter(testDB, subscriptionManager)
-		registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, tracer)
+		registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, subscriptionManager, tracer)
 	}
 
 	executorDriverFactory := pipeline.NewDriverFactory[executor.Job](natsConn)
@@ -308,6 +308,8 @@ func (app *App) Start(opts ...appOption) error {
 
 	provisioner := provisioning.New()
 
+	otlpConnectionTester := testconnection.NewOTLPConnectionTester(subscriptionManager)
+
 	router, mappers := controller(app.cfg,
 		tracer,
 		meter,
@@ -323,6 +325,7 @@ func (app *App) Start(opts ...appOption) error {
 		runRepo,
 		variableSetRepo,
 		wizardRepo,
+		otlpConnectionTester,
 		tracedbFactory,
 	)
 	registerWSHandler(router, mappers, subscriptionManager)
@@ -390,8 +393,16 @@ func registerSPAHandler(router *mux.Router, cfg httpServerConfig, analyticsEnabl
 		)
 }
 
-func registerOtlpServer(app *App, tracesRepo *traces.TraceRepository, runRepository test.RunRepository, eventEmitter executor.EventEmitter, dsRepo *datastore.Repository, tracer trace.Tracer) {
-	ingester := otlp.NewIngester(tracesRepo, runRepository, eventEmitter, dsRepo, tracer)
+func registerOtlpServer(
+	app *App,
+	tracesRepo *traces.TraceRepository,
+	runRepository test.RunRepository,
+	eventEmitter executor.EventEmitter,
+	dsRepo *datastore.Repository,
+	subManager subscription.Manager,
+	tracer trace.Tracer,
+) {
+	ingester := otlp.NewIngester(tracesRepo, runRepository, eventEmitter, dsRepo, subManager, tracer)
 	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester, tracer)
 	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()
@@ -557,6 +568,7 @@ func controller(
 	testRunRepo test.RunRepository,
 	variablesetRepo *variableset.Repository,
 	wizardRepo wizard.Repository,
+	otlpConnectionTester *testconnection.OTLPConnectionTester,
 	tracedbFactory tracedb.FactoryFunc,
 ) (*mux.Router, mappings.Mappings) {
 	mappers := mappings.New(tracesConversionConfig(), comparator.DefaultRegistry())
@@ -578,6 +590,7 @@ func controller(
 		testRunRepo,
 		variablesetRepo,
 		wizardRepo,
+		otlpConnectionTester,
 		tracedbFactory,
 
 		mappers,
@@ -603,6 +616,7 @@ func httpRouter(
 	testRunRepo test.RunRepository,
 	variableSetRepo *variableset.Repository,
 	wizardRepo wizard.Repository,
+	otlpConnectionTester *testconnection.OTLPConnectionTester,
 	tracedbFactory tracedb.FactoryFunc,
 
 	mappers mappings.Mappings,
@@ -621,6 +635,7 @@ func httpRouter(
 		testRunRepo,
 		variableSetRepo,
 		wizardRepo,
+		otlpConnectionTester,
 
 		tracedbFactory,
 		mappers,
