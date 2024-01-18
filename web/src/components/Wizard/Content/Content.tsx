@@ -1,4 +1,5 @@
 import {Tabs} from 'antd';
+import WizardAnalytics from 'services/Analytics/Wizard.service';
 import {IWizardStep} from 'types/Wizard.types';
 import * as S from './Content.styled';
 import Tab from './Tab';
@@ -20,6 +21,7 @@ const Content = ({activeStepId, isLoading, onChange, onNext, steps}: IProps) => 
       onTabClick={(key, event) => {
         event.preventDefault();
         onChange(key);
+        WizardAnalytics.onStepSelect(key);
       }}
     >
       {steps.map((step, index) => {

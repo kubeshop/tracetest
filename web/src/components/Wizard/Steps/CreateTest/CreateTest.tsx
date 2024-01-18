@@ -6,6 +6,7 @@ import {ADD_TEST_URL} from 'constants/Common.constants';
 import AllowButton, {Operation} from 'components/AllowButton';
 import CreateButton from 'components/CreateButton';
 import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
+import WizardAnalytics from 'services/Analytics/Wizard.service';
 import * as S from './CreateTest.styled';
 
 const CreateTest = () => {
@@ -20,19 +21,21 @@ const CreateTest = () => {
     <>
       <Typography.Title>Create your first test</Typography.Title>
       <Typography.Paragraph type="secondary">
-        This step involves creating tests by defining test assertions based on your application&apos;s trace data, which
-        helps validate the performance and behavior of your services.{' '}
+        At this point you are ready to run your first Tracetest test. Select the trigger type and create a test!{' '}
         <a href={ADD_TEST_URL} target="__blank">
-          Learn more in docs
+          Learn more about it in our docs.
         </a>
       </Typography.Paragraph>
 
-      <Typography.Title level={3}>
-        Choose the kind of trigger to initiate the trace is presented you will be redirected to the test page
-      </Typography.Title>
+      <Typography.Title level={3}>Choose the kind of trigger you want to use to start your test</Typography.Title>
       <Row>
         <Col span={18}>
-          <TriggerTypeList onClick={setSelectedType} />
+          <TriggerTypeList
+            onClick={(plugin: TriggerTypes) => {
+              setSelectedType(plugin);
+              WizardAnalytics.onTriggerTypeSelect(plugin);
+            }}
+          />
         </Col>
       </Row>
       <S.ButtonContainer>
@@ -44,7 +47,7 @@ const CreateTest = () => {
           operation={Operation.Edit}
           type="primary"
         >
-          Next
+          Continue
         </AllowButton>
       </S.ButtonContainer>
     </>
