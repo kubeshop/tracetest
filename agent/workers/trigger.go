@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
@@ -22,9 +23,16 @@ type TriggerWorker struct {
 	registry   *agentTrigger.Registry
 	traceCache collector.TraceCache
 	observer   event.Observer
+	cancelMap  *cancelChannelMap
 }
 
 type TriggerOption func(*TriggerWorker)
+
+func WithTriggerCancelContextsList(cancelContexts *cancelChannelMap) TriggerOption {
+	return func(tw *TriggerWorker) {
+		tw.cancelMap = cancelContexts
+	}
+}
 
 func WithTraceCache(cache collector.TraceCache) TriggerOption {
 	return func(tw *TriggerWorker) {
@@ -70,7 +78,32 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
 	w.observer.StartTriggerExecution(triggerRequest)
 
-	err := w.trigger(ctx, triggerRequest)
+	done := make(chan bool)
+	cancel := make(chan bool)
+
+	cacheKey := key(triggerRequest.TestID, triggerRequest.RunID)
+	w.cancelMap.Set(cacheKey, cancel)
+	defer w.cancelMap.Del(cacheKey)
+
+	subcontext, cancelSubctx := context.WithCancel(ctx)
+	defer cancelSubctx()
+
+	var err error
+	go func() {
+		err = w.trigger(subcontext, triggerRequest)
+	}()
+
+	select {
+	case <-done:
+		// trigger finished successfully
+		break
+	case <-cancel:
+		// The context was cancelled.
+		err = executor.ErrUserCancelled
+		cancelSubctx()
+		break
+	}
+
 	if err != nil {
 		w.logger.Error("Trigger error", zap.Error(err))
 		w.observer.EndTriggerExecution(triggerRequest, err)
@@ -91,13 +124,13 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 			w.logger.Error("Could not report trigger error back to the server", zap.Error(sendErr))
 			w.observer.Error(sendErr)
 
-			return fmt.Errorf("could not report trigger error back to the server: %w. Original error: %s", sendErr, err.Error())
+			err = fmt.Errorf("could not report trigger error back to the server: %w. Original error: %s", sendErr, err.Error())
 		}
 	}
 
-	w.observer.EndTriggerExecution(triggerRequest, nil)
+	w.observer.EndTriggerExecution(triggerRequest, err)
 
-	return err
+	return nil
 }
 
 func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {

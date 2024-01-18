@@ -1,6 +1,7 @@
 package subscription
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 )
@@ -12,6 +13,13 @@ type Message struct {
 }
 
 func (m Message) DecodeContent(output interface{}) error {
+	if _, isString := m.Content.(string); isString {
+		base64Decoded, err := base64.StdEncoding.DecodeString(m.Content.(string))
+		if err != nil {
+			return fmt.Errorf("failed to decode base64 string: %w", err)
+		}
+		m.Content = base64Decoded
+	}
 	return json.Unmarshal(m.Content.([]byte), output)
 }
 
@@ -49,4 +57,3 @@ func DecodeMessage(data []byte) (Message, error) {
 
 	return m, nil
 }
-

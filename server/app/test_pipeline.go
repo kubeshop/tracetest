@@ -145,5 +145,6 @@ func buildTestPipeline(
 		trRepo,
 		ppRepo,
 		dsRepo,
+		cancelRunHandlerFn,
 	)
 }

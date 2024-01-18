@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/executor/testrunner"
+	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
@@ -18,12 +19,13 @@ import (
 
 type TestPipeline struct {
 	*pipeline.Pipeline[Job]
-	updatePublisher updatePublisher
-	assertionQueue  pipeline.Enqueuer[Job]
-	runs            runsRepo
-	trGetter        testRunnerGetter
-	ppGetter        defaultPollingProfileGetter
-	dsGetter        currentDataStoreGetter
+	updatePublisher    updatePublisher
+	assertionQueue     pipeline.Enqueuer[Job]
+	runs               runsRepo
+	trGetter           testRunnerGetter
+	ppGetter           defaultPollingProfileGetter
+	dsGetter           currentDataStoreGetter
+	cancelRunHandlerFn runCancelHandlerFn
 }
 
 type runsRepo interface {
@@ -54,15 +56,18 @@ func NewTestPipeline(
 	trGetter testRunnerGetter,
 	ppGetter defaultPollingProfileGetter,
 	dsGetter currentDataStoreGetter,
+
+	cancelRunHandlerFn runCancelHandlerFn,
 ) *TestPipeline {
 	return &TestPipeline{
-		Pipeline:        pipeline,
-		updatePublisher: updatePublisher,
-		assertionQueue:  assertionQueue,
-		runs:            runs,
-		trGetter:        trGetter,
-		ppGetter:        ppGetter,
-		dsGetter:        dsGetter,
+		Pipeline:           pipeline,
+		updatePublisher:    updatePublisher,
+		assertionQueue:     assertionQueue,
+		runs:               runs,
+		trGetter:           trGetter,
+		ppGetter:           ppGetter,
+		dsGetter:           dsGetter,
+		cancelRunHandlerFn: cancelRunHandlerFn,
 	}
 }
 
@@ -86,6 +91,7 @@ func (p *TestPipeline) Run(ctx context.Context, testObj test.Test, metadata test
 	p.handleDBError(run, err)
 
 	job := NewJob()
+	job.TenantID = middleware.TenantIDFromContext(ctx)
 	job.Test = testObj
 	job.Run = run
 	job.PollingProfile = p.ppGetter.GetDefault(ctx)
@@ -121,8 +127,9 @@ func (p *TestPipeline) Rerun(ctx context.Context, testObj test.Test, runID int) 
 
 func (p *TestPipeline) StopTest(ctx context.Context, testID id.ID, runID int) {
 	sr := UserRequest{
-		TestID: testID,
-		RunID:  runID,
+		TenantID: middleware.TenantIDFromContext(ctx),
+		TestID:   testID,
+		RunID:    runID,
 	}
 
 	p.updatePublisher.PublishUpdate(subscription.Message{
@@ -143,7 +150,22 @@ func (p *TestPipeline) SkipTraceCollection(ctx context.Context, testID id.ID, ru
 	})
 }
 
+func (p *TestPipeline) UpdateStoppedTest(ctx context.Context, run test.Run) {
+	p.cancelRunHandlerFn(ctx, run)
+}
+
 type runCancelHandlerFn func(ctx context.Context, run test.Run) error
+
+var ErrUserCancelled = fmt.Errorf("cancelled by user")
+
+func RunWasUserCancelled(run test.Run) bool {
+	return run.TriggerResult.Error != nil &&
+		ErrorMessageIsUserCancelled(run.TriggerResult.Error.ErrorMessage)
+}
+
+func ErrorMessageIsUserCancelled(msg string) bool {
+	return msg == ErrUserCancelled.Error()
+}
 
 func HandleRunCancelation(updater RunUpdater, tracer trace.Tracer, eventEmitter EventEmitter) runCancelHandlerFn {
 	return func(ctx context.Context, run test.Run) error {

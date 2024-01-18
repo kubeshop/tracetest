@@ -95,6 +95,18 @@ func (o *verboseObserver) EndTriggerExecution(request *proto.TriggerRequest, err
 	o.ui.Println("")
 }
 
+func (o *verboseObserver) EndStopRequest(request *proto.StopRequest, err error) {
+	if err != nil {
+		o.ui.Warningf("%s Test run %d, test %s stop request failed!", consoleUI.Emoji_YellowCircle, request.RunID, request.TestID)
+		o.ui.Warningf("Error: %s", err.Error())
+		o.ui.Println("")
+		return
+	}
+
+	o.ui.Infof("%s Test run %d, test %s stop request with success", consoleUI.Emoji_WhiteCheckMark, request.RunID, request.TestID)
+	o.ui.Println("")
+}
+
 func (o *verboseObserver) Error(err error) {
 	o.ui.Errorf("%s An unknown error happened on Tracetest agent.", consoleUI.Emoji_RedCircle)
 	o.ui.Errorf("Error: %s", err.Error())
@@ -115,4 +127,8 @@ func (o *verboseObserver) StartTracePoll(request *proto.PollingRequest) {
 
 func (o *verboseObserver) StartTriggerExecution(request *proto.TriggerRequest) {
 	o.ui.Infof("%s Executing trigger for test run %d, test %s ...", consoleUI.Emoji_Sparkles, request.RunID, request.TestID)
+}
+
+func (o *verboseObserver) StartStopRequest(request *proto.StopRequest) {
+	o.ui.Infof("%s Stopping test run %d, test %s ...", consoleUI.Emoji_Sparkles, request.RunID, request.TestID)
 }

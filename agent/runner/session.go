@@ -96,10 +96,18 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		return nil, err
 	}
 
+	cancelFuncs := workers.NewCancelChannelMap()
+
+	stopWorker := workers.NewStopperWorker(
+		workers.WithStopperObserver(observer),
+		workers.WithStopperCancelContextsList(cancelFuncs),
+	)
+
 	triggerWorker := workers.NewTriggerWorker(
 		controlPlaneClient,
 		workers.WithTraceCache(traceCache),
 		workers.WithTriggerObserver(observer),
+		workers.WithTriggerCancelContextsList(cancelFuncs),
 	)
 
 	pollingWorker := workers.NewPollerWorker(
@@ -115,6 +123,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 	dataStoreTestConnectionWorker.SetLogger(logger)
 
 	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
+	controlPlaneClient.OnStopRequest(stopWorker.Stop)
 	controlPlaneClient.OnTriggerRequest(triggerWorker.Trigger)
 	controlPlaneClient.OnPollingRequest(pollingWorker.Poll)
 	controlPlaneClient.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error {
