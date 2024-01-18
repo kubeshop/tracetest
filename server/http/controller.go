@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/datastore"
@@ -735,7 +736,7 @@ func (c *controller) GetOTLPConnectionInformation(ctx context.Context) (openapi.
 
 	return openapi.Response(http.StatusOK, openapi.OtlpTestConnectionResponse{
 		SpanCount:         int32(response.NumberSpans),
-		LastSpanTimestamp: response.LastSpanTimestamp.String(),
+		LastSpanTimestamp: response.LastSpanTimestamp.Format(time.RFC3339Nano),
 	}), nil
 }
 
