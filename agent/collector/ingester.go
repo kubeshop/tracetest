@@ -53,6 +53,9 @@ type forwardIngester struct {
 	done           chan bool
 	traceCache     TraceCache
 	logger         *zap.Logger
+
+	spanCount         int
+	lastSpanTimestamp time.Time
 }
 
 type remoteIngesterConfig struct {
@@ -70,10 +73,15 @@ type buffer struct {
 }
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
+	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
+
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
+	i.spanCount += spanCount
+	i.lastSpanTimestamp = time.Now()
+
 	i.buffer.mutex.Unlock()
-	i.logger.Debug("received spans", zap.Int("count", len(request.ResourceSpans)))
+	i.logger.Debug("received spans", zap.Int("count", spanCount))
 
 	if i.traceCache != nil {
 		i.logger.Debug("caching test spans")
@@ -87,6 +95,17 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 			RejectedSpans: 0,
 		},
 	}, nil
+}
+
+func countSpans(request *pb.ExportTraceServiceRequest) int {
+	count := 0
+	for _, resourceSpan := range request.ResourceSpans {
+		for _, scopeSpan := range resourceSpan.ScopeSpans {
+			count += len(scopeSpan.Spans)
+		}
+	}
+
+	return count
 }
 
 func (i *forwardIngester) connectToRemoteServer(ctx context.Context) error {
