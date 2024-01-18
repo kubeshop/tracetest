@@ -205,7 +205,7 @@ export interface paths {
     delete: operations["deleteLinter"];
   };
   "/wizard": {
-    /** Get the configured Wizard */
+    /** Get the configured Wizard, showing the state of each step. */
     get: operations["getWizard"];
     /** Update a Wizard used on Tracetest */
     put: operations["updateWizard"];
@@ -1204,7 +1204,7 @@ export interface operations {
       500: unknown;
     };
   };
-  /** Get the configured Wizard */
+  /** Get the configured Wizard, showing the state of each step. */
   getWizard: {
     responses: {
       /** successful operation */

@@ -11,7 +11,7 @@ export const TopContainer = styled.div`
 export const ButtonsContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 16px;
   margin-top: 23px;
   padding: 16px 0;
   border-top: 1px solid ${({theme}) => theme.color.borderLight};

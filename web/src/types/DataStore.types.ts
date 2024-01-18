@@ -117,7 +117,7 @@ export type TDataStoreService = {
     dataStoreType?: SupportedDataStores,
     configuredDataStore?: SupportedDataStores
   ): TDraftDataStore;
-  shouldTestConnection(draft: TDraftDataStore): boolean;
+  getIsOtlpBased(draft: TDraftDataStore): boolean;
 };
 
 export interface IDataStorePluginProps {}
