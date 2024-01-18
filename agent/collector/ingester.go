@@ -51,8 +51,8 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 }
 
 type Statistics struct {
-	spanCount         int
-	lastSpanTimestamp time.Time
+	SpanCount         int64
+	LastSpanTimestamp time.Time
 }
 
 // forwardIngester forwards all incoming spans to a remote ingester. It also batches those
@@ -96,8 +96,8 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 	i.buffer.mutex.Lock()
 
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
-	i.statistics.spanCount += spanCount
-	i.statistics.lastSpanTimestamp = time.Now()
+	i.statistics.SpanCount += int64(spanCount)
+	i.statistics.LastSpanTimestamp = time.Now()
 
 	i.buffer.mutex.Unlock()
 	i.logger.Debug("received spans", zap.Int("count", spanCount))
