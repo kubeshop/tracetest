@@ -1,5 +1,5 @@
 import {Typography} from 'antd';
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 
 export const Container = styled.div`
   margin: 8px 0;
@@ -24,12 +24,26 @@ export const Container = styled.div`
   }
 `;
 
-export const StepTabContainer = styled.div<{$isActive: boolean}>`
+export const StepTabContainer = styled.div<{$isActive: boolean; $isDisabled: boolean}>`
+  align-items: center;
   background-color: ${({theme, $isActive}) => ($isActive ? theme.color.backgroundInteractive : theme.color.white)};
   display: flex;
   gap: 8px;
   padding: 16px;
+  text-align: left;
   min-width: 360px;
+
+  ${({$isDisabled}) =>
+    $isDisabled &&
+    css`
+      > div:first-child {
+        border: 2px solid ${({theme}) => theme.color.textLight};
+      }
+      div,
+      span {
+        color: ${({theme}) => theme.color.textLight};
+      }
+    `}
 `;
 
 export const StepTabNumber = styled.div`
@@ -39,6 +53,7 @@ export const StepTabNumber = styled.div`
   font-size: ${({theme}) => theme.size.sm};
   font-weight: 600;
   height: 24px;
+  text-align: center;
   width: 24px;
 `;
 

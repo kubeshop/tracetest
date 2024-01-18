@@ -8,13 +8,14 @@ export interface IWizardState {
 export interface IWizardStepMetadata {
   name: string;
   description: string;
-  component: React.FC;
+  component: React.FC<IWizardStepComponentProps>;
+  tabComponent: React.FC;
+  isEnabled: boolean;
+}
+export interface IWizardStepComponentProps {
+  isLoading: boolean;
+  onNext(): void;
 }
 
 export interface IWizardStep extends WizardStep, IWizardStepMetadata {}
 export type TWizardMap = Record<TWizardStepId, IWizardStepMetadata>;
-
-interface IWizardStepComponentProps {}
-
-export interface IWizardStepComponentMap
-  extends Record<string, (props: IWizardStepComponentProps) => React.ReactElement> {}

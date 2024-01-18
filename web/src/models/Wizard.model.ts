@@ -20,5 +20,8 @@ function Wizard({steps = []} = defaultWizard): Wizard {
 }
 
 export const isStepCompleted = (step: WizardStep) => step.state === 'completed';
+export const isStepPending = (step: WizardStep) => step.state === 'pending';
+export const isStepEnabled = (step: WizardStep, index: number, prevStep?: WizardStep) =>
+  isStepCompleted(step) || (index === 0 && isStepPending(step)) || (!!prevStep && isStepCompleted(prevStep));
 
 export default Wizard;
