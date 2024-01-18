@@ -5,7 +5,7 @@ export const TopContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 0 22px;
+  padding: 0;
 `;
 
 export const ButtonsContainer = styled.div`
@@ -13,7 +13,7 @@ export const ButtonsContainer = styled.div`
   justify-content: flex-end;
   gap: 8px;
   margin-top: 23px;
-  padding: 16px 22px;
+  padding: 16px 0;
   border-top: 1px solid ${({theme}) => theme.color.borderLight};
   position: sticky;
   bottom: 0;

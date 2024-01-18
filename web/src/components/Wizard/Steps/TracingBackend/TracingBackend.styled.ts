@@ -1,4 +1,4 @@
-import {Typography} from 'antd';
+import {Button, Typography} from 'antd';
 import styled from 'styled-components';
 
 export const Container = styled.div``;
@@ -15,7 +15,7 @@ export const Card = styled.div`
   gap: 6px;
   align-items: center;
   padding: 6px;
-  border: 1px solid ${({theme}) => theme.color.border};
+  border: 1px solid ${({theme}) => theme.color.borderLight};
   border-radius: 2px;
   cursor: pointer;
   height: 32px;
@@ -41,4 +41,16 @@ export const Header = styled.div`
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
+`;
+
+export const NoPaddingButton = styled(Button)`
+  padding: 4px 0;
+`;
+
+export const TabText = styled(Typography.Text)`
+  && {
+    margin: 0;
+    color: ${({theme}) => theme.color.textSecondary};
+    font-size: ${({theme}) => theme.size.sm};
+  }
 `;

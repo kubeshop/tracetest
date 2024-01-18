@@ -1,14 +1,13 @@
 import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {IWizardState, IWizardStep, TWizardMap} from 'types/Wizard.types';
-import Wizard from 'models/Wizard.model';
+import Wizard, {isStepEnabled} from 'models/Wizard.model';
 import Tracetest from 'redux/apis/Tracetest';
 
 interface IContext extends IWizardState {
   activeStepId: string;
   isLoading: boolean;
   onNext(): void;
-  onPrev(): void;
   onGoTo(key: string): void;
 }
 
@@ -18,7 +17,6 @@ export const Context = createContext<IContext>({
   steps: [],
   isLoading: false,
   onNext: noop,
-  onPrev: noop,
   onGoTo: noop,
 });
 
@@ -30,13 +28,15 @@ interface IProps {
 export const useWizard = () => useContext(Context);
 
 const WizardProvider = ({children, stepsMap}: IProps) => {
-  const {useGetWizardQuery} = Tracetest.instance;
+  const {useGetWizardQuery, useUpdateWizardMutation} = Tracetest.instance;
+  const [updateWizard, {isLoading}] = useUpdateWizardMutation();
   const {data: wizard = Wizard()} = useGetWizardQuery({});
   const steps = useMemo<IWizardStep[]>(
     () =>
-      wizard.steps.map(step => ({
+      wizard.steps.map((step, index) => ({
         ...step,
         ...(stepsMap[step.id] || {}),
+        isEnabled: isStepEnabled(step, index, wizard.steps[index - 1]),
       })),
     [stepsMap, wizard.steps]
   );
@@ -46,13 +46,18 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
   const activeStepId = steps[activeStep]?.id;
   const isFinalStep = activeStep === steps.length - 1;
 
-  const onNext = useCallback(() => {
-    if (!isFinalStep) setActiveStep(step => step + 1);
-  }, [isFinalStep]);
+  const onNext = useCallback(async () => {
+    if (!isFinalStep) {
+      await updateWizard({
+        steps: wizard.steps.map(step => ({
+          ...step,
+          ...(step.id === activeStepId ? {state: 'completed'} : {}),
+        })),
+      });
 
-  const onPrev = useCallback(() => {
-    setActiveStep(step => step - 1);
-  }, []);
+      setActiveStep(step => step + 1);
+    }
+  }, [activeStepId, isFinalStep, updateWizard, wizard.steps]);
 
   const onGoTo = useCallback(
     key => {
@@ -67,12 +72,11 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
       activeStep,
       activeStepId,
       steps,
-      isLoading: false, // TODO: implement loading
+      isLoading,
       onNext,
-      onPrev,
       onGoTo,
     }),
-    [activeStep, activeStepId, onGoTo, onNext, onPrev, steps]
+    [activeStep, activeStepId, isLoading, onGoTo, onNext, steps]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

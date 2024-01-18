@@ -5,11 +5,13 @@ import Tab from './Tab';
 
 interface IProps {
   activeStepId: string;
-  steps: IWizardStep[];
+  isLoading: boolean;
   onChange(key: string): void;
+  onNext(): void;
+  steps: IWizardStep[];
 }
 
-const Content = ({activeStepId, steps, onChange}: IProps) => (
+const Content = ({activeStepId, isLoading, onChange, onNext, steps}: IProps) => (
   <S.Container>
     <Tabs
       type="card"
@@ -23,8 +25,12 @@ const Content = ({activeStepId, steps, onChange}: IProps) => (
       {steps.map((step, index) => {
         const {component: Component, id} = step;
         return (
-          <Tabs.TabPane tab={<Tab index={index + 1} isActive={id === activeStepId} step={step} />} key={id}>
-            <Component />
+          <Tabs.TabPane
+            disabled={!step.isEnabled}
+            tab={<Tab index={index + 1} isActive={id === activeStepId} step={step} />}
+            key={id}
+          >
+            <Component isLoading={isLoading} onNext={onNext} />
           </Tabs.TabPane>
         );
       })}

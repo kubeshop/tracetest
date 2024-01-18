@@ -5,7 +5,7 @@ import {useWizard} from 'providers/Wizard';
 import * as S from './Wizard.styled';
 
 const Wizard = () => {
-  const {activeStepId, steps, onGoTo} = useWizard();
+  const {activeStepId, isLoading, onGoTo, onNext, steps} = useWizard();
   const completedSteps = steps.filter(({state}) => state === 'completed').length;
 
   return (
@@ -19,7 +19,7 @@ const Wizard = () => {
 
       <S.Body>
         <Header activeStep={completedSteps} totalCompleteSteps={steps.length} />
-        <Content activeStepId={activeStepId} steps={steps} onChange={onGoTo} />
+        <Content activeStepId={activeStepId} isLoading={isLoading} onChange={onGoTo} onNext={onNext} steps={steps} />
       </S.Body>
     </S.Container>
   );

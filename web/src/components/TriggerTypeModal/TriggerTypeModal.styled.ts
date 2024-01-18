@@ -11,6 +11,7 @@ export const CardContainer = styled.div<{$isActive: boolean; $isSelected: boolea
   gap: 12px;
   padding: 4px;
   padding-left: 16px;
+  transition: 0.3s;
   width: 48%;
 
   &:hover {

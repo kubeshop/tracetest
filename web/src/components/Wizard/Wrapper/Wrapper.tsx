@@ -3,24 +3,30 @@ import WizardProvider from 'providers/Wizard/Wizard.provider';
 import {withCustomization} from 'providers/Customization';
 import DataStoreProvider from 'providers/DataStore/DataStore.provider';
 import SettingsProvider from 'providers/Settings/Settings.provider';
-import TracingBackend from '../Steps/TracingBackend';
-import CreateTest from '../Steps/CreateTest';
+import TracingBackend, {TracingBackendTab} from '../Steps/TracingBackend';
+import CreateTest, {CreateTestTab} from '../Steps/CreateTest';
 
 const steps: TWizardMap = {
   agent: {
     name: '',
     description: '',
     component: () => <div>Agent</div>,
+    tabComponent: () => <div>Agent tab</div>,
+    isEnabled: true,
   },
   tracing_backend: {
     name: 'Configure access to your OTel traces',
     description: '',
     component: TracingBackend,
+    tabComponent: TracingBackendTab,
+    isEnabled: false,
   },
   create_test: {
     name: 'Run your first test',
     description: '',
     component: CreateTest,
+    tabComponent: CreateTestTab,
+    isEnabled: false,
   },
 };
 
