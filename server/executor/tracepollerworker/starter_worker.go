@@ -142,8 +142,8 @@ func (w *tracePollerStarterWorker) testConnection(ctx context.Context, traceDB t
 		return nil, err
 	}
 
+   	wg.Add(1)
 	w.dsTestPipeline.Run(ctx, job)
-	wg.Add(1)
 	wg.Wait()
 	w.dsTestPipeline.Unsubscribe(job.ID)
 
