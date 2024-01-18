@@ -8,6 +8,7 @@ export enum Categories {
   TestResults = 'test-results',
   SpanDetail = 'span-detail',
   Assertion = 'assertion',
+  Wizard = 'wizard',
 }
 
 export enum Labels {

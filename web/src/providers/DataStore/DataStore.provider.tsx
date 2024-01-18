@@ -7,6 +7,7 @@ import DataStoreService from 'services/DataStore.service';
 import {useContactUsModal} from 'components/ContactUs';
 import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/DataStore.types';
 import DataStore from 'models/DataStore.model';
+import OTLPTestConnectionResponse from 'models/OTLPTestConnectionResponse.model';
 import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useSettingsValues} from '../SettingsValues/SettingsValues.provider';
@@ -15,9 +16,12 @@ interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
   isTestConnectionLoading: boolean;
+  isOtlpTestConnectionError: boolean;
   testConnectionResponse?: TConnectionResult;
+  otlpTestConnectionResponse?: OTLPTestConnectionResponse;
   onSaveConfig(draft: TDraftDataStore, defaultDataStore: DataStore): void;
   onTestConnection(draft: TDraftDataStore, defaultDataStore: DataStore): void;
+  onOtlpTestConnection(): void;
   onIsFormValid(isValid: boolean): void;
   resetTestConnection(): void;
 }
@@ -26,9 +30,11 @@ export const Context = createContext<IContext>({
   isFormValid: false,
   isLoading: false,
   isTestConnectionLoading: false,
+  isOtlpTestConnectionError: false,
   onSaveConfig: noop,
   onIsFormValid: noop,
   onTestConnection: noop,
+  onOtlpTestConnection: noop,
   resetTestConnection: noop,
 });
 
@@ -38,14 +44,23 @@ interface IProps {
 
 export const useDataStore = () => useContext(Context);
 
+const POLLING_INTERVAL = 1000;
+
 const DataStoreProvider = ({children}: IProps) => {
-  const {useTestConnectionMutation, useUpdateDataStoreMutation} = TracetestAPI.instance;
+  const [pollingInterval, setPollingInterval] = useState<number | undefined>(POLLING_INTERVAL);
+  const {useTestConnectionMutation, useUpdateDataStoreMutation, useLazyTestOtlpConnectionQuery} = TracetestAPI.instance;
   const {isFetching} = useSettingsValues();
   const [updateDataStore, {isLoading: isLoadingUpdate}] = useUpdateDataStoreMutation();
   const [
     testConnection,
     {isLoading: isTestConnectionLoading, data: testConnectionResponse, reset: resetTestConnection},
   ] = useTestConnectionMutation();
+  const [
+    testOtlpConnection,
+    {isLoading: isOtlpTestConnectionLoading, data: otlpTestConnectionResponse, isError: isOtlpTestConnectionError},
+  ] = useLazyTestOtlpConnectionQuery({
+    pollingInterval,
+  });
 
   const [isFormValid, setIsFormValid] = useState(false);
   const {showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
@@ -108,26 +123,43 @@ const DataStoreProvider = ({children}: IProps) => {
     [connectionTries, onContactUsOpen, showTestConnectionNotification, testConnection]
   );
 
+  const onOtlpTestConnection = useCallback(() => {
+    setPollingInterval(POLLING_INTERVAL);
+    testOtlpConnection(undefined);
+  }, [testOtlpConnection]);
+
+  const onResetTestConnection = useCallback(() => {
+    setPollingInterval(undefined);
+    resetTestConnection();
+  }, [resetTestConnection]);
+
   const value = useMemo<IContext>(
     () => ({
       isLoading: isLoadingUpdate,
       isFormValid,
-      isTestConnectionLoading,
+      isTestConnectionLoading: isTestConnectionLoading || isOtlpTestConnectionLoading,
+      isOtlpTestConnectionError,
       onSaveConfig,
       onIsFormValid,
       onTestConnection,
+      onOtlpTestConnection,
       testConnectionResponse,
-      resetTestConnection,
+      otlpTestConnectionResponse,
+      resetTestConnection: onResetTestConnection,
     }),
     [
-      isLoadingUpdate,
       isFormValid,
+      isLoadingUpdate,
+      isOtlpTestConnectionError,
+      isOtlpTestConnectionLoading,
       isTestConnectionLoading,
-      onSaveConfig,
       onIsFormValid,
+      onOtlpTestConnection,
+      onResetTestConnection,
+      onSaveConfig,
       onTestConnection,
+      otlpTestConnectionResponse,
       testConnectionResponse,
-      resetTestConnection,
     ]
   );
 

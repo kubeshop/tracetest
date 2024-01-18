@@ -14,8 +14,15 @@ interface IProps {
 }
 
 const Configuration = ({dataStore, onBack}: IProps) => {
-  const {isLoading, isFormValid, onIsFormValid, onSaveConfig, onTestConnection} =
-    useDataStore();
+  const {
+    isLoading,
+    isFormValid,
+    onIsFormValid,
+    onSaveConfig,
+    onTestConnection,
+    testConnectionResponse,
+    otlpTestConnectionResponse,
+  } = useDataStore();
   const [form] = Form.useForm<TDraftDataStore>();
 
   const handleTestConnection = useCallback(async () => {
@@ -75,7 +82,8 @@ const Configuration = ({dataStore, onBack}: IProps) => {
         dataStoreType={dataStore.type as SupportedDataStores}
         isSubmitLoading={isLoading}
         isValid={isFormValid}
-        withColor
+        isTestConnectionSuccess={testConnectionResponse?.allPassed || !!otlpTestConnectionResponse?.spanCount}
+        isWizard
       />
     </Form>
   );

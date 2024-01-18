@@ -1,8 +1,9 @@
 import {noop} from 'lodash';
-import {createContext, useCallback, useContext, useMemo, useState} from 'react';
-import {IWizardState, IWizardStep, TWizardMap} from 'types/Wizard.types';
 import Wizard, {isStepEnabled} from 'models/Wizard.model';
+import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import Tracetest from 'redux/apis/Tracetest';
+import WizardAnalytics from 'services/Analytics/Wizard.service';
+import {IWizardState, IWizardStep, TWizardMap} from 'types/Wizard.types';
 
 interface IContext extends IWizardState {
   activeStepId: string;
@@ -57,6 +58,7 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
 
       setActiveStep(step => step + 1);
     }
+    WizardAnalytics.onStepComplete(activeStepId);
   }, [activeStepId, isFinalStep, updateWizard, wizard.steps]);
 
   const onGoTo = useCallback(

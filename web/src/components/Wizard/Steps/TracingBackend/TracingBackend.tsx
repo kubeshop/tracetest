@@ -1,6 +1,7 @@
 import {useCallback, useState} from 'react';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import DataStore, {fromType} from 'models/DataStore.model';
+import WizardAnalytics from 'services/Analytics/Wizard.service';
 import Selector from './Selector';
 import Configuration from './Configuration';
 
@@ -13,6 +14,7 @@ const TracingBackend = () => {
   const handleOnSelect = useCallback(
     type => {
       setSelectedDataStore(type === defaultDataStore.type ? defaultDataStore : fromType(type));
+      WizardAnalytics.onTracingBackendTypeSelect(type);
     },
     [defaultDataStore]
   );

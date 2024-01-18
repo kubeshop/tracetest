@@ -25,3 +25,9 @@ export const Description = styled(Typography.Text)`
     color: ${({theme}) => theme.color.textSecondary};
   }
 `;
+
+export const Title = styled(Typography.Title)`
+  && {
+    margin-bottom: 0;
+  }
+`;
