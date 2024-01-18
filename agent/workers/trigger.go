@@ -23,12 +23,12 @@ type TriggerWorker struct {
 	registry   *agentTrigger.Registry
 	traceCache collector.TraceCache
 	observer   event.Observer
-	cancelMap  *cancelChannelMap
+	cancelMap  *cancelFuncMap
 }
 
 type TriggerOption func(*TriggerWorker)
 
-func WithTriggerCancelContextsList(cancelContexts *cancelChannelMap) TriggerOption {
+func WithTriggerCancelFuncList(cancelContexts *cancelFuncMap) TriggerOption {
 	return func(tw *TriggerWorker) {
 		tw.cancelMap = cancelContexts
 	}
@@ -79,14 +79,13 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	w.observer.StartTriggerExecution(triggerRequest)
 
 	done := make(chan bool)
-	cancel := make(chan bool)
-
-	cacheKey := key(triggerRequest.TestID, triggerRequest.RunID)
-	w.cancelMap.Set(cacheKey, cancel)
-	defer w.cancelMap.Del(cacheKey)
 
 	subcontext, cancelSubctx := context.WithCancel(ctx)
 	defer cancelSubctx()
+
+	cacheKey := key(triggerRequest.TestID, triggerRequest.RunID)
+	w.cancelMap.Set(cacheKey, cancelSubctx)
+	defer w.cancelMap.Del(cacheKey)
 
 	var err error
 	go func() {
@@ -98,10 +97,9 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	case <-done:
 		// trigger finished successfully
 		break
-	case <-cancel:
+	case <-subcontext.Done():
 		// The context was cancelled.
 		err = executor.ErrUserCancelled
-		cancelSubctx()
 		break
 	}
 

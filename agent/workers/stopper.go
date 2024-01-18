@@ -12,12 +12,12 @@ import (
 type StopperWorker struct {
 	logger         *zap.Logger
 	observer       event.Observer
-	cancelContexts *cancelChannelMap
+	cancelContexts *cancelFuncMap
 }
 
 type StopperOption func(*StopperWorker)
 
-func WithStopperCancelContextsList(cancelContexts *cancelChannelMap) StopperOption {
+func WithStopperCancelFuncList(cancelContexts *cancelFuncMap) StopperOption {
 	return func(tw *StopperWorker) {
 		tw.cancelContexts = cancelContexts
 	}
@@ -51,7 +51,7 @@ func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest
 	w.observer.StartStopRequest(stopRequest)
 
 	cacheKey := key(stopRequest.TestID, stopRequest.RunID)
-	cancelChan, found := w.cancelContexts.Get(cacheKey)
+	cancelFn, found := w.cancelContexts.Get(cacheKey)
 	if !found {
 		err := fmt.Errorf("cancel func for StopRequest not found")
 		w.logger.Error(err.Error(), zap.String("testID", stopRequest.TestID), zap.Int32("runID", stopRequest.RunID))
@@ -59,7 +59,7 @@ func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest
 		return err
 	}
 
-	cancelChan <- true
+	cancelFn()
 
 	w.observer.EndStopRequest(stopRequest, nil)
 

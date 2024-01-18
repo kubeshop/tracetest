@@ -1,6 +1,7 @@
 package workers
 
 import (
+	"context"
 	"sync"
 
 	gocache "github.com/Code-Hex/go-generics-cache"
@@ -10,13 +11,13 @@ func key(testID string, runID int32) string {
 	return testID + string(runID)
 }
 
-type cancelChannelMap struct {
+type cancelFuncMap struct {
 	mutex       sync.Mutex
-	internalMap *gocache.Cache[string, chan bool]
+	internalMap *gocache.Cache[string, context.CancelFunc]
 }
 
 // Get implements TraceCache.
-func (c *cancelChannelMap) Get(key string) (chan bool, bool) {
+func (c *cancelFuncMap) Get(key string) (context.CancelFunc, bool) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -24,22 +25,22 @@ func (c *cancelChannelMap) Get(key string) (chan bool, bool) {
 }
 
 // Append implements TraceCache.
-func (c *cancelChannelMap) Set(key string, cancelFn chan bool) {
+func (c *cancelFuncMap) Set(key string, cancelFn context.CancelFunc) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	c.internalMap.Set(key, cancelFn)
 }
 
-func (c *cancelChannelMap) Del(key string) {
+func (c *cancelFuncMap) Del(key string) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	c.internalMap.Delete(key)
 }
 
-func NewCancelChannelMap() *cancelChannelMap {
-	return &cancelChannelMap{
-		internalMap: gocache.New[string, chan bool](),
+func NewCancelFuncMap() *cancelFuncMap {
+	return &cancelFuncMap{
+		internalMap: gocache.New[string, context.CancelFunc](),
 	}
 }
