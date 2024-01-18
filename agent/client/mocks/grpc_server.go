@@ -22,8 +22,9 @@ type GrpcServerMock struct {
 	terminationChannel        chan *proto.ShutdownRequest
 	dataStoreTestChannel      chan *proto.DataStoreConnectionTestRequest
 
-	lastTriggerResponse *proto.TriggerResponse
-	lastPollingResponse *proto.PollingResponse
+	lastTriggerResponse        *proto.TriggerResponse
+	lastPollingResponse        *proto.PollingResponse
+	lastOtlpConnectionResponse *proto.OTLPConnectionTestResponse
 
 	server *grpc.Server
 }
@@ -156,6 +157,15 @@ func (s *GrpcServerMock) RegisterOTLPConnectionTestListener(id *proto.AgentIdent
 	}
 }
 
+func (s *GrpcServerMock) SendOTLPConnectionTestResult(ctx context.Context, result *proto.OTLPConnectionTestResponse) (*proto.Empty, error) {
+	if result.AgentIdentification == nil || result.AgentIdentification.Token != "token" {
+		return nil, fmt.Errorf("could not validate token")
+	}
+
+	s.lastOtlpConnectionResponse = result
+	return &proto.Empty{}, nil
+}
+
 func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.PollingResponse) (*proto.Empty, error) {
 	if result.AgentIdentification == nil || result.AgentIdentification.Token != "token" {
 		return nil, fmt.Errorf("could not validate token")
@@ -195,6 +205,10 @@ func (s *GrpcServerMock) GetLastTriggerResponse() *proto.TriggerResponse {
 
 func (s *GrpcServerMock) GetLastPollingResponse() *proto.PollingResponse {
 	return s.lastPollingResponse
+}
+
+func (s *GrpcServerMock) GetLastOTLPConnectionResponse() *proto.OTLPConnectionTestResponse {
+	return s.lastOtlpConnectionResponse
 }
 
 func (s *GrpcServerMock) TerminateConnection(reason string) {

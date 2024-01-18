@@ -193,8 +193,9 @@ message OTLPConnectionTestRequest {
 
 message OTLPConnectionTestResponse {
     string requestID = 1;
-    int64 spanCount = 2;
-    int64 lastSpanTimestamp = 3;
+    AgentIdentification agentIdentification = 2;
+    int64 spanCount = 3;
+    int64 lastSpanTimestamp = 4;
 }
 
 message DataStoreConnectionTestRequest {
