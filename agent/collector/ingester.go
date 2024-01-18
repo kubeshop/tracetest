@@ -21,7 +21,14 @@ type stoppable interface {
 	Stop()
 }
 
-func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, startRemoteServer bool) (otlp.Ingester, error) {
+type ingester interface {
+	otlp.Ingester
+	stoppable
+
+	Statistics() Statistics
+}
+
+func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, startRemoteServer bool) (ingester, error) {
 	ingester := &forwardIngester{
 		BatchTimeout:   batchTimeout,
 		RemoteIngester: cfg,
@@ -43,6 +50,11 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 	return ingester, nil
 }
 
+type Statistics struct {
+	spanCount         int
+	lastSpanTimestamp time.Time
+}
+
 // forwardIngester forwards all incoming spans to a remote ingester. It also batches those
 // spans to reduce network traffic.
 type forwardIngester struct {
@@ -54,8 +66,7 @@ type forwardIngester struct {
 	traceCache     TraceCache
 	logger         *zap.Logger
 
-	spanCount         int
-	lastSpanTimestamp time.Time
+	statistics Statistics
 }
 
 type remoteIngesterConfig struct {
@@ -72,13 +83,21 @@ type buffer struct {
 	spans []*v1.ResourceSpans
 }
 
+func (i *forwardIngester) Statistics() Statistics {
+	return i.statistics
+}
+
+func (i *forwardIngester) ResetStatistics() {
+	i.statistics = Statistics{}
+}
+
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
 	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
 
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
-	i.spanCount += spanCount
-	i.lastSpanTimestamp = time.Now()
+	i.statistics.spanCount += spanCount
+	i.statistics.lastSpanTimestamp = time.Now()
 
 	i.buffer.mutex.Unlock()
 	i.logger.Debug("received spans", zap.Int("count", spanCount))

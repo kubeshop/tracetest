@@ -26,6 +26,12 @@ service Orchestrator {
     // Register an agent to listen for shutdown commands
     rpc RegisterShutdownListener(AgentIdentification) returns (stream ShutdownRequest) {}
 
+    // Register an agent to listen for connection test commands
+    rpc RegisterOTLPConnectionTestListener(AgentIdentification) returns (stream OTLPConnectionTestRequest) {}
+
+    // Send the OTLP connection test response
+    rpc SendOTLPConnectionTestResult(OTLPConnectionTestResponse) returns (Empty) {}
+
     // Ping is used to check if the agent is still connected
     rpc Ping(AgentIdentification) returns (Empty) {}
 
@@ -179,6 +185,16 @@ message TraceIdResponse {
 
 message Error {
     string message = 1;
+}
+
+message OTLPConnectionTestRequest {
+    string requestID = 1;
+}
+
+message OTLPConnectionTestResponse {
+    string requestID = 1;
+    int64 spanCount = 2;
+    int64 lastSpanTimestamp = 3;
 }
 
 message DataStoreConnectionTestRequest {

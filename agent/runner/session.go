@@ -47,10 +47,15 @@ func StartSession(ctx context.Context, cfg config.Config, observer event.Observe
 		return nil, err
 	}
 
-	err = StartCollector(ctx, cfg, traceCache, observer, logger)
+	agentCollector, err := StartCollector(ctx, cfg, traceCache, observer, logger)
 	if err != nil {
 		return nil, err
 	}
+
+	controlPlaneClient.OnOTLPConnectionTest(func(ctx context.Context, otr *proto.OTLPConnectionTestRequest) error {
+		controlPlaneClient.SendOTLPConnectionTestResult(ctx)
+		return nil
+	})
 
 	return &Session{
 		client: controlPlaneClient,
@@ -58,7 +63,7 @@ func StartSession(ctx context.Context, cfg config.Config, observer event.Observe
 	}, nil
 }
 
-func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger) error {
+func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger) (collector.Collector, error) {
 	noopTracer := trace.NewNoopTracerProvider().Tracer("noop")
 	collectorConfig := collector.Config{
 		HTTPPort: config.OTLPServer.HTTPPort,
@@ -72,17 +77,17 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 		collector.WithLogger(logger),
 	}
 
-	_, err := collector.Start(
+	collector, err := collector.Start(
 		ctx,
 		collectorConfig,
 		noopTracer,
 		opts...,
 	)
 	if err != nil {
-		return ErrOtlpServerStart
+		return nil, ErrOtlpServerStart
 	}
 
-	return nil
+	return collector, nil
 }
 
 func newControlPlaneClient(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger) (*client.Client, error) {
