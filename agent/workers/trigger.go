@@ -91,6 +91,7 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	var err error
 	go func() {
 		err = w.trigger(subcontext, triggerRequest)
+		done <- true
 	}()
 
 	select {
