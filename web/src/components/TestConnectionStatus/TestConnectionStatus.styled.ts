@@ -1,4 +1,5 @@
 import {CheckCircleFilled, InfoCircleFilled, LoadingOutlined, MinusCircleFilled} from '@ant-design/icons';
+import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const StatusContainer = styled.div`
@@ -21,4 +22,21 @@ export const IconInfo = styled(InfoCircleFilled)`
 
 export const LoadingIcon = styled(LoadingOutlined)`
   color: ${({theme}) => theme.color.primary};
+`;
+
+export const StatusText = styled(Typography.Paragraph).attrs({
+  type: 'secondary',
+})`
+  && {
+    font-weight: 600;
+    margin: 0;
+  }
+`;
+
+export const SpanCountTest = styled(Typography.Text).attrs({
+  type: 'secondary',
+})`
+  && {
+    font-size: ${({theme}) => theme.size.sm};
+  }
 `;

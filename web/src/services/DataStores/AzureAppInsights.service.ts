@@ -60,8 +60,8 @@ const AzureAppInsightsService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.AzureAppInsights,
     };
   },
-  shouldTestConnection({dataStore: {azureappinsights: {connectionType = ConnectionTypes.Direct} = {}} = {}}) {
-    return connectionType === ConnectionTypes.Direct;
+  getIsOtlpBased({dataStore: {azureappinsights: {connectionType = ConnectionTypes.Direct} = {}} = {}}) {
+    return connectionType === ConnectionTypes.Collector;
   },
 });
 

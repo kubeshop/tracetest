@@ -2,7 +2,6 @@ import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
-import ConnectionResult from 'models/ConnectionResult.model';
 import TracetestAPI from 'redux/apis/Tracetest';
 import DataStoreService from 'services/DataStore.service';
 import {useContactUsModal} from 'components/ContactUs';
@@ -47,6 +46,7 @@ const DataStoreProvider = ({children}: IProps) => {
     testConnection,
     {isLoading: isTestConnectionLoading, data: testConnectionResponse, reset: resetTestConnection},
   ] = useTestConnectionMutation();
+
   const [isFormValid, setIsFormValid] = useState(false);
   const {showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
   const {onOpen} = useConfirmationModal();
@@ -89,8 +89,8 @@ const DataStoreProvider = ({children}: IProps) => {
     async (draft: TDraftDataStore, defaultDataStore: DataStore) => {
       const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
 
-      if (!DataStoreService.shouldTestConnection(draft)) {
-        return showTestConnectionNotification(ConnectionResult({}), draft.dataStoreType!, false);
+      if (DataStoreService.getIsOtlpBased(draft)) {
+        return;
       }
 
       try {

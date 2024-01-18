@@ -38,8 +38,8 @@ const JaegerService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.JAEGER,
     };
   },
-  shouldTestConnection() {
-    return true;
+  getIsOtlpBased() {
+    return false;
   },
 });
 

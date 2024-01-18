@@ -31,7 +31,7 @@ interface IDataStoreService {
   getRequest(draft: TDraftDataStore, defaultDataStore: DataStore): Promise<TRawDataStore>;
   getInitialValues(config: DataStore, configuredDataStore?: SupportedDataStores): TDraftDataStore;
   validateDraft(config: TDraftDataStore): Promise<boolean>;
-  shouldTestConnection(draft: TDraftDataStore): boolean;
+  getIsOtlpBased(draft: TDraftDataStore): boolean;
   _getDataStore(type?: SupportedDataStores): TDataStoreService;
 }
 
@@ -72,10 +72,10 @@ const DataStoreService = (): IDataStoreService => ({
     return dataStore.validateDraft(draft);
   },
 
-  shouldTestConnection(draft) {
+  getIsOtlpBased(draft) {
     const dataStore = this._getDataStore(draft.dataStoreType);
 
-    return dataStore.shouldTestConnection(draft);
+    return dataStore.getIsOtlpBased(draft);
   },
 });
 

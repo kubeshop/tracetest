@@ -24,8 +24,8 @@ const SignalFxService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.SignalFX,
     };
   },
-  shouldTestConnection() {
-    return true;
+  getIsOtlpBased() {
+    return false;
   },
 });
 

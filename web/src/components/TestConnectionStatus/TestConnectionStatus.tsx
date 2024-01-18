@@ -1,11 +1,8 @@
-import {useMemo} from 'react';
-import {TDraftDataStore} from 'types/DataStore.types';
-import DataStoreService from 'services/DataStore.service';
-import {useDataStore} from 'providers/DataStore/DataStore.provider';
-import {Form, Typography} from 'antd';
+import OTLPTestConnectionResponse from 'models/OTLPTestConnectionResponse.model';
+import Date from 'utils/Date';
+import {Button} from 'antd';
 import * as S from './TestConnectionStatus.styled';
-
-export type TConnectionStatus = 'loading' | 'success' | 'error' | 'idle';
+import useTestConnectionStatus, {TConnectionStatus} from './hooks/useTestConnnectionStatus';
 
 const Icon = ({status}: {status: TConnectionStatus}) => {
   switch (status) {
@@ -21,41 +18,48 @@ const Icon = ({status}: {status: TConnectionStatus}) => {
   }
 };
 
-const getText = (status: TConnectionStatus, shouldTestConnection: boolean) => {
+const getText = (status: TConnectionStatus, {spanCount, lastSpanTimestamp} = OTLPTestConnectionResponse()) => {
   switch (status) {
     case 'loading':
-      return shouldTestConnection ? 'Connecting to Data Store' : 'Waiting for incoming traces';
+      return 'Waiting for incoming traces';
     case 'success':
-      return shouldTestConnection ? 'Successful Connection' : 'We received your traces';
+      return (
+        <>
+          We received your traces
+          <br />
+          <S.SpanCountTest>
+            <i>
+              {spanCount} spans, {Date.getTimeAgo(lastSpanTimestamp)}
+            </i>
+          </S.SpanCountTest>
+        </>
+      );
     case 'error':
-      return shouldTestConnection ? 'Connection Failed' : 'We could not receive your traces';
+      return 'We could not receive your traces';
     case 'idle':
     default:
       return 'Waiting for Test Connection';
   }
 };
 
-const TestConnectionStatus = () => {
-  const {isTestConnectionLoading, testConnectionResponse} = useDataStore();
-  const form = Form.useFormInstance<TDraftDataStore>();
+interface IProps {
+  onTestConnection(): void;
+}
 
-  const shouldTest = useMemo(() => DataStoreService.shouldTestConnection(form.getFieldsValue()), [form]);
+const TestConnectionStatus = ({onTestConnection}: IProps) => {
+  const {status, isOtlpBased, isLoading, otlpResponse} = useTestConnectionStatus();
 
-  const status = useMemo<TConnectionStatus>(() => {
-    if (isTestConnectionLoading) return 'loading';
-    if (!testConnectionResponse) return 'idle';
-
-    return testConnectionResponse.allPassed ? 'success' : 'error';
-  }, [isTestConnectionLoading, testConnectionResponse]);
-
-  const text = getText(status, shouldTest);
+  if (!isOtlpBased)
+    return (
+      <Button loading={isLoading} type="primary" ghost onClick={onTestConnection}>
+        Test Connection
+      </Button>
+    );
 
   return (
     <S.StatusContainer>
       <Icon status={status} />
-      <Typography.Text type="secondary">
-        <b>{text}</b>
-      </Typography.Text>
+      <S.StatusText>{getText(status, otlpResponse)}</S.StatusText>
     </S.StatusContainer>
   );
 };
