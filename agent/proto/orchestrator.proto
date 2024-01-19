@@ -9,6 +9,9 @@ service Orchestrator {
     // Connects an agent and returns the configuration that must be used by that agent
     rpc Connect(ConnectRequest) returns (AgentConfiguration) {}
 
+    // Register the agent to handle stop request, which are sent from users to stop a running test
+    rpc RegisterStopRequestAgent(AgentIdentification) returns (stream StopRequest) {}
+
     // Register an agent as a trigger agent, once connected, the server will be able to send
     // multiple trigger requests to the agent.
     rpc RegisterTriggerAgent(AgentIdentification) returns (stream TriggerRequest) {}
@@ -38,6 +41,13 @@ service Orchestrator {
 
 // Empty message for endpoints that don't return anything
 message Empty {}
+
+// StopRequest is a user request to intercept a running test.
+// It can be used to stop a test or skip the polling.
+message StopRequest{
+  string testID = 1;
+  int32 runID = 2;
+}
 
 // ConnectRequest is the initial request sent by the agent to the orchestrator
 // it contains all necessary information for authentication and identification

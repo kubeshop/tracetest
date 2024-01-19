@@ -34,7 +34,11 @@ type (
 	}
 )
 
-func (e TriggerError) Error() error {
+func (e *TriggerError) ToError() error {
+	if e == nil || e.ErrorMessage == "" {
+		return nil
+	}
+
 	return errors.New(e.ErrorMessage)
 }
 

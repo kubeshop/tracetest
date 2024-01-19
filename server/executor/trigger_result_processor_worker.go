@@ -70,7 +70,7 @@ func (r triggerResultProcessorWorker) ProcessItem(ctx context.Context, job Job) 
 	job.Run = r.handleExecutionResult(job.Run, ctx)
 	triggerResult := job.Run.TriggerResult
 	if triggerResult.Error != nil {
-		err := triggerResult.Error.Error()
+		err := triggerResult.Error.ToError()
 		if triggerResult.Error.ConnectionError {
 			r.emitUnreachableEndpointEvent(ctx, job, err)
 
