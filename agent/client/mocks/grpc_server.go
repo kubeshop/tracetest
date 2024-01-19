@@ -88,6 +88,14 @@ func (s *GrpcServerMock) Connect(ctx context.Context, req *proto.ConnectRequest)
 	}, nil
 }
 
+func (s *GrpcServerMock) RegisterStopRequestAgent(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterStopRequestAgentServer) error {
+	if id.Token != "token" {
+		return fmt.Errorf("could not validate token")
+	}
+
+	return nil
+}
+
 func (s *GrpcServerMock) RegisterTriggerAgent(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterTriggerAgentServer) error {
 	if id.Token != "token" {
 		return fmt.Errorf("could not validate token")

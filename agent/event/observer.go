@@ -18,6 +18,9 @@ type Observer interface {
 	StartDataStoreConnection(*proto.DataStoreConnectionTestRequest)
 	EndDataStoreConnection(*proto.DataStoreConnectionTestRequest, error)
 
+	StartStopRequest(*proto.StopRequest)
+	EndStopRequest(*proto.StopRequest, error)
+
 	Error(error)
 }
 
@@ -109,4 +112,20 @@ func (o *wrapperObserver) EndTriggerExecution(request *proto.TriggerRequest, err
 	}
 
 	o.wrappedObserver.EndTriggerExecution(request, err)
+}
+
+func (o *wrapperObserver) StartStopRequest(request *proto.StopRequest) {
+	if o.wrappedObserver == nil {
+		return
+	}
+
+	o.wrappedObserver.StartStopRequest(request)
+}
+
+func (o *wrapperObserver) EndStopRequest(request *proto.StopRequest, err error) {
+	if o.wrappedObserver == nil {
+		return
+	}
+
+	o.wrappedObserver.EndStopRequest(request, err)
 }

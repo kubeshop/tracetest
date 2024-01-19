@@ -23,7 +23,7 @@ func TestTrigger(t *testing.T) {
 	client, err := client.Connect(context.Background(), controlPlane.Addr())
 	require.NoError(t, err)
 
-	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache))
+	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache), workers.WithTriggerCancelFuncList(workers.NewCancelFuncMap()))
 
 	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
 		err := triggerWorker.Trigger(ctx, tr)
@@ -74,7 +74,7 @@ func TestTriggerAgainstGoogle(t *testing.T) {
 	client, err := client.Connect(context.Background(), controlPlane.Addr())
 	require.NoError(t, err)
 
-	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache))
+	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache), workers.WithTriggerCancelFuncList(workers.NewCancelFuncMap()))
 
 	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
 		err := triggerWorker.Trigger(ctx, tr)
@@ -120,7 +120,7 @@ func TestTriggerInexistentAPI(t *testing.T) {
 	client, err := client.Connect(context.Background(), controlPlane.Addr())
 	require.NoError(t, err)
 
-	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache))
+	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache), workers.WithTriggerCancelFuncList(workers.NewCancelFuncMap()))
 
 	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
 		err := triggerWorker.Trigger(ctx, tr)

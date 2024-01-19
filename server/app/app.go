@@ -249,6 +249,22 @@ func (app *App) Start(opts ...appOption) error {
 		registerOtlpServer(app, tracesRepo, runRepo, eventEmitter, dataStoreRepo, subscriptionManager, tracer)
 	}
 
+	testConnectionDriverFactory := pipeline.NewDriverFactory[testconnection.Job](natsConn)
+	dsTestListener := testconnection.NewListener()
+	dsTestPipeline := buildDataStoreTestPipeline(
+		testConnectionDriverFactory,
+		dsTestListener,
+		tracer,
+		tracedbFactory,
+		app.cfg,
+		meter,
+	)
+
+	dsTestPipeline.Start()
+	app.registerStopFn(func() {
+		dsTestPipeline.Stop()
+	})
+
 	executorDriverFactory := pipeline.NewDriverFactory[executor.Job](natsConn)
 	testPipeline := buildTestPipeline(
 		executorDriverFactory,
@@ -264,6 +280,7 @@ func (app *App) Start(opts ...appOption) error {
 		subscriptionManager,
 		triggerRegistry,
 		tracedbFactory,
+		dsTestPipeline,
 		app.cfg,
 		meter,
 	)
@@ -283,22 +300,6 @@ func (app *App) Start(opts ...appOption) error {
 	testSuitePipeline.Start()
 	app.registerStopFn(func() {
 		testSuitePipeline.Stop()
-	})
-
-	testConnectionDriverFactory := pipeline.NewDriverFactory[testconnection.Job](natsConn)
-	dsTestListener := testconnection.NewListener()
-	dsTestPipeline := buildDataStoreTestPipeline(
-		testConnectionDriverFactory,
-		dsTestListener,
-		tracer,
-		tracedbFactory,
-		app.cfg,
-		meter,
-	)
-
-	dsTestPipeline.Start()
-	app.registerStopFn(func() {
-		dsTestPipeline.Stop()
 	})
 
 	err = analytics.SendEvent("Server Started", "beacon", "", nil)

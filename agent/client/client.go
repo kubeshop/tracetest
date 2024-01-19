@@ -44,6 +44,7 @@ type Client struct {
 
 	logger *zap.Logger
 
+	stopListener                func(context.Context, *proto.StopRequest) error
 	triggerListener             func(context.Context, *proto.TriggerRequest) error
 	pollListener                func(context.Context, *proto.PollingRequest) error
 	shutdownListener            func(context.Context, *proto.ShutdownRequest) error
@@ -65,6 +66,11 @@ func (c *Client) Start(ctx context.Context) error {
 		// Thus, if we cancel the context, all those goroutines will fail.
 		cancel()
 	}()
+
+	err = c.startStopListener(ctx)
+	if err != nil {
+		return err
+	}
 
 	err = c.startTriggerListener(ctx)
 	if err != nil {
@@ -110,6 +116,10 @@ func (c *Client) SessionConfiguration() *SessionConfig {
 func (c *Client) Close() error {
 	c.done <- true
 	return c.conn.Close()
+}
+
+func (c *Client) OnStopRequest(listener func(context.Context, *proto.StopRequest) error) {
+	c.stopListener = listener
 }
 
 func (c *Client) OnTriggerRequest(listener func(context.Context, *proto.TriggerRequest) error) {
