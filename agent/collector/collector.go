@@ -51,6 +51,15 @@ func WithObserver(observer event.Observer) CollectorOption {
 type collector struct {
 	grpcServer stoppable
 	httpServer stoppable
+
+	ingester ingester
+}
+
+type Collector interface {
+	stoppable
+
+	Statistics() Statistics
+	ResetStatistics()
 }
 
 // Stop implements stoppable.
@@ -59,7 +68,15 @@ func (c *collector) Stop() {
 	c.httpServer.Stop()
 }
 
-func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) (stoppable, error) {
+func (c *collector) Statistics() Statistics {
+	return c.ingester.Statistics()
+}
+
+func (c *collector) ResetStatistics() {
+	c.ingester.ResetStatistics()
+}
+
+func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) (Collector, error) {
 	ingesterConfig := remoteIngesterConfig{
 		URL:      config.RemoteServerURL,
 		Token:    config.RemoteServerToken,
@@ -98,7 +115,7 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...Coll
 		return nil, fmt.Errorf("could not start HTTP OTLP listener: %w", err)
 	}
 
-	return &collector{grpcServer: grpcServer, httpServer: httpServer}, nil
+	return &collector{grpcServer: grpcServer, httpServer: httpServer, ingester: ingester}, nil
 }
 
 func onProcessTermination(callback func()) {

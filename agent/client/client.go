@@ -49,6 +49,7 @@ type Client struct {
 	pollListener                func(context.Context, *proto.PollingRequest) error
 	shutdownListener            func(context.Context, *proto.ShutdownRequest) error
 	dataStoreConnectionListener func(context.Context, *proto.DataStoreConnectionTestRequest) error
+	otlpConnectionTestListener  func(context.Context, *proto.OTLPConnectionTestRequest) error
 }
 
 func (c *Client) Start(ctx context.Context) error {
@@ -88,6 +89,11 @@ func (c *Client) Start(ctx context.Context) error {
 	}
 
 	err = c.startDataStoreConnectionTestListener(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = c.startOTLPConnectionTestListener(ctx)
 	if err != nil {
 		return err
 	}
@@ -132,6 +138,10 @@ func (c *Client) OnDataStoreTestConnectionRequest(listener func(context.Context,
 
 func (c *Client) OnPollingRequest(listener func(context.Context, *proto.PollingRequest) error) {
 	c.pollListener = listener
+}
+
+func (c *Client) OnOTLPConnectionTest(listener func(context.Context, *proto.OTLPConnectionTestRequest) error) {
+	c.otlpConnectionTestListener = listener
 }
 
 func (c *Client) OnConnectionClosed(listener func(context.Context, *proto.ShutdownRequest) error) {
