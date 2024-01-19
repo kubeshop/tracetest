@@ -1,15 +1,17 @@
 import {noop} from 'lodash';
-import Wizard, {isStepEnabled} from 'models/Wizard.model';
+import Wizard, {TWizardStepId, isStepEnabled} from 'models/Wizard.model';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import Tracetest from 'redux/apis/Tracetest';
 import WizardAnalytics from 'services/Analytics/Wizard.service';
 import {IWizardState, IWizardStep, TWizardMap} from 'types/Wizard.types';
+import WizardService from 'services/Wizard.service';
 
 interface IContext extends IWizardState {
   activeStepId: string;
   isLoading: boolean;
   onNext(): void;
   onGoTo(key: string): void;
+  onCompleteStep(stepId: TWizardStepId): void;
 }
 
 export const Context = createContext<IContext>({
@@ -19,6 +21,7 @@ export const Context = createContext<IContext>({
   isLoading: false,
   onNext: noop,
   onGoTo: noop,
+  onCompleteStep: noop,
 });
 
 interface IProps {
@@ -61,6 +64,17 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
     WizardAnalytics.onStepComplete(activeStepId);
   }, [activeStepId, isFinalStep, updateWizard, wizard.steps]);
 
+  const onCompleteStep = useCallback(
+    async (stepId: TWizardStepId) => {
+      if (WizardService.shouldUpdate(stepId, wizard.steps)) {
+        const updatedSteps = WizardService.completeStep(stepId, wizard.steps);
+        await updateWizard({steps: updatedSteps}).unwrap();
+        WizardAnalytics.onStepComplete(stepId);
+      }
+    },
+    [updateWizard, wizard.steps]
+  );
+
   const onGoTo = useCallback(
     key => {
       const index = steps.findIndex(step => step.id === key);
@@ -77,8 +91,9 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
       isLoading,
       onNext,
       onGoTo,
+      onCompleteStep,
     }),
-    [activeStep, activeStepId, isLoading, onGoTo, onNext, steps]
+    [activeStep, activeStepId, isLoading, onCompleteStep, onGoTo, onNext, steps]
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

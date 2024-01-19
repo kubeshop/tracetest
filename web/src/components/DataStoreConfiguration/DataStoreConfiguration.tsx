@@ -8,9 +8,8 @@ import * as S from './DataStoreConfiguration.styled';
 import TestConnectionStatus from '../TestConnectionStatus';
 
 interface IProps {
-  isTestConnectionSuccess?: boolean;
+  isTestConnectionSuccess: boolean;
   isSubmitLoading: boolean;
-  isValid: boolean;
   dataStoreType: SupportedDataStores;
   onSubmit(): void;
   onTestConnection(): void;
@@ -22,7 +21,6 @@ const DataStoreConfiguration = ({
   onTestConnection,
   isSubmitLoading,
   isTestConnectionSuccess,
-  isValid,
   dataStoreType,
   isWizard = false,
 }: IProps) => (
@@ -50,7 +48,7 @@ const DataStoreConfiguration = ({
       <TestConnectionStatus onTestConnection={onTestConnection} />
       <AllowButton
         operation={Operation.Configure}
-        disabled={!isValid || (isWizard && !isTestConnectionSuccess)}
+        disabled={!isTestConnectionSuccess}
         loading={isSubmitLoading}
         type="primary"
         onClick={onSubmit}
