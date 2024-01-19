@@ -14,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
+	"github.com/kubeshop/tracetest/server/testconnection"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
@@ -33,6 +34,7 @@ func buildTestPipeline(
 	subscriptionManager subscription.Manager,
 	triggerRegistry *trigger.Registry,
 	tracedbFactory tracedb.FactoryFunc,
+	dataStoreTestPipeline *testconnection.DataStoreTestPipeline,
 	appConfig *config.AppConfig,
 	meter metric.Meter,
 ) *executor.TestPipeline {
@@ -66,6 +68,7 @@ func buildTestPipeline(
 		execTestUpdater,
 		subscriptionManager,
 		tracer,
+		dataStoreTestPipeline,
 	)
 
 	traceFetcherWorker := tracepollerworker.NewFetcherWorker(
@@ -145,5 +148,6 @@ func buildTestPipeline(
 		trRepo,
 		ppRepo,
 		dsRepo,
+		cancelRunHandlerFn,
 	)
 }

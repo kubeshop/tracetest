@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
@@ -74,6 +75,7 @@ type Job struct {
 
 	TestSuite    testsuite.TestSuite
 	TestSuiteRun testsuite.TestSuiteRun
+	TenantID     string
 
 	Test test.Test
 	Run  test.Run
@@ -325,10 +327,11 @@ func (q Queue) listenPreprocess(ctx context.Context, job Job) (context.Context, 
 	ctx = context.WithValue(ctx, "LastInstanceID", job.Headers.Get("InstanceID"))
 
 	ctx, cancelCtx := context.WithCancelCause(ctx)
-	q.listenForUserRequests(context.Background(), cancelCtx, job)
+	q.listenForUserRequests(ctx, cancelCtx, job)
 
 	return ctx, Job{
 		Headers:        job.Headers,
+		TenantID:       job.TenantID,
 		Test:           q.resolveTest(ctx, job),
 		Run:            q.resolveTestRun(ctx, job),
 		TestSuite:      q.resolveTestSuite(ctx, job),
@@ -346,13 +349,16 @@ var (
 )
 
 type UserRequest struct {
-	TestID id.ID
-	RunID  int
+	TenantID string
+	TestID   id.ID
+	RunID    int
 }
 
 func (sr UserRequest) ResourceID(requestType UserRequestType) string {
 	runID := (test.Run{ID: sr.RunID, TestID: sr.TestID}).ResourceID()
-	return fmt.Sprintf("%s/%s", runID, requestType)
+	runID = strings.ReplaceAll(runID, "/", ".")
+
+	return fmt.Sprintf("%s.%s.%s", sr.TenantID, runID, requestType)
 }
 
 var (
@@ -364,7 +370,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 		return
 	}
 
-	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
+	stopTestCallback := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		cancelCtx(nil)
 		request := UserRequest{}
 		err := m.DecodeContent(&request)
@@ -384,7 +390,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 		return q.cancelRunHandlerFn(ctx, run)
 	})
 
-	spfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
+	skipPollCallback := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		request := UserRequest{}
 		err := m.DecodeContent(&request)
 		if err != nil {
@@ -404,8 +410,14 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 		return nil
 	})
 
-	q.subscriptor.Subscribe((UserRequest{job.Test.ID, job.Run.ID}).ResourceID(UserRequestTypeStop), sfn)
-	q.subscriptor.Subscribe((UserRequest{job.Test.ID, job.Run.ID}).ResourceID(UserRequestSkipTraceCollection), spfn)
+	userReq := UserRequest{
+		TenantID: job.TenantID,
+		TestID:   job.Test.ID,
+		RunID:    job.Run.ID,
+	}
+
+	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestTypeStop), stopTestCallback)
+	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestSkipTraceCollection), skipPollCallback)
 }
 
 func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuite {

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/kubeshop/tracetest/server/assertions/selectors"
 	"github.com/kubeshop/tracetest/server/datastore"
@@ -76,6 +77,7 @@ type testSuiteRunRepository interface {
 
 type testRunner interface {
 	StopTest(_ context.Context, testID id.ID, runID int)
+	UpdateStoppedTest(_ context.Context, run test.Run)
 	SkipTraceCollection(_ context.Context, testID id.ID, runID int)
 	Run(context.Context, test.Test, test.RunMetadata, variableset.VariableSet, *[]testrunner.RequiredGate) test.Run
 	Rerun(_ context.Context, _ test.Test, runID int) test.Run
@@ -735,7 +737,7 @@ func (c *controller) GetOTLPConnectionInformation(ctx context.Context) (openapi.
 
 	return openapi.Response(http.StatusOK, openapi.OtlpTestConnectionResponse{
 		SpanCount:         int32(response.NumberSpans),
-		LastSpanTimestamp: response.LastSpanTimestamp.String(),
+		LastSpanTimestamp: response.LastSpanTimestamp.Format(time.RFC3339Nano),
 	}), nil
 }
 
@@ -772,9 +774,14 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 	existingRun.Trace = traces.MergeTraces(existingRun.Trace, run.Trace)
 	existingRun.State = run.State
 
-	err = c.testRunRepository.UpdateRun(ctx, existingRun)
-	if err != nil {
-		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	if executor.RunWasUserCancelled(existingRun) {
+		existingRun.TriggerResult.Error = nil
+		c.testRunner.UpdateStoppedTest(ctx, existingRun)
+	} else {
+		err = c.testRunRepository.UpdateRun(ctx, existingRun)
+		if err != nil {
+			return openapi.Response(http.StatusInternalServerError, err.Error()), err
+		}
 	}
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&existingRun)), err

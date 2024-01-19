@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Orchestrator_Connect_FullMethodName                              = "/proto.Orchestrator/Connect"
+	Orchestrator_RegisterStopRequestAgent_FullMethodName             = "/proto.Orchestrator/RegisterStopRequestAgent"
 	Orchestrator_RegisterTriggerAgent_FullMethodName                 = "/proto.Orchestrator/RegisterTriggerAgent"
 	Orchestrator_SendTriggerResult_FullMethodName                    = "/proto.Orchestrator/SendTriggerResult"
 	Orchestrator_RegisterPollerAgent_FullMethodName                  = "/proto.Orchestrator/RegisterPollerAgent"
@@ -38,6 +39,8 @@ const (
 type OrchestratorClient interface {
 	// Connects an agent and returns the configuration that must be used by that agent
 	Connect(ctx context.Context, in *ConnectRequest, opts ...grpc.CallOption) (*AgentConfiguration, error)
+	// Register the agent to handle stop request, which are sent from users to stop a running test
+	RegisterStopRequestAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterStopRequestAgentClient, error)
 	// Register an agent as a trigger agent, once connected, the server will be able to send
 	// multiple trigger requests to the agent.
 	RegisterTriggerAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error)
@@ -79,8 +82,40 @@ func (c *orchestratorClient) Connect(ctx context.Context, in *ConnectRequest, op
 	return out, nil
 }
 
+func (c *orchestratorClient) RegisterStopRequestAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterStopRequestAgentClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[0], Orchestrator_RegisterStopRequestAgent_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &orchestratorRegisterStopRequestAgentClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Orchestrator_RegisterStopRequestAgentClient interface {
+	Recv() (*StopRequest, error)
+	grpc.ClientStream
+}
+
+type orchestratorRegisterStopRequestAgentClient struct {
+	grpc.ClientStream
+}
+
+func (x *orchestratorRegisterStopRequestAgentClient) Recv() (*StopRequest, error) {
+	m := new(StopRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *orchestratorClient) RegisterTriggerAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterTriggerAgentClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[0], Orchestrator_RegisterTriggerAgent_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[1], Orchestrator_RegisterTriggerAgent_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +156,7 @@ func (c *orchestratorClient) SendTriggerResult(ctx context.Context, in *TriggerR
 }
 
 func (c *orchestratorClient) RegisterPollerAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterPollerAgentClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[1], Orchestrator_RegisterPollerAgent_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[2], Orchestrator_RegisterPollerAgent_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +197,7 @@ func (c *orchestratorClient) SendPolledSpans(ctx context.Context, in *PollingRes
 }
 
 func (c *orchestratorClient) RegisterShutdownListener(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterShutdownListenerClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[2], Orchestrator_RegisterShutdownListener_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[3], Orchestrator_RegisterShutdownListener_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +229,7 @@ func (x *orchestratorRegisterShutdownListenerClient) Recv() (*ShutdownRequest, e
 }
 
 func (c *orchestratorClient) RegisterOTLPConnectionTestListener(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterOTLPConnectionTestListenerClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[3], Orchestrator_RegisterOTLPConnectionTestListener_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[4], Orchestrator_RegisterOTLPConnectionTestListener_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -244,7 +279,7 @@ func (c *orchestratorClient) Ping(ctx context.Context, in *AgentIdentification, 
 }
 
 func (c *orchestratorClient) RegisterDataStoreConnectionTestAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterDataStoreConnectionTestAgentClient, error) {
-	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[4], Orchestrator_RegisterDataStoreConnectionTestAgent_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[5], Orchestrator_RegisterDataStoreConnectionTestAgent_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -290,6 +325,8 @@ func (c *orchestratorClient) SendDataStoreConnectionTestResult(ctx context.Conte
 type OrchestratorServer interface {
 	// Connects an agent and returns the configuration that must be used by that agent
 	Connect(context.Context, *ConnectRequest) (*AgentConfiguration, error)
+	// Register the agent to handle stop request, which are sent from users to stop a running test
+	RegisterStopRequestAgent(*AgentIdentification, Orchestrator_RegisterStopRequestAgentServer) error
 	// Register an agent as a trigger agent, once connected, the server will be able to send
 	// multiple trigger requests to the agent.
 	RegisterTriggerAgent(*AgentIdentification, Orchestrator_RegisterTriggerAgentServer) error
@@ -321,6 +358,9 @@ type UnimplementedOrchestratorServer struct {
 
 func (UnimplementedOrchestratorServer) Connect(context.Context, *ConnectRequest) (*AgentConfiguration, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Connect not implemented")
+}
+func (UnimplementedOrchestratorServer) RegisterStopRequestAgent(*AgentIdentification, Orchestrator_RegisterStopRequestAgentServer) error {
+	return status.Errorf(codes.Unimplemented, "method RegisterStopRequestAgent not implemented")
 }
 func (UnimplementedOrchestratorServer) RegisterTriggerAgent(*AgentIdentification, Orchestrator_RegisterTriggerAgentServer) error {
 	return status.Errorf(codes.Unimplemented, "method RegisterTriggerAgent not implemented")
@@ -381,6 +421,27 @@ func _Orchestrator_Connect_Handler(srv interface{}, ctx context.Context, dec fun
 		return srv.(OrchestratorServer).Connect(ctx, req.(*ConnectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _Orchestrator_RegisterStopRequestAgent_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(AgentIdentification)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(OrchestratorServer).RegisterStopRequestAgent(m, &orchestratorRegisterStopRequestAgentServer{stream})
+}
+
+type Orchestrator_RegisterStopRequestAgentServer interface {
+	Send(*StopRequest) error
+	grpc.ServerStream
+}
+
+type orchestratorRegisterStopRequestAgentServer struct {
+	grpc.ServerStream
+}
+
+func (x *orchestratorRegisterStopRequestAgentServer) Send(m *StopRequest) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _Orchestrator_RegisterTriggerAgent_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -611,6 +672,11 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "RegisterStopRequestAgent",
+			Handler:       _Orchestrator_RegisterStopRequestAgent_Handler,
+			ServerStreams: true,
+		},
 		{
 			StreamName:    "RegisterTriggerAgent",
 			Handler:       _Orchestrator_RegisterTriggerAgent_Handler,
