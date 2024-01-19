@@ -57,8 +57,14 @@ The `@tracetest/cypress` npm package is a Cypress plugin that allows you to run 
 Clone the official [Tracetest Pokeshop Demo App Repo](https://github.com/kubeshop/pokeshop) to your local machine.
 
 ```bash
-git clone git@github.com:kubeshop/pokeshop.git
+git clone https://github.com/kubeshop/pokeshop.git
 cd pokeshop
+```
+
+Before moving forward, run `npm i` in the root folder to install the dependencies.
+
+```bash
+npm i
 ```
 
 **Docker**:
@@ -104,8 +110,6 @@ module.exports = defineConfig({
   },
 });
 ```
-
-Before moving forward, run `npm i` in the root folder to install the dependencies.
 
 ### The `home.cy` Test Script
 
@@ -249,6 +253,11 @@ describe('Home', { defaultCommandTimeout: 60000 }, () => {
 ### Setting the Environment Variables
 
 Copy the `.env.template` content into a new `.env` file. Add the [Tracetest API Token](/concepts/environment-tokens) and [Tracetest Agent API Key](/configuration/agent) to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
+
+```bash
+cp .env.template .env
+vi .env
+```
 
 ### Starting the Pokeshop Demo App
 
