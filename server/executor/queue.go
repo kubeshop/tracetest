@@ -370,7 +370,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 		return
 	}
 
-	sfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
+	stopTestCallback := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		cancelCtx(nil)
 		request := UserRequest{}
 		err := m.DecodeContent(&request)
@@ -390,7 +390,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 		return q.cancelRunHandlerFn(ctx, run)
 	})
 
-	spfn := subscription.NewSubscriberFunction(func(m subscription.Message) error {
+	skipPollCallback := subscription.NewSubscriberFunction(func(m subscription.Message) error {
 		request := UserRequest{}
 		err := m.DecodeContent(&request)
 		if err != nil {
@@ -410,14 +410,14 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 		return nil
 	})
 
-	uReq := UserRequest{
+	userReq := UserRequest{
 		TenantID: job.TenantID,
 		TestID:   job.Test.ID,
 		RunID:    job.Run.ID,
 	}
 
-	q.subscriptor.Subscribe(uReq.ResourceID(UserRequestTypeStop), sfn)
-	q.subscriptor.Subscribe(uReq.ResourceID(UserRequestSkipTraceCollection), spfn)
+	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestTypeStop), stopTestCallback)
+	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestSkipTraceCollection), skipPollCallback)
 }
 
 func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuite {
