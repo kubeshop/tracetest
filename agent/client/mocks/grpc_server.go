@@ -22,9 +22,10 @@ type GrpcServerMock struct {
 	terminationChannel        chan *proto.ShutdownRequest
 	dataStoreTestChannel      chan *proto.DataStoreConnectionTestRequest
 
-	lastTriggerResponse        *proto.TriggerResponse
-	lastPollingResponse        *proto.PollingResponse
-	lastOtlpConnectionResponse *proto.OTLPConnectionTestResponse
+	lastTriggerResponse             *proto.TriggerResponse
+	lastPollingResponse             *proto.PollingResponse
+	lastOtlpConnectionResponse      *proto.OTLPConnectionTestResponse
+	lastDataStoreConnectionResponse *proto.DataStoreConnectionTestResponse
 
 	server *grpc.Server
 }
@@ -166,6 +167,15 @@ func (s *GrpcServerMock) SendOTLPConnectionTestResult(ctx context.Context, resul
 	return &proto.Empty{}, nil
 }
 
+func (s *GrpcServerMock) SendDataStoreConnectionTestResult(ctx context.Context, result *proto.DataStoreConnectionTestResponse) (*proto.Empty, error) {
+	if result.AgentIdentification == nil || result.AgentIdentification.Token != "token" {
+		return nil, fmt.Errorf("could not validate token")
+	}
+
+	s.lastDataStoreConnectionResponse = result
+	return &proto.Empty{}, nil
+}
+
 func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.PollingResponse) (*proto.Empty, error) {
 	if result.AgentIdentification == nil || result.AgentIdentification.Token != "token" {
 		return nil, fmt.Errorf("could not validate token")
@@ -195,6 +205,10 @@ func (s *GrpcServerMock) SendPollingRequest(request *proto.PollingRequest) {
 	s.pollingChannel <- request
 }
 
+func (s *GrpcServerMock) SendDataStoreConnectionTestRequest(request *proto.DataStoreConnectionTestRequest) {
+	s.dataStoreTestChannel <- request
+}
+
 func (s *GrpcServerMock) SendOTLPConnectionTestRequest(request *proto.OTLPConnectionTestRequest) {
 	s.otlpConnectionTestChannel <- request
 }
@@ -209,6 +223,10 @@ func (s *GrpcServerMock) GetLastPollingResponse() *proto.PollingResponse {
 
 func (s *GrpcServerMock) GetLastOTLPConnectionResponse() *proto.OTLPConnectionTestResponse {
 	return s.lastOtlpConnectionResponse
+}
+
+func (s *GrpcServerMock) GetLastDataStoreConnectionResponse() *proto.DataStoreConnectionTestResponse {
+	return s.lastDataStoreConnectionResponse
 }
 
 func (s *GrpcServerMock) TerminateConnection(reason string) {
