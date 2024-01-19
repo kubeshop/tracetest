@@ -1,6 +1,5 @@
 import {TWizardMap} from 'types/Wizard.types';
 import WizardProvider from 'providers/Wizard/Wizard.provider';
-import {withCustomization} from 'providers/Customization';
 import TracingBackend, {TracingBackendTab} from '../Steps/TracingBackend';
 import CreateTest, {CreateTestTab} from '../Steps/CreateTest';
 
@@ -34,4 +33,4 @@ interface IProps {
 
 const Wrapper = ({children}: IProps) => <WizardProvider stepsMap={steps}>{children}</WizardProvider>;
 
-export default withCustomization(Wrapper, 'wizardWrapper');
+export default Wrapper;

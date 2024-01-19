@@ -14,7 +14,6 @@ import VariableSetProvider from 'providers/VariableSet';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import MissingVariablesModalProvider from 'providers/MissingVariablesModal/MissingVariablesModal.provider';
 import NotificationProvider from 'providers/Notification/Notification.provider';
-import WizardWrapper from 'components/Wizard/Wrapper';
 import {ConfigMode} from 'types/DataStore.types';
 import * as S from './Layout.styled';
 import MenuBottom from './MenuBottom';
@@ -70,61 +69,59 @@ const Layout = ({hasMenu = false}: IProps) => {
   return (
     <ConfirmationModalProvider>
       <NotificationProvider>
-        <WizardWrapper>
-          <MissingVariablesModalProvider>
-            <FileViewerModalProvider>
-              <VariableSetProvider>
-                <GuidedTourProvider>
-                  <CreateTestProvider>
-                    <S.Layout hasSider>
-                      {hasMenu && (
-                        <S.Sider width={256}>
-                          <S.LogoContainer>
-                            <Link to="/">
-                              <img alt="Tracetest logo" src={logoAsset} />
-                            </Link>
-                          </S.LogoContainer>
+        <MissingVariablesModalProvider>
+          <FileViewerModalProvider>
+            <VariableSetProvider>
+              <GuidedTourProvider>
+                <CreateTestProvider>
+                  <S.Layout hasSider>
+                    {hasMenu && (
+                      <S.Sider width={256}>
+                        <S.LogoContainer>
+                          <Link to="/">
+                            <img alt="Tracetest logo" src={logoAsset} />
+                          </Link>
+                        </S.LogoContainer>
 
-                          <S.SiderContent>
-                            <S.MenuContainer>
-                              <Menu
-                                defaultSelectedKeys={[
-                                  menuItems.findIndex(value => value.path === pathname).toString() || '0',
-                                ]}
-                                items={menuItems}
-                                mode="inline"
-                                theme="dark"
-                              />
-                            </S.MenuContainer>
+                        <S.SiderContent>
+                          <S.MenuContainer>
+                            <Menu
+                              defaultSelectedKeys={[
+                                menuItems.findIndex(value => value.path === pathname).toString() || '0',
+                              ]}
+                              items={menuItems}
+                              mode="inline"
+                              theme="dark"
+                            />
+                          </S.MenuContainer>
 
-                            <S.MenuContainer>
-                              <MenuBottom />
-                              <Menu
-                                defaultSelectedKeys={[
-                                  footerMenuItems.findIndex(value => value.path === pathname).toString() || '0',
-                                ]}
-                                items={footerMenuItems}
-                                mode="inline"
-                                theme="dark"
-                              />
-                            </S.MenuContainer>
-                          </S.SiderContent>
-                        </S.Sider>
-                      )}
+                          <S.MenuContainer>
+                            <MenuBottom />
+                            <Menu
+                              defaultSelectedKeys={[
+                                footerMenuItems.findIndex(value => value.path === pathname).toString() || '0',
+                              ]}
+                              items={footerMenuItems}
+                              mode="inline"
+                              theme="dark"
+                            />
+                          </S.MenuContainer>
+                        </S.SiderContent>
+                      </S.Sider>
+                    )}
 
-                      <S.Layout>
-                        <Header hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
-                        <S.Content $hasMenu={hasMenu}>
-                          <Outlet />
-                        </S.Content>
-                      </S.Layout>
+                    <S.Layout>
+                      <Header hasLogo={!hasMenu} isNoTracingMode={isNoTracingMode && !isLoading} />
+                      <S.Content $hasMenu={hasMenu}>
+                        <Outlet />
+                      </S.Content>
                     </S.Layout>
-                  </CreateTestProvider>
-                </GuidedTourProvider>
-              </VariableSetProvider>
-            </FileViewerModalProvider>
-          </MissingVariablesModalProvider>
-        </WizardWrapper>
+                  </S.Layout>
+                </CreateTestProvider>
+              </GuidedTourProvider>
+            </VariableSetProvider>
+          </FileViewerModalProvider>
+        </MissingVariablesModalProvider>
       </NotificationProvider>
     </ConfirmationModalProvider>
   );
