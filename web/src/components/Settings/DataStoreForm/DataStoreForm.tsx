@@ -16,7 +16,7 @@ interface IProps {
   onIsFormValid(isValid: boolean): void;
   onTestConnection(): void;
   isLoading: boolean;
-  isFormValid: boolean;
+  isTestConnectionSuccess: boolean;
 }
 
 const DataStoreForm = ({
@@ -26,7 +26,7 @@ const DataStoreForm = ({
   onIsFormValid,
   onTestConnection,
   isLoading,
-  isFormValid,
+  isTestConnectionSuccess,
 }: IProps) => {
   const configuredDataStoreType = dataStoreConfig.defaultDataStore.type as SupportedDataStores;
   const initialValues = useMemo(
@@ -69,9 +69,9 @@ const DataStoreForm = ({
         </Form.Item>
         <S.FactoryContainer>
           <DataStoreConfiguration
+            isTestConnectionSuccess={isTestConnectionSuccess}
             onSubmit={() => form.submit()}
             onTestConnection={onTestConnection}
-            isValid={isFormValid}
             isSubmitLoading={isLoading}
             dataStoreType={dataStoreType ?? SupportedDataStores.JAEGER}
           />

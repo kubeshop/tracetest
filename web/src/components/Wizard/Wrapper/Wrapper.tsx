@@ -1,8 +1,6 @@
 import {TWizardMap} from 'types/Wizard.types';
 import WizardProvider from 'providers/Wizard/Wizard.provider';
 import {withCustomization} from 'providers/Customization';
-import DataStoreProvider from 'providers/DataStore/DataStore.provider';
-import SettingsProvider from 'providers/Settings/Settings.provider';
 import TracingBackend, {TracingBackendTab} from '../Steps/TracingBackend';
 import CreateTest, {CreateTestTab} from '../Steps/CreateTest';
 
@@ -34,12 +32,6 @@ interface IProps {
   children: React.ReactNode;
 }
 
-const Wrapper = ({children}: IProps) => (
-  <DataStoreProvider>
-    <SettingsProvider>
-      <WizardProvider stepsMap={steps}>{children}</WizardProvider>
-    </SettingsProvider>
-  </DataStoreProvider>
-);
+const Wrapper = ({children}: IProps) => <WizardProvider stepsMap={steps}>{children}</WizardProvider>;
 
 export default withCustomization(Wrapper, 'wizardWrapper');
