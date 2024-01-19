@@ -9,7 +9,6 @@ import (
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
-	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
@@ -18,19 +17,19 @@ import (
 )
 
 type TriggerWorker struct {
-	logger     *zap.Logger
-	client     *client.Client
-	registry   *agentTrigger.Registry
-	traceCache collector.TraceCache
-	observer   event.Observer
-	cancelMap  *cancelFuncMap
+	logger                 *zap.Logger
+	client                 *client.Client
+	registry               *agentTrigger.Registry
+	traceCache             collector.TraceCache
+	observer               event.Observer
+	stoppableProcessRunner StoppableProcessRunner
 }
 
 type TriggerOption func(*TriggerWorker)
 
-func WithTriggerCancelFuncList(cancelContexts *cancelFuncMap) TriggerOption {
+func WithTriggerStoppableProcessRunner(stoppableProcessRunner StoppableProcessRunner) TriggerOption {
 	return func(tw *TriggerWorker) {
-		tw.cancelMap = cancelContexts
+		tw.stoppableProcessRunner = stoppableProcessRunner
 	}
 }
 
@@ -78,30 +77,9 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
 	w.observer.StartTriggerExecution(triggerRequest)
 
-	done := make(chan bool)
-
-	subcontext, cancelSubctx := context.WithCancel(ctx)
-	defer cancelSubctx()
-
-	cacheKey := key(triggerRequest.TestID, triggerRequest.RunID)
-	w.cancelMap.Set(cacheKey, cancelSubctx)
-	defer w.cancelMap.Del(cacheKey)
-
-	var err error
-	go func() {
-		err = w.trigger(subcontext, triggerRequest)
-		done <- true
-	}()
-
-	select {
-	case <-done:
-		// trigger finished successfully
-		break
-	case <-subcontext.Done():
-		// The context was cancelled.
-		err = executor.ErrUserCancelled
-		break
-	}
+	err := w.stoppableProcessRunner(ctx, triggerRequest.TestID, triggerRequest.RunID, func(subcontext context.Context) error {
+		return w.trigger(subcontext, triggerRequest)
+	})
 
 	if err != nil {
 		w.logger.Error("Trigger error", zap.Error(err))
