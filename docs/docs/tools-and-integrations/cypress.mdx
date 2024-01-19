@@ -111,9 +111,9 @@ module.exports = defineConfig({
 });
 ```
 
-### The `home.cy` Test Script
+### The `home.cy.ts` Test Script
 
-The `cypress/e2e/1-getting-started/home.cy` test script contains three different tests based on the Pokeshop Demo UI fetures, which are:
+The `cypress/e2e/1-getting-started/home.cy.ts` test script contains three different tests based on the Pokeshop Demo UI fetures, which are:
 
 1. Create a Pokemon
 2. Import a Pokemon (using an async process)
@@ -122,9 +122,10 @@ The `cypress/e2e/1-getting-started/home.cy` test script contains three different
 ### Tracetest Library Setup
 
 If you go to the `package.json` file you will find the inclusion of a Tracetest package for Cypress `@tracetest/cypress`.
+
 The first thing the test script does is import the package, grab the Tracetest API token from the environment variables and create the Tracetest instance.
 
-```typescript
+```typescript title=cypress/e2e/1-getting-started/home.cy.ts
 import Tracetest, { Types } from "@tracetest/cypress";
 
 const TRACETEST_API_TOKEN = Cypress.env("TRACETEST_API_TOKEN") || "";
@@ -133,7 +134,7 @@ let tracetest: Types.TracetestCypress | undefined = undefined;
 
 Afterward, during the `before` hook, create the Tracetest instance with the API token.
 
-```typescript
+```typescript title=cypress/e2e/1-getting-started/home.cy.ts
 before((done) => {
   Tracetest({ apiToken: TRACETEST_API_TOKEN }).then((instance) => {
     tracetest = instance;
@@ -152,7 +153,7 @@ before((done) => {
 
 Then, during the `beforeEach` hook, the script **captures** the document to inject the `traceparent` to the meta tag.
 
-```typescript
+```typescript title=cypress/e2e/1-getting-started/home.cy.ts
 beforeEach(() => {
   cy.visit("/", {
     onBeforeLoad: (win) => tracetest.capture(win.document),
@@ -162,7 +163,7 @@ beforeEach(() => {
 
 **OPTIONAL**: If you want to wait for the test to finish and break the Cypress execution based on a failed Tracetest test, you can add the `after` hook and call the `summary` method.
 
-```typescript
+```typescript title=cypress/e2e/1-getting-started/home.cy.ts
 after((done) => {
   tracetest.summary().then(() => done());
 });
@@ -170,7 +171,7 @@ after((done) => {
 
 The rest of the test script is the Cypress test definitions for the test cases mentioned above. The complete test script looks like this:
 
-```typescript
+```typescript title=cypress/e2e/1-getting-started/home.cy.ts
 import Tracetest, { Types } from '@tracetest/cypress';
 
 const TRACETEST_API_TOKEN = Cypress.env('TRACETEST_API_TOKEN') || '';
@@ -252,11 +253,18 @@ describe('Home', { defaultCommandTimeout: 60000 }, () => {
 
 ### Setting the Environment Variables
 
-Copy the `.env.template` content into a new `.env` file. Add the [Tracetest API Token](/concepts/environment-tokens) and [Tracetest Agent API Key](/configuration/agent) to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
+Copy the `.env.template` content into a new `.env` file.
 
-```bash
+```bash title=Terminal
 cp .env.template .env
-vi .env
+```
+
+Add the [Tracetest API Token](/concepts/environment-tokens) and [Tracetest Agent API Key](/configuration/agent) to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
+
+```bash title=.env
+TRACETEST_API_TOKEN=<YOUR_API_TOKEN>
+TRACETEST_AGENT_API_KEY=<YOUR_AGENT_API_KEY>
+POKESHOP_DEMO_URL=http://localhost:8081
 ```
 
 ### Starting the Pokeshop Demo App
@@ -353,7 +361,7 @@ To run the tests using the Cypress UI, run the following command from the root d
 npm run cy:open
 ```
 
-Then, navigate your way to the `e2e` section and select the `home.cy` test script.
+Then, navigate your way to the `e2e` section and select the `home.cy.ts` test script.
 
 ![Cypress UI](./img/cypress-scripts.png)
 
