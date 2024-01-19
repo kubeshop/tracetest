@@ -69,6 +69,7 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
       if (WizardService.shouldUpdate(stepId, wizard.steps)) {
         const updatedSteps = WizardService.completeStep(stepId, wizard.steps);
         await updateWizard({steps: updatedSteps}).unwrap();
+        WizardAnalytics.onStepComplete(stepId);
       }
     },
     [updateWizard, wizard.steps]
