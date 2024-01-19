@@ -26,12 +26,12 @@ const useTestConnectionStatus = () => {
   const form = Form.useFormInstance<TDraftDataStore>();
 
   const status = useMemo<TConnectionStatus>(() => {
-    if (isTestConnectionLoading || !otlpTestConnectionResponse?.spanCount) return 'loading';
+    if (isOtlpTestConnectionLoading || !otlpTestConnectionResponse?.spanCount) return 'loading';
     if (!otlpTestConnectionResponse) return 'idle';
     if (isOtlpTestConnectionError) return 'error';
 
     return 'success';
-  }, [isOtlpTestConnectionError, isTestConnectionLoading, otlpTestConnectionResponse]);
+  }, [isOtlpTestConnectionError, isOtlpTestConnectionLoading, otlpTestConnectionResponse]);
 
   // listens to all form changes
   const data = Form.useWatch([], form);
@@ -75,7 +75,7 @@ const useTestConnectionStatus = () => {
     status,
     isOtlpBased,
     otlpResponse: otlpTestConnectionResponse,
-    isLoading: isTestConnectionLoading || isOtlpTestConnectionLoading,
+    isLoading: isTestConnectionLoading,
   };
 };
 
