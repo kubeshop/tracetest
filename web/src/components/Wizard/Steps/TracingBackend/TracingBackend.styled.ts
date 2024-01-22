@@ -1,3 +1,4 @@
+import {CheckCircleOutlined} from '@ant-design/icons';
 import {Button, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -53,4 +54,8 @@ export const TabText = styled(Typography.Text)`
     color: ${({theme}) => theme.color.textSecondary};
     font-size: ${({theme}) => theme.size.sm};
   }
+`;
+
+export const SelectedIcon = styled(CheckCircleOutlined)`
+  color: ${({theme}) => theme.color.primary};
 `;
