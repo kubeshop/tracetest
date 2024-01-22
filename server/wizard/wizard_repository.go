@@ -32,6 +32,9 @@ type scanner interface {
 var (
 	defaultWizard = &Wizard{
 		Steps: []Step{{
+			ID:    "agent",
+			State: StepStatusPending,
+		}, {
 			ID:    "tracing_backend",
 			State: StepStatusPending,
 		}, {

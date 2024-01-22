@@ -18,4 +18,4 @@ export interface IWizardStepComponentProps {
 }
 
 export interface IWizardStep extends WizardStep, IWizardStepMetadata {}
-export type TWizardMap = Record<TWizardStepId, IWizardStepMetadata>;
+export type TWizardMap = Record<TWizardStepId, IWizardStepMetadata | undefined>;

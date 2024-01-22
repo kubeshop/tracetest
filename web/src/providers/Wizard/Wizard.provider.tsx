@@ -37,11 +37,13 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
   const {data: wizard = Wizard()} = useGetWizardQuery({});
   const steps = useMemo<IWizardStep[]>(
     () =>
-      wizard.steps.map((step, index) => ({
-        ...step,
-        ...(stepsMap[step.id] || {}),
-        isEnabled: isStepEnabled(step, index, wizard.steps[index - 1]),
-      })),
+      wizard.steps
+        .filter(step => !!stepsMap[step.id])
+        .map((step, index) => ({
+          ...step,
+          ...(stepsMap[step.id]! || {}),
+          isEnabled: isStepEnabled(step, index, wizard.steps[index - 1]),
+        })),
     [stepsMap, wizard.steps]
   );
 
