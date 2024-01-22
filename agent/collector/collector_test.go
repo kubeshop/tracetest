@@ -56,6 +56,11 @@ func TestCollector(t *testing.T) {
 	// Now after waiting the timeout, it should contain all spans
 	time.Sleep(4 * time.Second)
 	assert.Len(t, targetServer.ReceivedSpans(), 10)
+	assert.Equal(t, int64(10), c.Statistics().SpanCount)
+
+	c.ResetStatistics()
+
+	assert.Equal(t, int64(0), c.Statistics().SpanCount)
 }
 
 func TestCollectorWatchingSpansFromTest(t *testing.T) {

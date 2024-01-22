@@ -21,7 +21,15 @@ type stoppable interface {
 	Stop()
 }
 
-func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, startRemoteServer bool) (otlp.Ingester, error) {
+type ingester interface {
+	otlp.Ingester
+	stoppable
+
+	Statistics() Statistics
+	ResetStatistics()
+}
+
+func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, startRemoteServer bool) (ingester, error) {
 	ingester := &forwardIngester{
 		BatchTimeout:   batchTimeout,
 		RemoteIngester: cfg,
@@ -43,6 +51,11 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 	return ingester, nil
 }
 
+type Statistics struct {
+	SpanCount         int64
+	LastSpanTimestamp time.Time
+}
+
 // forwardIngester forwards all incoming spans to a remote ingester. It also batches those
 // spans to reduce network traffic.
 type forwardIngester struct {
@@ -53,6 +66,8 @@ type forwardIngester struct {
 	done           chan bool
 	traceCache     TraceCache
 	logger         *zap.Logger
+
+	statistics Statistics
 }
 
 type remoteIngesterConfig struct {
@@ -69,11 +84,24 @@ type buffer struct {
 	spans []*v1.ResourceSpans
 }
 
+func (i *forwardIngester) Statistics() Statistics {
+	return i.statistics
+}
+
+func (i *forwardIngester) ResetStatistics() {
+	i.statistics = Statistics{}
+}
+
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
+	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
+
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
+	i.statistics.SpanCount += int64(spanCount)
+	i.statistics.LastSpanTimestamp = time.Now()
+
 	i.buffer.mutex.Unlock()
-	i.logger.Debug("received spans", zap.Int("count", len(request.ResourceSpans)))
+	i.logger.Debug("received spans", zap.Int("count", spanCount))
 
 	if i.traceCache != nil {
 		i.logger.Debug("caching test spans")
@@ -87,6 +115,17 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 			RejectedSpans: 0,
 		},
 	}, nil
+}
+
+func countSpans(request *pb.ExportTraceServiceRequest) int {
+	count := 0
+	for _, resourceSpan := range request.ResourceSpans {
+		for _, scopeSpan := range resourceSpan.ScopeSpans {
+			count += len(scopeSpan.Spans)
+		}
+	}
+
+	return count
 }
 
 func (i *forwardIngester) connectToRemoteServer(ctx context.Context) error {

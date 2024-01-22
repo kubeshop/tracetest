@@ -29,6 +29,12 @@ service Orchestrator {
     // Register an agent to listen for shutdown commands
     rpc RegisterShutdownListener(AgentIdentification) returns (stream ShutdownRequest) {}
 
+    // Register an agent to listen for connection test commands
+    rpc RegisterOTLPConnectionTestListener(AgentIdentification) returns (stream OTLPConnectionTestRequest) {}
+
+    // Send the OTLP connection test response
+    rpc SendOTLPConnectionTestResult(OTLPConnectionTestResponse) returns (Empty) {}
+
     // Ping is used to check if the agent is still connected
     rpc Ping(AgentIdentification) returns (Empty) {}
 
@@ -189,6 +195,20 @@ message TraceIdResponse {
 
 message Error {
     string message = 1;
+}
+
+message OTLPConnectionTestRequest {
+    string requestID = 1;
+    // If set as true, the agent needs to reset the span counter and doesn't need to
+    // report the number of spans back to the server.
+    bool resetCounter = 2;
+}
+
+message OTLPConnectionTestResponse {
+    string requestID = 1;
+    AgentIdentification agentIdentification = 2;
+    int64 spanCount = 3;
+    int64 lastSpanTimestamp = 4;
 }
 
 message DataStoreConnectionTestRequest {
