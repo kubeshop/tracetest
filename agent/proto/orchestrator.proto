@@ -53,6 +53,7 @@ message Empty {}
 message StopRequest{
   string testID = 1;
   int32 runID = 2;
+  string type = 3;
 }
 
 // ConnectRequest is the initial request sent by the agent to the orchestrator

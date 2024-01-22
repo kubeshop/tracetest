@@ -2,6 +2,7 @@ package workers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/event"
@@ -12,12 +13,12 @@ import (
 type StopperWorker struct {
 	logger         *zap.Logger
 	observer       event.Observer
-	cancelContexts *cancelFuncMap
+	cancelContexts *cancelCauseFuncMap
 }
 
 type StopperOption func(*StopperWorker)
 
-func WithStopperCancelFuncList(cancelContexts *cancelFuncMap) StopperOption {
+func WithStopperCancelFuncList(cancelContexts *cancelCauseFuncMap) StopperOption {
 	return func(tw *StopperWorker) {
 		tw.cancelContexts = cancelContexts
 	}
@@ -59,7 +60,7 @@ func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest
 		return err
 	}
 
-	cancelFn()
+	cancelFn(errors.New(stopRequest.Type))
 
 	w.observer.EndStopRequest(stopRequest, nil)
 

@@ -773,6 +773,7 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 	existingRun.TriggerResult = run.TriggerResult
 	existingRun.Trace = traces.MergeTraces(existingRun.Trace, run.Trace)
 	existingRun.State = run.State
+	existingRun.LastError = errors.New(testRun.LastErrorState)
 
 	if executor.RunWasUserCancelled(existingRun) {
 		existingRun.TriggerResult.Error = nil

@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
@@ -77,8 +78,11 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
 	w.observer.StartTriggerExecution(triggerRequest)
 
-	err := w.stoppableProcessRunner(ctx, triggerRequest.TestID, triggerRequest.RunID, func(subcontext context.Context) error {
-		return w.trigger(subcontext, triggerRequest)
+	var err error
+	w.stoppableProcessRunner(ctx, triggerRequest.TestID, triggerRequest.RunID, func(subcontext context.Context) {
+		err = w.trigger(subcontext, triggerRequest)
+	}, func(_ string) {
+		err = executor.ErrUserCancelled
 	})
 
 	if err != nil {

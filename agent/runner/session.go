@@ -129,6 +129,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		controlPlaneClient,
 		workers.WithInMemoryDatastore(poller.NewInMemoryDatastore(traceCache)),
 		workers.WithObserver(observer),
+		workers.WithPollerStoppableProcessRunner(processStopper.RunStoppableProcess),
 	)
 
 	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient, observer)

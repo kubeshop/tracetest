@@ -344,14 +344,15 @@ func (q Queue) listenPreprocess(ctx context.Context, job Job) (context.Context, 
 type UserRequestType string
 
 var (
-	UserRequestTypeStop            UserRequestType = "stop"
-	UserRequestSkipTraceCollection UserRequestType = "skip_trace_collection"
+	UserRequestTypeStop                UserRequestType = "stop"
+	UserRequestTypeSkipTraceCollection UserRequestType = "skip_trace_collection"
 )
 
 type UserRequest struct {
 	TenantID string
 	TestID   id.ID
 	RunID    int
+	Type     string
 }
 
 func (sr UserRequest) ResourceID(requestType UserRequestType) string {
@@ -417,7 +418,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 	}
 
 	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestTypeStop), stopTestCallback)
-	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestSkipTraceCollection), skipPollCallback)
+	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestTypeSkipTraceCollection), skipPollCallback)
 }
 
 func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuite {

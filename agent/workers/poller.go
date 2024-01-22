@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/davecgh/go-spew/spew"
@@ -13,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/server/datastore"
+	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -21,12 +23,13 @@ import (
 )
 
 type PollerWorker struct {
-	client            *client.Client
-	tracer            trace.Tracer
-	sentSpanIDs       *gocache.Cache[string, bool]
-	inmemoryDatastore tracedb.TraceDB
-	logger            *zap.Logger
-	observer          event.Observer
+	client                 *client.Client
+	tracer                 trace.Tracer
+	sentSpanIDs            *gocache.Cache[string, bool]
+	inmemoryDatastore      tracedb.TraceDB
+	logger                 *zap.Logger
+	observer               event.Observer
+	stoppableProcessRunner StoppableProcessRunner
 }
 
 type PollerOption func(*PollerWorker)
@@ -40,6 +43,12 @@ func WithInMemoryDatastore(datastore tracedb.TraceDB) PollerOption {
 func WithObserver(observer event.Observer) PollerOption {
 	return func(pw *PollerWorker) {
 		pw.observer = observer
+	}
+}
+
+func WithPollerStoppableProcessRunner(stoppableProcessRunner StoppableProcessRunner) PollerOption {
+	return func(pw *PollerWorker) {
+		pw.stoppableProcessRunner = stoppableProcessRunner
 	}
 }
 
@@ -70,7 +79,17 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 	w.logger.Debug("Received polling request", zap.Any("request", request))
 	w.observer.StartTracePoll(request)
 
-	err := w.poll(ctx, request)
+	var err error
+	w.stoppableProcessRunner(ctx, request.TestID, request.RunID, func(ctx context.Context) {
+		time.Sleep(time.Minute)
+		err = w.poll(ctx, request)
+	}, func(cause string) {
+		err = executor.ErrUserCancelled
+		if cause == string(executor.UserRequestTypeSkipTraceCollection) {
+			err = executor.ErrSkipTraceCollection
+		}
+	})
+
 	if err != nil {
 		w.logger.Error("Error polling", zap.Error(err))
 		errorResponse := &proto.PollingResponse{

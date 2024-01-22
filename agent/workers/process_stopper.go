@@ -5,39 +5,37 @@ import (
 	"sync"
 
 	gocache "github.com/Code-Hex/go-generics-cache"
-	"github.com/kubeshop/tracetest/server/executor"
 )
 
-type StoppableProcessRunner func(parentCtx context.Context, testID string, runID int32, worker func(context.Context) error) error
+type StoppableProcessRunner func(parentCtx context.Context, testID string, runID int32, worker func(context.Context), stopedCallback func(cause string))
 
 func NewProcessStopper() processStopper {
 	return processStopper{
-		cancelMap: NewCancelFuncMap(),
+		cancelMap: newCancelCauseFuncMap(),
 	}
 }
 
 type processStopper struct {
-	cancelMap *cancelFuncMap
+	cancelMap *cancelCauseFuncMap
 }
 
-func (p processStopper) CancelMap() *cancelFuncMap {
+func (p processStopper) CancelMap() *cancelCauseFuncMap {
 	return p.cancelMap
 }
 
-func (p processStopper) RunStoppableProcess(parentCtx context.Context, testID string, runID int32, worker func(context.Context) error) error {
+func (p processStopper) RunStoppableProcess(parentCtx context.Context, testID string, runID int32, worker func(context.Context), stopedCallback func(cause string)) {
 	done := make(chan bool)
 
 	// create a subcontext for the worker so when canceled it doesn't affect the parent context
-	subcontext, cancelSubctx := context.WithCancel(parentCtx)
-	defer cancelSubctx()
+	subcontext, cancelSubctx := context.WithCancelCause(parentCtx)
+	defer cancelSubctx(nil)
 
 	cacheKey := key(testID, runID)
 	p.cancelMap.Set(cacheKey, cancelSubctx)
 	defer p.cancelMap.Del(cacheKey)
 
-	var err error
 	go func() {
-		err = worker(subcontext)
+		worker(subcontext)
 		done <- true
 	}()
 
@@ -46,25 +44,26 @@ func (p processStopper) RunStoppableProcess(parentCtx context.Context, testID st
 		// trigger finished successfully
 		break
 	case <-subcontext.Done():
-		// The context was cancelled.
-		err = executor.ErrUserCancelled
+		cause := "cancelled"
+		if err := context.Cause(subcontext); err != nil {
+			cause = err.Error()
+		}
+		stopedCallback(cause)
 		break
 	}
-
-	return err
 }
 
 func key(testID string, runID int32) string {
 	return testID + string(runID)
 }
 
-type cancelFuncMap struct {
+type cancelCauseFuncMap struct {
 	mutex       sync.Mutex
-	internalMap *gocache.Cache[string, context.CancelFunc]
+	internalMap *gocache.Cache[string, context.CancelCauseFunc]
 }
 
 // Get implements TraceCache.
-func (c *cancelFuncMap) Get(key string) (context.CancelFunc, bool) {
+func (c *cancelCauseFuncMap) Get(key string) (context.CancelCauseFunc, bool) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
@@ -72,22 +71,22 @@ func (c *cancelFuncMap) Get(key string) (context.CancelFunc, bool) {
 }
 
 // Append implements TraceCache.
-func (c *cancelFuncMap) Set(key string, cancelFn context.CancelFunc) {
+func (c *cancelCauseFuncMap) Set(key string, cancelFn context.CancelCauseFunc) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	c.internalMap.Set(key, cancelFn)
 }
 
-func (c *cancelFuncMap) Del(key string) {
+func (c *cancelCauseFuncMap) Del(key string) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
 	c.internalMap.Delete(key)
 }
 
-func NewCancelFuncMap() *cancelFuncMap {
-	return &cancelFuncMap{
-		internalMap: gocache.New[string, context.CancelFunc](),
+func newCancelCauseFuncMap() *cancelCauseFuncMap {
+	return &cancelCauseFuncMap{
+		internalMap: gocache.New[string, context.CancelCauseFunc](),
 	}
 }
