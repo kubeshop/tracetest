@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 
 	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/davecgh/go-spew/spew"
@@ -81,7 +80,6 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 
 	var err error
 	w.stoppableProcessRunner(ctx, request.TestID, request.RunID, func(ctx context.Context) {
-		time.Sleep(time.Minute)
 		err = w.poll(ctx, request)
 	}, func(cause string) {
 		err = executor.ErrUserCancelled

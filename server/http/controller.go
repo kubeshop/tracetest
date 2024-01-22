@@ -776,6 +776,7 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 	existingRun.LastError = errors.New(testRun.LastErrorState)
 
 	if executor.RunWasUserCancelled(existingRun) {
+		existingRun.LastError = nil
 		existingRun.TriggerResult.Error = nil
 		c.testRunner.UpdateStoppedTest(ctx, existingRun)
 	} else {

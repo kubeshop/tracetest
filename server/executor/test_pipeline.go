@@ -162,9 +162,11 @@ type runCancelHandlerFn func(ctx context.Context, run test.Run) error
 var ErrUserCancelled = fmt.Errorf("cancelled by user")
 
 func RunWasUserCancelled(run test.Run) bool {
+	// depeending on when the Run was cancelled (which step was being executed)
+	// the error might be set on different filelds
 	return (run.TriggerResult.Error != nil &&
 		ErrorMessageIsUserCancelled(run.TriggerResult.Error.ErrorMessage)) ||
-		(run.LastError != nil && ErrorMessageIsSkipTraceColleciton(run.LastError.Error()))
+		(run.LastError != nil && ErrorMessageIsUserCancelled(run.LastError.Error()))
 }
 
 func ErrorMessageIsUserCancelled(msg string) bool {
