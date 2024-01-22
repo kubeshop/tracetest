@@ -173,7 +173,7 @@ func ErrorMessageIsUserCancelled(msg string) bool {
 	return msg == ErrUserCancelled.Error()
 }
 
-func ErrorMessageIsSkipTraceColleciton(msg string) bool {
+func ErrorMessageIsSkipTraceCollection(msg string) bool {
 	return msg == ErrSkipTraceCollection.Error()
 }
 
