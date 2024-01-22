@@ -163,7 +163,7 @@ var ErrUserCancelled = fmt.Errorf("cancelled by user")
 
 func RunWasUserCancelled(run test.Run) bool {
 	// depeending on when the Run was cancelled (which step was being executed)
-	// the error might be set on different filelds
+	// the error might be set on different fields
 	return (run.TriggerResult.Error != nil &&
 		ErrorMessageIsUserCancelled(run.TriggerResult.Error.ErrorMessage)) ||
 		(run.LastError != nil && ErrorMessageIsUserCancelled(run.LastError.Error()))
