@@ -18,6 +18,7 @@ import (
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/testsuite"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
@@ -60,6 +61,10 @@ func (h headers) GetBool(key string) bool {
 
 func (h *headers) Set(key, value string) {
 	(*h)[key] = value
+}
+
+func (h *headers) Unset(key string) {
+	delete(*h, key)
 }
 
 func (h headers) SetInt(key string, value int) {
@@ -326,10 +331,14 @@ func (q Queue) listenPreprocess(ctx context.Context, job Job) (context.Context, 
 
 	ctx = context.WithValue(ctx, "LastInstanceID", job.Headers.Get("InstanceID"))
 
+	if tenantID := job.Headers.Get("tenantID"); tenantID != "" {
+		job.TenantID = tenantID
+	}
+
 	ctx, cancelCtx := context.WithCancelCause(ctx)
 	q.listenForUserRequests(ctx, cancelCtx, job)
 
-	return ctx, Job{
+	updatedJob := Job{
 		Headers:        job.Headers,
 		TenantID:       job.TenantID,
 		Test:           q.resolveTest(ctx, job),
@@ -339,26 +348,38 @@ func (q Queue) listenPreprocess(ctx context.Context, job Job) (context.Context, 
 		PollingProfile: q.resolvePollingProfile(ctx, job),
 		DataStore:      q.resolveDataStore(ctx, job),
 	}
+
+	if job.Headers.GetBool("skipTracePolling") {
+		updatedJob.Run.SkipTraceCollection = true
+		job.Headers.Unset("skipTracePolling")
+	}
+
+	return ctx, updatedJob
 }
 
 type UserRequestType string
 
 var (
-	UserRequestTypeStop            UserRequestType = "stop"
-	UserRequestSkipTraceCollection UserRequestType = "skip_trace_collection"
+	UserRequestTypeStop                UserRequestType = "stop"
+	UserRequestTypeSkipTraceCollection UserRequestType = "skip_trace_collection"
 )
 
 type UserRequest struct {
 	TenantID string
 	TestID   id.ID
 	RunID    int
+	Type     string
 }
 
 func (sr UserRequest) ResourceID(requestType UserRequestType) string {
 	runID := (test.Run{ID: sr.RunID, TestID: sr.TestID}).ResourceID()
 	runID = strings.ReplaceAll(runID, "/", ".")
+	tenantID := "_" //default if tenantID is empty to avoid issues with nats
+	if sr.TenantID != "" {
+		tenantID = sr.TenantID
+	}
 
-	return fmt.Sprintf("%s.%s.%s", sr.TenantID, runID, requestType)
+	return fmt.Sprintf("%s.%s.%s", tenantID, runID, requestType)
 }
 
 var (
@@ -378,7 +399,15 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 			return fmt.Errorf("cannot decode UserRequest message: %w", err)
 		}
 
-		run, err := q.runs.GetRun(ctx, request.TestID, request.RunID)
+		// when we call cancelCtx(), ctx gets cancelled
+		// we create a new context with the same tracing info as the original context
+		// so we can do operations and still have the spans correctly related
+		propagator := otel.GetTextMapPropagator()
+		carrier := propagation.MapCarrier{}
+		propagator.Inject(ctx, carrier)
+		cleanContext := propagator.Extract(context.Background(), carrier)
+
+		run, err := q.runs.GetRun(cleanContext, request.TestID, request.RunID)
 		if err != nil {
 			return fmt.Errorf("failed to get run %d for test %s: %w", request.RunID, request.TestID, err)
 		}
@@ -387,7 +416,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 			return nil
 		}
 
-		return q.cancelRunHandlerFn(ctx, run)
+		return q.cancelRunHandlerFn(cleanContext, run)
 	})
 
 	skipPollCallback := subscription.NewSubscriberFunction(func(m subscription.Message) error {
@@ -417,7 +446,7 @@ func (q Queue) listenForUserRequests(ctx context.Context, cancelCtx context.Canc
 	}
 
 	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestTypeStop), stopTestCallback)
-	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestSkipTraceCollection), skipPollCallback)
+	q.subscriptor.Subscribe(userReq.ResourceID(UserRequestTypeSkipTraceCollection), skipPollCallback)
 }
 
 func (q Queue) resolveTestSuite(ctx context.Context, job Job) testsuite.TestSuite {

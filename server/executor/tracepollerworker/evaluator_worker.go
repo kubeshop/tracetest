@@ -219,13 +219,17 @@ func tracePollerTimedOut(ctx context.Context, job executor.Job) bool {
 func (w *tracePollerEvaluatorWorker) enqueueTraceFetchJob(ctx context.Context, job executor.Job) {
 	go func() {
 		log.Printf("[TracePoller] Requeuing Test Run %d. Current iteration: %d\n", job.Run.ID, job.EnqueueCount())
-		time.Sleep(job.PollingProfile.Periodic.RetryDelayDuration())
 
-		job.IncreaseEnqueueCount()
-		job.Headers.SetBool("requeued", true)
+		done := make(chan bool)
+		go func() {
+			time.Sleep(job.PollingProfile.Periodic.RetryDelayDuration())
+			done <- true
+		}()
 
 		select {
-		default:
+		case <-done:
+			job.IncreaseEnqueueCount()
+			job.Headers.SetBool("requeued", true)
 		case <-ctx.Done():
 			err := context.Cause(ctx)
 			if errors.Is(err, executor.ErrSkipTraceCollection) {

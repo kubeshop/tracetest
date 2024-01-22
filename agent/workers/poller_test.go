@@ -26,7 +26,7 @@ func TestPollerWorker(t *testing.T) {
 	client, err := client.Connect(ctx, controlPlane.Addr())
 	require.NoError(t, err)
 
-	pollerWorker := workers.NewPollerWorker(client)
+	pollerWorker := workers.NewPollerWorker(client, workers.WithPollerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess))
 
 	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
 		return pollerWorker.Poll(ctx, pr)
@@ -125,7 +125,9 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 
 	pollerWorker := workers.NewPollerWorker(client, workers.WithInMemoryDatastore(
 		poller.NewInMemoryDatastore(cache),
-	))
+	),
+		workers.WithPollerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess),
+	)
 
 	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
 		return pollerWorker.Poll(ctx, pr)
@@ -182,7 +184,7 @@ func TestPollerWithInvalidDataStore(t *testing.T) {
 	client, err := client.Connect(ctx, controlPlane.Addr())
 	require.NoError(t, err)
 
-	pollerWorker := workers.NewPollerWorker(client)
+	pollerWorker := workers.NewPollerWorker(client, workers.WithPollerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess))
 
 	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
 		return pollerWorker.Poll(ctx, pr)
@@ -200,7 +202,7 @@ func TestPollerWithInvalidDataStore(t *testing.T) {
 			Tempo: &proto.TempoConfig{
 				Type: "http",
 				Http: &proto.HttpClientSettings{
-					Url: "http://localhost:16686", // invalid jaeger port, this should cause an error
+					Url: "http://localhost:12312", // invalid tempo port, this should cause an error
 				},
 			},
 		},
@@ -212,6 +214,6 @@ func TestPollerWithInvalidDataStore(t *testing.T) {
 
 	pollingResponse := controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
-	assert.NotNil(t, pollingResponse.Error)
+	require.NotNil(t, pollingResponse.Error)
 	assert.Contains(t, pollingResponse.Error.Message, "connection refused")
 }

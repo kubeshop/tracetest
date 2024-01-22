@@ -18,19 +18,19 @@ import (
 )
 
 type TriggerWorker struct {
-	logger     *zap.Logger
-	client     *client.Client
-	registry   *agentTrigger.Registry
-	traceCache collector.TraceCache
-	observer   event.Observer
-	cancelMap  *cancelFuncMap
+	logger                 *zap.Logger
+	client                 *client.Client
+	registry               *agentTrigger.Registry
+	traceCache             collector.TraceCache
+	observer               event.Observer
+	stoppableProcessRunner StoppableProcessRunner
 }
 
 type TriggerOption func(*TriggerWorker)
 
-func WithTriggerCancelFuncList(cancelContexts *cancelFuncMap) TriggerOption {
+func WithTriggerStoppableProcessRunner(stoppableProcessRunner StoppableProcessRunner) TriggerOption {
 	return func(tw *TriggerWorker) {
-		tw.cancelMap = cancelContexts
+		tw.stoppableProcessRunner = stoppableProcessRunner
 	}
 }
 
@@ -78,30 +78,12 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
 	w.observer.StartTriggerExecution(triggerRequest)
 
-	done := make(chan bool)
-
-	subcontext, cancelSubctx := context.WithCancel(ctx)
-	defer cancelSubctx()
-
-	cacheKey := key(triggerRequest.TestID, triggerRequest.RunID)
-	w.cancelMap.Set(cacheKey, cancelSubctx)
-	defer w.cancelMap.Del(cacheKey)
-
 	var err error
-	go func() {
+	w.stoppableProcessRunner(ctx, triggerRequest.TestID, triggerRequest.RunID, func(subcontext context.Context) {
 		err = w.trigger(subcontext, triggerRequest)
-		done <- true
-	}()
-
-	select {
-	case <-done:
-		// trigger finished successfully
-		break
-	case <-subcontext.Done():
-		// The context was cancelled.
+	}, func(_ string) {
 		err = executor.ErrUserCancelled
-		break
-	}
+	})
 
 	if err != nil {
 		w.logger.Error("Trigger error", zap.Error(err))

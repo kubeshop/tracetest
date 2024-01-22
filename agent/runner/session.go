@@ -111,24 +111,25 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		return nil, err
 	}
 
-	cancelFuncs := workers.NewCancelFuncMap()
+	processStopper := workers.NewProcessStopper()
 
 	stopWorker := workers.NewStopperWorker(
 		workers.WithStopperObserver(observer),
-		workers.WithStopperCancelFuncList(cancelFuncs),
+		workers.WithStopperCancelFuncList(processStopper.CancelMap()),
 	)
 
 	triggerWorker := workers.NewTriggerWorker(
 		controlPlaneClient,
 		workers.WithTraceCache(traceCache),
 		workers.WithTriggerObserver(observer),
-		workers.WithTriggerCancelFuncList(cancelFuncs),
+		workers.WithTriggerStoppableProcessRunner(processStopper.RunStoppableProcess),
 	)
 
 	pollingWorker := workers.NewPollerWorker(
 		controlPlaneClient,
 		workers.WithInMemoryDatastore(poller.NewInMemoryDatastore(traceCache)),
 		workers.WithObserver(observer),
+		workers.WithPollerStoppableProcessRunner(processStopper.RunStoppableProcess),
 	)
 
 	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient, observer)

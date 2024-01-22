@@ -16,14 +16,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestTrigger(t *testing.T) {
-	cache := collector.NewTraceCache()
+func setupTriggerWorker(t *testing.T) (*mocks.GrpcServerMock, collector.TraceCache) {
 	controlPlane := mocks.NewGrpcServer()
+	cache := collector.NewTraceCache()
 
 	client, err := client.Connect(context.Background(), controlPlane.Addr())
 	require.NoError(t, err)
 
-	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache), workers.WithTriggerCancelFuncList(workers.NewCancelFuncMap()))
+	triggerWorker := workers.NewTriggerWorker(
+		client,
+		workers.WithTraceCache(cache),
+		workers.WithTriggerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess),
+	)
 
 	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
 		err := triggerWorker.Trigger(ctx, tr)
@@ -32,6 +36,12 @@ func TestTrigger(t *testing.T) {
 	})
 
 	client.Start(context.Background())
+
+	return controlPlane, cache
+}
+
+func TestTrigger(t *testing.T) {
+	controlPlane, cache := setupTriggerWorker(t)
 
 	targetServer := createHelloWorldApi()
 	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
@@ -68,21 +78,7 @@ func TestTrigger(t *testing.T) {
 }
 
 func TestTriggerAgainstGoogle(t *testing.T) {
-	cache := collector.NewTraceCache()
-	controlPlane := mocks.NewGrpcServer()
-
-	client, err := client.Connect(context.Background(), controlPlane.Addr())
-	require.NoError(t, err)
-
-	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache), workers.WithTriggerCancelFuncList(workers.NewCancelFuncMap()))
-
-	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
-		err := triggerWorker.Trigger(ctx, tr)
-		assert.NoError(t, err, "trigger failed")
-		return err
-	})
-
-	client.Start(context.Background())
+	controlPlane, _ := setupTriggerWorker(t)
 
 	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
 
@@ -114,20 +110,7 @@ func TestTriggerAgainstGoogle(t *testing.T) {
 }
 
 func TestTriggerInexistentAPI(t *testing.T) {
-	cache := collector.NewTraceCache()
-	controlPlane := mocks.NewGrpcServer()
-
-	client, err := client.Connect(context.Background(), controlPlane.Addr())
-	require.NoError(t, err)
-
-	triggerWorker := workers.NewTriggerWorker(client, workers.WithTraceCache(cache), workers.WithTriggerCancelFuncList(workers.NewCancelFuncMap()))
-
-	client.OnTriggerRequest(func(ctx context.Context, tr *proto.TriggerRequest) error {
-		err := triggerWorker.Trigger(ctx, tr)
-		return err
-	})
-
-	client.Start(context.Background())
+	controlPlane, _ := setupTriggerWorker(t)
 
 	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
 

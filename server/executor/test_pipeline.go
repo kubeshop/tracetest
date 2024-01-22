@@ -130,6 +130,7 @@ func (p *TestPipeline) StopTest(ctx context.Context, testID id.ID, runID int) {
 		TenantID: middleware.TenantIDFromContext(ctx),
 		TestID:   testID,
 		RunID:    runID,
+		Type:     string(UserRequestTypeStop),
 	}
 
 	p.updatePublisher.PublishUpdate(subscription.Message{
@@ -140,12 +141,14 @@ func (p *TestPipeline) StopTest(ctx context.Context, testID id.ID, runID int) {
 
 func (p *TestPipeline) SkipTraceCollection(ctx context.Context, testID id.ID, runID int) {
 	sr := UserRequest{
-		TestID: testID,
-		RunID:  runID,
+		TenantID: middleware.TenantIDFromContext(ctx),
+		TestID:   testID,
+		RunID:    runID,
+		Type:     string(UserRequestTypeSkipTraceCollection),
 	}
 
 	p.updatePublisher.PublishUpdate(subscription.Message{
-		ResourceID: sr.ResourceID(UserRequestSkipTraceCollection),
+		ResourceID: sr.ResourceID(UserRequestTypeSkipTraceCollection),
 		Content:    sr,
 	})
 }
@@ -159,12 +162,19 @@ type runCancelHandlerFn func(ctx context.Context, run test.Run) error
 var ErrUserCancelled = fmt.Errorf("cancelled by user")
 
 func RunWasUserCancelled(run test.Run) bool {
-	return run.TriggerResult.Error != nil &&
-		ErrorMessageIsUserCancelled(run.TriggerResult.Error.ErrorMessage)
+	// depeending on when the Run was cancelled (which step was being executed)
+	// the error might be set on different fields
+	return (run.TriggerResult.Error != nil &&
+		ErrorMessageIsUserCancelled(run.TriggerResult.Error.ErrorMessage)) ||
+		(run.LastError != nil && ErrorMessageIsUserCancelled(run.LastError.Error()))
 }
 
 func ErrorMessageIsUserCancelled(msg string) bool {
 	return msg == ErrUserCancelled.Error()
+}
+
+func ErrorMessageIsSkipTraceCollection(msg string) bool {
+	return msg == ErrSkipTraceCollection.Error()
 }
 
 func HandleRunCancelation(updater RunUpdater, tracer trace.Tracer, eventEmitter EventEmitter) runCancelHandlerFn {
