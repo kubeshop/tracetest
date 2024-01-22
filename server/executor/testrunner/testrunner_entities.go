@@ -21,8 +21,6 @@ var DefaultTestRunner = TestRunner{
 	Name: "default",
 	RequiredGates: []RequiredGate{
 		RequiredGateTestSpecs,
-		RequiredGateAnalyzerRules,
-		RequiredGateAnalyzerScore,
 	},
 }
 

@@ -33,9 +33,7 @@ func TestTestRunnerResource(t *testing.T) {
 				"id": "current",
 				"name": "default",
 				"requiredGates": [
-					"test-specs",
-					"analyzer-rules",
-					"analyzer-score"
+					"test-specs"
 				]
 			}
 		}`,
