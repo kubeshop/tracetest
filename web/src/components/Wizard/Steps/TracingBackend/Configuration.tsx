@@ -11,9 +11,10 @@ import * as S from './TracingBackend.styled';
 interface IProps {
   dataStore: DataStore;
   onBack(): void;
+  onNext(skipSave?: boolean): void;
 }
 
-const Configuration = ({dataStore, onBack}: IProps) => {
+const Configuration = ({dataStore, onBack, onNext}: IProps) => {
   const {isLoading, onIsFormValid, onSaveConfig, onTestConnection, isTestConnectionSuccessful} = useDataStore();
   const [form] = Form.useForm<TDraftDataStore>();
 
@@ -45,9 +46,9 @@ const Configuration = ({dataStore, onBack}: IProps) => {
 
   const handleOnSubmit = useCallback(
     async (values: TDraftDataStore) => {
-      onSaveConfig(values, dataStore);
+      onSaveConfig(values, dataStore, () => onNext(true));
     },
-    [onSaveConfig, dataStore]
+    [onSaveConfig, dataStore, onNext]
   );
 
   return (

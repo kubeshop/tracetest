@@ -9,7 +9,7 @@ import WizardService from 'services/Wizard.service';
 interface IContext extends IWizardState {
   activeStepId: string;
   isLoading: boolean;
-  onNext(): void;
+  onNext(skipSave?: boolean): void;
   onGoTo(key: string): void;
   onCompleteStep(stepId: TWizardStepId): void;
 }
@@ -52,19 +52,26 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
   const activeStepId = steps[activeStep]?.id;
   const isFinalStep = activeStep === steps.length - 1;
 
-  const onNext = useCallback(async () => {
-    if (!isFinalStep) {
-      await updateWizard({
-        steps: wizard.steps.map(step => ({
-          ...step,
-          ...(step.id === activeStepId ? {state: 'completed'} : {}),
-        })),
-      });
+  const onNext = useCallback(
+    async (skipSave: boolean = false) => {
+      if (isFinalStep) {
+        return;
+      }
+
+      if (!skipSave) {
+        await updateWizard({
+          steps: wizard.steps.map(step => ({
+            ...step,
+            ...(step.id === activeStepId ? {state: 'completed'} : {}),
+          })),
+        });
+        WizardAnalytics.onStepComplete(activeStepId);
+      }
 
       setActiveStep(step => step + 1);
-    }
-    WizardAnalytics.onStepComplete(activeStepId);
-  }, [activeStepId, isFinalStep, updateWizard, wizard.steps]);
+    },
+    [activeStepId, isFinalStep, updateWizard, wizard.steps]
+  );
 
   const onCompleteStep = useCallback(
     async (stepId: TWizardStepId) => {

@@ -14,7 +14,7 @@ export interface IWizardStepMetadata {
 }
 export interface IWizardStepComponentProps {
   isLoading: boolean;
-  onNext(): void;
+  onNext(skipSave?: boolean): void;
 }
 
 export interface IWizardStep extends WizardStep, IWizardStepMetadata {}
