@@ -6,12 +6,12 @@ PROJECT_ROOT=${PWD}
 
 CURRENT_GORELEASER_VERSION := $(shell goreleaser --version | head -n 9 | tail -n 1 |  tr -s ' ' | cut -d' ' -f2-)
 goreleaser-version:
-# ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
-# 	@printf "\033[0;31m Bad goreleaser version $(CURRENT_GORELEASER_VERSION), please install $(GORELEASER_VERSION)\033[0m\n\n"
-# 	@printf "\033[0;31m Tracetest requires goreleaser pro installed (licence not necessary for local builds)\033[0m\n\n"
-# 	@printf "\033[0;33m See https://goreleaser.com/install/ \033[0m\n\n"
-# 	@exit 1
-# endif
+ifneq "$(CURRENT_GORELEASER_VERSION)" "$(GORELEASER_VERSION)"
+	@printf "\033[0;31m Bad goreleaser version $(CURRENT_GORELEASER_VERSION), please install $(GORELEASER_VERSION)\033[0m\n\n"
+	@printf "\033[0;31m Tracetest requires goreleaser pro installed (licence not necessary for local builds)\033[0m\n\n"
+	@printf "\033[0;33m See https://goreleaser.com/install/ \033[0m\n\n"
+	@exit 1
+endif
 
 
 CLI_SRC_FILES := $(shell find cli -type f)
