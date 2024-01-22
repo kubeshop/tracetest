@@ -20,7 +20,7 @@ interface IContext {
   isTestConnectionSuccessful: boolean;
   testConnectionResponse?: TConnectionResult;
   otlpTestConnectionResponse?: OTLPTestConnectionResponse;
-  onSaveConfig(draft: TDraftDataStore, defaultDataStore: DataStore): void;
+  onSaveConfig(draft: TDraftDataStore, defaultDataStore: DataStore, onAfterSave?: () => void): void;
   onTestConnection(draft: TDraftDataStore, defaultDataStore: DataStore): void;
   onSetOtlpTestConnectionResponse(response?: OTLPTestConnectionResponse): void;
   onIsFormValid(isValid: boolean): void;
@@ -65,7 +65,7 @@ const DataStoreProvider = ({children}: IProps) => {
   const {onOpen: onContactUsOpen} = useContactUsModal();
 
   const onSaveConfig = useCallback(
-    async (draft: TDraftDataStore, defaultDataStore: DataStore) => {
+    async (draft: TDraftDataStore, defaultDataStore: DataStore, onAfterSave: () => void = noop) => {
       const warningMessage =
         !!defaultDataStore.id && draft.dataStoreType !== defaultDataStore.type
           ? `Saving will delete your previous configuration of the ${
@@ -87,6 +87,7 @@ const DataStoreProvider = ({children}: IProps) => {
           await updateDataStore({dataStore}).unwrap();
           await onCompleteStep('tracing_backend');
           showSuccessNotification();
+          onAfterSave();
         },
       });
     },

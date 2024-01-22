@@ -2,10 +2,11 @@ import {useCallback, useState} from 'react';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import DataStore, {fromType} from 'models/DataStore.model';
 import WizardAnalytics from 'services/Analytics/Wizard.service';
+import {IWizardStepComponentProps} from 'types/Wizard.types';
 import Selector from './Selector';
 import Configuration from './Configuration';
 
-const TracingBackend = () => {
+const TracingBackend = ({onNext}: IWizardStepComponentProps) => {
   const {
     dataStoreConfig: {defaultDataStore},
   } = useSettingsValues();
@@ -21,7 +22,7 @@ const TracingBackend = () => {
 
   if (!selectedDataStore) return <Selector onSelect={handleOnSelect} />;
 
-  return <Configuration dataStore={selectedDataStore} onBack={() => setSelectedDataStore(undefined)} />;
+  return <Configuration dataStore={selectedDataStore} onBack={() => setSelectedDataStore(undefined)} onNext={onNext} />;
 };
 
 export default TracingBackend;
