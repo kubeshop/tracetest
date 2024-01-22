@@ -26,7 +26,7 @@ func TestPollerWorker(t *testing.T) {
 	client, err := client.Connect(ctx, controlPlane.Addr())
 	require.NoError(t, err)
 
-	pollerWorker := workers.NewPollerWorker(client)
+	pollerWorker := workers.NewPollerWorker(client, workers.WithPollerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess))
 
 	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
 		return pollerWorker.Poll(ctx, pr)
@@ -125,7 +125,9 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 
 	pollerWorker := workers.NewPollerWorker(client, workers.WithInMemoryDatastore(
 		poller.NewInMemoryDatastore(cache),
-	))
+	),
+		workers.WithPollerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess),
+	)
 
 	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
 		return pollerWorker.Poll(ctx, pr)
@@ -182,7 +184,7 @@ func TestPollerWithInvalidDataStore(t *testing.T) {
 	client, err := client.Connect(ctx, controlPlane.Addr())
 	require.NoError(t, err)
 
-	pollerWorker := workers.NewPollerWorker(client)
+	pollerWorker := workers.NewPollerWorker(client, workers.WithPollerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess))
 
 	client.OnPollingRequest(func(ctx context.Context, pr *proto.PollingRequest) error {
 		return pollerWorker.Poll(ctx, pr)
