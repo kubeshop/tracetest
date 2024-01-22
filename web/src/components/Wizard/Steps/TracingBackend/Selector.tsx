@@ -8,9 +8,10 @@ const backends = Object.values(SupportedDataStores);
 
 interface IProps {
   onSelect(backend: SupportedDataStores): void;
+  selectedBackend?: SupportedDataStores;
 }
 
-const Selector = ({onSelect}: IProps) => {
+const Selector = ({onSelect, selectedBackend}: IProps) => {
   return (
     <S.Container>
       <Typography.Title level={1}>How should Tracetest receive telemetry from your application?</Typography.Title>
@@ -21,7 +22,12 @@ const Selector = ({onSelect}: IProps) => {
 
       <S.BackendSelector>
         {backends.map(backend => (
-          <BackendCard backend={backend} key={backend} onSelect={() => onSelect(backend)} />
+          <BackendCard
+            backend={backend}
+            selectedBackend={selectedBackend}
+            key={backend}
+            onSelect={() => onSelect(backend)}
+          />
         ))}
       </S.BackendSelector>
 
