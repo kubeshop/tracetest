@@ -139,6 +139,17 @@ const sidebars = {
         },
         {
           type: "category",
+          label: "Serverless Functions",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/testing-vercel-functions-with-opentelemetry-tracetest",
+              label: "Testing Vercel Functions",
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "OpenTelemetry",
           items: [
             {
