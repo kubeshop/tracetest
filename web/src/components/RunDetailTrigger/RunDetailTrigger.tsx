@@ -39,7 +39,7 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
   const [isValid, setIsValid] = useState(true);
   const onValidateTest = useValidateTestDraft({pluginName: plugin.name, setIsValid});
 
-  const {run} = useTestRun();
+  const {run, stopRun} = useTestRun();
   const stateIsFinished = isRunStateFinished(run.state);
 
   const initialValues = useMemo(() => TestService.getInitialValues(test), [test]);
@@ -66,7 +66,13 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
         <Form.Item name="name" hidden>
           <Input type="hidden" value={test.name} />
         </Form.Item>
-        <Header isLoading={isDisabled} isValid={isValid} triggerType={test.trigger.type} />
+        <Header
+          isLoading={isDisabled}
+          isRunStateFinished={stateIsFinished}
+          isValid={isValid}
+          onStopTest={stopRun}
+          triggerType={test.trigger.type}
+        />
 
         <S.Body>
           <S.SectionLeft data-tour={StepsID.Trigger}>

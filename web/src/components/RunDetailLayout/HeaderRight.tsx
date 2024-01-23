@@ -30,10 +30,19 @@ const HeaderRight = ({testId, triggerType}: IProps) => {
     run: {state, requiredGatesResult},
     run,
     runEvents,
+    isLoadingStop,
+    stopRun,
   } = useTestRun();
   const {onRun} = useTest();
 
   const {onSkipPolling, isLoading} = useSkipPolling();
+
+  const handleOnRunClick = () => {
+    if (isRunStateFinished(state)) {
+      return onRun();
+    }
+    stopRun();
+  };
 
   return (
     <S.Section $justifyContent="flex-end">
@@ -42,18 +51,22 @@ const HeaderRight = ({testId, triggerType}: IProps) => {
         <S.StateContainer data-cy="test-run-result-status">
           <S.StateText>Test status:</S.StateText>
           <TestState testState={state} />
-          {isRunPollingState(state) && (
-            <SkipPollingPopover isLoading={isLoading} skipPolling={onSkipPolling} />
-          )}
+          {isRunPollingState(state) && <SkipPollingPopover isLoading={isLoading} skipPolling={onSkipPolling} />}
         </S.StateContainer>
       )}
       {(isRunStateSucceeded(state) || isRunStateStopped(state)) && (
         <RunStatusIcon state={state} requiredGatesResult={requiredGatesResult} />
       )}
       <VariableSetSelector />
-      {!isDraftMode && state && isRunStateFinished(state) && Test.shouldAllowRun(triggerType) && (
-        <CreateButton data-cy="run-test-button" ghost onClick={() => onRun()} type="primary">
-          Run Test
+      {!isDraftMode && state && Test.shouldAllowRun(triggerType) && (
+        <CreateButton
+          data-cy="run-test-button"
+          ghost
+          onClick={handleOnRunClick}
+          type="primary"
+          disabled={isLoadingStop}
+        >
+          {isRunStateFinished(state) ? 'Run Test' : 'Stop Test'}
         </CreateButton>
       )}
       <EventLogPopover runEvents={runEvents} />

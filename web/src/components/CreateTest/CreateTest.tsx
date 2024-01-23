@@ -19,6 +19,7 @@ const CreateTest = ({isLoading, isValid, triggerType}: IProps) => {
     <S.Container>
       <Header
         isLoading={isLoading}
+        isRunStateFinished
         isValid={isValid}
         onRunTest={() => CreateTestAnalytics.onFormSubmit()}
         triggerType={triggerType}
