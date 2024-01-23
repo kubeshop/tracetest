@@ -20,6 +20,15 @@ func (m Message) DecodeContent(output interface{}) error {
 		}
 		m.Content = base64Decoded
 	}
+
+	if _, isBytes := m.Content.([]byte); !isBytes {
+		bytes, err := json.Marshal(m.Content)
+		if err != nil {
+			return fmt.Errorf("could not marshal json: %w", err)
+		}
+		m.Content = bytes
+	}
+
 	return json.Unmarshal(m.Content.([]byte), output)
 }
 
