@@ -1380,3 +1380,45 @@ paths:
           description: "Linter not found"
         500:
           description: "problem deleting an Linter"
+  /wizard:
+    get:
+      tags:
+        - api
+      summary: "Get a specific wizard"
+      description: "Get the configured Wizard, showing the state of each step."
+      operationId: getWizard
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./wizards.yaml#/components/schemas/Wizard"
+        404:
+          description: "Wizard not found"
+        500:
+          description: "problem getting a Wizard"
+    put:
+      tags:
+        - api
+      summary: "Update a Wizard"
+      description: "Update a Wizard used on Tracetest"
+      operationId: updateWizard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./wizards.yaml#/components/schemas/Wizard"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./wizards.yaml#/components/schemas/Wizard"
+        400:
+          description: "invalid Wizard, some data was sent in incorrect format."
+        404:
+          description: "Wizard not found"
+        500:
+          description: "problem updating an Wizard"

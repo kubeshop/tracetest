@@ -14,7 +14,7 @@ export const FormContainer = styled.div`
 export const FactoryContainer = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 22px 0;
+  padding: 22px;
   justify-content: space-between;
   height: calc(${defaultHeight} - 25px);
   overflow-y: scroll;
@@ -22,13 +22,6 @@ export const FactoryContainer = styled.div`
   .ant-form-item {
     margin: 0;
   }
-`;
-
-export const TopContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 0 22px;
 `;
 
 export const Circle = styled.div`
@@ -63,24 +56,6 @@ export const Title = styled(Typography.Title)`
     font-size: ${({theme}) => theme.size.md};
     margin: 0 !important;
   }
-`;
-
-export const Description = styled(Typography.Text)`
-  && {
-    color: ${({theme}) => theme.color.textSecondary};
-  }
-`;
-
-export const ButtonsContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 23px;
-  padding: 16px 22px;
-  border-top: 1px solid ${({theme}) => theme.color.borderLight};
-  position: sticky;
-  bottom: 0;
-  background: white;
 `;
 
 export const InfoIcon = styled(CheckCircleOutlined)`

@@ -16,7 +16,7 @@ const SignalFxService = (): TDataStoreService => ({
 
     return Promise.resolve(true);
   },
-  getInitialValues({defaultDataStore: {signalfx = {}} = {}}) {
+  getInitialValues({signalfx = {}}) {
     const {realm = '', token = ''} = signalfx;
 
     return {
@@ -24,8 +24,8 @@ const SignalFxService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.SignalFX,
     };
   },
-  shouldTestConnection() {
-    return true;
+  getIsOtlpBased() {
+    return false;
   },
 });
 

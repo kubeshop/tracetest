@@ -1,5 +1,5 @@
 describe('Home', () => {
-  beforeEach(() => cy.visit('/'));
+  beforeEach(() => cy.visit('/tests'));
 
   it('should render the layout', () => {
     cy.get('[data-cy=menu-link]').should('be.visible');
@@ -12,7 +12,7 @@ describe('Home', () => {
 
   it('should run a test from the home page', () => {
     cy.createTest();
-    cy.visit('/');
+    cy.visit('/tests');
     cy.get('[data-cy^=test-run-button]:not([data-cy*=button-00])', {timeout: 10000}).first().click();
     cy.location('href').should('match', /\/test\/.*/i);
     cy.deleteTest();

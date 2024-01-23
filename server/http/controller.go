@@ -27,6 +27,7 @@ import (
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
+	"github.com/kubeshop/tracetest/server/wizard"
 	"github.com/labstack/gommon/log"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -42,6 +43,7 @@ type controller struct {
 	testRepository         testsRepository
 	testSuiteRepository    testSuiteRepository
 	testSuiteRunRepository testSuiteRunRepository
+	wizardRepository       wizard.Repository
 
 	dsTestPipeline dataStoreTester
 
@@ -112,6 +114,7 @@ func NewController(
 	testRepository testsRepository,
 	testRunRepository test.RunRepository,
 	variableSetGetter variableSetGetter,
+	wizardRepository wizard.Repository,
 
 	otlpConnectionTester *testconnection.OTLPConnectionTester,
 
@@ -126,6 +129,7 @@ func NewController(
 		testRepository:         testRepository,
 		testRunRepository:      testRunRepository,
 		variableSetGetter:      variableSetGetter,
+		wizardRepository:       wizardRepository,
 
 		dsTestPipeline: dsTestPipeline,
 
@@ -787,4 +791,24 @@ func (c *controller) UpdateTestRun(ctx context.Context, testID string, runID int
 	}
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.Run(&existingRun)), err
+}
+
+func (c *controller) UpdateWizard(ctx context.Context, update openapi.Wizard) (openapi.ImplResponse, error) {
+	wizard := c.mappers.In.Wizard(update)
+
+	err := c.wizardRepository.Upsert(ctx, &wizard)
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, err.Error()), err
+	}
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.Wizard(&wizard)), err
+}
+
+func (c *controller) GetWizard(ctx context.Context) (openapi.ImplResponse, error) {
+	wizard, err := c.wizardRepository.Get(ctx)
+	if err != nil {
+		return openapi.Response(http.StatusNotFound, err.Error()), err
+	}
+
+	return openapi.Response(http.StatusOK, c.mappers.Out.Wizard(wizard)), err
 }

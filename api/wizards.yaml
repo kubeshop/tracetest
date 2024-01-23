@@ -1,0 +1,22 @@
+openapi: 3.0.0
+components:
+  schemas:
+    Wizard:
+      type: object
+      properties:
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/WizardStep"
+    WizardStep:
+      type: object
+      properties:
+        id:
+          type: string
+          enum: ["tracing_backend", "create_test", "agent"]
+        state:
+          type: string
+          enum: [inProgress, completed, pending]
+        completedAt:
+          type: string
+          format: date-time

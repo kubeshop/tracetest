@@ -1,5 +1,5 @@
 import {Tabs, TabsProps} from 'antd';
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo} from 'react';
 import {useParams} from 'react-router-dom';
 import RunDetailAutomate from 'components/RunDetailAutomate';
 import RunDetailTest from 'components/RunDetailTest';
@@ -8,17 +8,14 @@ import RunDetailTrigger from 'components/RunDetailTrigger';
 import {RunDetailModes} from 'constants/TestRun.constants';
 import useDocumentTitle from 'hooks/useDocumentTitle';
 import Test from 'models/Test.model';
-import {isRunStateSucceeded} from 'models/TestRun.model';
-import {useNotification} from 'providers/Notification/Notification.provider';
-import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppSelector} from 'redux/hooks';
 import UserSelectors from 'selectors/User.selectors';
 import TestRunAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import {ConfigMode} from 'types/DataStore.types';
 import HeaderLeft from './HeaderLeft';
 import HeaderRight from './HeaderRight';
 import * as S from './RunDetailLayout.styled';
+import useRunCompletion from './hooks/useRunCompletion';
 
 interface IProps {
   test: Test;
@@ -38,27 +35,11 @@ const renderTab = (title: string, testId: string, runId: number, mode: string) =
 
 const RunDetailLayout = ({test: {id, name, trigger, skipTraceCollection}, test}: IProps) => {
   const {mode = RunDetailModes.TRIGGER} = useParams();
-  const {showNotification} = useNotification();
   const {isError, run, runEvents} = useTestRun();
-  const {dataStoreConfig} = useSettingsValues();
-  const [prevState, setPrevState] = useState(run.state);
   useDocumentTitle(`${name} - ${run.state}`);
   const runOriginPath = useAppSelector(UserSelectors.selectRunOriginPath);
 
-  useEffect(() => {
-    const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
-
-    if (isRunStateSucceeded(run.state) && !isRunStateSucceeded(prevState)) {
-      showNotification({
-        type: 'success',
-        title: isNoTracingMode
-          ? 'Response received. Skipping looking for trace as you are in No-Tracing Mode'
-          : 'Trace has been fetched successfully',
-      });
-    }
-
-    setPrevState(run.state);
-  }, [dataStoreConfig.mode, prevState, run.state, showNotification]);
+  useRunCompletion();
 
   const tabBarExtraContent = useMemo(
     () => ({

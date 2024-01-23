@@ -13,6 +13,7 @@ interface IContext {
   isError: boolean;
   isLoadingStop: boolean;
   isLoadingSkipPolling: boolean;
+  isSkippedPolling: boolean;
   runEvents: TestRunEvent[];
   stopRun(): void;
   skipPolling(): void;
@@ -23,6 +24,7 @@ export const Context = createContext<IContext>({
   isError: false,
   isLoadingStop: false,
   isLoadingSkipPolling: false,
+  isSkippedPolling: false,
   runEvents: [],
   stopRun: noop,
   skipPolling: noop,
@@ -43,14 +45,23 @@ const TestRunProvider = ({children, testId, runId = 0}: IProps) => {
   const {data: run, isError} = useGetRunByIdQuery({testId, runId}, {skip: !runId, pollingInterval});
   const {data: runEvents = []} = useGetRunEventsQuery({testId, runId}, {skip: !runId, pollingInterval});
   const [stopRunAction, {isLoading: isLoadingStop}] = useStopRunMutation();
-  const [skipPollingAction, {isLoading: isLoadingSkipPolling}] = useSkipPollingMutation();
+  const [skipPollingAction, {isLoading: isLoadingSkipPolling, isUninitialized}] = useSkipPollingMutation();
 
   const stopRun = useCallback(() => stopRunAction({runId, testId}), [runId, stopRunAction, testId]);
   const skipPolling = useCallback(() => skipPollingAction({runId, testId}), [runId, skipPollingAction, testId]);
 
   const value = useMemo<IContext>(
-    () => ({run: run!, isError, isLoadingStop, isLoadingSkipPolling, runEvents, stopRun, skipPolling}),
-    [run, isError, isLoadingStop, isLoadingSkipPolling, runEvents, stopRun, skipPolling]
+    () => ({
+      run: run!,
+      isError,
+      isLoadingStop,
+      isLoadingSkipPolling,
+      runEvents,
+      stopRun,
+      skipPolling,
+      isSkippedPolling: !isUninitialized,
+    }),
+    [run, isError, isLoadingStop, isLoadingSkipPolling, runEvents, stopRun, skipPolling, isUninitialized]
   );
 
   useEffect(() => {

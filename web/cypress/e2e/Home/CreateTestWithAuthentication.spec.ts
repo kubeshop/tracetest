@@ -2,7 +2,7 @@ describe('Create test with authentication', () => {
   beforeEach(() => {
     cy.interceptHomeApiCall();
     cy.enableDemo();
-    cy.visit('/');
+    cy.visit('/tests');
   });
 
   it('should create a basic GET test with api key authentication method', () => {

@@ -159,6 +159,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetVersion,
 		},
 		{
+			"GetWizard",
+			strings.ToUpper("Get"),
+			"/api/wizard",
+			c.GetWizard,
+		},
+		{
 			"ImportTestRun",
 			strings.ToUpper("Post"),
 			"/api/tests/import",
@@ -211,6 +217,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Patch"),
 			"/api/tests/{testId}/run/{runId}",
 			c.UpdateTestRun,
+		},
+		{
+			"UpdateWizard",
+			strings.ToUpper("Put"),
+			"/api/wizard",
+			c.UpdateWizard,
 		},
 	}
 }
@@ -620,6 +632,19 @@ func (c *ApiApiController) GetVersion(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetWizard - Get a specific wizard
+func (c *ApiApiController) GetWizard(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetWizard(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // ImportTestRun - import test and test run information
 func (c *ApiApiController) ImportTestRun(w http.ResponseWriter, r *http.Request) {
 	exportedTestInformationParam := ExportedTestInformation{}
@@ -824,6 +849,30 @@ func (c *ApiApiController) UpdateTestRun(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	result, err := c.service.UpdateTestRun(r.Context(), testIdParam, runIdParam, testRunParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateWizard - Update a Wizard
+func (c *ApiApiController) UpdateWizard(w http.ResponseWriter, r *http.Request) {
+	wizardParam := Wizard{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&wizardParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertWizardRequired(wizardParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateWizard(r.Context(), wizardParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -38,7 +38,7 @@ const AzureAppInsightsService = (): TDataStoreService => ({
 
     return Promise.resolve(true);
   },
-  getInitialValues({defaultDataStore: {azureappinsights = {}} = {}}) {
+  getInitialValues({azureappinsights = {}}) {
     const {
       resourceArmId = '',
       connectionType = ConnectionTypes.Direct,
@@ -60,8 +60,8 @@ const AzureAppInsightsService = (): TDataStoreService => ({
       dataStoreType: SupportedDataStores.AzureAppInsights,
     };
   },
-  shouldTestConnection({dataStore: {azureappinsights: {connectionType = ConnectionTypes.Direct} = {}} = {}}) {
-    return connectionType === ConnectionTypes.Direct;
+  getIsOtlpBased({dataStore: {azureappinsights: {connectionType = ConnectionTypes.Direct} = {}} = {}}) {
+    return connectionType === ConnectionTypes.Collector;
   },
 });
 

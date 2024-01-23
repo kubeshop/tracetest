@@ -63,6 +63,11 @@ const {
   useRunTestSuiteMutation,
   useLazyGetTestSuiteRunsQuery,
   useLazyGetTestSuiteRunByIdQuery,
+  useGetWizardQuery,
+  useUpdateWizardMutation,
+  useLazyTestOtlpConnectionQuery,
+  useTestOtlpConnectionQuery,
+  useResetTestOtlpConnectionMutation,
 
   endpoints,
 } = TracetestAPI.instance;
@@ -119,5 +124,10 @@ export {
   useRunTestSuiteMutation,
   useLazyGetTestSuiteRunsQuery,
   useLazyGetTestSuiteRunByIdQuery,
+  useGetWizardQuery,
+  useUpdateWizardMutation,
+  useLazyTestOtlpConnectionQuery,
+  useTestOtlpConnectionQuery,
+  useResetTestOtlpConnectionMutation,
   endpoints,
 };

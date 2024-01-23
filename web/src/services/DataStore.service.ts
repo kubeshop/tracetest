@@ -1,6 +1,5 @@
 import {SupportedDataStores, TDataStoreService, TDraftDataStore} from 'types/DataStore.types';
 import DataStore, {TRawDataStore} from 'models/DataStore.model';
-import DataStoreConfig from 'models/DataStoreConfig.model';
 import ElasticSearchService from './DataStores/ElasticSearch.service';
 import OtelCollectorService from './DataStores/OtelCollector.service';
 import SignalFxService from './DataStores/SignalFx.service';
@@ -30,9 +29,9 @@ const dataStoreServiceMap = {
 
 interface IDataStoreService {
   getRequest(draft: TDraftDataStore, defaultDataStore: DataStore): Promise<TRawDataStore>;
-  getInitialValues(config: DataStoreConfig, configuredDataStore?: SupportedDataStores): TDraftDataStore;
+  getInitialValues(config: DataStore, configuredDataStore?: SupportedDataStores): TDraftDataStore;
   validateDraft(config: TDraftDataStore): Promise<boolean>;
-  shouldTestConnection(draft: TDraftDataStore): boolean;
+  getIsOtlpBased(draft: TDraftDataStore): boolean;
   _getDataStore(type?: SupportedDataStores): TDataStoreService;
 }
 
@@ -61,12 +60,11 @@ const DataStoreService = (): IDataStoreService => ({
     } as TRawDataStore;
   },
 
-  getInitialValues(dataStoreConfig, configuredDataStore) {
-    const {defaultDataStore} = dataStoreConfig;
+  getInitialValues(defaultDataStore, configuredDataStore) {
     const type = (defaultDataStore.type || SupportedDataStores.JAEGER) as SupportedDataStores;
     const dataStore = this._getDataStore(type);
 
-    return {...dataStore.getInitialValues(dataStoreConfig, type, configuredDataStore), dataStoreType: type};
+    return {...dataStore.getInitialValues(defaultDataStore, type, configuredDataStore), dataStoreType: type};
   },
 
   validateDraft(draft) {
@@ -74,10 +72,10 @@ const DataStoreService = (): IDataStoreService => ({
     return dataStore.validateDraft(draft);
   },
 
-  shouldTestConnection(draft) {
+  getIsOtlpBased(draft) {
     const dataStore = this._getDataStore(draft.dataStoreType);
 
-    return dataStore.shouldTestConnection(draft);
+    return dataStore.getIsOtlpBased(draft);
   },
 });
 

@@ -3,7 +3,7 @@ import {POKEMON_HTTP_ENDPOINT} from '../constants/Test';
 describe('Create test from CURL Command', () => {
   beforeEach(() => {
     cy.enableDemo();
-    cy.visit('/');
+    cy.visit('/tests');
   });
 
   it('should create a basic GET test', () => {

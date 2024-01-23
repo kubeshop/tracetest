@@ -7,6 +7,7 @@ import DashboardWrapper from 'components/DashboardWrapper';
 import ErrorBoundary from 'components/ErrorBoundary';
 import {theme} from 'constants/Theme.constants';
 import {ReduxWrapperProvider} from 'redux/ReduxWrapperProvider';
+import Wrapper from 'components/Wizard/Wrapper';
 import {history} from 'redux/store';
 import {ThemeProvider} from 'styled-components';
 import Env from 'utils/Env';
@@ -23,7 +24,9 @@ const App = () => (
           <CaptureWrapper>
             <CustomizationWrapper>
               <DashboardWrapper>
-                <BaseApp />
+                <Wrapper>
+                  <BaseApp />
+                </Wrapper>
               </DashboardWrapper>
             </CustomizationWrapper>
           </CaptureWrapper>

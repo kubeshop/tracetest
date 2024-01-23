@@ -42,6 +42,7 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/kubeshop/tracetest/server/version"
+	"github.com/kubeshop/tracetest/server/wizard"
 	"github.com/nats-io/nats.go"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
@@ -236,6 +237,7 @@ func (app *App) Start(opts ...appOption) error {
 	runRepo := test.NewRunRepository(db)
 	testRunnerRepo := testrunner.NewRepository(db)
 	tracesRepo := traces.NewTraceRepository(db)
+	wizardRepo := wizard.NewRepository(db)
 
 	testSuiteRepository := testsuite.NewRepository(db, testRepo)
 	testSuiteRunRepository := testsuite.NewRunRepository(db, runRepo)
@@ -323,6 +325,7 @@ func (app *App) Start(opts ...appOption) error {
 		testRepo,
 		runRepo,
 		variableSetRepo,
+		wizardRepo,
 		otlpConnectionTester,
 		tracedbFactory,
 	)
@@ -565,6 +568,7 @@ func controller(
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
 	variablesetRepo *variableset.Repository,
+	wizardRepo wizard.Repository,
 	otlpConnectionTester *testconnection.OTLPConnectionTester,
 	tracedbFactory tracedb.FactoryFunc,
 ) (*mux.Router, mappings.Mappings) {
@@ -586,6 +590,7 @@ func controller(
 		testRepo,
 		testRunRepo,
 		variablesetRepo,
+		wizardRepo,
 		otlpConnectionTester,
 		tracedbFactory,
 
@@ -611,6 +616,7 @@ func httpRouter(
 	testRepo test.Repository,
 	testRunRepo test.RunRepository,
 	variableSetRepo *variableset.Repository,
+	wizardRepo wizard.Repository,
 	otlpConnectionTester *testconnection.OTLPConnectionTester,
 	tracedbFactory tracedb.FactoryFunc,
 
@@ -629,6 +635,7 @@ func httpRouter(
 		testRepo,
 		testRunRepo,
 		variableSetRepo,
+		wizardRepo,
 		otlpConnectionTester,
 
 		tracedbFactory,

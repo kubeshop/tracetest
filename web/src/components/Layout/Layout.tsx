@@ -1,4 +1,4 @@
-import {AppstoreAddOutlined, ClusterOutlined, GlobalOutlined, SettingOutlined} from '@ant-design/icons';
+import {AppstoreAddOutlined, ClusterOutlined, GlobalOutlined, HomeOutlined, SettingOutlined} from '@ant-design/icons';
 import {Menu} from 'antd';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -27,18 +27,24 @@ interface IProps {
 const menuItems = [
   {
     key: '0',
-    icon: <ClusterOutlined />,
-    label: <Link to="/">Tests</Link>,
-    path: '/tests',
+    icon: <HomeOutlined />,
+    label: <Link to="/">Home</Link>,
+    path: '/',
   },
   {
     key: '1',
+    icon: <ClusterOutlined />,
+    label: <Link to="/tests">Tests</Link>,
+    path: '/tests',
+  },
+  {
+    key: '2',
     icon: <AppstoreAddOutlined />,
     label: <Link to="/testsuites">Test Suites</Link>,
     path: '/testsuites',
   },
   {
-    key: '2',
+    key: '3',
     icon: <GlobalOutlined />,
     label: <Link to="/variablesets">Variable Sets</Link>,
     path: '/variablesets',
@@ -61,10 +67,10 @@ const Layout = ({hasMenu = false}: IProps) => {
   const isNoTracingMode = dataStoreConfig.mode === ConfigMode.NO_TRACING_MODE;
 
   return (
-    <NotificationProvider>
-      <MissingVariablesModalProvider>
-        <FileViewerModalProvider>
-          <ConfirmationModalProvider>
+    <ConfirmationModalProvider>
+      <NotificationProvider>
+        <MissingVariablesModalProvider>
+          <FileViewerModalProvider>
             <VariableSetProvider>
               <GuidedTourProvider>
                 <CreateTestProvider>
@@ -114,10 +120,10 @@ const Layout = ({hasMenu = false}: IProps) => {
                 </CreateTestProvider>
               </GuidedTourProvider>
             </VariableSetProvider>
-          </ConfirmationModalProvider>
-        </FileViewerModalProvider>
-      </MissingVariablesModalProvider>
-    </NotificationProvider>
+          </FileViewerModalProvider>
+        </MissingVariablesModalProvider>
+      </NotificationProvider>
+    </ConfirmationModalProvider>
   );
 };
 

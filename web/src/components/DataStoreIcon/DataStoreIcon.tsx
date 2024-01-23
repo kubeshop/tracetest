@@ -1,44 +1,14 @@
 import {useTheme} from 'styled-components';
 import {SupportedDataStores} from 'types/DataStore.types';
-import Elastic from './Icons/Elastic';
-import Jaeger from './Icons/Jaeger';
-import Lightstep from './Icons/Lightstep';
-import Datadog from './Icons/Datadog';
-import NewRelic from './Icons/NewRelic';
-import OpenSearch from './Icons/OpenSearch';
-import Otlp from './Icons/Otlp';
-import SignalFx from './Icons/SignalFx';
-import Tempo from './Icons/Tempo';
-import AWSXRay from './Icons/AwsXRay';
-import Honeycomb from './Icons/Honeycomb';
-import AzureAppInsights from './Icons/AzureAppInsights';
-import Signoz from './Icons/Signoz';
-import Dynatrace from './Icons/Dynatrace';
-import SumoLogic from './Icons/SumoLogic';
-
-const iconMap = {
-  [SupportedDataStores.JAEGER]: Jaeger,
-  [SupportedDataStores.SignalFX]: SignalFx,
-  [SupportedDataStores.ElasticApm]: Elastic,
-  [SupportedDataStores.OtelCollector]: Otlp,
-  [SupportedDataStores.TEMPO]: Tempo,
-  [SupportedDataStores.OpenSearch]: OpenSearch,
-  [SupportedDataStores.NewRelic]: NewRelic,
-  [SupportedDataStores.Lightstep]: Lightstep,
-  [SupportedDataStores.Datadog]: Datadog,
-  [SupportedDataStores.AWSXRay]: AWSXRay,
-  [SupportedDataStores.Honeycomb]: Honeycomb,
-  [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
-  [SupportedDataStores.Signoz]: Signoz,
-  [SupportedDataStores.Dynatrace]: Dynatrace,
-  [SupportedDataStores.SumoLogic]: SumoLogic,
-} as const;
+import colorIconMap from './colorIconMap';
+import iconMap from './iconMap';
 
 interface IProps {
   color?: string;
   dataStoreType: SupportedDataStores;
   width?: string;
   height?: string;
+  withColor?: boolean;
 }
 
 export interface IIconProps {
@@ -47,11 +17,11 @@ export interface IIconProps {
   height?: string;
 }
 
-const DataStoreIcon = ({color, dataStoreType, width, height}: IProps) => {
+const DataStoreIcon = ({color, withColor = false, dataStoreType, width, height}: IProps) => {
   const {
     color: {text: defaultColor},
   } = useTheme();
-  const Component = iconMap[dataStoreType];
+  const Component = withColor ? colorIconMap[dataStoreType] : iconMap[dataStoreType];
 
   return <Component color={color || defaultColor} width={width} height={height} />;
 };

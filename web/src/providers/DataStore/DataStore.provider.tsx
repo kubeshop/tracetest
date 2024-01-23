@@ -2,32 +2,41 @@ import {noop} from 'lodash';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 
 import {SupportedDataStoresToName} from 'constants/DataStore.constants';
-import ConnectionResult from 'models/ConnectionResult.model';
 import TracetestAPI from 'redux/apis/Tracetest';
 import DataStoreService from 'services/DataStore.service';
 import {useContactUsModal} from 'components/ContactUs';
 import {SupportedDataStores, TConnectionResult, TDraftDataStore} from 'types/DataStore.types';
 import DataStore from 'models/DataStore.model';
+import OTLPTestConnectionResponse from 'models/OTLPTestConnectionResponse.model';
 import useDataStoreNotification from './hooks/useDataStoreNotification';
 import {useConfirmationModal} from '../ConfirmationModal/ConfirmationModal.provider';
 import {useSettingsValues} from '../SettingsValues/SettingsValues.provider';
+import {useWizard} from '../Wizard';
 
 interface IContext {
   isFormValid: boolean;
   isLoading: boolean;
   isTestConnectionLoading: boolean;
-  onSaveConfig(draft: TDraftDataStore, defaultDataStore: DataStore): void;
+  isTestConnectionSuccessful: boolean;
+  testConnectionResponse?: TConnectionResult;
+  otlpTestConnectionResponse?: OTLPTestConnectionResponse;
+  onSaveConfig(draft: TDraftDataStore, defaultDataStore: DataStore, onAfterSave?: () => void): void;
   onTestConnection(draft: TDraftDataStore, defaultDataStore: DataStore): void;
+  onSetOtlpTestConnectionResponse(response?: OTLPTestConnectionResponse): void;
   onIsFormValid(isValid: boolean): void;
+  resetTestConnection(): void;
 }
 
 export const Context = createContext<IContext>({
   isFormValid: false,
   isLoading: false,
   isTestConnectionLoading: false,
+  isTestConnectionSuccessful: false,
   onSaveConfig: noop,
   onIsFormValid: noop,
   onTestConnection: noop,
+  resetTestConnection: noop,
+  onSetOtlpTestConnectionResponse: noop,
 });
 
 interface IProps {
@@ -39,8 +48,16 @@ export const useDataStore = () => useContext(Context);
 const DataStoreProvider = ({children}: IProps) => {
   const {useTestConnectionMutation, useUpdateDataStoreMutation} = TracetestAPI.instance;
   const {isFetching} = useSettingsValues();
+  const {onCompleteStep} = useWizard();
   const [updateDataStore, {isLoading: isLoadingUpdate}] = useUpdateDataStoreMutation();
-  const [testConnection, {isLoading: isTestConnectionLoading}] = useTestConnectionMutation();
+  const [
+    testConnection,
+    {isLoading: isTestConnectionLoading, data: testConnectionResponse, reset: resetTestConnection},
+  ] = useTestConnectionMutation();
+  const [otlpTestConnectionResponse, setOtlpTestConnectionResponse] = useState<
+    OTLPTestConnectionResponse | undefined
+  >();
+
   const [isFormValid, setIsFormValid] = useState(false);
   const {showSuccessNotification, showTestConnectionNotification} = useDataStoreNotification();
   const {onOpen} = useConfirmationModal();
@@ -48,7 +65,7 @@ const DataStoreProvider = ({children}: IProps) => {
   const {onOpen: onContactUsOpen} = useContactUsModal();
 
   const onSaveConfig = useCallback(
-    async (draft: TDraftDataStore, defaultDataStore: DataStore) => {
+    async (draft: TDraftDataStore, defaultDataStore: DataStore, onAfterSave: () => void = noop) => {
       const warningMessage =
         !!defaultDataStore.id && draft.dataStoreType !== defaultDataStore.type
           ? `Saving will delete your previous configuration of the ${
@@ -68,12 +85,18 @@ const DataStoreProvider = ({children}: IProps) => {
         onConfirm: async () => {
           const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
           await updateDataStore({dataStore}).unwrap();
+          await onCompleteStep('tracing_backend');
           showSuccessNotification();
+          onAfterSave();
         },
       });
     },
-    [onOpen, showSuccessNotification, updateDataStore]
+    [onCompleteStep, onOpen, showSuccessNotification, updateDataStore]
   );
+
+  const onResetTestConnection = useCallback(() => {
+    resetTestConnection();
+  }, [resetTestConnection]);
 
   const onIsFormValid = useCallback((isValid: boolean) => {
     setIsFormValid(isValid);
@@ -83,8 +106,8 @@ const DataStoreProvider = ({children}: IProps) => {
     async (draft: TDraftDataStore, defaultDataStore: DataStore) => {
       const dataStore = await DataStoreService.getRequest(draft, defaultDataStore);
 
-      if (!DataStoreService.shouldTestConnection(draft)) {
-        return showTestConnectionNotification(ConnectionResult({}), draft.dataStoreType!, false);
+      if (DataStoreService.getIsOtlpBased(draft)) {
+        return;
       }
 
       try {
@@ -107,11 +130,26 @@ const DataStoreProvider = ({children}: IProps) => {
       isLoading: isLoadingUpdate,
       isFormValid,
       isTestConnectionLoading,
+      isTestConnectionSuccessful: testConnectionResponse?.allPassed || !!otlpTestConnectionResponse?.spanCount,
       onSaveConfig,
       onIsFormValid,
       onTestConnection,
+      testConnectionResponse,
+      otlpTestConnectionResponse,
+      resetTestConnection: onResetTestConnection,
+      onSetOtlpTestConnectionResponse: setOtlpTestConnectionResponse,
     }),
-    [isLoadingUpdate, isFormValid, isTestConnectionLoading, onSaveConfig, onIsFormValid, onTestConnection]
+    [
+      isFormValid,
+      isLoadingUpdate,
+      isTestConnectionLoading,
+      onIsFormValid,
+      onResetTestConnection,
+      onSaveConfig,
+      onTestConnection,
+      otlpTestConnectionResponse,
+      testConnectionResponse,
+    ]
   );
 
   return <Context.Provider value={value}>{isFetching ? null : children}</Context.Provider>;

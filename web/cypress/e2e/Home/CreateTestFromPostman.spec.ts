@@ -1,7 +1,7 @@
 describe('Create test from Postman Collection', () => {
   beforeEach(() => {
     cy.enableDemo();
-    cy.visit('/');
+    cy.visit('/tests');
   });
 
   it('should create a basic GET test', () => {
