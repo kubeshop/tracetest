@@ -1,0 +1,25 @@
+{
+  "name": "quick-start-typescript",
+  "version": "0.0.1",
+  "description": "Tracetest x Typescript example",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "build": "tsc"
+  },
+  "keywords": [
+    "tracetest",
+    "typescript",
+    "@tracetest/core"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@tracetest/core": "^0.0.26",
+    "dotenv": "^16.3.2"
+  }
+}
