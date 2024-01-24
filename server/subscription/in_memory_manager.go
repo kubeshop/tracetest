@@ -6,28 +6,46 @@ import (
 )
 
 type inMemoryManager struct {
-	subscriptions map[string][]Subscriber
+	subscribers   map[string][]Subscriber
+	subscriptions *subscriptionStorage
 	mutex         sync.Mutex
+}
+
+type inMemorySubscription struct {
+	unsubscribeFn func()
+}
+
+func (s *inMemorySubscription) Unsubscribe() error {
+	s.unsubscribeFn()
+	return nil
 }
 
 func (m *inMemoryManager) getSubscribers(resourceID string) []Subscriber {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	return m.subscriptions[resourceID]
+	return m.subscribers[resourceID]
 }
 
 func (m *inMemoryManager) setSubscribers(resourceID string, subscribers []Subscriber) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	m.subscriptions[resourceID] = subscribers
+	m.subscribers[resourceID] = subscribers
 }
 
-func (m *inMemoryManager) Subscribe(resourceID string, subscriber Subscriber) {
+func (m *inMemoryManager) Subscribe(resourceID string, subscriber Subscriber) Subscription {
 	subscribers := append(m.getSubscribers(resourceID), subscriber)
 	m.setSubscribers(resourceID, subscribers)
+
+	return &inMemorySubscription{
+		unsubscribeFn: func() { m.unsubscribe(resourceID, subscriber.ID()) },
+	}
 }
 
-func (m *inMemoryManager) Unsubscribe(resourceID string, subscriptionID string) {
+func (m *inMemoryManager) GetSubscription(resourceID string, subscriptionID string) Subscription {
+	return m.subscriptions.Get(resourceID, subscriptionID)
+}
+
+func (m *inMemoryManager) unsubscribe(resourceID string, subscriptionID string) {
 	subscribers := m.getSubscribers(resourceID)
 
 	updated := make([]Subscriber, 0, len(subscribers)-1)

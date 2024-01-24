@@ -179,7 +179,7 @@ type testSuiteRunGetter interface {
 }
 
 type subscriptor interface {
-	Subscribe(string, subscription.Subscriber)
+	Subscribe(string, subscription.Subscriber) subscription.Subscription
 }
 
 type queueConfigurer[T any] struct {

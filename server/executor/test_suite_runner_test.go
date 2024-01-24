@@ -192,11 +192,11 @@ func runTestSuiteRunnerTest(t *testing.T, withErrors bool, assert func(t *testin
 
 		return nil
 	})
-	subscriptionManager.Subscribe(transactionRun.ResourceID(), sf)
+	subscription := subscriptionManager.Subscribe(transactionRun.ResourceID(), sf)
 
 	select {
 	case finalRun := <-done:
-		subscriptionManager.Unsubscribe(transactionRun.ResourceID(), sf.ID()) //cleanup to avoid race conditions
+		subscription.Unsubscribe()
 		assert(t, finalRun)
 	case <-time.After(10 * time.Second):
 		t.Log("timeout after 10 second")

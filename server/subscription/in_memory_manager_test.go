@@ -101,13 +101,13 @@ func TestManagerUnsubscribe(t *testing.T) {
 		Content:    "Test was deleted",
 	}
 
-	manager.Subscribe("test:1", subscriber)
+	subscription := manager.Subscribe("test:1", subscriber)
 	manager.PublishUpdate(message1)
 
 	assert.Equal(t, message1.Type, receivedMessage.Type)
 	assert.Equal(t, message1.Content, receivedMessage.Content)
 
-	manager.Unsubscribe("test:1", subscriber.ID())
+	subscription.Unsubscribe()
 	manager.PublishUpdate(message2)
 
 	assert.Equal(t, message1.Type, receivedMessage.Type, "subscriber should not be notified after unsubscribed")
