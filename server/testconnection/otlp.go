@@ -105,9 +105,8 @@ func (t *OTLPConnectionTester) GetSpanCount(ctx context.Context, opts ...GetSpan
 		return nil
 	})
 
-	t.subscriptionManager.Subscribe(topicName, subscriber)
-	// TODO: implement subscription
-	// defer t.subscriptionManager.Unsubscribe(topicName, subscriber.ID())
+	subscription := t.subscriptionManager.Subscribe(topicName, subscriber)
+	defer subscription.Unsubscribe()
 
 	t.subscriptionManager.Publish(GetSpanCountTopicName(WithTenantID(tenantID)), OTLPConnectionTestRequest{})
 
