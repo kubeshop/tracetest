@@ -29,13 +29,17 @@ const KeyValueList = ({
         <>
           {fields.map((field, index) => (
             <S.KeyValueContainer key={field.name}>
-              <Form.Item name={[field.name, 'key']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`${keyPlaceholder} ${index + 1}`} />
-              </Form.Item>
+              <S.Item>
+                <Form.Item name={[field.name, 'key']} noStyle>
+                  <Editor type={SupportedEditors.Interpolation} placeholder={`${keyPlaceholder} ${index + 1}`} />
+                </Form.Item>
+              </S.Item>
 
-              <Form.Item name={[field.name, 'value']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`${valuePlaceholder} ${index + 1}`} />
-              </Form.Item>
+              <S.Item>
+                <Form.Item name={[field.name, 'value']} noStyle>
+                  <Editor type={SupportedEditors.Interpolation} placeholder={`${valuePlaceholder} ${index + 1}`} />
+                </Form.Item>
+              </S.Item>
 
               <Form.Item noStyle>
                 <Button
