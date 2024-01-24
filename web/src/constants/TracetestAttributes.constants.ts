@@ -16,7 +16,7 @@ export default {
   },
   'tracetest.span.type': {
     description:
-      'Tracetest attribute based on the [OTel Trace Semantic Conventions](https://github.com/open-telemetry/opentelemetry-specification/tree/main/specification/trace/semantic_conventions)',
+      'Tracetest attribute based on the [OTel Trace Semantic Conventions](https://github.com/open-telemetry/semantic-conventions/blob/main/docs/README.md)',
     note: '',
     tags: ['general', 'http', 'database', 'rpc', 'messaging', 'faas', 'exception'],
   },
