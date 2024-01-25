@@ -36,7 +36,11 @@ func (e unsubscribeCommandExecutor) Execute(conn *websocket.Conn, message []byte
 		return
 	}
 
-	e.subscriptionManager.Unsubscribe(msg.Resource, msg.SubscriptionId)
+	subscription := e.subscriptionManager.GetSubscription(msg.Resource, msg.SubscriptionId)
+	err = subscription.Unsubscribe()
+	if err != nil {
+		conn.WriteJSON(ErrorMessage(fmt.Errorf("could not unsubscribe: %w", err)))
+	}
 
 	conn.WriteJSON(UnsubscribeSuccess())
 }

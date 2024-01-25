@@ -7,11 +7,12 @@ import (
 )
 
 type natsManager struct {
-	conn *nats.Conn
+	conn          *nats.Conn
+	subscriptions *subscriptionStorage
 }
 
-func (m *natsManager) Subscribe(resourceID string, subscriber Subscriber) {
-	_, err := m.conn.Subscribe(resourceID, func(msg *nats.Msg) {
+func (m *natsManager) Subscribe(resourceID string, subscriber Subscriber) Subscription {
+	subscription, err := m.conn.Subscribe(resourceID, func(msg *nats.Msg) {
 		decoded, err := DecodeMessage(msg.Data)
 		if err != nil {
 			log.Printf("cannot unmarshall incoming nats message: %s", err.Error())
@@ -25,12 +26,14 @@ func (m *natsManager) Subscribe(resourceID string, subscriber Subscriber) {
 	})
 	if err != nil {
 		log.Printf("cannot subscribe to nats topic: %s", err.Error())
-		return
+		return nil
 	}
+
+	return subscription
 }
 
-func (m *natsManager) Unsubscribe(resourceID string, subscriptionID string) {
-	panic("nats unsubscribe not implemented")
+func (m *natsManager) GetSubscription(resourceID string, subscriptionID string) Subscription {
+	return m.subscriptions.Get(resourceID, subscriptionID)
 }
 
 func (m *natsManager) PublishUpdate(message Message) {

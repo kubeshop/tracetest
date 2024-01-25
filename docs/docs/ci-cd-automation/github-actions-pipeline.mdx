@@ -61,7 +61,7 @@ jobs:
       run: curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
 
     - name: Configure Tracetest CLI
-      run: tracetest configure -g --endpoint http://localhost:11633
+      run: tracetest configure -g --server-url http://localhost:11633
 
     - name: Run tests via the Tracetest CLI
       run: |
@@ -101,7 +101,7 @@ jobs:
       run: curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash
 
     - name: Configure Tracetest CLI
-      run: tracetest configure -g --endpoint http://localhost:11633
+      run: tracetest configure -g --server-url http://localhost:11633
 
     - name: Run tests via the Tracetest CLI
       run: |
@@ -400,7 +400,7 @@ First, [install the CLI](https://docs.tracetest.io/getting-started/installation#
 Then, configure the CLI:
 
 ```bash
-tracetest configure --endpoint http://localhost:11633
+tracetest configure --server-url http://localhost:11633
 ```
 
 Once configured, you can run a test against the Tracetest instance via the terminal.

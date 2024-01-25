@@ -8,7 +8,7 @@ This is a simple quick start on how to configure a Node.js lambda function API t
 
 1. [Install the tracetest CLI](https://github.com/kubeshop/tracetest/blob/main/docs/installing.md#cli-installation)
 2. Run `terraform init`, `terraform apply` and accept the changes
-3. From the terraform outputs, grab the `tracetes_url` and run `tracetest configure --endpoint <tracetest_url>` on a terminal to configure the CLI to send all commands to that address
+3. From the terraform outputs, grab the `tracetes_url` and run `tracetest configure --server-url <tracetest_url>` on a terminal to configure the CLI to send all commands to that address
 4. From the terraform outputs, grab the `api_endpoint` and update the `<your_api_endpoint>` section from `test/test.yaml`
 5. Test if it works by running: `tracetest run test -f tests/test.yaml`. This would execute a test against the Node.js API Gateway endpoint that will send spans to Jaeger to be fetched from the Tracetest server.
 

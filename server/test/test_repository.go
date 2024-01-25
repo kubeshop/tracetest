@@ -313,7 +313,6 @@ func (r *repository) readRow(ctx context.Context, row scanner) (Test, error) {
 	if fail != nil {
 		test.Summary.LastRun.Fails = *fail
 	}
-
 	return test, nil
 }
 
@@ -455,7 +454,7 @@ func testHasChanged(oldTest Test, newTest Test) (bool, error) {
 		return false, err
 	}
 
-	definitionHasChanged, err := testFieldHasChanged(oldTest.Specs, newTest.Specs)
+	definitionHasChanged, err := testFieldHasChanged(oldTest.GetSpecs(), newTest.GetSpecs())
 	if err != nil {
 		return false, err
 	}

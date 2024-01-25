@@ -3,10 +3,12 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   background: ${({theme}) => theme.color.white};
+  border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
+  border-radius: 2px;
   display: flex;
   flex-direction: column;
   margin-bottom: 24px;
-  padding: 16px;
+  padding: 24px;
 `;
 
 export const FormContainer = styled.div`
@@ -21,7 +23,7 @@ export const FooterContainer = styled.div`
   border-top: 1px solid ${({theme}) => theme.color.borderLight};
 `;
 
-export const Description = styled(Typography.Text)`
+export const Description = styled(Typography.Paragraph)`
   && {
     color: ${({theme}) => theme.color.textSecondary};
   }
@@ -49,4 +51,10 @@ export const SwitchLabel = styled.label<{$disabled?: boolean}>`
   color: ${({$disabled, theme}) => ($disabled ? theme.color.textLight : theme.color.text)};
   cursor: ${({$disabled}) => ($disabled ? 'not-allowed' : 'pointer')};
   margin-bottom: 24px;
+`;
+
+export const Title = styled(Typography.Title)`
+  && {
+    margin-bottom: 16px;
+  }
 `;

@@ -12,7 +12,7 @@ const AuthApiKeyBase = ({baseName}: IProps) => (
     <S.FlexContainer>
       <Form.Item
         data-cy="apiKey-key"
-        style={{flexBasis: '50%'}}
+        style={{flexBasis: '50%', overflow: 'hidden'}}
         name={[...baseName, 'apiKey', 'key']}
         label="Key"
         rules={[{required: true}]}
@@ -21,7 +21,7 @@ const AuthApiKeyBase = ({baseName}: IProps) => (
       </Form.Item>
       <Form.Item
         data-cy="apiKey-value"
-        style={{flexBasis: '50%'}}
+        style={{flexBasis: '50%', overflow: 'hidden'}}
         name={[...baseName, 'apiKey', 'value']}
         label="Value"
         rules={[{required: true}]}

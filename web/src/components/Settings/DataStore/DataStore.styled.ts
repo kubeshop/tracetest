@@ -10,9 +10,11 @@ export const Title = styled(Typography.Title)`
 `;
 
 export const Wrapper = styled.div`
+  background: ${({theme}) => theme.color.white};
+  border-radius: 2px;
+  border: ${({theme}) => `1px solid ${theme.color.borderLight}`};
   display: flex;
   flex-direction: column;
-  background: ${({theme}) => theme.color.white};
 `;
 
 export const FormContainer = styled.div`

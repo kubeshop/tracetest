@@ -5,6 +5,7 @@ import * as S from '../common/Settings.styled';
 
 const Linter = () => (
   <S.Container>
+    <S.Title level={2}>Analyzer (Beta)</S.Title>
     <S.Description>
       <p>
         The Tracetest Analyzer is a plugin based framework used to audit OpenTelemetry traces to help teams improve
@@ -13,9 +14,9 @@ const Linter = () => (
         Add to this <a href={OCTOLIINT_ISSUE_URL}>Issue</a> or call us on <a href={COMMUNITY_SLACK_URL}>Slack</a>!
       </p>
       <DocsBanner>
-        Need more information about Analyzer?{' '}
+        Need more information about the Analyzer?{' '}
         <a href={ANALYZER_DOCUMENTATION_URL} target="_blank">
-          Go to our docs
+          Learn more in our docs
         </a>
       </DocsBanner>
     </S.Description>
