@@ -227,7 +227,7 @@ jobs:
 
           ./scripts/wait-for-port.sh 11633
 
-          ./dist/tracetest configure -g --endpoint http://localhost:11633
+          ./dist/tracetest configure -g --server-url http://localhost:11633
           ./dist/tracetest run test -f examples/${{ matrix.example_dir }}/tests/list-tests.yaml || (cat /tmp/docker-log; exit 1)
 
   smoke-test-cli:
