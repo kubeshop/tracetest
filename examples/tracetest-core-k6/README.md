@@ -7,7 +7,7 @@ For more detailed information about the K6 Tracetest Binary take a look a the [d
 ## Steps
 
 1. [Install the Tracetest CLI](https://docs.tracetest.io/installing/)
-2. Run `tracetest configure --endpoint http://localhost:11633` on a terminal
+2. Run `tracetest configure --server-url http://localhost:11633` on a terminal
 3. Run the project by using docker-compose: `docker-compose up -d` (Linux) or `docker compose up -d` (Mac)
 4. Test if it works by running: `tracetest run test -f tests/test.yaml`. This will create and run a test with trace id as trigger
 5. In as separate folder outside of the the Tracetest repo, build the k6 binary with the extension by using `xk6 build v0.42.0 --with github.com/kubeshop/xk6-tracetest`

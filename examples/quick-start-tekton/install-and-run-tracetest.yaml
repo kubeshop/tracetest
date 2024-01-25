@@ -36,7 +36,7 @@ spec:
       # The official Tracetest image comes with the Tracetest CLI installed
       script: |
         # Configure and Run Tracetest CLI
-        tracetest configure -g --endpoint http://tracetest.tracetest.svc.cluster.local:11633/
+        tracetest configure -g --server-url http://tracetest.tracetest.svc.cluster.local:11633/
         tracetest run test --file /workspace/test-api.yaml --required-gates test-specs --output pretty
       volumeMounts:
       - name: custom

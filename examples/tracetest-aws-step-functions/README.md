@@ -6,7 +6,7 @@ This is a simple quick start on how to configure a .NET State Machine (AWS Step 
 
 1. [Install the tracetest CLI](https://github.com/kubeshop/tracetest/blob/main/docs/installing.md#cli-installation)
 2. From the `infra` folder run `terraform init` and `terraform apply` and accept the changes
-3. From the terraform outputs, grab the `tracetest_url` and run `tracetest configure --endpoint <tracetest_url>` on a terminal to configure the CLI to send all commands to that address
+3. From the terraform outputs, grab the `tracetest_url` and run `tracetest configure --server-url <tracetest_url>` on a terminal to configure the CLI to send all commands to that address
 4. From the `src` folder run `sam build` and `sam deploy --guided`
 5. Follow the instructions from the guided deployment
 ![functions](./assets/functions.png)
