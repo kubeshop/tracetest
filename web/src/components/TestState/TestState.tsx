@@ -5,13 +5,14 @@ import TestStateProgress from './TestStateProgress';
 
 interface IProps {
   testState: TTestRunState;
+  info?: string;
 }
 
-const TestState = ({testState}: IProps) => {
-  const {label, percent, status} = TestStateMap[testState];
+const TestState = ({testState, info}: IProps) => {
+  const {label, percent, status, showInfo} = TestStateMap[testState];
 
   return percent ? (
-    <TestStateProgress label={label} percent={percent} />
+    <TestStateProgress label={label} percent={percent} showInfo={showInfo} info={info} />
   ) : (
     <TestStateBadge label={label} status={status} />
   );

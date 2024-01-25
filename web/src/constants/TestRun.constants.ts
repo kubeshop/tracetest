@@ -17,7 +17,12 @@ export enum TestState {
 
 export const TestStateMap: Record<
   TestState,
-  {status: 'success' | 'processing' | 'error' | 'default' | 'warning'; label: string; percent?: number}
+  {
+    status: 'success' | 'processing' | 'error' | 'default' | 'warning';
+    label: string;
+    percent?: number;
+    showInfo?: boolean;
+  }
 > = {
   [TestState.CREATED]: {
     status: 'default',
@@ -32,6 +37,7 @@ export const TestStateMap: Record<
     status: 'warning',
     label: 'Awaiting trace',
     percent: 50,
+    showInfo: true,
   },
   [TestState.AWAITING_TEST_RESULTS]: {
     status: 'success',

@@ -27,7 +27,7 @@ const HeaderRight = ({testId, triggerType}: IProps) => {
   const {isDraftMode: isTestOutputsDraftMode} = useTestOutput();
   const isDraftMode = isTestSpecsDraftMode || isTestOutputsDraftMode;
   const {
-    run: {state, requiredGatesResult},
+    run: {state, requiredGatesResult, trace},
     run,
     runEvents,
     isLoadingStop,
@@ -49,8 +49,8 @@ const HeaderRight = ({testId, triggerType}: IProps) => {
       {isDraftMode && <TestActions />}
       {!isDraftMode && state && state !== TestStateEnum.FINISHED && (
         <S.StateContainer data-cy="test-run-result-status">
-          <S.StateText>Test status:</S.StateText>
-          <TestState testState={state} />
+          <S.StateText>Status:</S.StateText>
+          <TestState testState={state} info={`(${trace?.spans?.length ?? 0} spans)`} />
           {isRunPollingState(state) && <SkipPollingPopover isLoading={isLoading} skipPolling={onSkipPolling} />}
         </S.StateContainer>
       )}
