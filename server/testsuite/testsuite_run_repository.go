@@ -85,7 +85,7 @@ INSERT INTO test_suite_runs (
 RETURNING "id"`
 
 const (
-	createSequeceQuery = `
+	createSequenceQuery = `
 	select pg_advisory_xact_lock(12345);
 	CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";
 	`
