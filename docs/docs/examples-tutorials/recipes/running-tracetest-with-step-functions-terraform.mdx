@@ -169,7 +169,7 @@ The output from the previous command should look similar to this:
 Now that all of the required services and infra have been created, you can start running trace-based testing by doing the following:
 
 1. Run this `sam list stack-outputs --stack-name <your_app_name>` command where you can copy the `StepFunctionsAPIUrl` value and add the `<your_api_endpoint>` placeholder from the `tests/incident.yaml` and `tests/exam.yaml` files.
-2. From the Terraform output, configure the [Tracetest CLI](https://docs.tracetest.io/cli/configuring-your-cli) to point to the public load balancer endpoint with `tracetest configure --endpoint <tracetest_url>`.
+2. From the Terraform output, configure the [Tracetest CLI](https://docs.tracetest.io/cli/configuring-your-cli) to point to the public load balancer endpoint with `tracetest configure --server-url <tracetest_url>`.
 3. Run the tests YAML file using the CLI.
 
 ```bash

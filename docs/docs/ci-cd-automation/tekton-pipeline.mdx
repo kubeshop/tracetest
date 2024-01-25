@@ -253,7 +253,7 @@ spec:
       image: kubeshop/tracetest:v0.11.9 # The official Tracetest image comes with the Tracetest CLI installed
       script: |
         # Configure and Run Tracetest CLI
-        tracetest configure -g --endpoint http://tracetest.tracetest.svc.cluster.local:11633/
+        tracetest configure -g --server-url http://tracetest.tracetest.svc.cluster.local:11633/
         tracetest run test -f /workspace/test-api.yaml
       volumeMounts:
       - name: custom
@@ -371,7 +371,7 @@ metadata:
 spec:
   serviceAccountName: tekton-robot
   triggers:
-    - name: install-and-run-tracetest-trigger 
+    - name: install-and-run-tracetest-trigger
       bindings:
       - ref: install-and-run-tracetest-binding
       template:

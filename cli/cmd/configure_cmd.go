@@ -31,7 +31,7 @@ var configureCmd = &cobra.Command{
 			return "", err
 		}
 
-		if flagProvided(cmd, "endpoint") {
+		if flagProvided(cmd, "server-url") {
 			flags.Endpoint = configParams.ServerURL
 		}
 
@@ -78,7 +78,7 @@ type configureParameters struct {
 	EnvironmentID  string
 }
 
-func (p configureParameters) Validate(cmd *cobra.Command, args []string) []error {
+func (p *configureParameters) Validate(cmd *cobra.Command, args []string) []error {
 	var errors []error
 
 	p.ServerURL = overrideEndpoint
