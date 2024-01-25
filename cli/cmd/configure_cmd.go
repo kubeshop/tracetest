@@ -31,7 +31,7 @@ var configureCmd = &cobra.Command{
 			return "", err
 		}
 
-		if flagProvided(cmd, "server-url") {
+		if flagProvided(cmd, "server-url") || flagProvided(cmd, "endpoint") {
 			flags.Endpoint = configParams.ServerURL
 		}
 
@@ -57,15 +57,21 @@ func flagProvided(cmd *cobra.Command, name string) bool {
 	return cmd.Flags().Lookup(name).Changed
 }
 
+var deprecatedEndpoint string
+
 func init() {
 	configureCmd.PersistentFlags().BoolVarP(&configParams.Global, "global", "g", false, "configuration will be saved in your home dir")
-	// configureCmd.PersistentFlags().StringVarP(&configParams.Endpoint, "server-url`", "s", "", "set the value for the endpoint, so the CLI won't ask for this value")
 
 	configureCmd.PersistentFlags().StringVarP(&configParams.Token, "token", "t", "", "set authetication with token, so the CLI won't ask you for authentication")
 	configureCmd.PersistentFlags().StringVarP(&configParams.EnvironmentID, "environment", "", "", "set environmentID, so the CLI won't ask you for it")
 	configureCmd.PersistentFlags().StringVarP(&configParams.OrganizationID, "organization", "", "", "set organizationID, so the CLI won't ask you for it")
 
 	configureCmd.PersistentFlags().BoolVarP(&configParams.CI, "ci", "", false, "if cloud is used, don't ask for authentication")
+
+	configureCmd.PersistentFlags().StringVarP(&deprecatedEndpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
+	configureCmd.PersistentFlags().MarkDeprecated("endpoint", "use --server-url instead")
+	configureCmd.PersistentFlags().MarkShorthandDeprecated("e", "use --server-url instead")
+
 	rootCmd.AddCommand(configureCmd)
 }
 
@@ -82,7 +88,14 @@ func (p *configureParameters) Validate(cmd *cobra.Command, args []string) []erro
 	var errors []error
 
 	p.ServerURL = overrideEndpoint
-	if cmd.Flags().Lookup("server-url").Changed {
+	flagUpdated := cmd.Flags().Lookup("server-url").Changed
+
+	if deprecatedEndpoint != "" {
+		p.ServerURL = deprecatedEndpoint
+		flagUpdated = true
+	}
+
+	if flagUpdated {
 		if p.ServerURL == "" {
 			errors = append(errors, paramError{
 				Parameter: "server-url",
