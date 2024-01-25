@@ -15,7 +15,7 @@ const Fields = ({baseName}: IProps) => (
         data-cy="plain-username"
         label="Username"
         rules={[{required: true}]}
-        style={{flexBasis: '50%'}}
+        style={{flexBasis: '50%', overflow: 'hidden'}}
       >
         <Editor type={SupportedEditors.Interpolation} placeholder="Kafka Plain Username" />
       </Form.Item>
@@ -25,7 +25,7 @@ const Fields = ({baseName}: IProps) => (
         label="Password"
         data-cy="plain-password"
         rules={[{required: true}]}
-        style={{flexBasis: '50%'}}
+        style={{flexBasis: '50%', overflow: 'hidden'}}
       >
         <Editor type={SupportedEditors.Interpolation} placeholder="Kafka Plain Password" />
       </Form.Item>

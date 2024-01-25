@@ -11,3 +11,8 @@ export const DeleteIcon = styled(DeleteOutlined)`
   color: ${({theme}) => theme.color.textSecondary};
   font-size: ${({theme}) => theme.size.md};
 `;
+
+export const Item = styled.div`
+  flex: 1;
+  overflow: hidden;
+`;

@@ -11,13 +11,17 @@ const Metadata = () => (
         <>
           {fields.map((field, index) => (
             <S.HeaderContainer key={field.name}>
-              <Form.Item name={[field.name, 'key']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`Key ${index + 1}`} />
-              </Form.Item>
+              <S.Item>
+                <Form.Item name={[field.name, 'key']} noStyle>
+                  <Editor type={SupportedEditors.Interpolation} placeholder={`Key ${index + 1}`} />
+                </Form.Item>
+              </S.Item>
 
-              <Form.Item name={[field.name, 'value']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`Value ${index + 1}`} />
-              </Form.Item>
+              <S.Item>
+                <Form.Item name={[field.name, 'value']} noStyle>
+                  <Editor type={SupportedEditors.Interpolation} placeholder={`Value ${index + 1}`} />
+                </Form.Item>
+              </S.Item>
 
               <Form.Item noStyle>
                 <Button
