@@ -13,7 +13,7 @@ const main = async () => {
   const tracetest = await Tracetest(TRACETEST_API_TOKEN, 'https://app-stage.tracetest.io', '');
 
   const getLastPokemonId = async (): Promise<number> => {
-    const response = await fetch('http://localhost:8081/pokemon');
+    const response = await fetch(baseUrl);
     const list = (await response.json()) as PokemonList;
 
     return list.items.length + 1;
