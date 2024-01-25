@@ -4,7 +4,7 @@ import {IUserState, TUserPreferenceKey, TUserPreferenceValue} from 'types/User.t
 
 export const initialState: IUserState = {
   preferences: UserPreferencesService.get(),
-  runOriginPath: '/',
+  runOriginPath: '/tests',
 };
 
 interface ISetUserPreferencesProps {
