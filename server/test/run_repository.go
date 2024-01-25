@@ -39,8 +39,10 @@ func NewRunRepository(db *sql.DB) RunRepository {
 }
 
 const (
-	createSequeceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
-	dropSequeceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
+	createSequeceQuery = `
+	select pg_advisory_xact_lock(12345);
+	CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";
+	`
 )
 
 const createRunQuery = `
