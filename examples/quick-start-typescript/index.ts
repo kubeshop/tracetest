@@ -1,4 +1,4 @@
-import Tracetest from '../../../tjs/packages/tracetest-client';
+import Tracetest from '@tracetest/client';
 import { config } from 'dotenv';
 import { PokemonList } from './types';
 import { deleteDefinition, importDefinition } from './definitions';
@@ -8,20 +8,6 @@ config();
 const { TRACETEST_API_TOKEN = '', POKESHOP_DEMO_URL = 'http://api:8081' } = process.env;
 
 const baseUrl = `${POKESHOP_DEMO_URL}/pokemon`;
-
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const sequencePromises = async (promises: Promise<any>[]) => {
-  const list = [];
-  for (const promise of promises) {
-    await wait(1000);
-    const result = await promise;
-
-    list.push(result);
-  }
-
-  return list;
-};
 
 const main = async () => {
   const tracetest = await Tracetest(TRACETEST_API_TOKEN, 'https://app-stage.tracetest.io', '');
@@ -65,7 +51,8 @@ const main = async () => {
     await Promise.all(
       importedPokemonList.map(async (pokemonId) => {
         console.log(`ℹ Deleting pokemon ${pokemonId}`);
-        return tracetest.runTest(test, { variables: getVariables(pokemonId) });
+        const run = await tracetest.runTest(test, { variables: getVariables(pokemonId) });
+        run.wait();
       })
     );
   };
