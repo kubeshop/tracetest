@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/kubeshop/tracetest/server/datastore"
 	tempopb "github.com/kubeshop/tracetest/server/internal/proto-gen-go/tempo-idl"
 	"github.com/kubeshop/tracetest/server/model"
@@ -144,6 +145,19 @@ func httpGetTraceByID(ctx context.Context, traceID string, client *datasource.Ht
 		return traces.Trace{}, fmt.Errorf("tempo err: %w %s", errors.New("authentication handshake failed"), string(body))
 	}
 
+	if contentTypeAcceptsType(resp, "application/protobuf") {
+		var protoMessage tempopb.Trace
+		err = proto.Unmarshal(body, &protoMessage)
+		if err != nil {
+			return traces.Trace{}, err
+		}
+
+		trace := &v1.TracesData{
+			ResourceSpans: protoMessage.GetBatches(),
+		}
+
+		return traces.FromOtel(trace), nil
+	}
 	var trace HttpTempoTraceByIDResponse
 	err = json.Unmarshal(body, &trace)
 	if err != nil {
@@ -166,4 +180,14 @@ func handleError(err error) error {
 	}
 
 	return nil
+}
+
+func contentTypeAcceptsType(resp *http.Response, accept string) bool {
+	for _, headerValue := range resp.Header["Content-Type"] {
+		if headerValue == accept {
+			return true
+		}
+	}
+
+	return false
 }
