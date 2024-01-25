@@ -1,4 +1,4 @@
-import { TestResource } from '@tracetest/core/dist/modules/openapi-client';
+import { TestResource } from '@tracetest/client/dist/modules/openapi-client';
 
 export const importDefinition: TestResource = {
   type: 'Test',
@@ -39,7 +39,7 @@ export const importDefinition: TestResource = {
       {
         name: 'DATABASE_POKEMON_ID',
         selector:
-          'span[tracetest.span.type="database" name="create pokeshop.pokemon" db.system="postgres" db.name="pokeshop" db.user="ashketchum" db.operation="create" db.sql.table="pokemon"]',
+          'span[tracetest.span.type="database" name="create postgres.pokemon" db.system="postgres" db.name="postgres" db.user="postgres" db.operation="create" db.sql.table="pokemon"]',
         value: "attr:db.result | json_path '$.id'",
       },
     ],

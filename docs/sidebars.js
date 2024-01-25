@@ -360,6 +360,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "tools-and-integrations/typescript",
+          label: "Typescript",
+        },
+        {
+          type: "doc",
           id: "tools-and-integrations/keptn",
           label: "Keptn",
         },

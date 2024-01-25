@@ -2,20 +2,33 @@ version: '3.5'
 name: pokeshop
 
 services:
-  app:
+  # tracetest services
+  tracetest-client:
     build: .
     environment:
       TRACETEST_API_TOKEN: ${TRACETEST_API_TOKEN}
       POKESHOP_DEMO_URL: ${POKESHOP_DEMO_URL}
-      TRACETEST_AGENT_API_KEY: ${TRACETEST_AGENT_API_KEY}
-  db:
+    depends_on:
+      api:
+        condition: service_healthy
+  tracetest-agent:
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
+      TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
+      TRACETEST_SERVER_URL: ${TRACETEST_SERVER_URL}
+    image: kubeshop/tracetest-agent:latest
+    networks:
+      default: null
+
+  # pokeshop demo services
+  postgres:
     image: postgres:14
     ports:
       - 5434:5432
     environment:
-      POSTGRES_USER: ashketchum
-      POSTGRES_PASSWORD: squirtle123
-      POSTGRES_DB: pokeshop
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 1s
@@ -81,88 +94,70 @@ services:
         condition: service_healthy
 
   api:
-    build: .
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
     environment:
       REDIS_URL: cache
-      DATABASE_URL: postgresql://ashketchum:squirtle123@db:5432/pokeshop?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
       COLLECTOR_ENDPOINT: http://otel-collector:4317
-      ZIPKIN_URL: http://localhost:9411
+      NPM_RUN_COMMAND: api
     healthcheck:
-      test: ['CMD', 'wget', '--spider', 'localhost:8081/pokemon/healthcheck']
+      test: ['CMD', 'wget', '--spider', 'localhost:8081']
       interval: 1s
       timeout: 3s
       retries: 60
     ports:
       - 8081:8081
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
       cache:
         condition: service_healthy
       queue:
         condition: service_healthy
-      jaeger:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-  rpc:
-    build: .
+
+  worker:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
     environment:
       REDIS_URL: cache
-      DATABASE_URL: postgresql://ashketchum:squirtle123@db:5432/pokeshop?schema=public
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
       COLLECTOR_ENDPOINT: http://otel-collector:4317
-      ZIPKIN_URL: http://localhost:9411
+      NPM_RUN_COMMAND: worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  rpc:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: rpc
     healthcheck:
-      test: ['CMD', 'wget', '--spider', 'localhost:8081/pokemon/healthcheck']
+      test: ['CMD', 'lsof', '-i', '8082']
       interval: 1s
       timeout: 3s
       retries: 60
-    ports:
-      - 8082:8082
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
       cache:
         condition: service_healthy
       queue:
         condition: service_healthy
-      jaeger:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-
-  worker:
-    build: .
-    environment:
-      REDIS_URL: cache
-      DATABASE_URL: postgresql://ashketchum:squirtle123@db:5432/pokeshop?schema=public
-      RABBITMQ_HOST: queue
-      POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      COLLECTOR_ENDPOINT: http://otel-collector:4317
-      ZIPKIN_URL: http://localhost:9411
-      NPM_RUN_COMMAND: worker
-    depends_on:
-      db:
-        condition: service_healthy
-      cache:
-        condition: service_healthy
-      queue:
-        condition: service_healthy
-      jaeger:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-
-  tracetest-agent:
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-      TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
-      TRACETEST_SERVER_URL: ${TRACETEST_SERVER_URL}
-    image: kubeshop/tracetest-agent:latest
-    networks:
-      default: null

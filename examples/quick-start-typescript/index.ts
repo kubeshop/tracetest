@@ -1,4 +1,4 @@
-import Tracetest from '@tracetest/core';
+import Tracetest from '../../../tjs/packages/tracetest-client';
 import { config } from 'dotenv';
 import { PokemonList } from './types';
 import { deleteDefinition, importDefinition } from './definitions';
@@ -9,11 +9,25 @@ const { TRACETEST_API_TOKEN = '', POKESHOP_DEMO_URL = 'http://api:8081' } = proc
 
 const baseUrl = `${POKESHOP_DEMO_URL}/pokemon`;
 
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const sequencePromises = async (promises: Promise<any>[]) => {
+  const list = [];
+  for (const promise of promises) {
+    await wait(1000);
+    const result = await promise;
+
+    list.push(result);
+  }
+
+  return list;
+};
+
 const main = async () => {
-  const tracetest = await Tracetest(TRACETEST_API_TOKEN);
+  const tracetest = await Tracetest(TRACETEST_API_TOKEN, 'https://app-stage.tracetest.io', '');
 
   const getLastPokemonId = async (): Promise<number> => {
-    const response = await fetch(baseUrl);
+    const response = await fetch('http://localhost:8081/pokemon');
     const list = (await response.json()) as PokemonList;
 
     return list.items.length + 1;
@@ -39,7 +53,7 @@ const main = async () => {
         const updatedRun = await run.wait();
         const pokemonId = updatedRun.outputs?.find((output) => output.name === 'DATABASE_POKEMON_ID')?.value || '';
 
-        console.log(`ℹ Adding pokemon ${pokemonId} to the list, ${updatedRun}`);
+        console.log(`ℹ Adding pokemon ${pokemonId} to the list`);
         importedPokemonList.push(pokemonId);
       })
     );
