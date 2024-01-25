@@ -527,9 +527,12 @@ func (r *repository) Delete(ctx context.Context, id id.ID) error {
 }
 
 const (
-	createSequenceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
-	dropSequenceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
-	runSequenceName     = "%sequence_name%"
+	createSequenceQuery = `
+	select pg_advisory_xact_lock(12345);
+	CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";
+	`
+	dropSequenceQuery = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
+	runSequenceName   = "%sequence_name%"
 )
 
 func dropSequence(ctx context.Context, tx *sql.Tx, testID id.ID, tenantID string) error {
