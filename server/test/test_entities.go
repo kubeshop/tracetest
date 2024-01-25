@@ -164,6 +164,14 @@ type (
 	}
 )
 
+func (t Test) GetSpecs() Specs {
+	if t.Specs == nil {
+		return Specs{}
+	}
+
+	return t.Specs
+}
+
 func (t Test) GetID() id.ID {
 	return t.ID
 }
