@@ -85,9 +85,12 @@ INSERT INTO test_suite_runs (
 RETURNING "id"`
 
 const (
-	createSequenceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
-	dropSequenceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
-	runSequenceName     = "%sequence_name%"
+	createSequenceQuery = `
+	select pg_advisory_xact_lock(12345);
+	CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";
+	`
+	dropSequenceQuery = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
+	runSequenceName   = "%sequence_name%"
 )
 
 func md5Hash(text string) string {

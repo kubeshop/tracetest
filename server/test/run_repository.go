@@ -38,11 +38,6 @@ func NewRunRepository(db *sql.DB) RunRepository {
 	}
 }
 
-const (
-	createSequeceQuery = `CREATE SEQUENCE IF NOT EXISTS "` + runSequenceName + `";`
-	dropSequeceQuery   = `DROP SEQUENCE IF EXISTS "` + runSequenceName + `";`
-)
-
 const createRunQuery = `
 INSERT INTO test_runs (
 	"id",
@@ -141,7 +136,7 @@ func (r *runRepository) CreateRun(ctx context.Context, test Test, run Run) (Run,
 
 	tenantID := sqlutil.TenantIDString(ctx)
 
-	_, err = tx.ExecContext(ctx, replaceRunSequenceName(createSequeceQuery, test.ID, tenantID))
+	_, err = tx.ExecContext(ctx, replaceRunSequenceName(createSequenceQuery, test.ID, tenantID))
 	if err != nil {
 		tx.Rollback()
 		return Run{}, fmt.Errorf("sql exec: %w", err)
