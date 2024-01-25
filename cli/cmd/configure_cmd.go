@@ -32,7 +32,7 @@ var configureCmd = &cobra.Command{
 		}
 
 		if flagProvided(cmd, "endpoint") {
-			flags.Endpoint = configParams.Endpoint
+			flags.Endpoint = configParams.ServerURL
 		}
 
 		if flagProvided(cmd, "token") {
@@ -59,7 +59,7 @@ func flagProvided(cmd *cobra.Command, name string) bool {
 
 func init() {
 	configureCmd.PersistentFlags().BoolVarP(&configParams.Global, "global", "g", false, "configuration will be saved in your home dir")
-	configureCmd.PersistentFlags().StringVarP(&configParams.Endpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
+	// configureCmd.PersistentFlags().StringVarP(&configParams.Endpoint, "server-url`", "s", "", "set the value for the endpoint, so the CLI won't ask for this value")
 
 	configureCmd.PersistentFlags().StringVarP(&configParams.Token, "token", "t", "", "set authetication with token, so the CLI won't ask you for authentication")
 	configureCmd.PersistentFlags().StringVarP(&configParams.EnvironmentID, "environment", "", "", "set environmentID, so the CLI won't ask you for it")
@@ -70,7 +70,7 @@ func init() {
 }
 
 type configureParameters struct {
-	Endpoint       string
+	ServerURL      string
 	Global         bool
 	CI             bool
 	Token          string
@@ -81,18 +81,19 @@ type configureParameters struct {
 func (p configureParameters) Validate(cmd *cobra.Command, args []string) []error {
 	var errors []error
 
-	if cmd.Flags().Lookup("endpoint").Changed {
-		if p.Endpoint == "" {
+	p.ServerURL = overrideEndpoint
+	if cmd.Flags().Lookup("server-url").Changed {
+		if p.ServerURL == "" {
 			errors = append(errors, paramError{
-				Parameter: "endpoint",
-				Message:   "endpoint cannot be empty",
+				Parameter: "server-url",
+				Message:   "server-url cannot be empty",
 			})
 		} else {
-			_, err := url.Parse(p.Endpoint)
+			_, err := url.Parse(p.ServerURL)
 			if err != nil {
 				errors = append(errors, paramError{
-					Parameter: "endpoint",
-					Message:   "endpoint is not a valid URL",
+					Parameter: "server-url",
+					Message:   "server-url is not a valid URL",
 				})
 			}
 		}
