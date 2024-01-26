@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {Input} from 'antd';
 import useInputActions from 'hooks/useInputActions';
 import {noop} from 'lodash';
@@ -14,14 +14,17 @@ const Overlay = ({onChange = noop, value = '', isDisabled = false}: IProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value);
   const ref = useRef(null);
-  useInputActions(ref, () => {
+
+  const handler = useCallback(() => {
     setIsOpen(false);
     if (inputValue) {
       onChange(inputValue);
     } else {
       setInputValue(value);
     }
-  });
+  }, [inputValue, onChange, value]);
+
+  useInputActions(ref, handler);
 
   useEffect(() => {
     setInputValue(value);
