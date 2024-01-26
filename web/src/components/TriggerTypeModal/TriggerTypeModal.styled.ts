@@ -35,6 +35,11 @@ export const CardContainer = styled.div<{$isActive: boolean; $isSelected: boolea
     `}
 `;
 
+export const IntegrationCardContainer = styled(CardContainer)`
+  width: auto;
+  padding-right: 16px;
+`;
+
 export const CardContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -50,6 +55,10 @@ export const CardList = styled.div`
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 48px;
+`;
+
+export const IntegrationCardList = styled(CardList)`
+  margin-bottom: 16px;
 `;
 
 export const CardTitle = styled(Typography.Text).attrs({
@@ -96,4 +105,12 @@ export const Title = styled(Typography.Title)<{$marginBottom?: number}>`
   && {
     margin-bottom: ${({$marginBottom}) => $marginBottom || 0}px;
   }
+`;
+
+export const Text = styled(Typography.Text)``;
+
+export const Divider = styled.div`
+  height: 1px;
+  border-top: 1px dashed ${({theme}) => theme.color.borderLight};
+  margin-bottom: 24px;
 `;
