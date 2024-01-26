@@ -8,5 +8,5 @@ export const Badge = styled(AntdBadge)`
 `;
 
 export const Text = styled(Typography.Text)`
-  color: ${({theme}) => theme.color.success};
+  color: ${({theme}) => theme.color.primary};
 `;

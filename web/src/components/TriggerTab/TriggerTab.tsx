@@ -1,3 +1,4 @@
+import {useTheme} from 'styled-components';
 import * as S from './TriggerTab.styled';
 
 interface IProps {
@@ -7,11 +8,15 @@ interface IProps {
 }
 
 const TriggerTab = ({hasContent, label, totalItems}: IProps) => {
+  const {
+    color: {primary},
+  } = useTheme();
+
   return (
     <div>
       {`${label} `}
       {!!totalItems && <S.Text>({totalItems})</S.Text>}
-      {hasContent && <S.Badge status="success" />}
+      {hasContent && <S.Badge color={primary} />}
     </div>
   );
 };
