@@ -5,6 +5,7 @@ import TestHeader from '../TestHeader';
 test('SpanAttributesTable', () => {
   const test = TestMock.model();
 
+  const onBack = jest.fn;
   const onDelete = jest.fn;
   const onEdit = jest.fn;
   const shouldEdit = true;
@@ -14,6 +15,7 @@ test('SpanAttributesTable', () => {
       description={test.description}
       id={test.id}
       shouldEdit={shouldEdit}
+      onBack={onBack}
       onEdit={onEdit}
       onDelete={onDelete}
       title={test.name}

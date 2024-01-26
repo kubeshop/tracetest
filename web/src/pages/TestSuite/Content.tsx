@@ -45,6 +45,7 @@ const Content = () => {
       <TestHeader
         description={testSuite.description}
         id={testSuite.id}
+        onBack={() => navigate('/testsuites')}
         onDelete={() => onDelete(testSuite.id, testSuite.name)}
         onEdit={onEdit}
         onDuplicate={handleOnDuplicate}

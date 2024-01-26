@@ -46,6 +46,7 @@ const Content = () => {
           test.trigger.entryPoint
         }`}
         id={test.id}
+        onBack={() => navigate('/tests')}
         onDelete={() => onDeleteResource(test.id, test.name, ResourceType.Test)}
         onEdit={onEdit}
         onDuplicate={handleOnDuplicate}

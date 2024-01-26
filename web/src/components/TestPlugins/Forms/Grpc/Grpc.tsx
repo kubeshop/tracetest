@@ -4,12 +4,18 @@ import GrpcService from 'services/Triggers/Grpc.service';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {Editor, FileUpload} from 'components/Inputs';
 import {Auth, Metadata, SkipTraceCollection} from 'components/Fields';
+import TriggerTab from 'components/TriggerTab';
 import useQueryTabs from 'hooks/useQueryTabs';
+import {TDraftTest} from 'types/Test.types';
 
 const RequestDetailsForm = () => {
   const [methodList, setMethodList] = useState<string[]>([]);
-  const form = Form.useFormInstance();
+  const form = Form.useFormInstance<TDraftTest>();
   const protoFile = Form.useWatch('protoFile', form);
+  const authType = Form.useWatch(['auth', 'type'], form);
+  const message = Form.useWatch('message', form);
+  const metadata = Form.useWatch('metadata', form);
+  const skipTraceCollection = Form.useWatch('skipTraceCollection', form);
 
   useEffect(() => {
     const getMethodList = async () => {
@@ -30,7 +36,11 @@ const RequestDetailsForm = () => {
 
   return (
     <Tabs defaultActiveKey={activeKey} onChange={setActiveKey} activeKey={activeKey}>
-      <Tabs.TabPane forceRender tab="Service definition" key="service-definition">
+      <Tabs.TabPane
+        forceRender
+        tab={<TriggerTab hasContent={!!protoFile} label="Service definition" />}
+        key="service-definition"
+      >
         <Form.Item data-cy="protoFile" name="protoFile" label="Upload Protobuf File">
           <FileUpload />
         </Form.Item>
@@ -46,11 +56,11 @@ const RequestDetailsForm = () => {
         </Form.Item>
       </Tabs.TabPane>
 
-      <Tabs.TabPane forceRender tab="Auth" key="auth">
+      <Tabs.TabPane forceRender tab={<TriggerTab hasContent={!!authType} label="Auth" />} key="auth">
         <Auth />
       </Tabs.TabPane>
 
-      <Tabs.TabPane forceRender tab="Message" key="message">
+      <Tabs.TabPane forceRender tab={<TriggerTab hasContent={!!message} label="Message" />} key="message">
         <Form.Item data-cy="message" name="message" style={{marginBottom: 0}}>
           <Editor
             type={SupportedEditors.Interpolation}
@@ -61,11 +71,11 @@ const RequestDetailsForm = () => {
         </Form.Item>
       </Tabs.TabPane>
 
-      <Tabs.TabPane forceRender tab="Metadata" key="metadata">
+      <Tabs.TabPane forceRender tab={<TriggerTab totalItems={metadata?.length} label="Metadata" />} key="metadata">
         <Metadata />
       </Tabs.TabPane>
 
-      <Tabs.TabPane forceRender tab="Settings" key="settings">
+      <Tabs.TabPane forceRender tab={<TriggerTab hasContent={!!skipTraceCollection} label="Settings" />} key="settings">
         <SkipTraceCollection />
       </Tabs.TabPane>
     </Tabs>
