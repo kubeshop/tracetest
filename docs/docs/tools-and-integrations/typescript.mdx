@@ -33,7 +33,7 @@ With the [`@tracetest/client` NPM Package](https://www.npmjs.com/package/@tracet
 
 ## How It Works
 
-The following is a high-level sequence diagram of how k6 and Tracetest interact with the different pieces of the system.
+The following is a high-level sequence diagram of how the Typescript script, the `@tracetest/client` package, and Tracetest interact.
 
 ```mermaid
 sequenceDiagram
@@ -73,7 +73,7 @@ npm i @tracetest/client
 
 ## Using the Tracetest Client Package
 
-Once you have installed the `@tracetest/client` package, you can use import it and start making use of it as any other library to trigger trace-based tests and run checks against the resulting telemetry data.
+Once you have installed the `@tracetest/client` package, you can import it and start making use of it as any other library to trigger trace-based tests and run checks against the resulting telemetry data.
 
 ## Project Structure
 
@@ -333,52 +333,52 @@ You can visit the Pokeshop Demo UI at `http://localhost:8081/`.
 The output from the Typescript script should be visible in the terminal. Where you can find links to Tracetest to find details about trace-based test results.
 
 ```bash
-2024-01-25 12:40:29 ℹ Importing pokemon 3
-2024-01-25 12:40:29 ℹ Importing pokemon 4
-2024-01-25 12:40:29 ℹ Importing pokemon 5
-2024-01-25 12:40:29 ℹ Importing pokemon 6
-2024-01-25 12:40:29 ℹ Importing pokemon 7
-2024-01-25 12:40:42 ℹ Adding pokemon 1 to the list
-2024-01-25 12:40:43 ℹ Adding pokemon 3 to the list
-2024-01-25 12:40:44 ℹ Adding pokemon 2 to the list
-2024-01-25 12:40:44 ℹ Adding pokemon 4 to the list
-2024-01-25 12:40:44 ℹ Adding pokemon 5 to the list
-2024-01-25 12:40:44 
-2024-01-25 12:40:44 Successful: 5
-2024-01-25 12:40:44 Failed: 0
-2024-01-25 12:40:44 
-2024-01-25 12:40:44 [✔️ Typescript: Import a Pokemon] #6 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/6
-2024-01-25 12:40:44 [✔️ Typescript: Import a Pokemon] #7 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/7
-2024-01-25 12:40:44 [✔️ Typescript: Import a Pokemon] #9 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/9
-2024-01-25 12:40:44 [✔️ Typescript: Import a Pokemon] #8 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/8
-2024-01-25 12:40:44 [✔️ Typescript: Import a Pokemon] #10 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/10
-2024-01-25 12:40:44 
-2024-01-25 12:40:44 ℹ Deleting pokemon 1
-2024-01-25 12:40:44 ℹ Deleting pokemon 3
-2024-01-25 12:40:44 ℹ Deleting pokemon 2
-2024-01-25 12:40:44 ℹ Deleting pokemon 4
-2024-01-25 12:40:44 ℹ Deleting pokemon 5
-2024-01-25 12:41:00 
-2024-01-25 12:41:00 Successful: 10
-2024-01-25 12:41:00 Failed: 0
-2024-01-25 12:41:00 
-2024-01-25 12:41:00 [✔️ Typescript: Import a Pokemon] #6 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/6
-2024-01-25 12:41:00 [✔️ Typescript: Import a Pokemon] #7 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/7
-2024-01-25 12:41:00 [✔️ Typescript: Import a Pokemon] #9 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/9
-2024-01-25 12:41:00 [✔️ Typescript: Import a Pokemon] #8 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/8
-2024-01-25 12:41:00 [✔️ Typescript: Import a Pokemon] #10 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/99TOHzpSR/run/10
-2024-01-25 12:41:00 [✔️ Typescript: Delete a Pokemon] #4 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/C2gwdktIR/run/4
-2024-01-25 12:41:00 [✔️ Typescript: Delete a Pokemon] #3 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/C2gwdktIR/run/3
-2024-01-25 12:41:00 [✔️ Typescript: Delete a Pokemon] #5 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/C2gwdktIR/run/5
-2024-01-25 12:41:00 [✔️ Typescript: Delete a Pokemon] #7 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/C2gwdktIR/run/7
-2024-01-25 12:41:00 [✔️ Typescript: Delete a Pokemon] #6 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/C2gwdktIR/run/6
+2024-01-26 10:54:44 ℹ Importing pokemon 3
+2024-01-26 10:54:44 ℹ Importing pokemon 4
+2024-01-26 10:54:44 ℹ Importing pokemon 5
+2024-01-26 10:54:44 ℹ Importing pokemon 6
+2024-01-26 10:54:44 ℹ Importing pokemon 7
+2024-01-26 10:54:56 ℹ Adding pokemon 1 to the list
+2024-01-26 10:54:58 ℹ Adding pokemon 2 to the list
+2024-01-26 10:54:59 ℹ Adding pokemon 3 to the list
+2024-01-26 10:54:59 ℹ Adding pokemon 5 to the list
+2024-01-26 10:54:59 ℹ Adding pokemon 4 to the list
+2024-01-26 10:54:59 
+2024-01-26 10:54:59 Successful: 5
+2024-01-26 10:54:59 Failed: 0
+2024-01-26 10:54:59 
+2024-01-26 10:54:59 [✔️ Typescript: Import a Pokemon] #1 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/1
+2024-01-26 10:54:59 [✔️ Typescript: Import a Pokemon] #2 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/2
+2024-01-26 10:54:59 [✔️ Typescript: Import a Pokemon] #3 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/3
+2024-01-26 10:54:59 [✔️ Typescript: Import a Pokemon] #4 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/4
+2024-01-26 10:54:59 [✔️ Typescript: Import a Pokemon] #5 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/5
+2024-01-26 10:54:59 
+2024-01-26 10:54:59 ℹ Deleting pokemon 1
+2024-01-26 10:54:59 ℹ Deleting pokemon 2
+2024-01-26 10:54:59 ℹ Deleting pokemon 3
+2024-01-26 10:54:59 ℹ Deleting pokemon 5
+2024-01-26 10:54:59 ℹ Deleting pokemon 4
+2024-01-26 10:55:14 
+2024-01-26 10:55:14 Successful: 10
+2024-01-26 10:55:14 Failed: 0
+2024-01-26 10:55:14 
+2024-01-26 10:55:14 [✔️ Typescript: Import a Pokemon] #1 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/1
+2024-01-26 10:55:14 [✔️ Typescript: Import a Pokemon] #2 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/2
+2024-01-26 10:55:14 [✔️ Typescript: Import a Pokemon] #3 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/3
+2024-01-26 10:55:14 [✔️ Typescript: Import a Pokemon] #4 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/4
+2024-01-26 10:55:14 [✔️ Typescript: Import a Pokemon] #5 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/99TOHzpSR/run/5
+2024-01-26 10:55:14 [✔️ Typescript: Delete a Pokemon] #1 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/C2gwdktIR/run/1
+2024-01-26 10:55:14 [✔️ Typescript: Delete a Pokemon] #2 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/C2gwdktIR/run/2
+2024-01-26 10:55:14 [✔️ Typescript: Delete a Pokemon] #4 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/C2gwdktIR/run/4
+2024-01-26 10:55:14 [✔️ Typescript: Delete a Pokemon] #3 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/C2gwdktIR/run/3
+2024-01-26 10:55:14 [✔️ Typescript: Delete a Pokemon] #5 - https://app-stage.tracetest.io/organizations/ttorg_08eb62e60d1db492/environments/ttenv_70f346fe8ddba633/test/C2gwdktIR/run/5
 ```
 
 ## What's Next?
 
-After running the initial set of tests, you can click the run link for any of them, update the assertions and run the scripts once more. This flow enables complete a trace-based TDD flow.
+After running the initial set of tests, you can click the run link for any of them, update the assertions, and run the scripts once more. This flow enables complete a trace-based TDD flow.
 
-![assertions](./img/tracetest-cloud-k6.gif)
+![assertions](./img/tracetest-cloud-typescript.gif)
 
 ## Learn More
 

@@ -72,7 +72,7 @@ export const deleteDefinition: TestResource = {
       },
       {
         selector:
-          'span[tracetest.span.type="database" name="delete pokeshop.pokemon" db.system="postgres" db.name="pokeshop" db.user="ashketchum" db.operation="delete" db.sql.table="pokemon"]',
+          'span[tracetest.span.type="database" name="delete postgres.pokemon" db.system="postgres" db.name="postgres" db.user="postgres" db.operation="delete" db.sql.table="pokemon"]',
         assertions: ['attr:db.result = 1'],
       },
       {
