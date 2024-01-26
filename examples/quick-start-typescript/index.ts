@@ -10,7 +10,7 @@ const { TRACETEST_API_TOKEN = '', POKESHOP_DEMO_URL = 'http://api:8081' } = proc
 const baseUrl = `${POKESHOP_DEMO_URL}/pokemon`;
 
 const main = async () => {
-  const tracetest = await Tracetest(TRACETEST_API_TOKEN, 'https://app-stage.tracetest.io', '');
+  const tracetest = await Tracetest(TRACETEST_API_TOKEN);
 
   const getLastPokemonId = async (): Promise<number> => {
     const response = await fetch(baseUrl);
