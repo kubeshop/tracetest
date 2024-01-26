@@ -1,0 +1,163 @@
+version: '3.5'
+name: pokeshop
+
+services:
+  # tracetest services
+  tracetest-client:
+    build: .
+    environment:
+      TRACETEST_API_TOKEN: ${TRACETEST_API_TOKEN}
+      POKESHOP_DEMO_URL: ${POKESHOP_DEMO_URL}
+    depends_on:
+      api:
+        condition: service_healthy
+  tracetest-agent:
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
+      TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
+      TRACETEST_SERVER_URL: ${TRACETEST_SERVER_URL}
+    image: kubeshop/tracetest-agent:latest
+    networks:
+      default: null
+
+  # pokeshop demo services
+  postgres:
+    image: postgres:14
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  cache:
+    image: redis:6
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  queue:
+    image: rabbitmq:3.12
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - 14250:14250
+      - 16685:16685
+      - 16686:16686
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', 'localhost:16686']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.59.0
+    restart: unless-stopped
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - 55679:55679
+      - 8888:8888
+      - 4317:4317
+      - 4318:4318
+    command:
+      - '--config'
+      - '/otel-local-config.yaml'
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
+    environment:
+      - JAEGER_ENDPOINT=jaeger:14250
+    depends_on:
+      jaeger:
+        condition: service_healthy
+
+  api:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: api
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', 'localhost:8081']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    ports:
+      - 8081:8081
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  worker:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  rpc:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: rpc
+    healthcheck:
+      test: ['CMD', 'lsof', '-i', '8082']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
