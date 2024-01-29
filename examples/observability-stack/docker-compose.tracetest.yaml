@@ -1,0 +1,41 @@
+version: "3.7"
+
+services:
+  tracetest:
+    image: kubeshop/tracetest:latest
+    platform: linux/amd64
+    volumes:
+      - type: bind
+        source: ./config/tracetest.provision.yaml
+        target: /app/provisioning.yaml
+    ports:
+      - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
+      TRACETEST_POSTGRES_HOST: postgres
+      TRACETEST_POSTGRES_USER: postgres
+      TRACETEST_POSTGRES_PASSWORD: postgres
+      TRACETEST_POSTGRES_DBNAME: postgres
+      TRACETEST_POSTGRES_PORT: 5432
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60

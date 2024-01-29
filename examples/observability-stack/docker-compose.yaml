@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  grafana:
+    image: grafana/grafana:10.2.3
+    user: "472"
+    depends_on:
+      - prometheus
+      - tempo
+      - otel-collector
+    ports:
+      - 33000:33000
+    environment:
+      - GF_SERVER_HTTP_PORT=33000
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - type: bind
+        source: ./config/grafana.datasource.yaml
+        target: /etc/grafana/provisioning/datasources/datasources.yaml
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.92.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./config/otel-collector.config.yaml:/otel-local-config.yaml
+    ports:
+      - 4317:4317
+
+  tempo:
+    image: grafana/tempo:2.3.1
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - type: bind
+        source: ./config/tempo.config.yaml
+        target: /etc/tempo.yaml
+
+  prometheus:
+    image: prom/prometheus:v2.49.1
+    command:
+      - --config.file=/etc/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+    volumes:
+      - type: bind
+        source: ./config/prometheus.config.yaml
+        target: /etc/prometheus.yaml

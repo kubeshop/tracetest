@@ -1,0 +1,40 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+        cors:
+          allowed_origins:
+            - "http://*"
+            - "https://*"
+
+processors:
+  batch:
+    timeout: 100ms
+
+exporters:
+  debug:
+    verbosity: detailed
+
+  otlp/tempo:
+    endpoint: tempo:4317
+    tls:
+      insecure: true
+
+  prometheus:
+    endpoint: 0.0.0.0:8889
+
+extensions:
+  health_check: {}
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, prometheus]
+
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, otlp/tempo]
