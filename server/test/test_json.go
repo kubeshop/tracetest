@@ -168,7 +168,7 @@ func (output *RunOutput) UnmarshalJSON(data []byte) error {
 		Value    string
 		SpanID   string
 		Resolved bool
-		Error    string
+		Error    interface{}
 	}{}
 
 	err := json.Unmarshal(data, &obj)
@@ -176,14 +176,42 @@ func (output *RunOutput) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	errString := ""
+	if s, ok := obj.Error.(string); ok {
+		errString = s
+	}
+
 	output.Name = obj.Name
 	output.Value = obj.Value
 	output.SpanID = obj.SpanID
 	output.Resolved = obj.Resolved
-	if err = stringToErr(obj.Error); err != nil {
+	if err = stringToErr(errString); err != nil {
 		output.Error = err
 	}
 	return nil
+}
+
+func (output RunOutput) MarshalJSON() ([]byte, error) {
+	errString := ""
+	if output.Error != nil {
+		errString = output.Error.Error()
+	}
+
+	obj := struct {
+		Name     string
+		Value    string
+		SpanID   string
+		Resolved bool
+		Error    string
+	}{
+		Name:     output.Name,
+		Value:    output.Value,
+		SpanID:   output.SpanID,
+		Resolved: output.Resolved,
+		Error:    errString,
+	}
+
+	return json.Marshal(obj)
 }
 
 func (sar SpanAssertionResult) MarshalJSON() ([]byte, error) {
