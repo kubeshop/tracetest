@@ -21,7 +21,7 @@ const AnalyzerErrors = ({errors, isSelected}: IProps) => {
       <S.ErrorIcon
         onClick={() => {
           TraceAnalyzerAnalytics.onSpanErrorsClick();
-          setIsOpen(prev => !prev);
+          setIsOpen(true);
         }}
         $isClickable
       />
