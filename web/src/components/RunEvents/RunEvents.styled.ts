@@ -21,7 +21,7 @@ export const Container = styled.div<{$hasScroll?: boolean}>`
   align-items: center;
   display: flex;
   flex-direction: column;
-  padding: 70px 20%;
+  padding: 24px 20%;
 
   ${({$hasScroll}) =>
     $hasScroll &&
@@ -94,4 +94,34 @@ export const InvalidDataStoreContainer = styled.div`
   align-items: center;
   gap: 2px;
   margin-bottom: 5px;
+`;
+
+export const TabsContainer = styled.div`
+  .ant-tabs-nav {
+    padding: 0 12px;
+    margin-bottom: 0;
+  }
+
+  .ant-tabs-content-holder {
+    height: calc(100% - 38px);
+    overflow-y: scroll;
+  }
+
+  .ant-tabs-nav {
+    padding: 0;
+  }
+`;
+
+export const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+`;
+
+export const Title = styled(Typography.Title)`
+  && {
+    font-size: ${({theme}) => theme.size.lg};
+    margin: 0;
+  }
 `;
