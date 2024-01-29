@@ -1,37 +1,12 @@
-import {ReadOutlined} from '@ant-design/icons';
-import {FramedCodeBlock} from 'components/CodeBlock';
-import * as S from './CliCommand.styled';
-import Controls from './Controls';
+import {withCustomization} from 'providers/Customization';
 import useCliCommand from './hooks/useCliCommand';
 import {IMethodChildrenProps} from '../../RunDetailAutomateMethods';
+import Command from './Command';
 
-const CLiCommand = ({id, variableSetId, fileName = '', resourceType, docsUrl}: IMethodChildrenProps) => {
+const CLiCommand = (props: IMethodChildrenProps) => {
   const {command, onGetCommand} = useCliCommand();
 
-  return (
-    <S.Container>
-      <S.TitleContainer>
-        <S.Title>CLI Configuration</S.Title>
-        <a href={docsUrl} target="_blank">
-          <ReadOutlined />
-        </a>
-      </S.TitleContainer>
-      <FramedCodeBlock
-        title="Tracetest CLI command:"
-        language="bash"
-        value={command}
-        minHeight="100px"
-        maxHeight="100px"
-      />
-      <Controls
-        onChange={onGetCommand}
-        id={id}
-        fileName={fileName}
-        variableSetId={variableSetId}
-        resourceType={resourceType}
-      />
-    </S.Container>
-  );
+  return <Command command={command} onGetCommand={onGetCommand} {...props} />;
 };
 
-export default CLiCommand;
+export default withCustomization(CLiCommand, 'cliCommand');
