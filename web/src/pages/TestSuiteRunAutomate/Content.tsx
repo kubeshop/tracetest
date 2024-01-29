@@ -1,5 +1,5 @@
 import {snakeCase} from 'lodash';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import RunDetailAutomateDefinition from 'components/RunDetailAutomateDefinition';
 import RunDetailAutomateMethods from 'components/RunDetailAutomateMethods';
 import CliCommand from 'components/RunDetailAutomateMethods/methods/CLICommand';
@@ -9,19 +9,24 @@ import {useVariableSet} from 'providers/VariableSet';
 import {useTestSuite} from 'providers/TestSuite';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './TestSuiteRunAutomate.styled';
+import useDefinitionFile from '../../hooks/useDefinitionFile';
 
 const Content = () => {
   const {testSuite} = useTestSuite();
   useDocumentTitle(`${testSuite.name} - Automate`);
   const [fileName, setFileName] = useState<string>(`${snakeCase(testSuite.name)}.yaml`);
   const {selectedVariableSet: {id: variableSetId} = {}} = useVariableSet();
+  const {definition, loadDefinition} = useDefinitionFile();
+
+  useEffect(() => {
+    loadDefinition(ResourceType.TestSuite, testSuite.id, testSuite.version);
+  }, [loadDefinition, testSuite.id, testSuite.version]);
 
   return (
     <S.Container>
       <S.SectionLeft>
         <RunDetailAutomateDefinition
-          id={testSuite.id}
-          version={testSuite.version}
+          definition={definition}
           resourceType={ResourceType.TestSuite}
           fileName={fileName}
           onFileNameChange={setFileName}
