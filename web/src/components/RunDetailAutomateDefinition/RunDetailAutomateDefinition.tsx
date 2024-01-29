@@ -1,31 +1,23 @@
 import {DownloadOutlined} from '@ant-design/icons';
 import {Button} from 'antd';
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {FramedCodeBlock} from 'components/CodeBlock';
 import {Overlay} from 'components/Inputs';
-import useDefinitionFile from 'hooks/useDefinitionFile';
 import {ResourceName, ResourceType} from 'types/Resource.type';
 import {downloadFile} from 'utils/Common';
 import * as S from './RunDetailAutomateDefinition.styled';
 
 interface IProps {
-  id: string;
-  version: number;
   resourceType: ResourceType;
   fileName: string;
+  definition: string;
   onFileNameChange(value: string): void;
 }
 
-const RunDetailAutomateDefinition = ({id, version, resourceType, fileName, onFileNameChange}: IProps) => {
-  const {definition, loadDefinition} = useDefinitionFile();
-
+const RunDetailAutomateDefinition = ({resourceType, fileName, definition, onFileNameChange}: IProps) => {
   const onDownload = useCallback(() => {
     downloadFile(definition, fileName);
   }, [definition, fileName]);
-
-  useEffect(() => {
-    loadDefinition(resourceType, id, version);
-  }, [id, loadDefinition, resourceType, version]);
 
   return (
     <S.Container>

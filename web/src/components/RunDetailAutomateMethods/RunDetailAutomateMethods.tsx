@@ -20,6 +20,7 @@ export interface IMethodChildrenProps {
   id: string;
   resourceType: ResourceType;
   variableSetId?: string;
+  definition?: string;
 }
 
 const RunDetailAutomateMethods = ({resourceType, methods = []}: IProps) => {
