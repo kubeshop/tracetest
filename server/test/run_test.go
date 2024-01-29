@@ -1,6 +1,8 @@
 package test_test
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -12,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/server/test"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRunExecutionTime(t *testing.T) {
@@ -201,4 +204,47 @@ func TestRunRequiredGates(t *testing.T) {
 		assert.Len(t, result.Failed, 3)
 		assert.Equal(t, gates, result.Failed)
 	})
+}
+
+func TestRunOutput(t *testing.T) {
+	jsonContent := []byte(`[{"Key": "MY_OUTPUT", "Value": {"Name": "MY_OUTPUT", "Error": {}, "Value": "", "SpanID": "", "Resolved": false}}]`)
+
+	var output test.Run
+	err := json.Unmarshal(jsonContent, &output.Outputs)
+	require.NoError(t, err)
+}
+
+func TestRunOutputJSON(t *testing.T) {
+	jsonContent := []byte(`{"Name": "MY_OUTPUT", "Error": {}, "Value": "1", "SpanID": "2", "Resolved": true}`)
+
+	var output test.RunOutput
+	err := json.Unmarshal(jsonContent, &output)
+	require.NoError(t, err)
+
+	assert.Equal(t, "MY_OUTPUT", output.Name)
+	assert.Equal(t, "1", output.Value)
+	assert.Equal(t, "2", output.SpanID)
+	assert.Equal(t, true, output.Resolved)
+	assert.Nil(t, output.Error)
+}
+
+func TestRunOutputMarshalJSON(t *testing.T) {
+	var runOutput = test.RunOutput{
+		Name:     "MY_OUTPUT",
+		Value:    "1",
+		SpanID:   "2",
+		Resolved: true,
+		Error:    errors.New("not empty"),
+	}
+	jsonContent, _ := json.Marshal(runOutput)
+
+	var output test.RunOutput
+	err := json.Unmarshal(jsonContent, &output)
+	require.NoError(t, err)
+
+	assert.Equal(t, "MY_OUTPUT", output.Name)
+	assert.Equal(t, "1", output.Value)
+	assert.Equal(t, "2", output.SpanID)
+	assert.Equal(t, true, output.Resolved)
+	assert.Equal(t, "not empty", output.Error.Error())
 }
