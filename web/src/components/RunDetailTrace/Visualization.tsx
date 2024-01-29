@@ -44,7 +44,8 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(changeNodes({changes})), [dispatch]);
 
   const onNodeClick = useCallback(
-    (event, {id}: Node) => {
+    (event: React.MouseEvent, {id}: Node) => {
+      event.stopPropagation();
       TraceDiagramAnalyticsService.onClickSpan(id);
       dispatch(selectSpan({spanId: id}));
     },
