@@ -60,6 +60,7 @@ const SpanProvider = ({children}: IProps) => {
     return () => {
       dispatch(RouterActions.updateSearch({[RouterSearchFields.SelectedSpan]: ''}));
       dispatch(clearMatchedSpans());
+      dispatch(clearSelectedSpan());
     };
   }, [dispatch]);
 
