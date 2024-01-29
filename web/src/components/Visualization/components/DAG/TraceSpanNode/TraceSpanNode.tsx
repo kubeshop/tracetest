@@ -13,7 +13,7 @@ const TraceSpanNode = ({data, id, selected}: IProps) => {
   return (
     <BaseSpanNode
       className={data.isMatched ? 'matched' : ''}
-      footer={analyzerErrors && <AnalyzerErrors errors={analyzerErrors} />}
+      footer={analyzerErrors && <AnalyzerErrors errors={analyzerErrors} isSelected={selected} />}
       id={id}
       isMatched={data.isMatched}
       isSelected={selected}

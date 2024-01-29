@@ -22,16 +22,12 @@ export const Section = styled.div`
   z-index: 1;
 `;
 
-export const SectionLeft = styled(Section)`
+export const SectionLeft = styled(Section)<{$hasShadow?: boolean}>`
   background-color: ${({theme}) => theme.color.background};
+  box-shadow: ${({$hasShadow}) =>
+    $hasShadow &&
+    `inset 20px 0px 24px -20px rgba(153, 155, 168, 0.18), inset -20px 0 24px -20px rgba(153, 155, 168, 0.18)`};
   z-index: 1;
-`;
-
-export const SectionRight = styled(Section)<{$shouldScroll: boolean}>`
-  background-color: ${({theme}) => theme.color.white};
-  box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
-  overflow-y: ${({$shouldScroll}) => ($shouldScroll ? 'scroll' : 'hidden')};
-  z-index: 2;
 `;
 
 export const VisualizationContainer = styled.div`
