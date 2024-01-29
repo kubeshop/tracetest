@@ -24,7 +24,7 @@ const TracePanel = ({run, testId, runEvents, skipTraceCollection}: TProps) => {
   return (
     <FillPanel>
       <S.Container>
-        <S.SectionLeft>
+        <S.SectionLeft $hasShadow>
           <S.SearchContainer>
             <Search runId={run.id} testId={testId} />
           </S.SearchContainer>

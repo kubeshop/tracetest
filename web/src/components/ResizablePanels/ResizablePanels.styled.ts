@@ -4,8 +4,7 @@ import {withPulseAnimation} from '../PulseButton';
 
 export const GlobalStyle = createGlobalStyle`
   .spaces-resize-handle {
-    background-color: ${({theme}) => theme.color.borderLight};
-    width: 3px !important;
+    border-left: 1px solid ${({theme}) => theme.color.borderLight};
     z-index: 10;
   }
 
@@ -41,7 +40,6 @@ export const SplitterContainer = styled.div``;
 
 export const PanelContainer = styled.div<{$isOpen: boolean}>`
   background-color: ${({theme}) => theme.color.white};
-  box-shadow: 0 20px 24px rgba(153, 155, 168, 0.18);
   height: 100%;
   overflow: visible;
   overflow-y: scroll;
