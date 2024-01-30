@@ -44,7 +44,7 @@ func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
 
 func (c Configurator) Start(ctx context.Context, prev Config, flags agentConfig.Flags) error {
 	c.flags = flags
-	serverURL := getFirstValidString(flags.Endpoint, prev.UIEndpoint, DefaultCloudEndpoint)
+	serverURL := getFirstValidString(flags.ServerURL, prev.UIEndpoint, DefaultCloudEndpoint)
 	if serverURL == "" {
 		path := ""
 		if prev.ServerPath != nil {

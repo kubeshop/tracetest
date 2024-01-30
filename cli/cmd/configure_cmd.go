@@ -32,7 +32,7 @@ var configureCmd = &cobra.Command{
 		}
 
 		if flagProvided(cmd, "server-url") || flagProvided(cmd, "endpoint") {
-			flags.Endpoint = configParams.ServerURL
+			flags.ServerURL = configParams.ServerURL
 		}
 
 		if flagProvided(cmd, "token") {
@@ -47,8 +47,7 @@ var configureCmd = &cobra.Command{
 			flags.OrganizationID = configParams.OrganizationID
 		}
 
-		err = configurator.Start(ctx, config, flags)
-		return "", err
+		return "", configurator.Start(ctx, config, flags)
 	})),
 	PostRun: teardownCommand,
 }

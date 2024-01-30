@@ -38,6 +38,11 @@ type Config struct {
 	UIEndpoint       string `yaml:"uIEndpoint,omitempty"`
 }
 
+func (c Config) OAuthEndpoint() string {
+	return fmt.Sprintf("%s%s", c.URL(), c.Path())
+
+}
+
 func (c Config) URL() string {
 	if c.Scheme == "" || c.Endpoint == "" {
 		return ""
