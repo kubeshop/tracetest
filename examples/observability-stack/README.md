@@ -18,6 +18,7 @@ If you want to run it with Trace-based Tests, you can execute:
 
 ```sh
 # run our Observability stack 
+export TRACETEST_API_KEY="{{Your Tracetest.io Token}}"
 docker compose -f ./docker-compose.yaml -f docker-compose.tracetest.yaml up -d
 
 # install dependencies and run API
@@ -27,5 +28,5 @@ npm run with-telemetry
 
 And then run a test with:
 ```sh
-tracetest run test -f ./test-api.yaml --server-url http://localhost:11633
+tracetest run test -f ./test-api.yaml
 ```
