@@ -4,9 +4,8 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "prestart": "cd ../cli; make docgen;",
     "start": "docusaurus start",
-    "prebuild": "cd ../cli; make docgen;",
+    "docgen": "cd ../cli; make docgen;",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
