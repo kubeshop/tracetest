@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  tracetest:
+    image: kubeshop/tracetest-agent:latest
+    platform: linux/amd64
+    depends_on:
+      otel-collector:
+        condition: service_started
+    environment:
+      TRACETEST_API_KEY: ${TRACETEST_API_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

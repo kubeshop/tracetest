@@ -1,0 +1,17 @@
+type: Test
+spec:
+  id: _0N272tIg
+  name: Test API call
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: http://host.docker.internal:8080/
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+    name: HTTP call was made correctly
+    assertions:
+    - attr:http.status_code = 200
