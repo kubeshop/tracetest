@@ -1,11 +1,11 @@
 # Observability Stack Example
 
-This folder has the minimal code to run a local observability stack, plug an API into it, and do some trace based tests.
+This folder has minimal code to run a local observability stack, plug an API into it, and do some trace-based tests.
 
-To run the Observability Stack and the local API, execute:
+To run the observability stack and the local API, execute:
 
 ```sh
-# run our Observability stack 
+# run the observability stack 
 docker compose up -d
 
 # install dependencies and run API
@@ -14,10 +14,10 @@ npm run with-telemetry
 
 ```
 
-If you want to run it with Trace-based Tests, you can execute:
+To run it with trace-based tests, execute:
 
 ```sh
-# run our Observability stack 
+# run the observability stack 
 export TRACETEST_API_KEY="{{Your Tracetest.io Token}}"
 docker compose -f ./docker-compose.yaml -f docker-compose.tracetest.yaml up -d
 
