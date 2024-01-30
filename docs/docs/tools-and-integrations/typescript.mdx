@@ -63,31 +63,50 @@ This is a simple quick-start guide on how to use the Tracetest `@tracetest/clien
 
 **Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
+## Run This Quckstart Example
+
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
+
+Clone the Tracetest project and go to the TypeScript Quickstart:
+
+```bash
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/quick-start-typescript
+```
+
+Follow these instructions to run the included demo app and TypeScript example:
+
+1. Copy the `.env.template` file to `.env`.
+2. Log into the [Tracetest app](https://app.tracetest.io/).
+3. This example is configured to use the OpenTelemetry Collector. Ensure the environment you will be utilizing to run this example is also configured to use the OpenTelemetry Tracing Backend by clicking on Settings, Tracing Backend, OpenTelemetry, Save.
+4. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent API key](https://docs.tracetest.io/concepts/agent) details by editing your .env file. You can find these values in the Settings area for your environment.
+5. Run `docker compose up -d`.
+6. Look for the `tracetest-client` service in Docker and click on it to view the logs. It will show the results from the trace-based tests that are triggered from the index.ts Typescript file.
+7. Follow the links in the log to to view the test runs programmatically created by your TypeScript test script.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
+
+## Project Structure
+
+The quick start TypeScript project is built with Docker Compose.
+
+The [Pokeshop Demo App](/live-examples/pokeshop/overview) is a complete example of a distributed application using different back-end and front-end services. We will be launching it and running tests against it as part of this example.
+
+The `docker-compose.yaml` file in the root directory of the quick start runs the Pokeshop Demo app, the OpenTelemetry Collector setup, and the [Tracetest Agent](/concepts/agent).
+
+The TypeScript quick start has two primary files: a Typescript file `definitions.ts` that defines two Tracetest tests, and a Typescript file 'index.ts' that imports these test definitions and uses the "@tracetest/client" NPM package to run them multiple times. 
+
+We will show you how to install the NPM package and use these two TypeScript files to programmatically run Tracetest tests.
+
 ## Installing the `@tracetest/client` NPM Package
 
-Installing the `@tracetest/client` NPM Package is as easy as running the following command:
+The first step when using the TypeScript NPM package is to install the `@tracetest/client` NPM Package. It is as easy as running the following command:
 
 ```bash
 npm i @tracetest/client
 ```
 
-## Using the Tracetest Client Package
-
 Once you have installed the `@tracetest/client` package, you can import it and start making use of it as any other library to trigger trace-based tests and run checks against the resulting telemetry data.
-
-## Project Structure
-
-The project is built with Docker Compose.
-
-### Pokeshop Demo App
-
-The [Pokeshop Demo App](/live-examples/pokeshop/overview) is a complete example of a distributed application using different backend and front-end services, implementation code is written in Typescript.
-
-The `docker-compose-yaml` file in the root directory is for the Pokeshop Demo app, the OpenTelemetry setup, and the [Tracetest Agent](/concepts/agent).
-
-### Docker Compose Network
-
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. For example, `jaeger:14250` in the `collector.config.yaml` file will map to the `jaeger` service, where port `14250` is the port where the Jaeger all-in-one instance accepts telemetry data.
 
 ## Tracetest Test Definitions
 
@@ -261,76 +280,17 @@ const main = async () => {
 main();
 ```
 
-## Tracetest Agent Connects to Tracetest
-
-The `docker-compose.yaml` file includes the [Tracetest Agent](/concepts/agent) image, which is going to be listening for incoming traces from both the gRPC (4317) and HTTP (4318) OTLP ports.
-
-```yaml
-version: "3"
-
-services:
-  tracetest-agent:
-    image: kubeshop/tracetest-agent:latest
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-      TRACETEST_API_KEY: ${TRACETEST_API_KEY}
-```
-
-Do not forget to set the `TRACETEST_AGENT_API_KEY` environment variable in the `.env` file to your Tracetest Agent. The API key available on the `Settings > Agent` page of your environment as you can see [here](/configuration/agent).
-
-From the `collector.config.yaml` file we can see how the telemetry data is routed to the `tracetest-agent` service.
-
-```yaml title=tracetest-datastore.yaml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
-        cors:
-          allowed_origins:
-            - "http://*"
-            - "https://*"
-
-processors:
-  batch:
-
-exporters:
-  logging:
-    loglevel: debug
-  jaeger:
-    endpoint: ${JAEGER_ENDPOINT}
-    tls:
-      insecure: true
-  otlp/trace:
-    endpoint: tracetest-agent:4317
-    tls:
-      insecure: true
-
-service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      processors: []
-      exporters: [logging, jaeger]
-    traces/1:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp/trace]
-```
-
 ## Running the Full Example
 
 To start the full setup, run the following command:
 
 ```bash
-docker-compose up
+docker compose up -d
 ```
-
-You can visit the Pokeshop Demo UI at `http://localhost:8081/`.
 
 ## Finding the Results
 
-The output from the Typescript script should be visible in the terminal. Where you can find links to Tracetest to find details about trace-based test results.
+The output from the TypeScript script should be visible in the log for the `tracetest-client` service in Docker Compose. This log will show links to Tracetest for each of the test runs invoked by `index.ts`. Click a link to launch Tracetest and view the test result.
 
 ```bash
 2024-01-26 10:54:44 ℹ Importing pokemon 3
