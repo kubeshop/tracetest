@@ -11,7 +11,6 @@ docker compose up -d
 # install dependencies and run API
 npm install
 npm run with-telemetry
-
 ```
 
 To run it with trace-based tests, execute:
