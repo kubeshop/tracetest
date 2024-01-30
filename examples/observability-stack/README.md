@@ -1,4 +1,4 @@
-# Observability Stack example
+# Observability Stack Example
 
 This folder has the minimal code to run a local observability stack, plug an API into it, and do some trace based tests.
 
@@ -14,7 +14,7 @@ npm run with-telemetry
 
 ```
 
-Now if you want to run it with Trace-based Tests, you can execute:
+If you want to run it with Trace-based Tests, you can execute:
 
 ```sh
 # run our Observability stack 
