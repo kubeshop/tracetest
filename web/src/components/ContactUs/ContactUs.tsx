@@ -1,8 +1,7 @@
-import {createContext, useContext, useMemo, useState} from 'react';
 import {noop} from 'lodash';
-import * as S from './ContactUs.styled';
+import {createContext, useContext, useMemo, useState} from 'react';
 import ContactUsModal from './ContactUsModal';
-import PulseButton from '../PulseButton';
+import Launcher from './Launcher';
 
 interface IContext {
   onOpen(): void;
@@ -21,12 +20,7 @@ const ContactUs: React.FC = ({children}) => {
   return (
     <Context.Provider value={value}>
       {children}
-      <S.Container onClick={() => setIsOpen(true)}>
-        <S.PulseButtonContainer>
-          <PulseButton />
-        </S.PulseButtonContainer>
-        <S.PlushieImage />
-      </S.Container>
+      <Launcher onClick={() => setIsOpen(true)} />
       <ContactUsModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </Context.Provider>
   );
