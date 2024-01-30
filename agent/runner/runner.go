@@ -75,6 +75,11 @@ func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 		s.ui.Error(err.Error())
 	}
 
+	if env.AgentApiKey == "" {
+		s.ui.Error("You are attempting to start the agent in an environment you do not have admin rights to. Please ask the administrator of this environment to grant you admin rights.")
+		return
+	}
+
 	err = s.StartAgent(ctx, cfg.AgentEndpoint, env.AgentApiKey, cfg.UIEndpoint)
 	if err != nil {
 		s.ui.Error(err.Error())
