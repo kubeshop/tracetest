@@ -9,3 +9,5 @@ services:
         condition: service_started
     environment:
       TRACETEST_API_KEY: ${TRACETEST_API_KEY}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
