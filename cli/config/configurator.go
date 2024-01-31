@@ -101,7 +101,9 @@ func (c Configurator) createConfig(serverURL string) (Config, error) {
 	}
 
 	if strings.Contains(serverURL, DefaultCloudDomain) {
-		path = &DefaultCloudPath
+		path = DefaultCloudPath
+	} else if !strings.HasSuffix(path, "/api") {
+		path = strings.TrimSuffix(path, "/") + "/api"
 	}
 
 	return Config{

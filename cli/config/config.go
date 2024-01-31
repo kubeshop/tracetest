@@ -22,15 +22,15 @@ var (
 )
 
 type Config struct {
-	Scheme            string  `yaml:"scheme"`
-	Endpoint          string  `yaml:"endpoint"`
-	ServerPath        *string `yaml:"serverPath,omitempty"`
-	OrganizationID    string  `yaml:"organizationID,omitempty"`
-	EnvironmentID     string  `yaml:"environmentID,omitempty"`
-	Token             string  `yaml:"token,omitempty"`
-	Jwt               string  `yaml:"jwt,omitempty"`
-	AgentApiKey       string  `yaml:"-"`
-	EndpointOverriden bool    `yaml:"-"`
+	Scheme            string `yaml:"scheme"`
+	Endpoint          string `yaml:"endpoint"`
+	ServerPath        string `yaml:"serverPath,omitempty"`
+	OrganizationID    string `yaml:"organizationID,omitempty"`
+	EnvironmentID     string `yaml:"environmentID,omitempty"`
+	Token             string `yaml:"token,omitempty"`
+	Jwt               string `yaml:"jwt,omitempty"`
+	AgentApiKey       string `yaml:"-"`
+	EndpointOverriden bool   `yaml:"-"`
 
 	// cloud config
 	CloudAPIEndpoint string `yaml:"-"`
@@ -61,8 +61,8 @@ func (c Config) UI() string {
 
 func (c Config) Path() string {
 	pathPrefix := "/api"
-	if c.ServerPath != nil {
-		pathPrefix = *c.ServerPath
+	if c.ServerPath != "" {
+		pathPrefix = c.ServerPath
 	}
 
 	if pathPrefix == "/" {
@@ -130,18 +130,13 @@ func ValidateServerURL(serverURL string) error {
 	return nil
 }
 
-func ParseServerURL(serverURL string) (scheme, endpoint string, serverPath *string, err error) {
+func ParseServerURL(serverURL string) (scheme, endpoint, serverPath string, err error) {
 	url, err := urlx.Parse(serverURL)
 	if err != nil {
-		return "", "", nil, fmt.Errorf("could not parse server URL: %w", err)
+		return "", "", "", fmt.Errorf("could not parse server URL: %w", err)
 	}
 
-	var path *string
-	if url.Path != "" {
-		path = &url.Path
-	}
-
-	return url.Scheme, url.Host, path, nil
+	return url.Scheme, url.Host, url.Path, nil
 }
 
 func Save(config Config) error {
