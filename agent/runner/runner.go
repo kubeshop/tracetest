@@ -57,7 +57,7 @@ Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces 
 
 	s.logger = logger
 
-	return s.configurator.Start(ctx, cfg, flags)
+	return s.configurator.Start(ctx, &cfg, flags)
 }
 
 func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
