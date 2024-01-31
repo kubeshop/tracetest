@@ -51,6 +51,10 @@ func (c Config) URL() string {
 	return fmt.Sprintf("%s://%s", c.Scheme, strings.TrimSuffix(c.Endpoint, "/"))
 }
 
+func (c Config) FullURL() string {
+	return fmt.Sprintf("%s%s", c.URL(), c.ServerPath)
+}
+
 func (c Config) UI() string {
 	if c.UIEndpoint != "" && !c.EndpointOverriden {
 		return fmt.Sprintf("%s/organizations/%s/environments/%s", strings.TrimSuffix(c.UIEndpoint, "/"), c.OrganizationID, c.EnvironmentID)
