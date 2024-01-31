@@ -17,21 +17,25 @@ import (
 type onFinishFn func(context.Context, Config)
 
 type Configurator struct {
-	resources *resourcemanager.Registry
-	ui        cliUI.UI
-	onFinish  onFinishFn
-	flags     agentConfig.Flags
+	resources      *resourcemanager.Registry
+	ui             cliUI.UI
+	onFinish       onFinishFn
+	flags          agentConfig.Flags
+	finalServerURL string
 }
 
 func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 	ui := cliUI.DefaultUI
-	onFinish := func(_ context.Context, _ Config) {
-		ui.Success("Successfully configured Tracetest CLI")
-		ui.Finish()
-	}
-	flags := agentConfig.Flags{}
 
-	return Configurator{resources, ui, onFinish, flags}
+	return Configurator{
+		resources: resources,
+		ui:        ui,
+		onFinish: func(_ context.Context, _ Config) {
+			ui.Success("Successfully configured Tracetest CLI")
+			ui.Finish()
+		},
+		flags: agentConfig.Flags{},
+	}
 }
 
 func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
@@ -42,6 +46,7 @@ func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
 func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig.Flags) error {
 	c.flags = flags
 	serverURL, err := c.getServerURL(prev, flags)
+	c.finalServerURL = serverURL
 	if err != nil {
 		return err
 	}
@@ -113,11 +118,27 @@ func (c Configurator) createConfig(serverURL string) (Config, error) {
 	}, nil
 }
 
+type invalidServerErr struct {
+	ui        cliUI.UI
+	serverURL string
+	parent    error
+}
+
+func (e invalidServerErr) Error() string {
+	return fmt.Errorf("cannot reach %s: %w", e.serverURL, e.parent).Error()
+}
+
+func (e invalidServerErr) Render() {
+	msg := fmt.Sprintf(`Cannot reach "%s". Please verify the url and enter it again.`, e.serverURL)
+	e.ui.Error(msg)
+}
+
 func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Config) (_ Config, _ error, isOSS bool) {
 	client := GetAPIClient(cfg)
 	version, err := getVersionMetadata(ctx, client)
 	if err != nil {
-		return Config{}, fmt.Errorf("cannot get version metadata: %w", err), false
+		err = invalidServerErr{c.ui, c.finalServerURL, fmt.Errorf("cannot get version metadata: %w", err)}
+		return Config{}, err, false
 	}
 
 	serverType := version.GetType()

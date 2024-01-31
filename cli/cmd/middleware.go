@@ -29,17 +29,27 @@ func WithResultHandler(runFn RunFn) CobraRunFn {
 	}
 }
 
-func OnError(err error) {
-	errorMessage := handleErrorMessage(err)
+type errorMessageRenderer interface {
+	Render()
+}
 
-	fmt.Fprintf(os.Stderr, `
+const defaultErrorFormat = `
 Version
 %s
 
 An error ocurred when executing the command
 
 %s
-`, versionText, errorMessage)
+`
+
+func OnError(err error) {
+	errorMessage := handleErrorMessage(err)
+
+	if renderer, ok := err.(errorMessageRenderer); ok {
+		renderer.Render()
+	} else {
+		fmt.Fprintf(os.Stderr, defaultErrorFormat, versionText, errorMessage)
+	}
 	ExitCLI(1)
 }
 
