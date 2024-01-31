@@ -26,13 +26,9 @@ var configureCmd = &cobra.Command{
 		flags := agentConfig.Flags{
 			CI: configParams.CI,
 		}
-		config, err := config.LoadConfig("")
-		if err != nil {
-			return "", err
-		}
 
 		if flagProvided(cmd, "server-url") || flagProvided(cmd, "endpoint") {
-			flags.Endpoint = configParams.ServerURL
+			flags.ServerURL = configParams.ServerURL
 		}
 
 		if flagProvided(cmd, "token") {
@@ -47,8 +43,7 @@ var configureCmd = &cobra.Command{
 			flags.OrganizationID = configParams.OrganizationID
 		}
 
-		err = configurator.Start(ctx, config, flags)
-		return "", err
+		return "", configurator.Start(ctx, nil, flags)
 	})),
 	PostRun: teardownCommand,
 }

@@ -8,7 +8,7 @@ const (
 )
 
 type Flags struct {
-	Endpoint       string
+	ServerURL      string
 	OrganizationID string
 	EnvironmentID  string
 	CI             bool

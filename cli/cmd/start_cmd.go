@@ -30,7 +30,7 @@ var startCmd = &cobra.Command{
 		flags := agentConfig.Flags{
 			OrganizationID: saveParams.organizationID,
 			EnvironmentID:  saveParams.environmentID,
-			Endpoint:       saveParams.endpoint,
+			ServerURL:      saveParams.endpoint,
 			AgentApiKey:    saveParams.agentApiKey,
 			Token:          saveParams.token,
 			Mode:           agentConfig.Mode(saveParams.mode),
