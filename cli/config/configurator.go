@@ -51,9 +51,14 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 		return err
 	}
 
-	cfg, err = c.populateConfigWithVersionInfo(ctx, cfg)
+	cfg, err, isOSS := c.populateConfigWithVersionInfo(ctx, cfg)
 	if err != nil {
 		return err
+	}
+
+	if isOSS {
+		// we don't need anything else for OSS
+		return nil
 	}
 
 	if flags.CI {
@@ -106,32 +111,32 @@ func (c Configurator) createConfig(serverURL string) (Config, error) {
 	}, nil
 }
 
-func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Config) (Config, error) {
+func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Config) (_ Config, _ error, isOSS bool) {
 	client := GetAPIClient(cfg)
 	version, err := getVersionMetadata(ctx, client)
 	if err != nil {
-		return Config{}, fmt.Errorf("cannot get version metadata: %w", err)
+		return Config{}, fmt.Errorf("cannot get version metadata: %w", err), false
 	}
 
 	serverType := version.GetType()
 	if serverType == "oss" {
 		err := Save(cfg)
 		if err != nil {
-			return Config{}, fmt.Errorf("could not save configuration: %w", err)
+			return Config{}, fmt.Errorf("could not save configuration: %w", err), false
 		}
 
 		c.ui.Success("Successfully configured Tracetest CLI")
-		return cfg, nil
+		return cfg, nil, true
 	}
 
 	cfg.AgentEndpoint = version.GetAgentEndpoint()
 	cfg.UIEndpoint = version.GetUiEndpoint()
 	cfg.Scheme, cfg.Endpoint, cfg.ServerPath, err = ParseServerURL(version.GetApiEndpoint())
 	if err != nil {
-		return Config{}, fmt.Errorf("cannot parse server url: %w", err)
+		return Config{}, fmt.Errorf("cannot parse server url: %w", err), false
 	}
 
-	return cfg, nil
+	return cfg, nil, false
 }
 
 func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config, flags agentConfig.Flags) (Config, error) {

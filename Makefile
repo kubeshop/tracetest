@@ -1,5 +1,5 @@
 export VERSION?=dev
-export TRACETEST_DEFAULT_CLOUD_ENDPOINT=https://app-stage.tracetest.io
+export TRACETEST_DEFAULT_CLOUD_ENDPOINT=https://app.tracetest.io
 TAG?=$(VERSION)
 GORELEASER_VERSION=1.23.0-pro
 
