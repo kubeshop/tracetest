@@ -83,16 +83,21 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 }
 
 func (c Configurator) getServerURL(prev *Config, flags agentConfig.Flags) (string, error) {
-	var prevUIEndpoint string
-	if prev != nil {
-		prevUIEndpoint = prev.UIEndpoint
-	}
-	serverURL := getFirstValidString(flags.ServerURL, prevUIEndpoint)
-	if serverURL == "" {
-		serverURL = c.ui.TextInput("What tracetest server do you want to use?", DefaultCloudEndpoint)
+	serverURL := flags.ServerURL
+
+	// if flag was passed, don't show prompt
+	if flags.ServerURL == "" {
+		possibleValues := []string{}
+		if prev != nil {
+			possibleValues = append(possibleValues, prev.UIEndpoint, prev.URL())
+		}
+		possibleValues = append(possibleValues, DefaultCloudEndpoint)
+
+		lastUsed := getFirstNonEmptyString(possibleValues)
+		serverURL = c.ui.TextInput("What tracetest server do you want to use?", lastUsed)
 	}
 
-	if err := ValidateServerURL(serverURL); err != nil {
+	if err := validateServerURL(serverURL); err != nil {
 		return "", err
 	}
 
@@ -163,9 +168,11 @@ func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Con
 }
 
 func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config, flags agentConfig.Flags) (Config, error) {
-	if prev != nil && prev.Jwt != "" {
-		cfg.Jwt = prev.Jwt
-		cfg.Token = prev.Token
+	if prev != nil && cfg.URL() == prev.URL() {
+		if prev != nil && prev.Jwt != "" {
+			cfg.Jwt = prev.Jwt
+			cfg.Token = prev.Token
+		}
 	}
 
 	if flags.Token != "" {
@@ -178,12 +185,12 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 
 	if flags.AgentApiKey != "" {
 		cfg.AgentApiKey = flags.AgentApiKey
-		c.ShowOrganizationSelector(ctx, cfg, flags)
+		c.showOrganizationSelector(ctx, cfg, flags)
 		return cfg, nil
 	}
 
 	if cfg.Jwt != "" {
-		c.ShowOrganizationSelector(ctx, cfg, flags)
+		c.showOrganizationSelector(ctx, cfg, flags)
 		return cfg, nil
 	}
 
@@ -225,7 +232,7 @@ func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
 	return cfg, nil
 }
 
-func getFirstValidString(values ...string) string {
+func getFirstNonEmptyString(values []string) string {
 	for _, v := range values {
 		if v != "" {
 			return v
@@ -240,7 +247,7 @@ func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config) func(token
 		cfg.Jwt = jwt
 		cfg.Token = token
 
-		c.ShowOrganizationSelector(ctx, cfg, c.flags)
+		c.showOrganizationSelector(ctx, cfg, c.flags)
 	}
 }
 
@@ -248,7 +255,7 @@ func (c Configurator) onOAuthFailure(err error) {
 	c.ui.Exit(err.Error())
 }
 
-func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, flags agentConfig.Flags) {
+func (c Configurator) showOrganizationSelector(ctx context.Context, cfg Config, flags agentConfig.Flags) {
 	cfg.OrganizationID = flags.OrganizationID
 	if cfg.OrganizationID == "" && flags.AgentApiKey == "" {
 		orgID, err := c.organizationSelector(ctx, cfg)

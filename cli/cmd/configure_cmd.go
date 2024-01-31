@@ -27,6 +27,11 @@ var configureCmd = &cobra.Command{
 			CI: configParams.CI,
 		}
 
+		config, err := config.LoadConfig("")
+		if err != nil {
+			return "", err
+		}
+
 		if flagProvided(cmd, "server-url") || flagProvided(cmd, "endpoint") {
 			flags.ServerURL = configParams.ServerURL
 		}
@@ -43,7 +48,7 @@ var configureCmd = &cobra.Command{
 			flags.OrganizationID = configParams.OrganizationID
 		}
 
-		return "", configurator.Start(ctx, nil, flags)
+		return "", configurator.Start(ctx, &config, flags)
 	})),
 	PostRun: teardownCommand,
 }
