@@ -4,6 +4,9 @@ services:
   tracetest:
     image: kubeshop/tracetest-agent:latest
     platform: linux/amd64
+    command:
+      - --mode
+      - verbose
     depends_on:
       otel-collector:
         condition: service_started
