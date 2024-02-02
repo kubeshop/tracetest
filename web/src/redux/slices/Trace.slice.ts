@@ -2,8 +2,8 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-renderer';
 
 import {theme} from 'constants/Theme.constants';
-import {NodeTypesEnum} from 'constants/Visualization.constants';
-import DAGModel from 'models/DAG.model';
+// import {NodeTypesEnum} from 'constants/Visualization.constants';
+// import DAGModel from 'models/DAG.model';
 import Span from 'models/Span.model';
 
 export interface ITraceState {
@@ -27,9 +27,9 @@ const traceSlice = createSlice({
   initialState,
   reducers: {
     initNodes(state, {payload}: PayloadAction<{spans: Span[]}>) {
-      const {edges, nodes} = DAGModel(payload.spans, NodeTypesEnum.TraceSpan);
-      state.edges = edges;
-      state.nodes = nodes;
+      // const {edges, nodes} = DAGModel(payload.spans, NodeTypesEnum.TraceSpan);
+      state.edges = [];
+      state.nodes = [];
       // Clear state
       state.matchedSpans = [];
       state.searchText = '';

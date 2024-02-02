@@ -19,6 +19,7 @@ function DAG(spans: Span[], type: NodeTypesEnum) {
     if (b.id > a.id) return 1;
     return 0;
   });
+
   return DAGService.getEdgesAndNodes(nodesDatum);
 }
 
