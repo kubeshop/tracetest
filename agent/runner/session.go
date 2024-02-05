@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/kubeshop/tracetest/agent/workers/poller"
 
@@ -36,8 +37,14 @@ func (s *Session) WaitUntilDisconnected() {
 func StartSession(ctx context.Context, cfg config.Config, observer event.Observer, logger *zap.Logger) (*Session, error) {
 	observer = event.WrapObserver(observer)
 
+	tracer, err := telemetry.GetTracer(ctx, config.CollectorEndpoint, config.Name)
+	if err != nil {
+		observer.Error(err)
+		return nil, err
+	}
+
 	traceCache := collector.NewTraceCache()
-	controlPlaneClient, err := newControlPlaneClient(ctx, cfg, traceCache, observer, logger)
+	controlPlaneClient, err := newControlPlaneClient(ctx, cfg, traceCache, observer, logger, tracer)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +54,7 @@ func StartSession(ctx context.Context, cfg config.Config, observer event.Observe
 		return nil, err
 	}
 
-	agentCollector, err := StartCollector(ctx, cfg, traceCache, observer, logger)
+	agentCollector, err := StartCollector(ctx, cfg, traceCache, observer, logger, tracer)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +80,8 @@ func StartSession(ctx context.Context, cfg config.Config, observer event.Observe
 	}, nil
 }
 
-func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger) (collector.Collector, error) {
-	noopTracer := trace.NewNoopTracerProvider().Tracer("noop")
+func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger, tracer trace.Tracer) (collector.Collector, error) {
+
 	collectorConfig := collector.Config{
 		HTTPPort: config.OTLPServer.HTTPPort,
 		GRPCPort: config.OTLPServer.GRPCPort,
@@ -90,7 +97,7 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 	collector, err := collector.Start(
 		ctx,
 		collectorConfig,
-		noopTracer,
+		tracer,
 		opts...,
 	)
 	if err != nil {
@@ -100,7 +107,7 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 	return collector, nil
 }
 
-func newControlPlaneClient(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger) (*client.Client, error) {
+func newControlPlaneClient(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger, tracer trace.Tracer) (*client.Client, error) {
 	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
@@ -123,19 +130,19 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		workers.WithTraceCache(traceCache),
 		workers.WithTriggerObserver(observer),
 		workers.WithTriggerStoppableProcessRunner(processStopper.RunStoppableProcess),
+		workers.WithTriggerLogger(logger),
 	)
 
 	pollingWorker := workers.NewPollerWorker(
 		controlPlaneClient,
 		workers.WithInMemoryDatastore(poller.NewInMemoryDatastore(traceCache)),
-		workers.WithObserver(observer),
+		workers.WithPollerObserver(observer),
 		workers.WithPollerStoppableProcessRunner(processStopper.RunStoppableProcess),
+		workers.WithPollerLogger(logger),
 	)
 
 	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient, observer)
 
-	triggerWorker.SetLogger(logger)
-	pollingWorker.SetLogger(logger)
 	dataStoreTestConnectionWorker.SetLogger(logger)
 
 	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)

@@ -15,6 +15,8 @@ import (
 	"github.com/kubeshop/tracetest/agent/proto"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
 const (
@@ -43,6 +45,7 @@ type Client struct {
 	done          chan bool
 
 	logger *zap.Logger
+	tracer trace.Tracer
 
 	stopListener                func(context.Context, *proto.StopRequest) error
 	triggerListener             func(context.Context, *proto.TriggerRequest) error
@@ -98,7 +101,7 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
-	err = c.startHearthBeat(ctx)
+	err = c.startHeartBeat(ctx)
 	if err != nil {
 		return err
 	}

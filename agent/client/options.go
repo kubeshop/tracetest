@@ -3,6 +3,7 @@ package client
 import (
 	"time"
 
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
@@ -29,5 +30,11 @@ func WithPingPeriod(period time.Duration) Option {
 func WithLogger(logger *zap.Logger) Option {
 	return func(c *Client) {
 		c.logger = logger
+	}
+}
+
+func WithTracer(tracer trace.Tracer) Option {
+	return func(c *Client) {
+		c.tracer = tracer
 	}
 }

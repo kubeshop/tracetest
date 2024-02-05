@@ -39,7 +39,7 @@ func WithInMemoryDatastore(datastore tracedb.TraceDB) PollerOption {
 	}
 }
 
-func WithObserver(observer event.Observer) PollerOption {
+func WithPollerObserver(observer event.Observer) PollerOption {
 	return func(pw *PollerWorker) {
 		pw.observer = observer
 	}
@@ -48,6 +48,12 @@ func WithObserver(observer event.Observer) PollerOption {
 func WithPollerStoppableProcessRunner(stoppableProcessRunner StoppableProcessRunner) PollerOption {
 	return func(pw *PollerWorker) {
 		pw.stoppableProcessRunner = stoppableProcessRunner
+	}
+}
+
+func WithPollerLogger(logger *zap.Logger) PollerOption {
+	return func(pw *PollerWorker) {
+		pw.logger = logger
 	}
 }
 
@@ -68,10 +74,6 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 	}
 
 	return pollerWorker
-}
-
-func (w *PollerWorker) SetLogger(logger *zap.Logger) {
-	w.logger = logger
 }
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {

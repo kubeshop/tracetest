@@ -54,6 +54,12 @@ func WithSensor(sensor sensors.Sensor) TriggerOption {
 	}
 }
 
+func WithTriggerLogger(logger *zap.Logger) TriggerOption {
+	return func(tw *TriggerWorker) {
+		tw.logger = logger
+	}
+}
+
 func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWorker {
 	// TODO: use a real tracer
 	tracer := trace.NewNoopTracerProvider().Tracer("noop")
@@ -76,10 +82,6 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 	}
 
 	return worker
-}
-
-func (w *TriggerWorker) SetLogger(logger *zap.Logger) {
-	w.logger = logger
 }
 
 func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
