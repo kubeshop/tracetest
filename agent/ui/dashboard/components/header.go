@@ -164,6 +164,7 @@ func (h *Header) getTracetestLogo() tview.Primitive {
 	textView := tview.NewTextView().SetTextColor(styles.HeaderLogoColor)
 	textView.SetBackgroundColor(styles.HeaderBackgroundColor)
 	textView.SetText(logo)
+	textView.SetWrap(false).SetWordWrap(false)
 
 	return textView
 }
