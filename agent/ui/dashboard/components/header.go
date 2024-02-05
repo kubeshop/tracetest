@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/styles"
@@ -23,8 +24,8 @@ type AgentContext struct {
 }
 
 type BannerMessage struct {
-	Message string
-	Type    string
+	Text string
+	Type string
 }
 
 type AgentMetrics struct {
@@ -41,6 +42,7 @@ type Header struct {
 	sensor          sensors.Sensor
 	data            HeaderData
 
+	messageBanner    *MessageBanner
 	uptimeTextView   *tview.TableCell
 	testRunsTextView *tview.TableCell
 	tracesTextView   *tview.TableCell
@@ -52,16 +54,43 @@ func NewHeader(renderScheduler RenderScheduler, sensor sensors.Sensor) *Header {
 		Flex:            tview.NewFlex(),
 		renderScheduler: renderScheduler,
 		sensor:          sensor,
+		messageBanner:   NewMessageBanner(renderScheduler),
 	}
 
-	h.Flex.SetDirection(tview.FlexColumn).
+	h.draw()
+
+	return h
+}
+
+func (h *Header) draw() {
+	h.Clear()
+
+	flex := tview.NewFlex()
+
+	flex.SetDirection(tview.FlexColumn).
 		AddItem(h.getEnvironmentInformationTable(), 0, 4, true).
 		AddItem(h.getMetricsTable(), 0, 2, true).
 		AddItem(h.getTracetestLogo(), 0, 2, true)
 
-	h.setupSensors()
+	h.Flex.SetDirection(tview.FlexRow).AddItem(h.messageBanner, 0, 0, true).AddItem(flex, 0, 8, true)
 
-	return h
+	h.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		switch event.Rune() {
+		case 's':
+			h.messageBanner.SetMessage("Now you see me :D", events.Error)
+			h.showMessageBanner()
+		case 'w':
+			h.messageBanner.SetMessage("This is a warning! :D", events.Warning)
+			h.showMessageBanner()
+		case 'h':
+			h.messageBanner.SetMessage("", events.Error)
+			h.hideMessageBanner()
+		}
+
+		return event
+	})
+
+	h.setupSensors()
 }
 
 func (h *Header) onDataChange() {
@@ -70,6 +99,13 @@ func (h *Header) onDataChange() {
 		h.testRunsTextView.SetText(fmt.Sprintf("%d", h.data.Metrics.TestRuns))
 		h.tracesTextView.SetText(fmt.Sprintf("%d", h.data.Metrics.Traces))
 		h.spansTextView.SetText(fmt.Sprintf("%d", h.data.Metrics.Spans))
+
+		// if text := h.data.Message.Text; text == "" {
+		// 	h.hideMessageBanner()
+		// } else {
+		// 	h.messageBanner.SetText(text)
+		// 	h.showMessageBanner()
+		// }
 	})
 }
 
@@ -105,6 +141,14 @@ func (h *Header) getMetricsTable() tview.Primitive {
 	table.SetCell(3, 1, h.spansTextView)
 	table.SetBorderPadding(1, 1, 1, 1)
 	return table
+}
+
+func (h *Header) showMessageBanner() {
+	h.Flex.ResizeItem(h.messageBanner, 0, 4)
+}
+
+func (h *Header) hideMessageBanner() {
+	h.Flex.ResizeItem(h.messageBanner, 0, 0)
 }
 
 const logo = ` _______                 _           _
