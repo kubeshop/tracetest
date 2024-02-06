@@ -31,12 +31,15 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const isMatchedMode = Boolean(matchedSpans.length);
 
+  // TODO: Trace will never change, we can calculate this once and then keep using it
   useEffect(() => {
     dispatch(initNodes({spans}));
   }, [dispatch, spans]);
 
   useEffect(() => {
     if (selectedSpan) return;
+
+    // TODO: Find an easier way to get the first span
     const firstSpan = spans.find(span => !span.parentId);
     dispatch(selectSpan({spanId: firstSpan?.id ?? ''}));
   }, [dispatch, selectedSpan, spans]);

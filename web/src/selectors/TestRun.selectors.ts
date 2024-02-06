@@ -13,6 +13,7 @@ const selectTestRun = (state: RootState, params: {testId: string; runId: number;
   return data ?? TestRun({});
 };
 
+// TODO: look for a simpler way of getting the span by id
 export const selectSpanById = createSelector([selectTestRun, selectParams], (testRun, params) => {
   const {trace} = testRun;
   return trace?.spans?.find(span => span.id === params.spanId) ?? Span({id: params.spanId});
