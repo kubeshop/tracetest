@@ -46,14 +46,15 @@ const DAG = ({
           edges={edges}
           nodes={nodes}
           deleteKeyCode={null}
-          fitView
           minZoom={0.1}
           multiSelectionKeyCode={null}
           nodesConnectable={false}
           nodeTypes={nodeTypes}
+          onInit={() => onNavigateToSpan(nodes[0]?.id)}
           onNodeClick={onNodeClick}
           onNodeDragStop={onNodeClick}
           onNodesChange={onNodesChange}
+          onlyRenderVisibleElements
           selectionKeyCode={null}
         >
           {isMiniMapActive && <MiniMap />}

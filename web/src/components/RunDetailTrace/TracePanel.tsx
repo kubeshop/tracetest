@@ -42,12 +42,7 @@ const TracePanel = ({run, testId, runEvents, skipTraceCollection}: TProps) => {
                 />
               )}
             </S.SwitchContainer>
-            <Visualization
-              runEvents={runEvents}
-              runState={run.state}
-              spans={run?.trace?.spans ?? []}
-              type={visualizationType}
-            />
+            <Visualization runEvents={runEvents} runState={run.state} trace={run.trace} type={visualizationType} />
           </S.VisualizationContainer>
         </S.SectionLeft>
       </S.Container>

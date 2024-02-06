@@ -124,7 +124,7 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
           <Visualization
             runEvents={runEvents}
             runState={run.state}
-            spans={run?.trace?.spans ?? []}
+            trace={run.trace}
             type={visualizationType}
           />
         </S.SectionLeft>

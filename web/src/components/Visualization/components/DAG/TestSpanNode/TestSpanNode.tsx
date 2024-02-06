@@ -9,7 +9,7 @@ import useSelectAsCurrent from '../../../hooks/useSelectAsCurrent';
 
 interface IProps extends NodeProps<INodeDataSpan> {}
 
-const TestSpanNode = ({data, id, selected}: IProps) => {
+const TestSpanNode = ({data, id, selected, ...props}: IProps) => {
   const {span, testSpecs, testOutputs} = useSpanData(id);
   const {isLoading, onSelectAsCurrent, showSelectAsCurrent} = useSelectAsCurrent({
     selected,

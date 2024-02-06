@@ -1,9 +1,9 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-renderer';
 
 import {theme} from 'constants/Theme.constants';
-// import {NodeTypesEnum} from 'constants/Visualization.constants';
-// import DAGModel from 'models/DAG.model';
+import {NodeTypesEnum} from 'constants/Visualization.constants';
+import DAGModel from 'models/DAG.model';
 import Span from 'models/Span.model';
 
 export interface ITraceState {
@@ -26,10 +26,10 @@ const traceSlice = createSlice({
   name: 'trace',
   initialState,
   reducers: {
-    initNodes(state, {payload}: PayloadAction<{spans: Span[]}>) {
-      // const {edges, nodes} = DAGModel(payload.spans, NodeTypesEnum.TraceSpan);
-      state.edges = [];
-      state.nodes = [];
+    initNodes(state, {payload: {edges, nodes}}: PayloadAction<{edges: Edge[]; nodes: Node[]}>) {
+      state.edges = edges;
+      state.nodes = nodes;
+
       // Clear state
       state.matchedSpans = [];
       state.searchText = '';
@@ -70,5 +70,13 @@ const traceSlice = createSlice({
   },
 });
 
-export const {initNodes, changeNodes, selectSpan, matchSpans, setSearchText} = traceSlice.actions;
+export const initNodes = createAsyncThunk<void, {spans: Span[]}>(
+  'trace/generateDagLayout',
+  async ({spans}, {dispatch}) => {
+    const {edges, nodes} = await DAGModel(spans, NodeTypesEnum.TraceSpan);
+    dispatch(traceSlice.actions.initNodes({edges, nodes}));
+  }
+);
+
+export const {changeNodes, selectSpan, matchSpans, setSearchText} = traceSlice.actions;
 export default traceSlice.reducer;

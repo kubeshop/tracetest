@@ -3,57 +3,35 @@ import {TestRunStage} from 'constants/TestRunEvents.constants';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useCallback, useEffect} from 'react';
-import {Node, NodeChange} from 'react-flow-renderer';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {changeNodes, initNodes, selectSpan} from 'redux/slices/Trace.slice';
+import {selectSpan} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import TestRunService from 'services/TestRun.service';
+import Trace from 'models/Trace.model';
 import {TTestRunState} from 'types/TestRun.types';
-import Span from 'models/Span.model';
-import DAG from '../Visualization/components/DAG';
 import Timeline from '../Visualization/components/Timeline';
 import {VisualizationType} from './RunDetailTrace';
+import TraceDAG from './TraceDAG';
 
 interface IProps {
   runEvents: TestRunEvent[];
   runState: TTestRunState;
-  spans: Span[];
+  trace: Trace;
   type: VisualizationType;
 }
 
-const Visualization = ({runEvents, runState, spans, type}: IProps) => {
+const Visualization = ({runEvents, runState, trace, trace: {spans, rootSpan}, type}: IProps) => {
   const dispatch = useAppDispatch();
-  const edges = useAppSelector(TraceSelectors.selectEdges);
   const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
-  const nodes = useAppSelector(TraceSelectors.selectNodes);
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const isMatchedMode = Boolean(matchedSpans.length);
-
-  // TODO: Trace will never change, we can calculate this once and then keep using it
-  useEffect(() => {
-    dispatch(initNodes({spans}));
-  }, [dispatch, spans]);
 
   useEffect(() => {
     if (selectedSpan) return;
 
-    // TODO: Find an easier way to get the first span
-    const firstSpan = spans.find(span => !span.parentId);
-    dispatch(selectSpan({spanId: firstSpan?.id ?? ''}));
-  }, [dispatch, selectedSpan, spans]);
-
-  const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(changeNodes({changes})), [dispatch]);
-
-  const onNodeClick = useCallback(
-    (event: React.MouseEvent, {id}: Node) => {
-      event.stopPropagation();
-      TraceDiagramAnalyticsService.onClickSpan(id);
-      dispatch(selectSpan({spanId: id}));
-    },
-    [dispatch]
-  );
+    dispatch(selectSpan({spanId: rootSpan.id ?? ''}));
+  }, [dispatch, rootSpan.id, selectedSpan, spans]);
 
   const onNodeClickTimeline = useCallback(
     (spanId: string) => {
@@ -75,16 +53,7 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   }
 
   return type === VisualizationType.Dag ? (
-    <DAG
-      edges={edges}
-      isMatchedMode={isMatchedMode}
-      matchedSpans={matchedSpans}
-      nodes={nodes}
-      onNavigateToSpan={onNavigateToSpan}
-      onNodesChange={onNodesChange}
-      onNodeClick={onNodeClick}
-      selectedSpan={selectedSpan}
-    />
+    <TraceDAG trace={trace} onNavigateToSpan={onNavigateToSpan} />
   ) : (
     <Timeline
       isMatchedMode={isMatchedMode}
