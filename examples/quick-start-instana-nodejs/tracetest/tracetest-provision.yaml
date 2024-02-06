@@ -1,0 +1,6 @@
+---
+type: DataStore
+spec:
+  name: OTLP
+  type: otlp
+  default: true
