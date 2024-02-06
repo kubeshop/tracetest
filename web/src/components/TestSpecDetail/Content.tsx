@@ -76,6 +76,7 @@ const Content = ({
         title={!selector && !name ? 'All Spans' : name}
       />
 
+      {/* // TODO: consider a virtualized list here */}
       {Object.entries(results).map(([spanId, checkResults]) => {
         const span = trace?.spans.find(({id}) => id === spanId);
 
