@@ -7,6 +7,7 @@ type Trace = {
   traceId: string;
 };
 
+// TODO: keep the flat map of spans for easy access
 const Trace = ({traceId = '', flat = {}}: TRawTrace): Trace => {
   return {
     traceId,

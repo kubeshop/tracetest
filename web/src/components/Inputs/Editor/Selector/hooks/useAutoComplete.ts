@@ -24,6 +24,7 @@ const useAutoComplete = ({testId, runId}: IProps) => {
 
   const getAttributeList = useCallback(() => {
     const state = getState();
+    // TODO: this list is calculated multiple times while typing, we should memoize it
     const defaultList = AssertionSelectors.selectAllAttributeList(state, testId, runId);
 
     return defaultList;
@@ -55,7 +56,9 @@ const useAutoComplete = ({testId, runId}: IProps) => {
         const uniqueList = uniqBy(attributeList, 'key');
         const identifierText = state.doc.sliceString(nodeBefore.from, nodeBefore.to);
         const isIdentifier = nodeBefore.name === Tokens.Identifier;
-        const list = isIdentifier ? uniqueList.filter(({key}) => key.toLowerCase().includes(identifierText.toLowerCase())) : uniqueList;
+        const list = isIdentifier
+          ? uniqueList.filter(({key}) => key.toLowerCase().includes(identifierText.toLowerCase()))
+          : uniqueList;
 
         return {
           from: isIdentifier ? nodeBefore.from : word.from,

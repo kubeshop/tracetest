@@ -18,6 +18,7 @@ interface IProps {
 }
 
 function getSpanName(spans: Span[], spanId: string) {
+  // TODO: find an easier way to get the span name
   const span = spans.find(s => s.id === spanId);
   return span?.name ?? '';
 }
@@ -58,6 +59,7 @@ const Rule = ({
       </S.Column>
 
       <S.RuleBody>
+        {/* TODO: Add a search capability to look for spans in the result list */}
         {results?.map((result, resultIndex) => (
           // eslint-disable-next-line react/no-array-index-key
           <div key={`${result.spanId}-${resultIndex}`}>

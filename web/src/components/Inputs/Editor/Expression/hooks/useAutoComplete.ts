@@ -21,6 +21,7 @@ const useAutoComplete = ({testId, runId, onSelect = noop, autocompleteCustomValu
   const getAttributeList = useCallback(() => {
     const state = getState();
     const spanIdList = SpanSelectors.selectMatchedSpans(state);
+    // TODO: this list is calculated multiple times while typing, we should memoize it
     const attributeList = AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList);
 
     return uniqBy(attributeList, 'key');
