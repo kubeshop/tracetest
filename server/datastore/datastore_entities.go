@@ -134,52 +134,54 @@ type SumoLogicConfig struct {
 }
 
 const (
-	DataStoreTypeJaeger           DataStoreType = "jaeger"
-	DataStoreTypeTempo            DataStoreType = "tempo"
-	DataStoreTypeOpenSearch       DataStoreType = "opensearch"
-	DataStoreTypeSignalFX         DataStoreType = "signalfx"
-	DataStoreTypeOTLP             DataStoreType = "otlp"
-	DataStoreTypeNewRelic         DataStoreType = "newrelic"
-	DataStoreTypeLighStep         DataStoreType = "lightstep"
-	DataStoreTypeElasticAPM       DataStoreType = "elasticapm"
-	DataStoreTypeDataDog          DataStoreType = "datadog"
+	DataStoreTypeAgent            DataStoreType = "agent"
 	DataStoreTypeAwsXRay          DataStoreType = "awsxray"
+	DataStoreTypeAzureAppInsights DataStoreType = "azureappinsights"
+	DataStoreTypeDataDog          DataStoreType = "datadog"
+	DataStoreTypeDynatrace        DataStoreType = "dynatrace"
+	DataStoreTypeElasticAPM       DataStoreType = "elasticapm"
 	DataStoreTypeHoneycomb        DataStoreType = "honeycomb"
-	DatastoreTypeAzureAppInsights DataStoreType = "azureappinsights"
-	DatastoreTypeSumoLogic        DataStoreType = "sumologic"
-	DatastoreTypeSignoz           DataStoreType = "signoz"
-	DatastoreTypeDynatrace        DataStoreType = "dynatrace"
-	DatastoreTypeAgent            DataStoreType = "agent"
+	DataStoreTypeInstana          DataStoreType = "instana"
+	DataStoreTypeJaeger           DataStoreType = "jaeger"
+	DataStoreTypeLighStep         DataStoreType = "lightstep"
+	DataStoreTypeNewRelic         DataStoreType = "newrelic"
+	DataStoreTypeOpenSearch       DataStoreType = "opensearch"
+	DataStoreTypeOTLP             DataStoreType = "otlp"
+	DataStoreTypeSignalFX         DataStoreType = "signalfx"
+	DataStoreTypeSignoz           DataStoreType = "signoz"
+	DataStoreTypeSumoLogic        DataStoreType = "sumologic"
+	DataStoreTypeTempo            DataStoreType = "tempo"
 )
 
 var validTypes = []DataStoreType{
-	DataStoreTypeJaeger,
-	DataStoreTypeTempo,
-	DataStoreTypeOpenSearch,
-	DataStoreTypeSignalFX,
-	DataStoreTypeOTLP,
-	DataStoreTypeNewRelic,
-	DataStoreTypeLighStep,
-	DataStoreTypeElasticAPM,
-	DataStoreTypeDataDog,
+	DataStoreTypeAgent,
 	DataStoreTypeAwsXRay,
+	DataStoreTypeAzureAppInsights,
+	DataStoreTypeDataDog,
+	DataStoreTypeDynatrace,
+	DataStoreTypeElasticAPM,
 	DataStoreTypeHoneycomb,
-	DatastoreTypeAzureAppInsights,
-	DatastoreTypeSumoLogic,
-	DatastoreTypeSignoz,
-	DatastoreTypeDynatrace,
-	DatastoreTypeAgent,
+	DataStoreTypeJaeger,
+	DataStoreTypeLighStep,
+	DataStoreTypeNewRelic,
+	DataStoreTypeOpenSearch,
+	DataStoreTypeOTLP,
+	DataStoreTypeSignalFX,
+	DataStoreTypeSignoz,
+	DataStoreTypeSumoLogic,
+	DataStoreTypeTempo,
 }
 
 var otlpBasedDataStores = []DataStoreType{
-	DataStoreTypeOTLP,
-	DataStoreTypeNewRelic,
-	DataStoreTypeLighStep,
+	DataStoreTypeAgent,
 	DataStoreTypeDataDog,
+	DataStoreTypeDynatrace,
 	DataStoreTypeHoneycomb,
-	DatastoreTypeSignoz,
-	DatastoreTypeDynatrace,
-	DatastoreTypeAgent,
+	DataStoreTypeInstana,
+	DataStoreTypeLighStep,
+	DataStoreTypeNewRelic,
+	DataStoreTypeOTLP,
+	DataStoreTypeSignoz,
 }
 
 func (ds DataStore) Validate() error {
@@ -225,11 +227,11 @@ func (ds DataStore) Validate() error {
 		return fmt.Errorf("data store should have Tempo config values set up")
 	}
 
-	if ds.Type == DatastoreTypeAzureAppInsights && ds.Values.AzureAppInsights == nil {
+	if ds.Type == DataStoreTypeAzureAppInsights && ds.Values.AzureAppInsights == nil {
 		return fmt.Errorf("data store should have Azure Application Insights config values set up")
 	}
 
-	if ds.Type == DatastoreTypeSumoLogic && ds.Values.SumoLogic == nil {
+	if ds.Type == DataStoreTypeSumoLogic && ds.Values.SumoLogic == nil {
 		return fmt.Errorf("data store should have Sumo Logic config values set up")
 	}
 
@@ -245,7 +247,7 @@ func (ds DataStore) GetID() id.ID {
 }
 
 func (ds DataStore) IsOTLPBasedProvider() bool {
-	if ds.Type == DatastoreTypeAzureAppInsights {
+	if ds.Type == DataStoreTypeAzureAppInsights {
 		return ds.Values.AzureAppInsights.ConnectionType == ConnectionTypesCollector
 	}
 

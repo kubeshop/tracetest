@@ -86,9 +86,9 @@ func (f *traceDBFactory) getTraceDBInstance(ds datastore.DataStore) (TraceDB, er
 		tdb, err = newSignalFXDB(ds.Values.SignalFx)
 	case datastore.DataStoreTypeAwsXRay:
 		tdb, err = NewAwsXRayDB(ds.Values.AwsXRay)
-	case datastore.DatastoreTypeAzureAppInsights:
+	case datastore.DataStoreTypeAzureAppInsights:
 		tdb, err = NewAzureAppInsightsDB(ds.Values.AzureAppInsights)
-	case datastore.DatastoreTypeSumoLogic:
+	case datastore.DataStoreTypeSumoLogic:
 		tdb, err = NewSumoLogicDB(ds.Values.SumoLogic)
 	default:
 		return &noopTraceDB{}, nil

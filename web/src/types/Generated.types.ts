@@ -1502,7 +1502,8 @@ export interface external {
           | "azureappinsights"
           | "signoz"
           | "dynatrace"
-          | "sumologic";
+          | "sumologic"
+          | "instana";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
         /** @enum {string} */
