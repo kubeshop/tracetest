@@ -1,10 +1,11 @@
 import {coordCenter, Dag, dagStratify, layeringSimplex, sugiyama} from 'd3-dag';
-import {MarkerType} from 'react-flow-renderer';
+import {Edge, MarkerType, Node} from 'react-flow-renderer';
 
 import {theme} from 'constants/Theme.constants';
 import {INodeDatum} from 'types/DAG.types';
+import {withLowPriority} from '../utils/Common';
 
-function getDagLayout<T>(nodesDatum: INodeDatum<T>[]) {
+function getDagLayout<T>(nodesDatum: INodeDatum<T>[]): Dag<INodeDatum<T>, undefined> {
   const stratify = dagStratify();
   const dag = stratify(nodesDatum);
 
@@ -18,7 +19,7 @@ function getDagLayout<T>(nodesDatum: INodeDatum<T>[]) {
   return dag;
 }
 
-function getNodes<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
+function getNodes<T>(dagLayout: Dag<INodeDatum<T>, undefined>): Node[] {
   return dagLayout.descendants().map(({data: {id, data, type}, x, y}) => ({
     data,
     id,
@@ -27,7 +28,7 @@ function getNodes<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
   }));
 }
 
-function getEdges<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
+function getEdges<T>(dagLayout: Dag<INodeDatum<T>, undefined>): Edge[] {
   return dagLayout.links().map(({source, target}) => ({
     animated: false,
     id: `${source.data.id}-${target.data.id}`,
@@ -39,12 +40,12 @@ function getEdges<T>(dagLayout: Dag<INodeDatum<T>, undefined>) {
 }
 
 const DAGService = () => ({
-  getEdgesAndNodes<T>(nodesDatum: INodeDatum<T>[]) {
+  async getEdgesAndNodes<T>(nodesDatum: INodeDatum<T>[]): Promise<{edges: Edge[]; nodes: Node[]}> {
     if (!nodesDatum.length) return {edges: [], nodes: []};
 
-    const dagLayout = getDagLayout(nodesDatum);
-    const edges = getEdges(dagLayout);
-    const nodes = getNodes(dagLayout);
+    const dagLayout = await withLowPriority(getDagLayout)(nodesDatum);
+    const edges = await withLowPriority(getEdges)(dagLayout);
+    const nodes = await withLowPriority(getNodes)(dagLayout);
 
     return {edges, nodes};
   },
