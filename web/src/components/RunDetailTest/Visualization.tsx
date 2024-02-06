@@ -8,8 +8,6 @@ import {TestRunStage} from 'constants/TestRunEvents.constants';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useSpan} from 'providers/Span/Span.provider';
-import {useAppDispatch} from 'redux/hooks';
-import {initNodes} from 'redux/slices/DAG.slice';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import Trace from 'models/Trace.model';
 import TestRunService from 'services/TestRun.service';
@@ -23,15 +21,10 @@ export interface IProps {
   trace: Trace;
 }
 
-const Visualization = ({runEvents, runState, trace, trace: {spans, traceId}, type}: IProps) => {
-  const dispatch = useAppDispatch();
+const Visualization = ({runEvents, runState, trace, trace: {spans}, type}: IProps) => {
   const {onSelectSpan, matchedSpans, onSetFocusedSpan, selectedSpan} = useSpan();
 
   const {isOpen} = useTestSpecForm();
-
-  useEffect(() => {
-    dispatch(initNodes({spans}));
-  }, [dispatch, spans, traceId]);
 
   useEffect(() => {
     if (selectedSpan) return;
