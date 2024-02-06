@@ -20,13 +20,14 @@ import TestRunService from 'services/TestRun.service';
 import {TTestRunState} from 'types/TestRun.types';
 
 export interface IProps {
+  isDAGDisabled: boolean;
   runEvents: TestRunEvent[];
   runState: TTestRunState;
   spans: Span[];
   type: VisualizationType;
 }
 
-const Visualization = ({runEvents, runState, spans, type}: IProps) => {
+const Visualization = ({isDAGDisabled, runEvents, runState, spans, type}: IProps) => {
   const dispatch = useAppDispatch();
   const edges = useAppSelector(DAGSelectors.selectEdges);
   const nodes = useAppSelector(DAGSelectors.selectNodes);
@@ -35,8 +36,9 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
   const {isOpen} = useTestSpecForm();
 
   useEffect(() => {
+    if (isDAGDisabled) return;
     dispatch(initNodes({spans}));
-  }, [dispatch, spans]);
+  }, [dispatch, isDAGDisabled, spans]);
 
   useEffect(() => {
     if (selectedSpan) return;
