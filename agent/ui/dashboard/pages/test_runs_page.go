@@ -22,7 +22,7 @@ func NewTestRunPage(renderScheduler components.RenderScheduler, sensor sensors.S
 		SetRows(10, 90).
 		SetColumns(30, 0, 30).
 		AddItem(components.NewHeader(renderScheduler, sensor), 0, 0, 1, 3, 0, 0, true).
-		AddItem(tview.NewBox(), 1, 0, 1, 3, 0, 0, true)
+		AddItem(components.NewTestRunList(), 1, 0, 1, 3, 0, 0, true)
 
 	return p
 }

@@ -11,8 +11,10 @@ var (
 	WarningMessageBackgroundColor = tcell.NewRGBColor(227, 149, 30)
 	WarningMessageForegroundColor = tcell.NewRGBColor(0, 0, 0)
 
+	HighlighColor = tcell.NewRGBColor(253, 166, 34)
+
 	MetricNameStyle = tcell.Style{}.
-			Foreground(tcell.NewRGBColor(253, 166, 34)).
+			Foreground(HighlighColor).
 			Bold(true)
 
 	MetricValueStyle = tcell.Style{}.

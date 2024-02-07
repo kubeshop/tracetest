@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/pages"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/styles"
 	"github.com/rivo/tview"
 )
 
@@ -27,6 +28,7 @@ func startUptimeCounter(sensor sensors.Sensor) {
 
 func StartDashboard(ctx context.Context) error {
 	app := tview.NewApplication()
+	tview.Styles.PrimitiveBackgroundColor = styles.HeaderBackgroundColor
 	renderScheduler := components.NewRenderScheduler(app)
 	sensor := sensors.NewSensor()
 
