@@ -489,6 +489,34 @@ paths:
             application/json:
               schema:
                 $ref: "tests.yaml#/components/schemas/ExportedTestInformation"
+
+  /tests/{testId}/run/{runId}/search-spans:
+    post:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/testId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
+      summary: get spans fileter by query
+      description: get spans fileter by query
+      operationId: searchSpans
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: query to filter spans, can be either a full text search or a Span Query Language query
+      responses:
+        200:
+          description: trace containing matching spans only
+          content:
+            application/json:
+              schema:
+                $ref: "trace.yaml#/components/schemas/Trace"
+
   /tests/import:
     post:
       tags:
