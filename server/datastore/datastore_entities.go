@@ -161,6 +161,7 @@ var validTypes = []DataStoreType{
 	DataStoreTypeDynatrace,
 	DataStoreTypeElasticAPM,
 	DataStoreTypeHoneycomb,
+	DataStoreTypeInstana,
 	DataStoreTypeJaeger,
 	DataStoreTypeLighStep,
 	DataStoreTypeNewRelic,

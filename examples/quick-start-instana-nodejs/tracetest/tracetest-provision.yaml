@@ -1,6 +1,7 @@
 ---
 type: DataStore
 spec:
-  name: OTLP
-  type: otlp
+  id: current
+  name: Instana
+  type: instana
   default: true
