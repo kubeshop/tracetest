@@ -48,7 +48,16 @@ const getSpanSignature = (
   }, []);
 };
 
-const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = '', name = ''}: TRawSpan): Span => {
+const defaultSpan: TRawSpan = {
+  id: '',
+  parentId: '',
+  name: '',
+  attributes: {},
+  startTime: 0,
+  endTime: 0,
+};
+
+const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = '', name = ''} = defaultSpan): Span => {
   const mappedAttributeList: TSpanFlatAttribute[] = [{key: 'name', value: name}];
   const attributeList = Object.entries(attributes)
     .map<TSpanFlatAttribute>(([key, value]) => ({

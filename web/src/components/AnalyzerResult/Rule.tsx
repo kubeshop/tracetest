@@ -3,7 +3,6 @@ import {CaretUpFilled} from '@ant-design/icons';
 import {Space, Tooltip, Typography} from 'antd';
 import {LinterResultPluginRule} from 'models/LinterResult.model';
 import Trace from 'models/Trace.model';
-import Span from 'models/Span.model';
 import {LinterRuleErrorLevel} from 'models/Linter.model';
 import {useAppDispatch} from 'redux/hooks';
 import {selectSpan} from 'redux/slices/Trace.slice';
@@ -15,12 +14,6 @@ import RuleLink from './RuleLink';
 interface IProps {
   rule: LinterResultPluginRule;
   trace: Trace;
-}
-
-function getSpanName(spans: Span[], spanId: string) {
-  // TODO: find an easier way to get the span name
-  const span = spans.find(s => s.id === spanId);
-  return span?.name ?? '';
 }
 
 const Rule = ({
@@ -69,7 +62,7 @@ const Rule = ({
               type="link"
               $error={!result.passed}
             >
-              {getSpanName(trace.spans, result.spanId)}
+              {trace.flat[result.spanId].name ?? ''}
             </S.SpanButton>
 
             {!result.passed && result.errors.length > 1 && (

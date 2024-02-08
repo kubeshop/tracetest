@@ -51,7 +51,7 @@ const TracePanel = ({run, testId, runEvents, skipTraceCollection}: TProps) => {
               isDAGDisabled={isDAGDisabled}
               runEvents={runEvents}
               runState={run.state}
-              spans={run?.trace?.spans ?? []}
+              trace={run.trace}
               type={visualizationType}
             />
           </S.VisualizationContainer>
