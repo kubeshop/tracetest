@@ -195,6 +195,12 @@ func (c *ApiApiController) Routes() Routes {
 			c.RunTestSuite,
 		},
 		{
+			"SearchSpans",
+			strings.ToUpper("Post"),
+			"/api/tests/{testId}/run/{runId}/search-spans",
+			c.SearchSpans,
+		},
+		{
 			"SkipTraceCollection",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run/{runId}/skipPolling",
@@ -748,6 +754,39 @@ func (c *ApiApiController) RunTestSuite(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	result, err := c.service.RunTestSuite(r.Context(), testSuiteIdParam, runInformationParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// SearchSpans - get spans fileter by query
+func (c *ApiApiController) SearchSpans(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	testIdParam := params["testId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	searchSpansRequestParam := SearchSpansRequest{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&searchSpansRequestParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertSearchSpansRequestRequired(searchSpansRequestParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.SearchSpans(r.Context(), testIdParam, runIdParam, searchSpansRequestParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

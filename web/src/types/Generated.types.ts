@@ -76,6 +76,10 @@ export interface paths {
     /** export test and test run information for debugging */
     get: operations["exportTestRun"];
   };
+  "/tests/{testId}/run/{runId}/search-spans": {
+    /** get spans fileter by query */
+    post: operations["searchSpans"];
+  };
   "/tests/import": {
     /** import test and test run information for debugging */
     post: operations["importTestRun"];
@@ -566,6 +570,26 @@ export interface operations {
       200: {
         content: {
           "application/json": external["tests.yaml"]["components"]["schemas"]["ExportedTestInformation"];
+        };
+      };
+    };
+  };
+  /** get spans fileter by query */
+  searchSpans: {
+    parameters: {};
+    responses: {
+      /** trace containing matching spans only */
+      200: {
+        content: {
+          "application/json": external["tests.yaml"]["components"]["schemas"]["SearchSpansResult"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** @description query to filter spans, can be either a full text search or a Span Query Language query */
+          query?: string;
         };
       };
     };
@@ -2007,6 +2031,9 @@ export interface external {
           selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
           spanIds?: string[];
         };
+        SearchSpansResult: {
+          spansIds?: string[];
+        };
         Selector: {
           query?: string;
           structure?: external["tests.yaml"]["components"]["schemas"]["SpanSelector"][];
@@ -2092,7 +2119,7 @@ export interface external {
         Trace: {
           traceId?: string;
           tree?: external["trace.yaml"]["components"]["schemas"]["Span"];
-          /** @description falttened version, mapped as spanId -> span{} */
+          /** @description flattened version, mapped as spanId -> span{} */
           flat?: {
             [
               key: string

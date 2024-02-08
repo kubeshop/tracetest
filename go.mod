@@ -41,7 +41,6 @@ require (
 	github.com/jhump/protoreflect v1.12.0
 	github.com/json-iterator/go v1.1.12
 	github.com/kyokomi/emoji/v2 v2.2.12
-	github.com/labstack/gommon v0.3.0
 	github.com/mitchellh/mapstructure v1.5.1-0.20220423185008-bf980b35cac4
 	github.com/nats-io/nats.go v1.31.0
 	github.com/ohler55/ojg v1.14.4
@@ -170,8 +169,6 @@ require (
 	github.com/streadway/amqp v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v1.2.1 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
