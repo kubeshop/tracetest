@@ -1,10 +1,9 @@
 import {useCallback} from 'react';
-import {noop, uniqBy} from 'lodash';
+import {noop} from 'lodash';
 import {Completion, CompletionContext} from '@codemirror/autocomplete';
 import {useAppStore} from 'redux/hooks';
-import AssertionSelectors from 'selectors/Assertion.selectors';
 import VariableSetSelectors from 'selectors/VariableSet.selectors';
-import SpanSelectors from 'selectors/Span.selectors';
+import {selectExpressionAttributeList} from 'selectors/Editor.selectors';
 import EditorService from 'services/Editor.service';
 import {SupportedEditors} from 'constants/Editor.constants';
 
@@ -18,14 +17,10 @@ interface IProps {
 const useAutoComplete = ({testId, runId, onSelect = noop, autocompleteCustomValues}: IProps) => {
   const {getState} = useAppStore();
 
-  const getAttributeList = useCallback(() => {
-    const state = getState();
-    const spanIdList = SpanSelectors.selectMatchedSpans(state);
-    // TODO: this list is calculated multiple times while typing, we should memoize it
-    const attributeList = AssertionSelectors.selectAttributeList(state, testId, runId, spanIdList);
-
-    return uniqBy(attributeList, 'key');
-  }, [getState, runId, testId]);
+  const getAttributeList = useCallback(
+    () => selectExpressionAttributeList(getState(), testId, runId),
+    [getState, runId, testId]
+  );
 
   const getSelectedVariableSetEntryList = useCallback(() => {
     const state = getState();

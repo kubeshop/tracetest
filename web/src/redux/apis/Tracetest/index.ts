@@ -68,6 +68,7 @@ const {
   useLazyTestOtlpConnectionQuery,
   useTestOtlpConnectionQuery,
   useResetTestOtlpConnectionMutation,
+  useGetSearchedSpansMutation,
 
   endpoints,
 } = TracetestAPI.instance;
@@ -129,5 +130,6 @@ export {
   useLazyTestOtlpConnectionQuery,
   useTestOtlpConnectionQuery,
   useResetTestOtlpConnectionMutation,
+  useGetSearchedSpansMutation,
   endpoints,
 };

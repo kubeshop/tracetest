@@ -11,8 +11,8 @@ import {
   Tokens,
 } from 'constants/Editor.constants';
 import {useAppStore} from 'redux/hooks';
-import AssertionSelectors from 'selectors/Assertion.selectors';
 import {escapeString} from 'utils/Common';
+import {selectSelectorAttributeList} from 'selectors/Editor.selectors';
 
 interface IProps {
   testId: string;
@@ -22,13 +22,10 @@ interface IProps {
 const useAutoComplete = ({testId, runId}: IProps) => {
   const {getState} = useAppStore();
 
-  const getAttributeList = useCallback(() => {
-    const state = getState();
-    // TODO: this list is calculated multiple times while typing, we should memoize it
-    const defaultList = AssertionSelectors.selectAllAttributeList(state, testId, runId);
-
-    return defaultList;
-  }, [getState, runId, testId]);
+  const getAttributeList = useCallback(
+    () => selectSelectorAttributeList(getState(), testId, runId),
+    [getState, runId, testId]
+  );
 
   return useCallback(
     async (context: CompletionContext) => {

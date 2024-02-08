@@ -21,7 +21,6 @@ const TraceDAG = ({trace: {spans}, onNavigateToSpan}: IProps) => {
   const isMatchedMode = Boolean(matchedSpans.length);
   const dispatch = useAppDispatch();
 
-  // TODO: Trace will never change, we can calculate this once and then keep using it
   useEffect(() => {
     dispatch(initNodes({spans}));
   }, [dispatch, spans]);
