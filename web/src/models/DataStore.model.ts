@@ -6,15 +6,16 @@ export type TRawAzureAppInsightsDataStore = TDataStoreSchemas['AzureAppInsights'
 
 export type TRawOtlpDataStore = {};
 type DataStore = Model<TRawDataStore, {}>['spec'] & {
-  otlp?: TRawOtlpDataStore;
-  newrelic?: TRawOtlpDataStore;
-  lightstep?: TRawOtlpDataStore;
-  datadog?: TRawOtlpDataStore;
-  honeycomb?: TRawOtlpDataStore;
-  azureappinsights?: TRawAzureAppInsightsDataStore & TRawOtlpDataStore;
-  signoz?: TRawOtlpDataStore;
-  dynatrace?: TRawOtlpDataStore;
   agent?: TRawOtlpDataStore;
+  azureappinsights?: TRawAzureAppInsightsDataStore & TRawOtlpDataStore;
+  datadog?: TRawOtlpDataStore;
+  dynatrace?: TRawOtlpDataStore;
+  honeycomb?: TRawOtlpDataStore;
+  instana?: TRawOtlpDataStore;
+  lightstep?: TRawOtlpDataStore;
+  newrelic?: TRawOtlpDataStore;
+  otlp?: TRawOtlpDataStore;
+  signoz?: TRawOtlpDataStore;
 };
 
 const DataStore = ({

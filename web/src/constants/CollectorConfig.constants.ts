@@ -259,24 +259,61 @@ service:
       exporters: [logging, otlphttp/dynatrace]
 `;
 
+export const Instana = (traceTestBlock: string) => `receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+exporters:
+  logging:
+    verbosity: detailed
+
+  ${traceTestBlock}
+
+  # OTLP for Instana
+  # Send traces to Instana. Read more in docs here: https://www.ibm.com/docs/en/instana-observability/current?topic=opentelemetry-sending-data-instana-backend
+  otlp/instana:
+    endpoint: otlp-XXXX-saas.instana.io:4317 # it can be one of the SaaS environments. Look on the Instana doc link for more details.
+    headers:
+      x-instana-key: some-key # it is the Instana Agent Key provided by Instana UI
+
+service:
+  pipelines:
+    traces/tracetest:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/tracetest]
+    traces/instana:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/instana]
+`;
+
 export const CollectorConfigMap = {
+  [SupportedDataStores.AzureAppInsights]: AzureAppInsights(tracetest),
   [SupportedDataStores.Datadog]: Datadog(tracetest),
+  [SupportedDataStores.Dynatrace]: Dynatrace(tracetest),
+  [SupportedDataStores.Honeycomb]: Honeycomb(tracetest),
+  [SupportedDataStores.Instana]: Instana(tracetest),
   [SupportedDataStores.Lightstep]: Lightstep(tracetest),
   [SupportedDataStores.NewRelic]: NewRelic(tracetest),
   [SupportedDataStores.OtelCollector]: OtelCollector(tracetest),
-  [SupportedDataStores.Honeycomb]: Honeycomb(tracetest),
-  [SupportedDataStores.AzureAppInsights]: AzureAppInsights(tracetest),
   [SupportedDataStores.Signoz]: Signoz(tracetest),
-  [SupportedDataStores.Dynatrace]: Dynatrace(tracetest),
 } as const;
 
 export const CollectorConfigFunctionMap = {
+  [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Datadog]: Datadog,
+  [SupportedDataStores.Dynatrace]: Dynatrace,
+  [SupportedDataStores.Honeycomb]: Honeycomb,
+  [SupportedDataStores.Instana]: Instana,
   [SupportedDataStores.Lightstep]: Lightstep,
   [SupportedDataStores.NewRelic]: NewRelic,
   [SupportedDataStores.OtelCollector]: OtelCollector,
-  [SupportedDataStores.Honeycomb]: Honeycomb,
-  [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
   [SupportedDataStores.Signoz]: Signoz,
-  [SupportedDataStores.Dynatrace]: Dynatrace,
 } as const;
