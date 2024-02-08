@@ -1,4 +1,4 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {applyNodeChanges, Edge, MarkerType, Node, NodeChange} from 'react-flow-renderer';
 
 import {theme} from 'constants/Theme.constants';
@@ -23,8 +23,7 @@ const dagSlice = createSlice({
   name: 'dag',
   initialState,
   reducers: {
-    initNodes(state, {payload}: PayloadAction<{spans: Span[]}>) {
-      const {edges, nodes} = DAGModel(payload.spans, NodeTypesEnum.TestSpan);
+    initNodes(state, {payload: {edges, nodes}}: PayloadAction<{edges: Edge[]; nodes: Node[]}>) {
       state.edges = edges;
       state.nodes = nodes;
     },
@@ -78,5 +77,13 @@ const dagSlice = createSlice({
   },
 });
 
-export const {initNodes, onNodesChange} = dagSlice.actions;
+export const initNodes = createAsyncThunk<void, {spans: Span[]}>(
+  'dag/generateDagLayout',
+  async ({spans}, {dispatch}) => {
+    const {edges, nodes} = await DAGModel(spans, NodeTypesEnum.TestSpan);
+    dispatch(dagSlice.actions.initNodes({edges, nodes}));
+  }
+);
+
+export const {onNodesChange} = dagSlice.actions;
 export default dagSlice.reducer;

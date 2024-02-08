@@ -131,7 +131,7 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
             isDAGDisabled={isDAGDisabled}
             runEvents={runEvents}
             runState={run.state}
-            spans={run?.trace?.spans ?? []}
+            trace={run.trace}
             type={visualizationType}
           />
         </S.SectionLeft>
