@@ -6,15 +6,15 @@ import {useCallback, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
 import {selectSpan} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
-import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TestRunService from 'services/TestRun.service';
 import Trace from 'models/Trace.model';
 import {TTestRunState} from 'types/TestRun.types';
-import Timeline from '../Visualization/components/Timeline';
+import TimelineV2 from 'components/Visualization/components/Timeline/TimelineV2';
 import {VisualizationType} from './RunDetailTrace';
 import TraceDAG from './TraceDAG';
 
 interface IProps {
+  containerHeight: number;
   isDAGDisabled: boolean;
   runEvents: TestRunEvent[];
   runState: TTestRunState;
@@ -22,25 +22,23 @@ interface IProps {
   type: VisualizationType;
 }
 
-const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans, rootSpan}, type}: IProps) => {
+const Visualization = ({
+  containerHeight,
+  isDAGDisabled,
+  runEvents,
+  runState,
+  trace,
+  trace: {spans, rootSpan},
+  type,
+}: IProps) => {
   const dispatch = useAppDispatch();
-  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
-  const isMatchedMode = Boolean(matchedSpans.length);
 
   useEffect(() => {
     if (selectedSpan) return;
 
     dispatch(selectSpan({spanId: rootSpan.id ?? ''}));
   }, [dispatch, rootSpan.id, selectedSpan, spans]);
-
-  const onNodeClickTimeline = useCallback(
-    (spanId: string) => {
-      TraceAnalyticsService.onTimelineSpanClick(spanId);
-      dispatch(selectSpan({spanId}));
-    },
-    [dispatch]
-  );
 
   const onNavigateToSpan = useCallback(
     (spanId: string) => {
@@ -56,15 +54,7 @@ const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans
   return type === VisualizationType.Dag && !isDAGDisabled ? (
     <TraceDAG trace={trace} onNavigateToSpan={onNavigateToSpan} />
   ) : (
-    <Timeline
-      isMatchedMode={isMatchedMode}
-      matchedSpans={matchedSpans}
-      nodeType={NodeTypesEnum.TraceSpan}
-      onNavigateToSpan={onNavigateToSpan}
-      onNodeClick={onNodeClickTimeline}
-      selectedSpan={selectedSpan}
-      spans={spans}
-    />
+    <TimelineV2 containerHeight={containerHeight} nodeType={NodeTypesEnum.TraceSpan} spans={spans} />
   );
 };
 
