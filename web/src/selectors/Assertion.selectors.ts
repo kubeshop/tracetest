@@ -1,5 +1,5 @@
 import {createSelector} from '@reduxjs/toolkit';
-import {sortBy, uniqBy} from 'lodash';
+import {sortBy} from 'lodash';
 
 import TracetestAPI from 'redux/apis/Tracetest';
 import {RootState} from 'redux/store';
@@ -29,31 +29,27 @@ const selectMatchedSpanList = createSelector(stateSelector, paramsSelector, (sta
   const {data: {trace} = {}} = TracetestAPI.instance.endpoints.getRunById.select({testId, runId})(state);
   if (!spanIdList.length) return trace?.spans || [];
 
-  return spanIdList.map(spanId => trace!.flat[spanId]);
-});
-
-const selectAttributeList = createSelector(
-  selectMatchedSpanList,
-  SpanSelectors.selectMatchedSpans,
-  (spanList, matchedSpans) =>
-    spanList
-      .flatMap(span => span.attributeList)
-      .concat(SpanAttributeService.getPseudoAttributeList(matchedSpans.length))
-);
-
-const selectAllAttributeList = createSelector(stateSelector, paramsSelector, (state, {testId, runId}) => {
-  const {data: {trace} = {}} = TracetestAPI.instance.endpoints.getRunById.select({testId, runId})(state);
-
-  const spanList = trace?.spans || [];
-
-  return spanList.flatMap(span => span.attributeList);
+  return spanIdList.map((spanId) => trace!.flat[spanId]);
 });
 
 const AssertionSelectors = () => {
   return {
     selectMatchedSpanList,
-    selectAttributeList,
-    selectAllAttributeList,
+    selectAttributeList: createSelector(
+      selectMatchedSpanList,
+      SpanSelectors.selectMatchedSpans,
+      (spanList, matchedSpans) =>
+        spanList
+          .flatMap(span => span.attributeList)
+          .concat(SpanAttributeService.getPseudoAttributeList(matchedSpans.length))
+    ),
+    selectAllAttributeList: createSelector(stateSelector, paramsSelector, (state, {testId, runId}) => {
+      const {data: {trace} = {}} = TracetestAPI.instance.endpoints.getRunById.select({testId, runId})(state);
+
+      const spanList = trace?.spans || [];
+
+      return spanList.flatMap(span => span.attributeList);
+    }),
     selectSelectorAttributeList: createSelector(
       selectMatchedSpanList,
       currentSelectorListSelector,
@@ -76,8 +72,6 @@ const AssertionSelectors = () => {
 
       return list;
     }),
-
-    selectAllUniqueAttributeList: createSelector(selectAllAttributeList, attributeList => uniqBy(attributeList, 'key')),
   };
 };
 
