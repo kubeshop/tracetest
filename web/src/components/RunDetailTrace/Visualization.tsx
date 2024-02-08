@@ -17,13 +17,14 @@ import Timeline from '../Visualization/components/Timeline';
 import {VisualizationType} from './RunDetailTrace';
 
 interface IProps {
+  isDAGDisabled: boolean;
   runEvents: TestRunEvent[];
   runState: TTestRunState;
   spans: Span[];
   type: VisualizationType;
 }
 
-const Visualization = ({runEvents, runState, spans, type}: IProps) => {
+const Visualization = ({isDAGDisabled, runEvents, runState, spans, type}: IProps) => {
   const dispatch = useAppDispatch();
   const edges = useAppSelector(TraceSelectors.selectEdges);
   const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
@@ -33,8 +34,9 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
 
   // TODO: Trace will never change, we can calculate this once and then keep using it
   useEffect(() => {
+    if (isDAGDisabled) return;
     dispatch(initNodes({spans}));
-  }, [dispatch, spans]);
+  }, [dispatch, isDAGDisabled, spans]);
 
   useEffect(() => {
     if (selectedSpan) return;
