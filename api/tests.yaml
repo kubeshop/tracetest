@@ -339,6 +339,14 @@ components:
           items:
             type: string
 
+    SearchSpansResult:
+      type: object
+      properties:
+        spansIds:
+          type: array
+          items:
+            type: string
+
     Selector:
       type: object
       properties:

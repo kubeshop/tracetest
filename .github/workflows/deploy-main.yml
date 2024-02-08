@@ -209,6 +209,10 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - shell: bash
+      run: |
+        echo "TAG=sha-$(git rev-parse --short=8 $GITHUB_SHA)" >> $GITHUB_ENV
+
     - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
       with:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
@@ -225,7 +229,7 @@ jobs:
 
     - name: Deploy
       run: |
-        TAG=sha-$(git rev-parse --short=8 $GITHUB_SHA) \
+        TAG=${{env.TAG}} \
         NAME=tracetest-beta \
         CONFIG_FILE=./k8s/tracetest.beta.yaml \
         EXPOSE_HOST=beta.tracetest.io \
@@ -233,3 +237,10 @@ jobs:
         BACKEND_CONFIG=tracetest-beta \
         ./k8s/deploy.sh
 
+    - name: Trigger Infra Update
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.INFRA_REPO_PAT }}
+        repository: ${{ secrets.INFRA_REPO }}
+        event-type: update-tags
+        client-payload: '{"repo_name": "tracetest", "new_tag": "${{ env.TAG }}"}'
