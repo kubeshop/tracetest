@@ -581,7 +581,7 @@ export interface operations {
       /** trace containing matching spans only */
       200: {
         content: {
-          "application/json": external["trace.yaml"]["components"]["schemas"]["Trace"];
+          "application/json": external["tests.yaml"]["components"]["schemas"]["SearchSpansResult"];
         };
       };
     };
@@ -2029,6 +2029,9 @@ export interface external {
         SelectedSpansResult: {
           selector?: external["tests.yaml"]["components"]["schemas"]["Selector"];
           spanIds?: string[];
+        };
+        SearchSpansResult: {
+          spansIds?: string[];
         };
         Selector: {
           query?: string;

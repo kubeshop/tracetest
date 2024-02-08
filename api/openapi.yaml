@@ -515,7 +515,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "trace.yaml#/components/schemas/Trace"
+                $ref: "tests.yaml#/components/schemas/SearchSpansResult"
 
   /tests/import:
     post:

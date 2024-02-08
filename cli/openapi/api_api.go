@@ -2669,7 +2669,7 @@ func (r ApiSearchSpansRequest) SearchSpansRequest(searchSpansRequest SearchSpans
 	return r
 }
 
-func (r ApiSearchSpansRequest) Execute() (*Trace, *http.Response, error) {
+func (r ApiSearchSpansRequest) Execute() (*SearchSpansResult, *http.Response, error) {
 	return r.ApiService.SearchSpansExecute(r)
 }
 
@@ -2694,13 +2694,13 @@ func (a *ApiApiService) SearchSpans(ctx context.Context, testId string, runId in
 
 // Execute executes the request
 //
-//	@return Trace
-func (a *ApiApiService) SearchSpansExecute(r ApiSearchSpansRequest) (*Trace, *http.Response, error) {
+//	@return SearchSpansResult
+func (a *ApiApiService) SearchSpansExecute(r ApiSearchSpansRequest) (*SearchSpansResult, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *Trace
+		localVarReturnValue *SearchSpansResult
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.SearchSpans")
