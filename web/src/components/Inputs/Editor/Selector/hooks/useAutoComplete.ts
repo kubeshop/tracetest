@@ -10,7 +10,7 @@ import {
   pseudoSelectorList,
   Tokens,
 } from 'constants/Editor.constants';
-import {useAppStore} from 'redux/hooks';
+import {useAppSelector} from 'redux/hooks';
 import AssertionSelectors from 'selectors/Assertion.selectors';
 import {escapeString} from 'utils/Common';
 
@@ -20,15 +20,7 @@ interface IProps {
 }
 
 const useAutoComplete = ({testId, runId}: IProps) => {
-  const {getState} = useAppStore();
-
-  const getAttributeList = useCallback(() => {
-    const state = getState();
-    // TODO: this list is calculated multiple times while typing, we should memoize it
-    const defaultList = AssertionSelectors.selectAllAttributeList(state, testId, runId);
-
-    return defaultList;
-  }, [getState, runId, testId]);
+  const attributeList = useAppSelector(state => AssertionSelectors.selectAllAttributeList(state, testId, runId));
 
   return useCallback(
     async (context: CompletionContext) => {
@@ -40,7 +32,6 @@ const useAutoComplete = ({testId, runId}: IProps) => {
 
       const tree = syntaxTree(state);
       const nodeBefore = tree.resolveInner(pos, -1);
-      const attributeList = getAttributeList();
 
       if (
         nodeBefore.prevSibling?.name === Tokens.Identifier ||
@@ -100,7 +91,7 @@ const useAutoComplete = ({testId, runId}: IProps) => {
         options: [{label: 'span', apply: 'span[', type: 'variableName'}],
       };
     },
-    [getAttributeList]
+    [attributeList]
   );
 };
 

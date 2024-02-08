@@ -22,11 +22,8 @@ const SpanSelectors = () => ({
   selectMatchedSpans,
   selectSpanById: createSelector(stateSelector, paramsSelector, (state, {spanId, testId, runId}) => {
     const {data: {trace} = {}} = TracetestAPI.instance.endpoints.getRunById.select({testId, runId})(state);
-    
-    // TODO: look for a simpler way of getting the span by id
-    const spanList = trace?.spans || [];
 
-    return spanList.find(span => span.id === spanId);
+    return trace?.flat[spanId];
   }),
   selectSelectedSpan: createSelector(spansStateSelector, ({selectedSpan}) => selectedSpan),
   selectFocusedSpan: createSelector(spansStateSelector, ({focusedSpan}) => focusedSpan),

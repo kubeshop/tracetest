@@ -22,16 +22,15 @@ export interface IProps {
   trace: Trace;
 }
 
-const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans}, type}: IProps) => {
+const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans, rootSpan}, type}: IProps) => {
   const {onSelectSpan, matchedSpans, onSetFocusedSpan, selectedSpan} = useSpan();
 
   const {isOpen} = useTestSpecForm();
 
   useEffect(() => {
     if (selectedSpan) return;
-    const firstSpan = spans.find(span => !span.parentId);
-    onSelectSpan(firstSpan?.id ?? '');
-  }, [onSelectSpan, selectedSpan, spans]);
+    onSelectSpan(rootSpan.id);
+  }, [onSelectSpan, rootSpan, selectedSpan, spans]);
 
   const onNodeClickTimeline = useCallback(
     (spanId: string) => {

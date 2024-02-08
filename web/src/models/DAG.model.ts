@@ -13,7 +13,6 @@ function getNodesDatumFromSpans(spans: Span[], type: NodeTypesEnum): INodeDatum<
 }
 
 function DAG(spans: Span[], type: NodeTypesEnum) {
-  // TODO: this runs twice for the list of spans
   const nodesDatum = getNodesDatumFromSpans(spans, type).sort((a, b) => {
     if (b.data.startTime !== a.data.startTime) return b.data.startTime - a.data.startTime;
     if (b.id < a.id) return -1;
