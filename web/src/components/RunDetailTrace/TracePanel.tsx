@@ -4,7 +4,7 @@ import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import {TestState} from 'constants/TestRun.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
 import Search from './Search';
-import {VisualizationType} from './RunDetailTrace';
+import {VisualizationType, getIsDAGDisabled} from './RunDetailTrace';
 import * as S from './RunDetailTrace.styled';
 import Switch from '../Visualization/components/Switch/Switch';
 import Visualization from './Visualization';
@@ -19,7 +19,10 @@ type TProps = {
 };
 
 const TracePanel = ({run, testId, runEvents, skipTraceCollection}: TProps) => {
-  const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
+  const isDAGDisabled = getIsDAGDisabled(run?.trace?.spans?.length);
+  const [visualizationType, setVisualizationType] = useState(() =>
+    isDAGDisabled ? VisualizationType.Timeline : VisualizationType.Dag
+  );
 
   return (
     <FillPanel>
@@ -34,15 +37,23 @@ const TracePanel = ({run, testId, runEvents, skipTraceCollection}: TProps) => {
             <S.SwitchContainer>
               {run.state === TestState.FINISHED && (
                 <Switch
+                  isDAGDisabled={isDAGDisabled}
                   onChange={type => {
                     TraceAnalyticsService.onSwitchDiagramView(type);
                     setVisualizationType(type);
                   }}
                   type={visualizationType}
+                  totalSpans={run?.trace?.spans?.length}
                 />
               )}
             </S.SwitchContainer>
-            <Visualization runEvents={runEvents} runState={run.state} trace={run.trace} type={visualizationType} />
+            <Visualization
+              isDAGDisabled={isDAGDisabled}
+              runEvents={runEvents}
+              runState={run.state}
+              trace={run.trace}
+              type={visualizationType}
+            />
           </S.VisualizationContainer>
         </S.SectionLeft>
       </S.Container>

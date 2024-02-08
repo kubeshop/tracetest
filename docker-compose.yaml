@@ -48,10 +48,10 @@ services:
     image: otel/opentelemetry-collector-contrib:0.59.0
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - "55679:55679"
-      - "4317:4317"
-      - "8888:8888"
+    # ports:
+    #   - "55679:55679"
+    #   - "4317:4317"
+    #   - "8888:8888"
     command:
       - "--config"
       - "/otel-local-config.yaml"

@@ -15,13 +15,14 @@ import {TTestRunState} from 'types/TestRun.types';
 import TestDAG from './TestDAG';
 
 export interface IProps {
+  isDAGDisabled: boolean;
   runEvents: TestRunEvent[];
   runState: TTestRunState;
   type: VisualizationType;
   trace: Trace;
 }
 
-const Visualization = ({runEvents, runState, trace, trace: {spans}, type}: IProps) => {
+const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans}, type}: IProps) => {
   const {onSelectSpan, matchedSpans, onSetFocusedSpan, selectedSpan} = useSpan();
 
   const {isOpen} = useTestSpecForm();
@@ -52,7 +53,7 @@ const Visualization = ({runEvents, runState, trace, trace: {spans}, type}: IProp
     return <RunEvents events={runEvents} stage={TestRunStage.Trace} state={runState} />;
   }
 
-  return type === VisualizationType.Dag ? (
+  return type === VisualizationType.Dag && !isDAGDisabled ? (
     <TestDAG trace={trace} onNavigateToSpan={onNavigateToSpan} />
   ) : (
     <Timeline
