@@ -14,7 +14,6 @@ import {VisualizationType} from './RunDetailTrace';
 import TraceDAG from './TraceDAG';
 
 interface IProps {
-  containerHeight: number;
   isDAGDisabled: boolean;
   runEvents: TestRunEvent[];
   runState: TTestRunState;
@@ -22,15 +21,7 @@ interface IProps {
   type: VisualizationType;
 }
 
-const Visualization = ({
-  containerHeight,
-  isDAGDisabled,
-  runEvents,
-  runState,
-  trace,
-  trace: {spans, rootSpan},
-  type,
-}: IProps) => {
+const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans, rootSpan}, type}: IProps) => {
   const dispatch = useAppDispatch();
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
 
@@ -54,7 +45,7 @@ const Visualization = ({
   return type === VisualizationType.Dag && !isDAGDisabled ? (
     <TraceDAG trace={trace} onNavigateToSpan={onNavigateToSpan} />
   ) : (
-    <TimelineV2 containerHeight={containerHeight} nodeType={NodeTypesEnum.TraceSpan} spans={spans} />
+    <TimelineV2 nodeType={NodeTypesEnum.TraceSpan} spans={spans} />
   );
 };
 

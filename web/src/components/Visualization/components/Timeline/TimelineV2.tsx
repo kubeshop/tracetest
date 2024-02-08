@@ -8,13 +8,14 @@ import SpanNodeFactory from './SpanNodeFactoryV2';
 import TimelineProvider from './Timeline.provider';
 import * as S from './TimelineV2.styled';
 
+const HEADER_HEIGHT = 210;
+
 export interface IProps {
-  containerHeight: number;
   nodeType: NodeTypesEnum;
   spans: Span[];
 }
 
-const Timeline = ({containerHeight, nodeType, spans}: IProps) => {
+const Timeline = ({nodeType, spans}: IProps) => {
   const listRef = useRef<List>(null);
   const nodes = useMemo(() => TimelineModel(spans, nodeType), [spans, nodeType]);
 
@@ -23,7 +24,7 @@ const Timeline = ({containerHeight, nodeType, spans}: IProps) => {
       <NavigationWrapper />
       <S.Container>
         <List
-          height={containerHeight}
+          height={window.innerHeight - HEADER_HEIGHT}
           itemCount={nodes.length}
           itemData={nodes}
           itemSize={32}

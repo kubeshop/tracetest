@@ -11,8 +11,6 @@ import Visualization from './Visualization';
 import {FillPanel} from '../ResizablePanels';
 import SkipTraceCollectionInfo from '../SkipTraceCollectionInfo';
 
-const HEADER_HEIGHT = 210;
-
 type TProps = {
   run: TestRun;
   testId: string;
@@ -55,7 +53,6 @@ const TracePanel = ({run, testId, runEvents, skipTraceCollection}: TProps) => {
               runState={run.state}
               trace={run.trace}
               type={visualizationType}
-              containerHeight={window.innerHeight - HEADER_HEIGHT}
             />
           </S.VisualizationContainer>
         </S.SectionLeft>
