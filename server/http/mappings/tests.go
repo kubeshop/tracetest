@@ -338,6 +338,17 @@ func (m OpenAPI) Runs(in []test.Run) []openapi.TestRun {
 	return runs
 }
 
+func (m OpenAPI) RunsSimplified(in []test.Run) []openapi.TestRun {
+	runs := make([]openapi.TestRun, len(in))
+	for i, t := range in {
+		// remove non requried fields
+		t.Trace = nil
+		runs[i] = m.Run(&t)
+	}
+
+	return runs
+}
+
 // in
 type Model struct {
 	comparators           comparator.Registry

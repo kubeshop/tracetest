@@ -251,7 +251,7 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 	}
 
 	return openapi.Response(200, paginated[openapi.TestRun]{
-		items: c.mappers.Out.Runs(runs),
+		items: c.mappers.Out.RunsSimplified(runs),
 		count: count,
 	}), nil
 }
