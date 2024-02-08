@@ -23,6 +23,4 @@ function DAG(spans: Span[], type: NodeTypesEnum) {
   return DAGService.getEdgesAndNodes(nodesDatum);
 }
 
-export const getShouldShowDAG = (spanCount: number): boolean => spanCount <= 200;
-
 export default DAG;
