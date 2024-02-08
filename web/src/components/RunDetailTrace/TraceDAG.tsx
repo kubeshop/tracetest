@@ -6,7 +6,7 @@ import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalyti
 import {useCallback, useEffect} from 'react';
 import Trace from 'models/Trace.model';
 import DAG from '../Visualization/components/DAG';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner, {SpinnerContainer} from '../LoadingSpinner';
 
 interface IProps {
   trace: Trace;
@@ -38,7 +38,11 @@ const TraceDAG = ({trace: {spans}, onNavigateToSpan}: IProps) => {
   );
 
   if (spans.length && !nodes.length) {
-    return <LoadingSpinner />;
+    return (
+      <SpinnerContainer>
+        <LoadingSpinner />
+      </SpinnerContainer>
+    );
   }
 
   return (

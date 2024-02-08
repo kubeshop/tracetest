@@ -9,7 +9,7 @@ import DAGSelectors from 'selectors/DAG.selectors';
 import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import Trace from 'models/Trace.model';
 import {useTestSpecForm} from '../TestSpecForm/TestSpecForm.provider';
-import LoadingSpinner from '../LoadingSpinner';
+import LoadingSpinner, {SpinnerContainer} from '../LoadingSpinner';
 
 export interface IProps {
   trace: Trace;
@@ -38,7 +38,11 @@ const TestDAG = ({trace: {spans}, onNavigateToSpan}: IProps) => {
   );
 
   if (spans.length && !nodes.length) {
-    return <LoadingSpinner />;
+    return (
+      <SpinnerContainer>
+        <LoadingSpinner />
+      </SpinnerContainer>
+    );
   }
 
   return (
