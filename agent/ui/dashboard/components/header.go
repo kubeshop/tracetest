@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/styles"
@@ -72,26 +71,10 @@ func (h *Header) draw() {
 	flex := tview.NewFlex()
 
 	flex.SetDirection(tview.FlexColumn).
-		AddItem(h.getEnvironmentInformationTable(), 0, 1, true).
-		AddItem(h.getMetricsTable(), 0, 1, true)
+		AddItem(h.getEnvironmentInformationTable(), 0, 1, false).
+		AddItem(h.getMetricsTable(), 0, 1, false)
 
-	h.Flex.SetDirection(tview.FlexRow).AddItem(h.messageBanner, 0, 0, true).AddItem(flex, 0, 8, true)
-
-	h.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		switch event.Rune() {
-		case 's':
-			h.messageBanner.SetMessage("Now you see me :D", events.Error)
-			h.showMessageBanner()
-		case 'w':
-			h.messageBanner.SetMessage("This is a warning! :D", events.Warning)
-			h.showMessageBanner()
-		case 'h':
-			h.messageBanner.SetMessage("", events.Error)
-			h.hideMessageBanner()
-		}
-
-		return event
-	})
+	h.Flex.SetDirection(tview.FlexRow).AddItem(h.messageBanner, 0, 0, false).AddItem(flex, 0, 8, false)
 
 	h.setupSensors()
 }
@@ -125,7 +108,7 @@ func (h *Header) getEnvironmentInformationTable() tview.Primitive {
 func (h *Header) getMetricsTable() tview.Primitive {
 	table := tview.NewTable()
 	table.SetBackgroundColor(styles.HeaderBackgroundColor)
-	table.SetBorder(true).SetTitle("Environment").SetTitleColor(styles.HighlighColor)
+	table.SetBorder(true).SetTitle("Tracetest Metrics").SetTitleColor(styles.HighlighColor)
 	table.SetCell(0, 0, tview.NewTableCell("Uptime: ").SetStyle(styles.MetricNameStyle))
 	table.SetCell(0, 1, h.uptimeTableCell)
 	table.SetCell(1, 0, tview.NewTableCell("Runs: ").SetStyle(styles.MetricNameStyle))
