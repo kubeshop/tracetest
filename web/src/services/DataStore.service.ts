@@ -10,21 +10,22 @@ import AzureAppInsightsService from './DataStores/AzureAppInsights.service';
 import SumoLogicService from './DataStores/SumoLogic.service';
 
 const dataStoreServiceMap = {
-  [SupportedDataStores.JAEGER]: JaegerService,
-  [SupportedDataStores.TEMPO]: BaseClientService,
-  [SupportedDataStores.OpenSearch]: ElasticSearchService,
-  [SupportedDataStores.ElasticApm]: ElasticSearchService,
-  [SupportedDataStores.SignalFX]: SignalFxService,
-  [SupportedDataStores.OtelCollector]: OtelCollectorService,
-  [SupportedDataStores.NewRelic]: OtelCollectorService,
-  [SupportedDataStores.Lightstep]: OtelCollectorService,
-  [SupportedDataStores.Datadog]: OtelCollectorService,
-  [SupportedDataStores.Honeycomb]: OtelCollectorService,
   [SupportedDataStores.AWSXRay]: AwsXRayService,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsightsService,
-  [SupportedDataStores.Signoz]: OtelCollectorService,
+  [SupportedDataStores.Datadog]: OtelCollectorService,
   [SupportedDataStores.Dynatrace]: OtelCollectorService,
+  [SupportedDataStores.ElasticApm]: ElasticSearchService,
+  [SupportedDataStores.Honeycomb]: OtelCollectorService,
+  [SupportedDataStores.Instana]: OtelCollectorService,
+  [SupportedDataStores.JAEGER]: JaegerService,
+  [SupportedDataStores.Lightstep]: OtelCollectorService,
+  [SupportedDataStores.NewRelic]: OtelCollectorService,
+  [SupportedDataStores.OpenSearch]: ElasticSearchService,
+  [SupportedDataStores.OtelCollector]: OtelCollectorService,
+  [SupportedDataStores.SignalFX]: SignalFxService,
+  [SupportedDataStores.Signoz]: OtelCollectorService,
   [SupportedDataStores.SumoLogic]: SumoLogicService,
+  [SupportedDataStores.TEMPO]: BaseClientService,
 } as const;
 
 interface IDataStoreService {

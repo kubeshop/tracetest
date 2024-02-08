@@ -2030,7 +2030,7 @@ func (r ApiGetWizardRequest) Execute() (*Wizard, *http.Response, error) {
 /*
 GetWizard Get a specific wizard
 
-Get the configured Wizard
+Get the configured Wizard, showing the state of each step.
 
 	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 	@return ApiGetWizardRequest
