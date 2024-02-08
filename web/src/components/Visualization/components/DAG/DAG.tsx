@@ -5,6 +5,7 @@ import Actions from './Actions';
 import * as S from './DAG.styled';
 import TestSpanNode from './TestSpanNode/TestSpanNode';
 import TraceSpanNode from './TraceSpanNode/TraceSpanNode';
+import {MAX_DAG_NODES} from '../../../../constants/Visualization.constants';
 
 /** Important to define the nodeTypes outside the component to prevent re-renderings */
 const nodeTypes = {traceSpan: TraceSpanNode, testSpan: TestSpanNode};
@@ -50,12 +51,13 @@ const DAG = ({
           multiSelectionKeyCode={null}
           nodesConnectable={false}
           nodeTypes={nodeTypes}
-          onInit={() => onNavigateToSpan(nodes[0]?.id)}
+          onInit={() => nodes.length >= MAX_DAG_NODES && onNavigateToSpan(nodes[0]?.id)}
           onNodeClick={onNodeClick}
           onNodeDragStop={onNodeClick}
           onNodesChange={onNodesChange}
           onlyRenderVisibleElements
           selectionKeyCode={null}
+          fitView={nodes.length <= MAX_DAG_NODES}
         >
           {isMiniMapActive && <MiniMap />}
         </ReactFlow>
