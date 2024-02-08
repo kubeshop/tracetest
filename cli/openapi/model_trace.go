@@ -21,7 +21,7 @@ var _ MappedNullable = &Trace{}
 type Trace struct {
 	TraceId *string `json:"traceId,omitempty"`
 	Tree    *Span   `json:"tree,omitempty"`
-	// falttened version, mapped as spanId -> span{}
+	// flattened version, mapped as spanId -> span{}
 	Flat *map[string]Span `json:"flat,omitempty"`
 }
 

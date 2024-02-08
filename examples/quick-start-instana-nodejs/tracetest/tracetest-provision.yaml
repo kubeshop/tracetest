@@ -1,0 +1,7 @@
+---
+type: DataStore
+spec:
+  id: current
+  name: Instana
+  type: instana
+  default: true
