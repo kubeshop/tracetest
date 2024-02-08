@@ -1,0 +1,11 @@
+node_modules
+.vscode
+
+node_modules
+api/.build/
+.idea/
+.DS_Store
+.env
+
+cypress/screenshots
+cypress/downloads

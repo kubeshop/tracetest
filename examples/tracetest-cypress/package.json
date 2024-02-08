@@ -1,0 +1,19 @@
+{
+  "name": "tracetest-cypress",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "cy:open": "cypress open",
+    "start": "cypress run"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tracetest/cypress": "^0.0.27",
+    "cypress": "^13.6.4",
+    "dotenv": "^16.4.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
