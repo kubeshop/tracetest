@@ -68,12 +68,18 @@ func NewHeader(renderScheduler RenderScheduler, sensor sensors.Sensor) *Header {
 func (h *Header) draw() {
 	h.Clear()
 
+	// This flex layout represents the two information boxes we see on the interface. They are aligned
+	// in the Column orientation (take a look at CSS's flex direction).
+	// Each one fills 50% of the available space. (each one takes `proportion=1`
+	// and total proporsion of all elements is 2, so 1/2 for each element)
 	flex := tview.NewFlex()
 
 	flex.SetDirection(tview.FlexColumn).
 		AddItem(h.getEnvironmentInformationTable(), 0, 1, false).
 		AddItem(h.getMetricsTable(), 0, 1, false)
 
+	// Then we have this flex for stacking the MessageBanner and the previous flex layout together in a different
+	// orientation. The banner will be on top of the flex layout.
 	h.Flex.SetDirection(tview.FlexRow).AddItem(h.messageBanner, 0, 0, false).AddItem(flex, 0, 8, false)
 
 	h.setupSensors()

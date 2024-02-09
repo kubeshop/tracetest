@@ -26,7 +26,7 @@ func startUptimeCounter(sensor sensors.Sensor) {
 			case <-ticker.C:
 				sensor.Emit(events.UptimeChanged, time.Since(start).Round(time.Second))
 			case <-fastTicker.C:
-				sensor.Emit(events.NewTestRun, models.TestRun{TestID: "1", RunID: "1", Name: "my test", Type: "HTTP", Endpoint: "http://localhost:11633/api/tests", Status: "Awaiting Traces", When: time.Since(start)})
+				sensor.Emit(events.NewTestRun, models.TestRun{TestID: "1", RunID: "1", Name: "my test", Type: "HTTP", Endpoint: "http://localhost:11633/api/tests", Status: "Awaiting Traces", When: time.Since(start).Round(time.Second)})
 			}
 		}
 	}()
