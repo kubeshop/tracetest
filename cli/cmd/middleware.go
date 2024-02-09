@@ -1,13 +1,20 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
+	"syscall"
 
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/cli/ui"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 type RunFn func(cmd *cobra.Command, args []string) (string, error)
@@ -19,13 +26,62 @@ func WithResultHandler(runFn RunFn) CobraRunFn {
 		res, err := runFn(cmd, args)
 
 		if err != nil {
-			OnError(err)
+			handleError(err, cmd, args)
 			return
 		}
 
 		if res != "" {
 			fmt.Println(res)
 		}
+	}
+}
+
+func handleError(err error, cmd *cobra.Command, args []string) {
+	reqErr := resourcemanager.RequestError{}
+	if errors.As(err, &reqErr) && reqErr.IsAuthError {
+		handleAuthError(cmd, args)
+	} else {
+		OnError(err)
+	}
+}
+
+func handleAuthError(cmd *cobra.Command, args []string) {
+	ui.DefaultUI.Warning("Your authentication token has expired, please log in again.")
+	configurator.
+		WithOnFinish(func(ctx context.Context, _ config.Config) {
+			retryCommand(cmd, args)
+		}).
+		ExecuteUserLogin(context.Background(), cliConfig)
+}
+
+func retryCommand(cmd *cobra.Command, args []string) {
+	cmdLine := buildCmdLine(cmd, args)
+	execCmd := exec.Command("sh", "-c", cmdLine)
+	execCmd.Stdout = os.Stdout
+	execCmd.Stderr = os.Stderr
+	err := execCmd.Run()
+
+	if err != nil {
+		exitWithCmdStatus(err)
+	} else {
+		os.Exit(0)
+	}
+}
+
+func buildCmdLine(cmd *cobra.Command, args []string) string {
+	cmdLine := append([]string{cmd.CommandPath()}, args...)
+	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+		if flag.Changed {
+			cmdLine = append(cmdLine, fmt.Sprintf("--%s=%s", flag.Name, flag.Value.String()))
+		}
+	})
+	return strings.Join(cmdLine, " ")
+}
+
+func exitWithCmdStatus(err error) {
+	if exitError, ok := err.(*exec.ExitError); ok {
+		ws := exitError.Sys().(syscall.WaitStatus)
+		os.Exit(ws.ExitStatus())
 	}
 }
 

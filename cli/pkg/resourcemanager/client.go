@@ -134,8 +134,9 @@ var ErrNotFound = RequestError{
 }
 
 type RequestError struct {
-	Code    int    `json:"code"`
-	Message string `json:"error"`
+	Code        int    `json:"code"`
+	Message     string `json:"error"`
+	IsAuthError bool   `json:"isAuthError"`
 }
 
 type alternateRequestError struct {
@@ -150,6 +151,10 @@ func (e RequestError) Error() string {
 func (e RequestError) Is(target error) bool {
 	t, ok := target.(RequestError)
 	return ok && t.Code == e.Code
+}
+
+func isAuthError(resp *http.Response) bool {
+	return resp.StatusCode == http.StatusUnauthorized
 }
 
 func isSuccessResponse(resp *http.Response) bool {
@@ -188,9 +193,9 @@ func parseRequestError(resp *http.Response, format Format) error {
 	if err != nil {
 		return fmt.Errorf("cannot parse response body: %w", err)
 	}
-
 	return RequestError{
-		Code:    alternateReqError.Status,
-		Message: alternateReqError.Detail,
+		Code:        alternateReqError.Status,
+		Message:     alternateReqError.Detail,
+		IsAuthError: isAuthError(resp),
 	}
 }

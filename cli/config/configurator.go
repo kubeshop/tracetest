@@ -187,6 +187,10 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 		return cfg, nil
 	}
 
+	return c.ExecuteUserLogin(ctx, cfg)
+}
+
+func (c Configurator) ExecuteUserLogin(ctx context.Context, cfg Config) (Config, error) {
 	oauthServer := oauth.NewOAuthServer(cfg.OAuthEndpoint(), cfg.UIEndpoint)
 	err := oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
 		WithOnFailure(c.onOAuthFailure).
@@ -195,7 +199,7 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 		return Config{}, err
 	}
 
-	return cfg, nil
+	return cfg, err
 }
 
 func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
