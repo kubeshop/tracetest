@@ -41,7 +41,6 @@ func (r *sensor) On(eventName string, cb func(Event)) {
 		slice = existingSlice
 	} else {
 		slice = make([]func(Event), 0)
-		slice = append(slice, cb)
 	}
 	r.listeners[eventName] = append(slice, cb)
 }
