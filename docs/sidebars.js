@@ -146,6 +146,11 @@ const sidebars = {
               id: "examples-tutorials/recipes/testing-vercel-functions-with-opentelemetry-tracetest",
               label: "Testing Vercel Functions",
             },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/testing-lambda-functions-with-opentelemetry-tracetest",
+              label: "Testing AWS Lambda Functions",
+            },
           ],
         },
         {
