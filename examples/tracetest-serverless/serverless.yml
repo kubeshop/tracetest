@@ -1,0 +1,19 @@
+service: tracetest-serverless
+frameworkVersion: "3"
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment:
+    NODE_OPTIONS: --require lambda-wrapper
+    COLLECTOR_ENDPOINT: ${env:TRACETEST_AGENT_ENDPOINT}
+
+functions:
+  api:
+    handler: index.handler
+    events:
+      - httpApi:
+          path: /
+          method: get
