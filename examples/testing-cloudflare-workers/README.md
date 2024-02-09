@@ -14,27 +14,41 @@ It's using Cloudflare Workers with [OpenTelemetry configured with otel-cf-worker
 - [Cloudflare Workers Account](https://workers.cloudflare.com/)
 - [Cloudflare Database](https://developers.cloudflare.com/d1/get-started/)
 
-    Create D1
+Install npm modules:
 
-    ```bash
-    npx wrangler d1 create testing-cloudflare-workers
+```bash
+npm i
+```
 
-    ✅ Successfully created DB 'testing-cloudflare-workers' in region EEUR
-    Created your database using D1's new storage backend. The new storage backend is not yet recommended for production workloads, but backs up your data via point-in-time
-    restore.
+If you do not have `npx`, install it:
 
-    [[d1_databases]]
-    binding = "DB" # i.e. available in your Worker on env.DB
-    database_name = "testing-cloudflare-workers"
-    database_id = "<your_database_id>"
-    ```
+```bash
+npm install -g npx
+```
 
-    Configure D1
+Create a D1 database:
 
-    ```bash
-    npx wrangler d1 execute testing-cloudflare-workers --local --file=./schema.sql
-    npx wrangler d1 execute testing-cloudflare-workers --file=./schema.sql
-    ```
+```bash
+npx wrangler d1 create testing-cloudflare-workers
+
+✅ Successfully created DB 'testing-cloudflare-workers' in region EEUR
+Created your database using D1's new storage backend. The new storage backend is not yet recommended for production workloads, but backs up your data via point-in-time
+restore.
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "testing-cloudflare-workers"
+database_id = "<your_database_id>"
+```
+
+Set the `database_id` credentials in your `wrangler.toml`.
+
+Configure the D1 database:
+
+```bash
+npx wrangler d1 execute testing-cloudflare-workers --local --file=./schema.sql
+npx wrangler d1 execute testing-cloudflare-workers --file=./schema.sql
+```
 
 ## Getting Started with Docker
 
