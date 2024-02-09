@@ -14,10 +14,6 @@ processors:
 exporters:
   logging:
     loglevel: debug
-  jaeger:
-    endpoint: ${JAEGER_ENDPOINT}
-    tls:
-      insecure: true
   otlp/trace:
     endpoint: tracetest-agent:4317
     tls:
@@ -26,10 +22,6 @@ exporters:
 service:
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: []
-      exporters: [logging, jaeger]
-    traces/1:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp/trace]

@@ -51,17 +51,6 @@ services:
       timeout: 5s
       retries: 60
 
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    environment:
-      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
-      - COLLECTOR_OTLP_ENABLED=true
-    healthcheck:
-      test: ['CMD', 'wget', '--spider', 'localhost:16686']
-      interval: 1s
-      timeout: 3s
-      retries: 60
-
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.59.0
     restart: unless-stopped
@@ -72,11 +61,6 @@ services:
       - '/otel-local-config.yaml'
     volumes:
       - ./collector.config.yaml:/otel-local-config.yaml
-    environment:
-      - JAEGER_ENDPOINT=jaeger:14250
-    depends_on:
-      jaeger:
-        condition: service_healthy
 
   api:
     image: kubeshop/demo-pokemon-api:latest
