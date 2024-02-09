@@ -102,8 +102,8 @@ export const SpanBarLabel = styled.div<{$side: 'left' | 'right'}>`
         `};
 `;
 
-export const TextConnector = styled.text`
-  fill: ${({theme}) => theme.color.text};
+export const TextConnector = styled.text<{$isActive?: boolean}>`
+  fill: ${({theme, $isActive}) => ($isActive ? theme.color.white : theme.color.text)};
   font-size: ${({theme}) => theme.size.xs};
 `;
 
@@ -117,7 +117,34 @@ export const LineBase = styled.line`
   stroke: ${({theme}) => theme.color.textSecondary};
 `;
 
-export const RectBase = styled.rect<{$isTransparent?: boolean}>`
+export const RectBase = styled.rect<{$isActive?: boolean}>`
+  fill: ${({theme, $isActive}) => ($isActive ? theme.color.primary : theme.color.white)};
   stroke: ${({theme}) => theme.color.textSecondary};
-  fill: ${({theme, $isTransparent}) => ($isTransparent ? 'transparent' : theme.color.white)};
+`;
+
+export const RectBaseTransparent = styled(RectBase)`
+  cursor: pointer;
+  fill: transparent;
+`;
+
+export const HeaderRow = styled.div`
+  background-color: ${({theme}) => theme.color.white};
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: 32px;
+  padding: 0px 16px;
+`;
+
+export const HeaderContent = styled.div`
+  align-items: center;
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+export const HeaderTitle = styled(Typography.Title)`
+  && {
+    margin: 0;
+  }
 `;

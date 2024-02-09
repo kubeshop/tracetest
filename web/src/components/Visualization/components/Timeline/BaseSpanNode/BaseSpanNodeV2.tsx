@@ -20,24 +20,32 @@ interface IProps extends IPropsComponent {
 }
 
 const BaseSpanNode = ({header, index, node, span, style}: IProps) => {
-  const {getScale, matchedSpans, onNodeClick, selectedSpan} = useTimeline();
+  const {collapsedSpans, getScale, matchedSpans, onSpanCollapse, onSpanClick, selectedSpan} = useTimeline();
   const {start: viewStart, end: viewEnd} = getScale(span.startTime, span.endTime);
   const hintSide = getHintSide(viewStart, viewEnd);
   const isSelected = selectedSpan === node.data.id;
   const isMatched = matchedSpans.includes(node.data.id);
+  const isCollapsed = collapsedSpans.includes(node.data.id);
   const leftPadding = node.depth * BaseLeftPadding;
 
   return (
     <div style={style}>
       <S.Row
-        onClick={() => onNodeClick(node.data.id)}
+        onClick={() => onSpanClick(node.data.id)}
         $isEven={index % 2 === 0}
         $isMatched={isMatched}
         $isSelected={isSelected}
       >
         <S.Col>
           <S.Header>
-            <Connector hasParent={!!node.data.parentId} leftPadding={leftPadding} totalChildren={node.children} />
+            <Connector
+              hasParent={!!node.data.parentId}
+              id={node.data.id}
+              isCollapsed={isCollapsed}
+              leftPadding={leftPadding}
+              onCollapse={onSpanCollapse}
+              totalChildren={node.children}
+            />
             <S.NameContainer>
               <S.Title>{span.name}</S.Title>
             </S.NameContainer>
