@@ -4,8 +4,6 @@ import {IPropsComponent} from '../SpanNodeFactoryV2';
 import {useTimeline} from '../Timeline.provider';
 import * as S from '../TimelineV2.styled';
 
-const BaseLeftPadding = 16; // TODO: Move to Timeline.constants
-
 function toPercent(value: number) {
   return `${(value * 100).toFixed(1)}%`;
 }
@@ -26,7 +24,6 @@ const BaseSpanNode = ({header, index, node, span, style}: IProps) => {
   const isSelected = selectedSpan === node.data.id;
   const isMatched = matchedSpans.includes(node.data.id);
   const isCollapsed = collapsedSpans.includes(node.data.id);
-  const leftPadding = node.depth * BaseLeftPadding;
 
   return (
     <div style={style}>
@@ -42,7 +39,7 @@ const BaseSpanNode = ({header, index, node, span, style}: IProps) => {
               hasParent={!!node.data.parentId}
               id={node.data.id}
               isCollapsed={isCollapsed}
-              leftPadding={leftPadding}
+              nodeDepth={node.depth}
               onCollapse={onSpanCollapse}
               totalChildren={node.children}
             />
