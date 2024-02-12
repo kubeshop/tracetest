@@ -1,0 +1,53 @@
+name = "pokemon-api"
+main = "src/index.ts"
+compatibility_date = "2023-12-18"
+compatibility_flags = [ "nodejs_compat" ]
+
+# Set the IP to make the Cloudflare Worker available in Docker containers
+[dev]
+ip = "0.0.0.0"
+port = 8787
+local_protocol = "http"
+
+# Development
+[env.dev]
+name = "pokemon-api-dev"
+main = "src/index.ts"
+compatibility_date = "2023-12-18"
+compatibility_flags = [ "nodejs_compat" ]
+d1_databases = [
+  { binding = "DB", database_name = "testing-cloudflare-workers", database_id = "<YOUR_DATABASE_ID>" },
+]
+[env.dev.vars]
+TRACETEST_URL = "http://localhost:4318/v1/traces"
+
+# Prod
+[env.prod]
+name = "pokemon-api"
+main = "src/index.ts"
+compatibility_date = "2023-12-18"
+compatibility_flags = [ "nodejs_compat" ]
+workers_dev = true
+d1_databases = [
+  { binding = "DB", database_name = "testing-cloudflare-workers", database_id = "<YOUR_DATABASE_ID>" },
+]
+[env.prod.vars]
+TRACETEST_URL = "https://<YOUR_TRACETEST_AGENT_URL>.tracetest.io:443/v1/traces"
+
+# Docker
+[env.docker]
+name = "pokemon-api-docker"
+main = "src/index.ts"
+compatibility_date = "2023-12-18"
+compatibility_flags = [ "nodejs_compat" ]
+d1_databases = [
+  { binding = "DB", database_name = "testing-cloudflare-workers", database_id = "<YOUR_DATABASE_ID>" },
+]
+[env.docker.vars]
+TRACETEST_URL = "http://tracetest-agent:4318/v1/traces"
+
+# D1
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "testing-cloudflare-workers"
+database_id = "<YOUR_DATABASE_ID>"
