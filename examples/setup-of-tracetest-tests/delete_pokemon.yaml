@@ -1,0 +1,29 @@
+type: Test
+spec:
+  id: delete-pokemon
+  name: Delete Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      method: DELETE
+      url: https://demo-pokeshop.tracetest.io/pokemon/${env:pokemon_id}
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+    name: Delete returns a 200 status code
+    assertions:
+    - attr:tracetest.response.status = 200
+  - selector: span[tracetest.span.type="database" db.system="redis" db.operation="del" db.redis.database_index="0"]
+    name: Ensure we are deleting from the redis cache also
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[tracetest.span.type="database"]
+    name: "All Database Spans: Processing time is less than 10ms"
+    assertions:
+    - attr:tracetest.span.duration < 10ms
+  - selector: span[tracetest.span.type="database" name="delete pokeshop.pokemon" db.system="postgres" db.name="pokeshop" db.user="ashketchum" db.operation="delete" db.sql.table="pokemon"]
+    name: Check that number of deleted rows from Postgres is one
+    assertions:
+    - attr:db.result = 1

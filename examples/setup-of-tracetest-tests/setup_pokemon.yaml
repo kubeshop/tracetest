@@ -1,0 +1,26 @@
+type: Test
+spec:
+  id: setup-pokemon
+  name: Setup Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: https://demo-pokeshop.tracetest.io/pokemon
+      body: "{\n  \"name\": \"fearow\",\n  \"type\":\"normal,flying\",\n  \"imageUrl\":\"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/22.png\",\n  \"isFeatured\": false\n}\n"
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+    name: Check to see the post worked
+    assertions:
+    - attr:tracetest.response.status = 201
+  outputs:
+  - name: pokemon_id
+    selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+    value: attr:tracetest.response.body| json_path '$.id'
+  skipTraceCollection: true
+
+
+  
