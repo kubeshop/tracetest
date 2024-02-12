@@ -3,13 +3,13 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import {useTest} from 'providers/Test/Test.provider';
 import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useMemo} from 'react';
-import Date from 'utils/Date';
 import {isRunStateFinished} from 'models/TestRun.model';
 import {TDraftTest} from 'types/Test.types';
 import TestService from 'services/Test.service';
 import HeaderForm from './HeaderForm';
 import Info from './Info';
 import * as S from './RunDetailLayout.styled';
+import TestRunService from '../../services/TestRun.service';
 
 interface IProps {
   name: string;
@@ -18,21 +18,8 @@ interface IProps {
 }
 
 const HeaderLeft = ({name, triggerType, origin}: IProps) => {
-  const {
-    run: {
-      createdAt,
-      testSuiteId,
-      testSuiteRunId,
-      executionTime,
-      trace,
-      traceId,
-      testVersion,
-      metadata: {source} = {},
-    } = {},
-    run,
-  } = useTestRun();
+  const {run: {createdAt, testSuiteId, testSuiteRunId, executionTime, trace, traceId} = {}, run} = useTestRun();
   const {onEdit, isEditLoading: isLoading, test} = useTest();
-  const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
   const {navigate} = useDashboard();
   const stateIsFinished = isRunStateFinished(run.state);
 
@@ -44,7 +31,7 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
   const description = useMemo(() => {
     return (
       <>
-        v{testVersion} • {triggerType} • Ran {createdTimeAgo} {source && <>• Run via {source.toUpperCase()}</>}
+        {TestRunService.getHeaderInfo(run, triggerType)}
         {testSuiteId && !!testSuiteRunId && (
           <>
             {' '}
@@ -56,7 +43,7 @@ const HeaderLeft = ({name, triggerType, origin}: IProps) => {
         )}
       </>
     );
-  }, [testVersion, triggerType, createdTimeAgo, source, testSuiteId, testSuiteRunId]);
+  }, [run, triggerType, testSuiteId, testSuiteRunId]);
 
   return (
     <S.Section $justifyContent="flex-start">
