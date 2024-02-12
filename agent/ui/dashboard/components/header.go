@@ -178,4 +178,10 @@ func (h *Header) setupSensors() {
 		h.data.Metrics.Traces = int64(count)
 		h.onDataChange()
 	})
+
+	h.sensor.On(events.NewTestRun, func(e sensors.Event) {
+		h.data.Metrics.TestRuns++
+
+		h.onDataChange()
+	})
 }
