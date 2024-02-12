@@ -2,9 +2,11 @@ package runner
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
+	"github.com/golang-jwt/jwt"
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/ui"
 
@@ -100,6 +102,10 @@ func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoi
 		cfg.APIKey = agentApiKey
 	}
 
+	if s.mode == agentConfig.Mode_Dashboard {
+		return s.RunDashboardStrategy(ctx, cfg, uiEndpoint)
+	}
+
 	if s.mode == agentConfig.Mode_Desktop {
 		return s.RunDesktopStrategy(ctx, cfg, uiEndpoint)
 	}
@@ -109,4 +115,38 @@ func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoi
 
 func enableLogging(logLevel string) bool {
 	return os.Getenv("TRACETEST_DEV") == "true" && logLevel == "debug"
+}
+
+func (s *Runner) authenticate(ctx context.Context, cfg agentConfig.Config) (*Session, jwt.MapClaims, error) {
+	isStarted := false
+	session := &Session{}
+
+	var err error
+
+	for !isStarted {
+		session, err = StartSession(ctx, cfg, nil, s.logger)
+		if err != nil && errors.Is(err, ErrOtlpServerStart) {
+			s.ui.Error("Tracetest Agent binds to the OpenTelemetry ports 4317 and 4318 which are used to receive trace information from your system. The agent tried to bind to these ports, but failed.")
+			shouldRetry := s.ui.Enter("Please stop the process currently listening on these ports and press enter to try again.")
+
+			if !shouldRetry {
+				s.ui.Finish()
+				return nil, nil, err
+			}
+
+			continue
+		}
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		isStarted = true
+	}
+
+	claims, err := config.GetTokenClaims(session.Token)
+	if err != nil {
+		return nil, nil, err
+	}
+	return session, claims, nil
 }

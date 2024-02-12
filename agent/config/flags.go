@@ -3,8 +3,9 @@ package config
 type Mode string
 
 const (
-	Mode_Desktop Mode = "desktop"
-	Mode_Verbose Mode = "verbose"
+	Mode_Dashboard Mode = "dashboard"
+	Mode_Desktop   Mode = "desktop"
+	Mode_Verbose   Mode = "verbose"
 )
 
 type Flags struct {
