@@ -114,7 +114,7 @@ export const CircleDot = styled.circle`
 `;
 
 export const LineBase = styled.line`
-  stroke: ${({theme}) => theme.color.textSecondary};
+  stroke: ${({theme}) => theme.color.borderLight};
 `;
 
 export const RectBase = styled.rect<{$isActive?: boolean}>`
