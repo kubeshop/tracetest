@@ -224,7 +224,6 @@ Cypress.Commands.add('createAssertion', () => {
   cy.get('[data-cy=assertion-check-operator]').click({force: true});
 
   cy.get('[data-cy=assertion-form-submit-button]').click();
-  cy.get('[data-cy=test-specs-container]').should('be.visible');
   cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
 });
 

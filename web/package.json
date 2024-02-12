@@ -83,6 +83,8 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:ci": "cypress run --parallel --record --key $CYPRESS_RECORD_KEY",
+    "cy:local:run": "POKEMON_HTTP_ENDPOINT=http://demo-api:8081 cypress run",
+    "cy:local:open": "POKEMON_HTTP_ENDPOINT=http://demo-api:8081 cypress open",
     "prettier": "prettier --write ./src",
     "less": "lessc --js src/antd-theme/antd-customized.less src/antd-theme/antd-customized.css"
   },
