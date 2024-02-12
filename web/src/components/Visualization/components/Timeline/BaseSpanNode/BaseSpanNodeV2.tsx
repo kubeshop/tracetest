@@ -13,11 +13,10 @@ function getHintSide(viewStart: number, viewEnd: number) {
 }
 
 interface IProps extends IPropsComponent {
-  header?: React.ReactNode;
   span: Span;
 }
 
-const BaseSpanNode = ({header, index, node, span, style}: IProps) => {
+const BaseSpanNode = ({index, node, span, style}: IProps) => {
   const {collapsedSpans, getScale, matchedSpans, onSpanCollapse, onSpanClick, selectedSpan} = useTimeline();
   const {start: viewStart, end: viewEnd} = getScale(span.startTime, span.endTime);
   const hintSide = getHintSide(viewStart, viewEnd);

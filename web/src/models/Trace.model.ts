@@ -16,17 +16,21 @@ const defaultTrace: TRawTrace = {
   tree: {},
 };
 
-const Trace = ({traceId = '', flat = {}, tree = {}} = defaultTrace): Trace => ({
-  traceId,
-  rootSpan: Span(tree),
-  flat: Object.values(flat).reduce<TSpanMap>(
-    (acc, span) => ({
-      ...acc,
-      [span.id || '']: Span(span),
-    }),
-    {}
-  ),
-  spans: Object.values(flat).map(rawSpan => Span(rawSpan)),
-});
+const Trace = ({traceId = '', flat: rawFlat = {}, tree = {}} = defaultTrace): Trace => {
+  const flat: TSpanMap = {};
+  const spans = Object.values(rawFlat).map(raw => {
+    const span = Span(raw);
+    flat[span.id || ''] = span;
+
+    return span;
+  });
+
+  return {
+    traceId,
+    rootSpan: Span(tree),
+    flat,
+    spans,
+  };
+};
 
 export default Trace;

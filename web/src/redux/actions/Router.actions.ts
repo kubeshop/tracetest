@@ -4,7 +4,7 @@ import {Params} from 'react-router-dom';
 import {push} from 'redux-first-history';
 import {RouterSearchFields} from 'constants/Common.constants';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
-import DAGSelectors from 'selectors/DAG.selectors';
+// import DAGSelectors from 'selectors/DAG.selectors';
 import SpanSelectors from 'selectors/Span.selectors';
 import {setSelectedSpan} from 'redux/slices/Span.slice';
 import {setSelectedSpec} from 'redux/slices/TestSpecs.slice';
@@ -31,10 +31,13 @@ const RouterActions = () => ({
         getState() as RootState,
         Number(positionIndex)
       );
-      const isDagReady = DAGSelectors.selectNodes(getState() as RootState).length > 0;
+      
+      // TODO: the default view for big traces is no longer the DAG, so this check is no longer valid
+      // move the view to the state and check depending on the type
+      // const isViewReady = DAGSelectors.selectNodes(getState() as RootState).length > 0;
 
       if (selectedSpec === assertionResult?.selector) return;
-      if (assertionResult && isDagReady) dispatch(setSelectedSpec(assertionResult));
+      if (assertionResult) dispatch(setSelectedSpec(assertionResult));
     }
   ),
   updateSelectedSpan: createAsyncThunk<void, IQuery>(

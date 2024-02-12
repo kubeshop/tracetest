@@ -9,13 +9,25 @@ import ListWrapper from './ListWrapper';
 export interface IProps {
   nodeType: NodeTypesEnum;
   spans: Span[];
+  onNavigate(spanId: string): void;
+  onClick(spanId: string): void;
+  matchedSpans: string[];
+  selectedSpan: string;
 }
 
-const Timeline = ({nodeType, spans}: IProps) => {
+const Timeline = ({nodeType, spans, onClick, onNavigate, matchedSpans, selectedSpan}: IProps) => {
   const listRef = useRef<List>(null);
 
   return (
-    <TimelineProvider listRef={listRef} nodeType={nodeType} spans={spans}>
+    <TimelineProvider
+      onClick={onClick}
+      onNavigate={onNavigate}
+      matchedSpans={matchedSpans}
+      selectedSpan={selectedSpan}
+      listRef={listRef}
+      nodeType={nodeType}
+      spans={spans}
+    >
       <NavigationWrapper />
       <ListWrapper listRef={listRef} />
     </TimelineProvider>

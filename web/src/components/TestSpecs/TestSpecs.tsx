@@ -1,7 +1,8 @@
 import TestSpec from 'components/TestSpec';
+import AutoSizer, {Size} from 'react-virtualized-auto-sizer';
+import {FixedSizeList as List} from 'react-window';
 import AssertionResults, {TAssertionResultEntry} from 'models/AssertionResults.model';
 import Empty from './Empty';
-import * as S from './TestSpecs.styled';
 
 interface IProps {
   assertionResults?: AssertionResults;
@@ -17,20 +18,32 @@ const TestSpecs = ({assertionResults, onDelete, onEdit, onOpen, onRevert}: IProp
   }
 
   return (
-    <S.Container data-cy="test-specs-container">
-      {assertionResults?.resultList?.map(specResult =>
-        specResult.resultList.length ? (
-          <TestSpec
-            key={specResult.id}
-            onDelete={onDelete}
-            onEdit={onEdit}
-            onOpen={onOpen}
-            onRevert={onRevert}
-            testSpec={specResult}
-          />
-        ) : null
+    <AutoSizer>
+      {({height, width}: Size) => (
+        <List
+          height={height}
+          itemCount={assertionResults.resultList.length}
+          itemData={assertionResults.resultList}
+          itemSize={10}
+          width={width}
+        >
+          {({index, data}) => {
+            const specResult = data[index];
+
+            return specResult.resultList.length ? (
+              <TestSpec
+                key={specResult.id}
+                onDelete={onDelete}
+                onEdit={onEdit}
+                onOpen={onOpen}
+                onRevert={onRevert}
+                testSpec={specResult}
+              />
+            ) : null;
+          }}
+        </List>
       )}
-    </S.Container>
+    </AutoSizer>
   );
 };
 

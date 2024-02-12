@@ -17,6 +17,7 @@ export const Container = styled.div<{$isDeleted: boolean}>`
   display: flex;
   gap: 12px;
   padding: 16px;
+  margin-bottom: 16px;
 
   > div:first-child {
     opacity: ${({$isDeleted}) => ($isDeleted ? 0.5 : 1)};

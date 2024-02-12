@@ -18,10 +18,6 @@ export const CardContainer = styled(Card)<{$isSelected: boolean; $type: Semantic
   border: ${({$isSelected, theme}) =>
     $isSelected ? `1px solid ${theme.color.interactive}` : `1px solid ${theme.color.borderLight}`};
 
-  :not(:last-child) {
-    margin-bottom: 16px;
-  }
-
   .ant-card-head {
     border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
     border-top: ${({$type}) => `4px solid ${SemanticGroupNamesToColor[$type]}`};
@@ -108,5 +104,12 @@ export const SpanHeaderContainer = styled.div`
   cursor: pointer;
   display: flex;
   gap: 8px;
+`;
+
+export const Wrapper = styled.div`
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-between;
+  display: flex;
   padding: 8px 12px;
 `;
