@@ -42,24 +42,25 @@ The AWS Lambda function will fetch data from an external API, transform the data
 
 **Tracetest Account**:
 
-- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
-- Create an [environment](/concepts/environments).
-- Create an [environment token](/concepts/environment-tokens).
-- Have access to the environment's [agent cloud endpoint](/concepts/cloud-agent).
-- [AWS Account](https://aws.amazon.com/) with the [AWS CLI](https://aws.amazon.com/cli/) installed and configured.
+- Copy the `.env.template` file to `.env`.
+- Log into **the** [Tracetest app](https://app.tracetest.io/).
+- This example is configured to use the OpenTelemetry Collector. Ensure the environment you will be utilizing to run this example is also configured to use the OpenTelemetry Tracing Backend by clicking on Settings, Tracing Backend, OpenTelemetry, and Save.
+- Configure your environment to use [the cloud agent](https://docs.tracetest.io/concepts/cloud-agent), click the Click the Settings link and from the Agent tab select the "Run Agent in tracetest cloud" option.
+- Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent url](https://docs.tracetest.io/concepts/cloud-agent) details by editing your .env file. You can find these values in the Settings area for your environment.
+- Have your [AWS Account](https://aws.amazon.com/) with the [AWS CLI](https://aws.amazon.com/cli/) installed and configured.
 
 **AWS Lambda Functions Example:**
 
 Clone the [Tracetest GitHub Repo](https://github.com/kubeshop/tracetest) to your local machine, and open the Serverless quick start example app.
 
-```bash
+```bash title=Terminal
 git clone https://github.com/kubeshop/tracetest.git
 cd tracetest/examples/quick-start-serverless
 ```
 
 Before moving forward, run `npm i` in the root folder to install the dependencies.
 
-```bash
+```bash title=Terminal
 npm i
 ```
 
@@ -79,7 +80,7 @@ The `tracetest.ts` file contains the script that will execute the trace-based te
 
 The AWS Lambda is a simple API, [contained in the `src/handler.ts` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-serverless/src/handler.ts).
 
-```typescript
+```typescript title=src/handler.ts
 import { APIGatewayEvent, Handler } from "aws-lambda";
 import fetch from "node-fetch";
 import { Pokemon, RawPokemon } from "./types";
@@ -133,7 +134,7 @@ export const importPokemon: Handler<APIGatewayEvent> = async (event) => {
 
 The OpenTelemetry tracing is [contained in the `src/lambda-wrapper.ts` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-serverless/src/lambda-wrapper.ts). Traces will be sent to the Tracetest Cloud Agent.
 
-```typescript
+```typescript title=src/lambda-wrapper.ts
 const api = require("@opentelemetry/api");
 const { BatchSpanProcessor } = require("@opentelemetry/sdk-trace-base");
 const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-grpc");
@@ -167,34 +168,43 @@ registerInstrumentations({
 });
 ```
 
+## Set up Environment Variables
+
+Copy the `.env.template` and create a `.env` file in the same directory. Add token and Cloud Agent endpoint.
+
+```txt title=.env
+TRACETEST_AGENT_ENDPOINT=<my_agent_endpoint>
+TRACETEST_API_KEY=<my_token_with_engineer_access>
+```
+
 ## The Tracetest Script
 
 The `tracetest.ts` file contains the script that will execute the trace-based tests based on the serverless deployment.
 
-```typescript
-import Tracetest from '@tracetest/client';
-import { TestResource } from '@tracetest/client/dist/modules/openapi-client';
-import { config } from 'dotenv';
+```typescript title=tracetest.ts
+import Tracetest from "@tracetest/client";
+import { TestResource } from "@tracetest/client/dist/modules/openapi-client";
+import { config } from "dotenv";
 
 config();
 
-const { TRACETEST_API_TOKEN = '', ENDPOINT = '' } = process.env;
+const { TRACETEST_API_TOKEN = "", ENDPOINT = "" } = process.env;
 
 const definition: TestResource = {
-  type: 'Test',
+  type: "Test",
   spec: {
-    id: 'ZV1G3v2IR',
-    name: 'Serverless: Import Pokemon',
+    id: "ZV1G3v2IR",
+    name: "Serverless: Import Pokemon",
     trigger: {
-      type: 'http',
+      type: "http",
       httpRequest: {
-        method: 'POST',
-        url: '${var:ENDPOINT}/import',
+        method: "POST",
+        url: "${var:ENDPOINT}/import",
         body: '{"id": "${var:POKEMON_ID}"}\n',
         headers: [
           {
-            key: 'Content-Type',
-            value: 'application/json',
+            key: "Content-Type",
+            value: "application/json",
           },
         ],
       },
@@ -202,17 +212,18 @@ const definition: TestResource = {
     specs: [
       {
         selector: 'span[tracetest.span.type="database"]',
-        name: 'All Database Spans: Processing time is less than 100ms',
-        assertions: ['attr:tracetest.span.duration < 100ms'],
+        name: "All Database Spans: Processing time is less than 100ms",
+        assertions: ["attr:tracetest.span.duration < 100ms"],
       },
       {
         selector: 'span[tracetest.span.type="http"]',
-        name: 'All HTTP Spans: Status  code is 200',
-        assertions: ['attr:http.status_code = 200'],
+        name: "All HTTP Spans: Status  code is 200",
+        assertions: ["attr:http.status_code = 200"],
       },
       {
-        selector: 'span[name="tracetest-serverless-dev-api"] span[tracetest.span.type="http" name="GET" http.method="GET"]',
-        name: 'The request matches the pokemon Id',
+        selector:
+          'span[name="tracetest-serverless-dev-api"] span[tracetest.span.type="http" name="GET" http.method="GET"]',
+        name: "The request matches the pokemon Id",
         assertions: ['attr:http.url  =  "https://pokeapi.co/api/v2/pokemon/${var:POKEMON_ID}"'],
       },
     ],
@@ -226,11 +237,11 @@ const main = async () => {
   await tracetest.runTest(test, {
     variables: [
       {
-        key: 'ENDPOINT',
+        key: "ENDPOINT",
         value: ENDPOINT.trim(),
       },
       {
-        key: 'POKEMON_ID',
+        key: "POKEMON_ID",
         value: `${Math.floor(Math.random() * 100) + 1}`,
       },
     ],
@@ -243,7 +254,7 @@ main();
 
 The output from the `tracetest.ts` script will show the test results with links to the Tracetest App.
 
-```bash
+```bash title=Terminal
 > tracetest-serverless@1.0.0 test
 > ENDPOINT="$(serverless info --verbose | grep HttpApiUrl | sed s/HttpApiUrl\:\ //g)" ts-node tracetest.ts
 
@@ -264,11 +275,11 @@ To run the tests without deploying the serverless stack, you can use the `npm te
 
 Spin up the deployment and test execution.
 
-```bash
+```bash title=Terminal
 npm start
 ```
 
-This will trigger the serverless deploy command and immediately run the trace-based tests after completion.
+This will trigger the serverless deploy command and immediately run the [trace-based tests using the Tracetest Typescript integration](../../tools-and-integrations/typescript.mdx) after completion.
 
 ## Learn More
 
