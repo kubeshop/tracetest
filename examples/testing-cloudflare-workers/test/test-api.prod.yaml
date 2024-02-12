@@ -6,7 +6,7 @@ spec:
     type: http
     httpRequest:
       method: POST
-      url: https://pokemon-api.adnan-433.workers.dev/api/pokemon?id=13
+      url: https://pokemon-api.<YOUR_URL>.workers.dev/api/pokemon?id=13
       headers:
       - key: Content-Type
         value: application/json
