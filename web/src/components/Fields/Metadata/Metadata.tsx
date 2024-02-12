@@ -1,8 +1,7 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
-import {SupportedEditors} from 'constants/Editor.constants';
-import {Editor} from 'components/Inputs';
 import * as S from './Metadata.styled';
+import SingleLine from '../../Inputs/SingleLine';
 
 const Metadata = () => (
   <Form.Item>
@@ -13,13 +12,13 @@ const Metadata = () => (
             <S.HeaderContainer key={field.name}>
               <S.Item>
                 <Form.Item name={[field.name, 'key']} noStyle>
-                  <Editor type={SupportedEditors.Interpolation} placeholder={`Key ${index + 1}`} />
+                  <SingleLine placeholder={`Key ${index + 1}`} />
                 </Form.Item>
               </S.Item>
 
               <S.Item>
                 <Form.Item name={[field.name, 'value']} noStyle>
-                  <Editor type={SupportedEditors.Interpolation} placeholder={`Value ${index + 1}`} />
+                  <SingleLine placeholder={`Value ${index + 1}`} />
                 </Form.Item>
               </S.Item>
 

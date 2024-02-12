@@ -1,9 +1,8 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
 import {DEFAULT_HEADERS, IKeyValue} from 'constants/Test.constants';
-import {Editor} from 'components/Inputs';
-import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from './Headers.styled';
+import SingleLine from '../../Inputs/SingleLine';
 
 interface IProps {
   initialValue?: IKeyValue[];
@@ -26,11 +25,11 @@ const Headers = ({
           {fields.map((field, index) => (
             <S.HeaderContainer key={field.name}>
               <Form.Item name={[field.name, 'key']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`${unit} ${index + 1}`} />
+                <SingleLine placeholder={`${unit} ${index + 1}`} />
               </Form.Item>
 
               <Form.Item name={[field.name, 'value']} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`Value ${index + 1}`} />
+                <SingleLine placeholder={`Value ${index + 1}`} />
               </Form.Item>
 
               <Form.Item noStyle>

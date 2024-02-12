@@ -1,8 +1,6 @@
 import {Form} from 'antd';
-import React from 'react';
-import {Editor} from 'components/Inputs';
-import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from './Auth.styled';
+import SingleLine from '../../Inputs/SingleLine';
 
 interface IProps {
   baseName: string[];
@@ -18,7 +16,7 @@ const AuthBasic = ({baseName}: IProps) => (
         label="Username"
         rules={[{required: true}]}
       >
-        <Editor type={SupportedEditors.Interpolation} />
+        <SingleLine />
       </Form.Item>
       <Form.Item
         style={{flexBasis: '50%', overflow: 'hidden'}}
@@ -27,7 +25,7 @@ const AuthBasic = ({baseName}: IProps) => (
         data-cy="basic-password"
         rules={[{required: true}]}
       >
-        <Editor type={SupportedEditors.Interpolation} />
+        <SingleLine />
       </Form.Item>
     </S.FlexContainer>
   </S.Row>

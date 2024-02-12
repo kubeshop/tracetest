@@ -1,8 +1,7 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
-import {SupportedEditors} from 'constants/Editor.constants';
-import {Editor} from 'components/Inputs';
 import * as S from './MultiURL.styled';
+import SingleLine from '../../Inputs/SingleLine';
 
 interface IProps {
   name?: string[];
@@ -24,7 +23,7 @@ const MultiURL = ({name = ['brokerUrls']}: IProps) => (
           {fields.map((field, index) => (
             <S.URLContainer key={field.name}>
               <Form.Item name={[field.name]} noStyle>
-                <Editor type={SupportedEditors.Interpolation} placeholder={`Enter broker URL (${index + 1})`} />
+                <SingleLine placeholder={`Enter broker URL (${index + 1})`} />
               </Form.Item>
 
               {!isFirstItem(index) && (
