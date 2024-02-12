@@ -27,24 +27,26 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 ## Why is this important?
 
-Serverless architectural patterns struggle with visibility. They’re difficult to troubleshoot in production and complex to test across development and staging environments including integration tests.
+Serverless architectural patterns are notoriously difficult to troubleshoot in production and complex to test across development and staging environments including integration tests.
 
-Including OpenTelemetry in Cloudflare Workers exposes telemetry that you can use for both production visibility and trace-based testing.
+Using OpenTelemetry in Cloudflare Workers exposes telemetry that you can use for both production visibility and trace-based testing.
 
 This sample shows how to run tests against Cloudflare Workers using [OpenTelemetry](https://opentelemetry.io/) and Tracetest by:
 
-1. Testing Cloudflare Workers in your local development environment.
-2. Testing Cloudflare Workers in live staging and production deployments.
-3. Integration testing Cloudflare Workers for CI pipelines.
+1. [Testing Cloudflare Workers in your local development environment.](#testing-the-cloudflare-worker-locally)
+2. [Testing Cloudflare Workers in live staging and production deployments.](#testing-the-clodflare-worker-in-staging-and-production)
+3. [Integration testing Cloudflare Workers for CI pipelines.](#integration-testing-the-cloudflare-worker)
 
 The Cloudflare Worker will fetch data from an external API, transform the data and insert it into a D1 database. This particular flow has two failure points that are difficult to test.
 
 1. Validating that an external API request from a Cloudflare Worker is successful.
-2. Validating that a D1 datavase insert request is successful.
+2. Validating that a D1 database insert request is successful.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1707484941/Blogposts/testing-cloudflare-workers/cf-work-tt-2_zcwwjd.png)
 
 ## Prerequisites
 
-**Tracetest Account**:
+### Tracetest Account
 
 - Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
 - Create an [environment](/concepts/environments).
@@ -53,24 +55,48 @@ The Cloudflare Worker will fetch data from an external API, transform the data a
 - [Cloudflare Workers Account](https://workers.cloudflare.com/)
 - [Cloudflare D1 Database](https://developers.cloudflare.com/d1/get-started/)
 
-**Cloudflare Workers Example:**
+### Cloudflare Workers Example
 
 Clone the [Tracetest GitHub Repo](https://github.com/kubeshop/pokeshop) to your local machine, and open the Vercel example app.
 
-```bash
+```bash title=Terminal
 git clone https://github.com/kubeshop/tracetest.git
 cd tracetest/examples/testing-cloudflare-workers
 ```
 
 Before moving forward, run `npm i` in the root folder to install the dependencies.
 
-```bash
+```bash title=Terminal
 npm i
 ```
 
-**Docker**:
+Run the command to create a D1 database both locally and in your Cloudflare Workers account.
 
-- Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+```bash title=Terminal
+npx wrangler d1 create testing-cloudflare-workers
+```
+
+This will output the `database_id` credentials. Set them in [your `wrangler.toml` as explained in this section below](#set-up-environment-variables).
+
+Run the command to create a schema in your D1 database with a `schema.sql` file.
+
+```sql title=schema.sql
+DROP TABLE IF EXISTS Pokemon;
+CREATE TABLE IF NOT EXISTS Pokemon (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  createdAt TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+```bash title=Terminal
+npx wrangler d1 execute testing-cloudflare-workers --local --file=./schema.sql
+npx wrangler d1 execute testing-cloudflare-workers --file=./schema.sql
+```
+
+### Docker
+
+Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
 ## Project Structure
 
@@ -240,32 +266,6 @@ database_name = "testing-cloudflare-workers"
 database_id = "<YOUR_DATABASE_ID>"
 ```
 
-### Create a D1 Database
-
-Run the command to create a D1 database.
-
-```bash
-npx wrangler d1 create testing-cloudflare-workers
-
-✅ Successfully created DB 'testing-cloudflare-workers' in region EEUR
-Created your database using D1's new storage backend. The new storage backend is not yet recommended for production workloads, but backs up your data via point-in-time
-restore.
-
-[[d1_databases]]
-binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "testing-cloudflare-workers"
-database_id = "<your_database_id>"
-```
-
-This will output the `database_id` credentials. Set them in your `wrangler.toml`.
-
-Run the command to create a schema in your D1 database.
-
-```bash
-npx wrangler d1 execute testing-cloudflare-workers --local --file=./schema.sql
-npx wrangler d1 execute testing-cloudflare-workers --file=./schema.sql
-```
-
 ### Set up Environment Variables
 
 Edit the `wrangler.toml` file. Add your D1 and Tracetest env vars.
@@ -283,7 +283,7 @@ database_id = "<YOUR_DATABASE_ID>"
 
 ### Start the Cloudflare Worker
 
-```bash
+```bash title=Terminal
 npx wrangler dev --env dev
 
 # or:
@@ -359,7 +359,7 @@ Select to [run the Tracetest Agent in the Cloud](/concepts/cloud-agent). OpenTel
 
 Copy the HTTP URL and paste it in the `wrangler.toml` and append `v1/traces` to the end of the Tracetest URL.
 
-```toml
+```toml title=wrangler.toml
 # Production
 [env.prod]
 name = "pokemon-api"
@@ -376,7 +376,7 @@ TRACETEST_URL = "https://<YOUR_TRACETEST_AGENT_URL>.tracetest.io:443/v1/traces"
 
 Deploy the Cloudflare Worker.
 
-```bash
+```bash title=Terminal
 npx wrangler deploy --env prod
 
 # or
@@ -452,7 +452,7 @@ Edit the `docker-compose.yaml` in the root directory. Add your `TRACETEST_API_KE
 
 Edit the `run.bash`. Add your `TRACETEST_API_TOKEN`.
 
-```bash
+```bash title=run.bash
 #/bin/bash
 
 # Find the API Token here: https://docs.tracetest.io/concepts/environment-tokens
@@ -463,13 +463,13 @@ tracetest run test -f ./test-api.docker.yaml --required-gates test-specs --outpu
 
 Now you can run the Vercel function and Tracetest Agent!
 
-```bash
+```bash title=Terminal
 docker compose up -d --build
 ```
 
 And, trigger the integration tests.
 
-```bash
+```bash title=Terminal
 docker compose run integration-tests
 
 [Ouput]
