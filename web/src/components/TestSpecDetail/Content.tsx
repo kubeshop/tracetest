@@ -5,9 +5,11 @@ import AutoSizer, {Size} from 'react-virtualized-auto-sizer';
 import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
+import TraceSelectors from 'selectors/Trace.selectors';
 import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import Header from './Header';
 import ResultCard from './ResultCard';
+import Search from './Search';
 
 interface IProps {
   onClose(): void;
@@ -34,7 +36,11 @@ const Content = ({
     name = '',
   } = useAppSelector(state => TestSpecsSelectors.selectSpecBySelector(state, selector)) || {};
   const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
-  const results = useMemo(() => Object.entries(AssertionService.getResultsHashedBySpanId(resultList)), [resultList]);
+  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
+  const results = useMemo(
+    () => Object.entries(AssertionService.getResultsHashedBySpanId(resultList, matchedSpans)),
+    [matchedSpans, resultList]
+  );
 
   const listRef = useRef<List>(null);
 
@@ -75,6 +81,8 @@ const Content = ({
         selector={selector}
         title={!selector && !name ? 'All Spans' : name}
       />
+
+      <Search />
 
       <AutoSizer>
         {({height, width}: Size) => (

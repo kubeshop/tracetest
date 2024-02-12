@@ -66,8 +66,9 @@ export const Column = styled.div`
   margin-bottom: 8px;
 `;
 
-export const RuleBody = styled(Column)`
+export const RuleBody = styled(Column)<{$resultCount: number}>`
   padding-left: 20px;
+  height: ${({$resultCount}) => ($resultCount > 10 ? '100vh' : `${$resultCount * 32}px`)};
 `;
 
 export const Subtitle = styled(Typography.Title)`
