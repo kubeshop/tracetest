@@ -5,10 +5,16 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/ui/dashboard"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/models"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 )
 
 func main() {
-	err := dashboard.StartDashboard(context.Background())
+	err := dashboard.StartDashboard(context.Background(), models.EnvironmentInformation{
+		OrganizationName: "Ana",
+		EnvironmentName:  "Empregada",
+		AgentVersion:     "0.15.5",
+	}, sensors.NewSensor())
 	if err != nil {
 		fmt.Println(err.Error())
 	}

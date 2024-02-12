@@ -102,6 +102,7 @@ func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoi
 		cfg.APIKey = agentApiKey
 	}
 
+	s.mode = agentConfig.Mode_Dashboard
 	if s.mode == agentConfig.Mode_Dashboard {
 		return s.RunDashboardStrategy(ctx, cfg, uiEndpoint)
 	}

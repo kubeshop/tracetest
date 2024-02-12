@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -15,6 +16,11 @@ type Config struct {
 	ServerURL string `mapstructure:"server_url"`
 
 	OTLPServer OtlpServer `mapstructure:"otlp_server"`
+}
+
+func (c Config) APIEndpoint() string {
+	regex := regexp.MustCompile(":[0-9]+$")
+	return string(regex.ReplaceAll([]byte(c.ServerURL), []byte("")))
 }
 
 type OtlpServer struct {

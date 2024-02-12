@@ -32,11 +32,11 @@ func startUptimeCounter(sensor sensors.Sensor) {
 	}()
 }
 
-func StartDashboard(ctx context.Context) error {
+func StartDashboard(ctx context.Context, environment models.EnvironmentInformation, sensor sensors.Sensor) error {
 	app := tview.NewApplication()
 	tview.Styles.PrimitiveBackgroundColor = styles.HeaderBackgroundColor
 	renderScheduler := components.NewRenderScheduler(app)
-	sensor := sensors.NewSensor()
+	sensor.Emit(events.EnvironmentStart, environment)
 
 	startUptimeCounter(sensor)
 
