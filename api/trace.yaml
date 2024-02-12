@@ -9,7 +9,7 @@ components:
         tree:
           $ref: "#/components/schemas/Span"
         flat:
-          description: falttened version, mapped as spanId -> span{}
+          description: flattened version, mapped as spanId -> span{}
           type: object
           additionalProperties:
             $ref: "#/components/schemas/Span"

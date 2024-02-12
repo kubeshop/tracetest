@@ -1,0 +1,21 @@
+{
+  "name": "pokemon-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "deploy-dev": "wrangler deploy",
+    "dev": "wrangler dev --env dev",
+    "docker": "wrangler dev --env docker",
+    "deploy": "wrangler deploy --env prod",
+    "start": "wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "typescript": "^5.0.4",
+    "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "@microlabs/otel-cf-workers": "^1.0.0-rc.15",
+    "@opentelemetry/api": "^1.4.1"
+  }
+}

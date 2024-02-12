@@ -4,9 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,7 +31,6 @@ import (
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/kubeshop/tracetest/server/wizard"
-	"github.com/labstack/gommon/log"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -251,7 +253,7 @@ func (c *controller) GetTestRuns(ctx context.Context, testID string, take, skip 
 	}
 
 	return openapi.Response(200, paginated[openapi.TestRun]{
-		items: c.mappers.Out.Runs(runs),
+		items: c.mappers.Out.RunsSimplified(runs),
 		count: count,
 	}), nil
 }
@@ -811,4 +813,53 @@ func (c *controller) GetWizard(ctx context.Context) (openapi.ImplResponse, error
 	}
 
 	return openapi.Response(http.StatusOK, c.mappers.Out.Wizard(wizard)), err
+}
+
+func (c *controller) SearchSpans(ctx context.Context, testID string, runID int32, query openapi.SearchSpansRequest) (openapi.ImplResponse, error) {
+	if query.Query == "" {
+		return openapi.Response(http.StatusBadRequest, "query is empty"), nil
+	}
+
+	run, err := c.testRunRepository.GetRun(ctx, id.ID(testID), int(runID))
+	if err != nil {
+		return openapi.Response(http.StatusInternalServerError, ""), nil
+	}
+
+	if run.Trace == nil {
+		return openapi.Response(http.StatusUnprocessableEntity, "trace not available"), nil
+	}
+
+	selector, err := selectors.New(query.Query)
+	var selectedSpanIds []string
+	if err != nil {
+		// not a query, try full text search
+		log.Printf("treating query %s as text. parsing error was %s: ", query.Query, err.Error())
+		normalizedQuery := strings.ToLower(query.Query)
+		for _, span := range run.Trace.Flat {
+			stringSpan, err := json.Marshal(span)
+			if err != nil {
+				log.Printf("error marshalling span: %v", err)
+				continue
+			}
+			normalizedSpan := strings.ToLower(string(stringSpan))
+			if strings.Contains(normalizedSpan, normalizedQuery) {
+				selectedSpanIds = append(selectedSpanIds, hex.EncodeToString(span.ID[:]))
+			}
+		}
+	} else {
+		log.Printf("treating query %s as selector", query.Query)
+		selectedSpans := selector.Filter(*run.Trace)
+		selectedSpanIds = make([]string, len(selectedSpans))
+
+		for i, span := range selectedSpans {
+			selectedSpanIds[i] = hex.EncodeToString(span.ID[:])
+		}
+	}
+
+	res := openapi.SearchSpansResult{
+		SpansIds: selectedSpanIds,
+	}
+
+	return openapi.Response(http.StatusOK, res), nil
+
 }

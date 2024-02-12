@@ -1,36 +1,38 @@
 import { SupportedDataStores } from 'types/DataStore.types';
+import AWSXRay from './ColorIcons/AwsXRay';
+import AzureAppInsights from './ColorIcons/AzureAppInsights';
+import Datadog from './ColorIcons/Datadog';
+import Dynatrace from './ColorIcons/Dynatrace';
 import Elastic from './ColorIcons/Elastic';
+import Honeycomb from './ColorIcons/Honeycomb';
+import Instana from './ColorIcons/Instana';
 import Jaeger from './ColorIcons/Jaeger';
 import Lightstep from './ColorIcons/Lightstep';
-import Datadog from './ColorIcons/Datadog';
 import NewRelic from './ColorIcons/NewRelic';
 import OpenSearch from './ColorIcons/OpenSearch';
 import Otlp from './ColorIcons/Otlp';
 import SignalFx from './ColorIcons/SignalFx';
-import Tempo from './ColorIcons/Tempo';
-import AWSXRay from './ColorIcons/AwsXRay';
-import Honeycomb from './ColorIcons/Honeycomb';
-import AzureAppInsights from './ColorIcons/AzureAppInsights';
 import Signoz from './ColorIcons/Signoz';
-import Dynatrace from './ColorIcons/Dynatrace';
 import SumoLogic from './ColorIcons/SumoLogic';
+import Tempo from './ColorIcons/Tempo';
 
 const colorIconMap = {
-  [SupportedDataStores.JAEGER]: Jaeger,
-  [SupportedDataStores.SignalFX]: SignalFx,
-  [SupportedDataStores.ElasticApm]: Elastic,
-  [SupportedDataStores.OtelCollector]: Otlp,
-  [SupportedDataStores.TEMPO]: Tempo,
-  [SupportedDataStores.OpenSearch]: OpenSearch,
-  [SupportedDataStores.NewRelic]: NewRelic,
-  [SupportedDataStores.Lightstep]: Lightstep,
-  [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.AWSXRay]: AWSXRay,
-  [SupportedDataStores.Honeycomb]: Honeycomb,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
-  [SupportedDataStores.Signoz]: Signoz,
+  [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Dynatrace]: Dynatrace,
+  [SupportedDataStores.ElasticApm]: Elastic,
+  [SupportedDataStores.Honeycomb]: Honeycomb,
+  [SupportedDataStores.Instana]: Instana,
+  [SupportedDataStores.JAEGER]: Jaeger,
+  [SupportedDataStores.Lightstep]: Lightstep,
+  [SupportedDataStores.NewRelic]: NewRelic,
+  [SupportedDataStores.OpenSearch]: OpenSearch,
+  [SupportedDataStores.OtelCollector]: Otlp,
+  [SupportedDataStores.SignalFX]: SignalFx,
+  [SupportedDataStores.Signoz]: Signoz,
   [SupportedDataStores.SumoLogic]: SumoLogic,
+  [SupportedDataStores.TEMPO]: Tempo,
 } as const;
 
 export default colorIconMap;

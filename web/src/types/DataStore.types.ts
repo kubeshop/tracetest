@@ -15,21 +15,22 @@ export enum ConnectionTypes {
 }
 
 export enum SupportedDataStores {
-  OtelCollector = 'otlp',
-  JAEGER = 'jaeger',
-  TEMPO = 'tempo',
-  NewRelic = 'newrelic',
-  Lightstep = 'lightstep',
-  OpenSearch = 'opensearch',
-  ElasticApm = 'elasticapm',
-  SignalFX = 'signalfx',
-  Datadog = 'datadog',
   AWSXRay = 'awsxray',
-  Honeycomb = 'honeycomb',
   AzureAppInsights = 'azureappinsights',
-  Signoz = 'signoz',
+  Datadog = 'datadog',
   Dynatrace = 'dynatrace',
+  ElasticApm = 'elasticapm',
+  Honeycomb = 'honeycomb',
+  Instana = 'instana',
+  JAEGER = 'jaeger',
+  Lightstep = 'lightstep',
+  NewRelic = 'newrelic',
+  OpenSearch = 'opensearch',
+  OtelCollector = 'otlp',
+  SignalFX = 'signalfx',
+  Signoz = 'signoz',
   SumoLogic = 'sumologic',
+  TEMPO = 'tempo',
 }
 
 export enum SupportedClientTypes {
@@ -38,12 +39,13 @@ export enum SupportedClientTypes {
 }
 
 export type TCollectorDataStores =
+  | SupportedDataStores.Datadog
+  | SupportedDataStores.Dynatrace
+  | SupportedDataStores.Instana
+  | SupportedDataStores.Lightstep
   | SupportedDataStores.NewRelic
   | SupportedDataStores.OtelCollector
-  | SupportedDataStores.Lightstep
-  | SupportedDataStores.Datadog
-  | SupportedDataStores.Signoz
-  | SupportedDataStores.Dynatrace;
+  | SupportedDataStores.Signoz;
 
 export type TRawGRPCClientSettings = TDataStoreSchemas['GRPCClientSettings'];
 export type TRawElasticSearch = TDataStoreSchemas['ElasticSearch'];
@@ -89,17 +91,18 @@ export interface IElasticSearch extends TRawElasticSearch {
 
 export type IDataStore = DataStore & {
   agent?: TRawOtlpDataStore;
-  jaeger?: IBaseClientSettings;
-  tempo?: IBaseClientSettings;
-  opensearch?: IElasticSearch;
+  datadog?: TRawOtlpDataStore;
+  dynatrace?: TRawOtlpDataStore;
   elasticapm?: IElasticSearch;
-  otlp?: TRawOtlpDataStore;
+  honeycomb?: TRawOtlpDataStore;
+  instana?: TRawOtlpDataStore;
+  jaeger?: IBaseClientSettings;
   lightstep?: TRawOtlpDataStore;
   newrelic?: TRawOtlpDataStore;
-  datadog?: TRawOtlpDataStore;
-  honeycomb?: TRawOtlpDataStore;
+  opensearch?: IElasticSearch;
+  otlp?: TRawOtlpDataStore;
   signoz?: TRawOtlpDataStore;
-  dynatrace?: TRawOtlpDataStore;
+  tempo?: IBaseClientSettings;
 };
 
 export type TDraftDataStore = {

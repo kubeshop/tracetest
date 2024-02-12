@@ -374,7 +374,7 @@ var cases = []struct {
 			dataStore: &datastore.DataStore{
 				Name:    "Sumo Logic",
 				Default: true,
-				Type:    datastore.DatastoreTypeSumoLogic,
+				Type:    datastore.DataStoreTypeSumoLogic,
 				Values: datastore.DataStoreValues{
 					SumoLogic: &datastore.SumoLogicConfig{
 						URL:       "https://api.sumologic.com",

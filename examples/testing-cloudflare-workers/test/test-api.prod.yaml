@@ -1,0 +1,25 @@
+type: Test
+spec:
+  id: WMGTfM2Sg
+  name: Test API Prod
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: https://pokemon-api.<YOUR_URL>.workers.dev/api/pokemon?id=13
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="faas" name="POST" faas.trigger="http"]
+    name: Validate cold start
+    assertions:
+    - attr:faas.coldstart = "false"
+  - selector: "span[tracetest.span.type=\"http\" name=\"GET: pokeapi.co\"]"
+    name: Validate external API.
+    assertions:
+    - attr:http.response.status_code = 200
+  - selector: "span[tracetest.span.type=\"general\" name=\"D1: Add Pokemon\"]"
+    name: Validate Pokemon name.
+    assertions:
+    - attr:pokemon.name = "weedle"

@@ -1,0 +1,37 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+      grpc:
+
+processors:
+  batch:
+    send_batch_max_size: 100
+    send_batch_size: 10
+    timeout: 10s
+
+exporters:
+  # OTLP for Tracetest
+  otlp/tracetest:
+    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    tls:
+      insecure: true
+
+  # Instana exporter
+  # One example on how to set up a collector configuration for Instana can be seen here:
+  # https://www.ibm.com/docs/en/instana-observability/current?topic=opentelemetry-sending-data-instana-backend
+  otlp/instana:
+    endpoint: ${INSTANA_OTLP_GRPC_ENDPOINT}
+    headers:
+      x-instana-key: ${INSTANA_API_KEY}
+
+service:
+  pipelines:
+    traces/tracetest:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/tracetest]
+    traces/instana:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/instana]
