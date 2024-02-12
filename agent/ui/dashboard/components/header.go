@@ -146,7 +146,7 @@ func (h *Header) hideMessageBanner() {
 }
 
 func (h *Header) setupSensors() {
-	h.sensor.On(events.UptimeChanged, func(e sensors.Event) {
+	h.sensor.On(events.TimeChanged, func(e sensors.Event) {
 		var uptime time.Duration
 		e.Unmarshal(&uptime)
 

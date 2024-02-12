@@ -18,15 +18,12 @@ type Dashboard struct{}
 
 func startUptimeCounter(sensor sensors.Sensor) {
 	ticker := time.NewTicker(time.Second)
-	fastTicker := time.NewTicker(50 * time.Millisecond)
 	start := time.Now()
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
-				sensor.Emit(events.UptimeChanged, time.Since(start).Round(time.Second))
-			case <-fastTicker.C:
-				sensor.Emit(events.NewTestRun, models.TestRun{TestID: "1", RunID: "1", Name: "my test", Type: "HTTP", Endpoint: "http://localhost:11633/api/tests", Status: "Awaiting Traces", When: time.Since(start).Round(time.Second)})
+				sensor.Emit(events.TimeChanged, time.Since(start).Round(time.Second))
 			}
 		}
 	}()

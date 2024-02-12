@@ -30,7 +30,7 @@ func NewTestRunPage(renderScheduler components.RenderScheduler, sensor sensors.S
 	}
 
 	p.header = components.NewHeader(renderScheduler, sensor)
-	p.testRunList = components.NewTestRunList(renderScheduler)
+	p.testRunList = components.NewTestRunList(renderScheduler, sensor)
 
 	p.Grid.
 		// We gonna use 4 lines (it could be 2, but there's a limitation in tview that only allow

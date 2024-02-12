@@ -9,5 +9,6 @@ type TestRun struct {
 	Type     string
 	Endpoint string
 	Status   string
+	Started  time.Time
 	When     time.Duration
 }

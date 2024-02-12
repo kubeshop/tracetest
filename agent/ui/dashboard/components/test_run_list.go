@@ -3,8 +3,11 @@ package components
 import (
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/models"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/styles"
 	"github.com/rivo/tview"
 )
@@ -22,13 +25,15 @@ type TestRunList struct {
 
 	testRuns []models.TestRun
 
+	sensor          sensors.Sensor
 	renderScheduler RenderScheduler
 }
 
-func NewTestRunList(renderScheduler RenderScheduler) *TestRunList {
+func NewTestRunList(renderScheduler RenderScheduler, sensor sensors.Sensor) *TestRunList {
 	list := &TestRunList{
 		Table:           tview.NewTable(),
 		renderScheduler: renderScheduler,
+		sensor:          sensor,
 	}
 
 	for i, header := range headers {
@@ -48,12 +53,25 @@ func NewTestRunList(renderScheduler RenderScheduler) *TestRunList {
 		fmt.Println(row, column)
 	})
 
+	list.setupSensors()
+
 	return list
 }
 
 func (l *TestRunList) SetTestRuns(runs []models.TestRun) {
 	l.testRuns = runs
 	l.renderScheduler.Render(func() {
+		l.renderRuns()
+	})
+}
+
+func (l *TestRunList) setupSensors() {
+	l.sensor.On(events.TimeChanged, func(e sensors.Event) {
+		for i, run := range l.testRuns {
+			run.When = time.Since(run.Started).Round(time.Second)
+			l.testRuns[i] = run
+		}
+
 		l.renderRuns()
 	})
 }

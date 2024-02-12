@@ -12,7 +12,7 @@ import (
 func (s *Runner) RunDesktopStrategy(ctx context.Context, cfg agentConfig.Config, uiEndpoint string) error {
 	s.ui.Infof("Starting Agent with name %s...", cfg.Name)
 
-	session, claims, err := s.authenticate(ctx, cfg)
+	session, claims, err := s.authenticate(ctx, cfg, nil)
 	if err != nil {
 		return err
 	}
