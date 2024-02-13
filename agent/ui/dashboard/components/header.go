@@ -112,7 +112,7 @@ func (h *Header) getEnvironmentInformationTable() tview.Primitive {
 	table.SetCell(1, 0, tview.NewTableCell("Environment: ").SetStyle(styles.MetricNameStyle))
 	table.SetCell(1, 1, h.environmentTableCell)
 	table.SetCell(2, 0, tview.NewTableCell("Last Tracing Backend: ").SetStyle(styles.MetricNameStyle))
-	table.SetCell(2, 1, tview.NewTableCell("Jaeger").SetStyle(styles.MetricValueStyle))
+	table.SetCell(2, 1, tview.NewTableCell("<not set>").SetStyle(styles.MetricValueStyle))
 	table.SetCell(3, 0, tview.NewTableCell("Version: ").SetStyle(styles.MetricNameStyle))
 	table.SetCell(3, 1, h.agentVersionTableCell)
 	table.SetBorderPadding(1, 1, 2, 1)

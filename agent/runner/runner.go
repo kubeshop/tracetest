@@ -23,6 +23,7 @@ type Runner struct {
 	ui           ui.ConsoleUI
 	mode         agentConfig.Mode
 	logger       *zap.Logger
+	claims       jwt.MapClaims
 }
 
 func NewRunner(configurator config.Configurator, resources *resourcemanager.Registry, ui ui.ConsoleUI) *Runner {
@@ -103,11 +104,6 @@ func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoi
 		cfg.APIKey = agentApiKey
 	}
 
-	s.mode = agentConfig.Mode_Dashboard
-	if s.mode == agentConfig.Mode_Dashboard {
-		return s.RunDashboardStrategy(ctx, cfg, uiEndpoint)
-	}
-
 	if s.mode == agentConfig.Mode_Desktop {
 		return s.RunDesktopStrategy(ctx, cfg, uiEndpoint)
 	}
@@ -150,5 +146,10 @@ func (s *Runner) authenticate(ctx context.Context, cfg agentConfig.Config, obser
 	if err != nil {
 		return nil, nil, err
 	}
+	s.claims = claims
 	return session, claims, nil
+}
+
+func (s *Runner) getCurrentSessionClaims() jwt.MapClaims {
+	return s.claims
 }

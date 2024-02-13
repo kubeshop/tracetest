@@ -17,7 +17,7 @@ var headers = []string{
 	"Type",
 	"Endpoint",
 	"Status",
-	"When",
+	"Age",
 }
 
 type TestRunList struct {

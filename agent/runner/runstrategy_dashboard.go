@@ -23,13 +23,10 @@ func (s *Runner) RunDashboardStrategy(ctx context.Context, cfg agentConfig.Confi
 		collector.SetSensor(sensor)
 	}
 
-	observer := newDashboardObserver(sensor)
-	session, claims, err := s.authenticate(ctx, cfg, observer)
-	if err != nil {
-		return err
+	claims := s.getCurrentSessionClaims()
+	if claims == nil {
+		return fmt.Errorf("not authenticated")
 	}
-
-	defer session.Close()
 
 	// TODO: convert ids into names
 	return dashboard.StartDashboard(ctx, models.EnvironmentInformation{

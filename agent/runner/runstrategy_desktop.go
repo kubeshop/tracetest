@@ -20,19 +20,28 @@ func (s *Runner) RunDesktopStrategy(ctx context.Context, cfg agentConfig.Config,
 	isOpen := true
 	message := `Agent is started! Leave the terminal open so tests can be run and traces gathered from this environment.
 You can`
-	options := []consoleUI.Option{{
-		Text: "Open Tracetest in a browser to this environment",
-		Fn: func(_ consoleUI.ConsoleUI) {
-			s.ui.OpenBrowser(fmt.Sprintf("%sorganizations/%s/environments/%s", uiEndpoint, claims["organization_id"], claims["environment_id"]))
+	options := []consoleUI.Option{
+		{
+			Text: "Open Tracetest in a browser to this environment",
+			Fn: func(_ consoleUI.ConsoleUI) {
+				s.ui.OpenBrowser(fmt.Sprintf("%sorganizations/%s/environments/%s", uiEndpoint, claims["organization_id"], claims["environment_id"]))
+			},
 		},
-	}, {
-		Text: "Stop this agent",
-		Fn: func(_ consoleUI.ConsoleUI) {
-			isOpen = false
-			session.Close()
-			s.ui.Finish()
+		{
+			Text: "(Experimental) Open Dashboard",
+			Fn: func(ui consoleUI.ConsoleUI) {
+				s.RunDashboardStrategy(ctx, cfg, uiEndpoint)
+			},
 		},
-	}}
+		{
+			Text: "Stop this agent",
+			Fn: func(_ consoleUI.ConsoleUI) {
+				isOpen = false
+				session.Close()
+				s.claims = nil
+				s.ui.Finish()
+			},
+		}}
 
 	for isOpen {
 		selected := s.ui.Select(message, options, 0)
