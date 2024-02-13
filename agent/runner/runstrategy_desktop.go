@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 
 	consoleUI "github.com/kubeshop/tracetest/agent/ui"
 )
@@ -12,7 +13,9 @@ import (
 func (s *Runner) RunDesktopStrategy(ctx context.Context, cfg agentConfig.Config, uiEndpoint string) error {
 	s.ui.Infof("Starting Agent with name %s...", cfg.Name)
 
-	session, claims, err := s.authenticate(ctx, cfg, nil)
+	sensor := sensors.NewSensor()
+	dashboardObserver := newDashboardObserver(sensor)
+	session, claims, err := s.authenticate(ctx, cfg, dashboardObserver)
 	if err != nil {
 		return err
 	}
@@ -30,7 +33,7 @@ You can`
 		{
 			Text: "(Experimental) Open Dashboard",
 			Fn: func(ui consoleUI.ConsoleUI) {
-				s.RunDashboardStrategy(ctx, cfg, uiEndpoint)
+				s.RunDashboardStrategy(ctx, cfg, uiEndpoint, sensor)
 			},
 		},
 		{

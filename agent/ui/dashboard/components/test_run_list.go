@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"strings"
 	"time"
 
@@ -50,7 +49,10 @@ func NewTestRunList(renderScheduler RenderScheduler, sensor sensors.Sensor) *Tes
 	list.SetSelectable(true, false)
 	list.Select(0, 0)
 	list.SetSelectedFunc(func(row, column int) {
-		fmt.Println(row, column)
+		// ignore the header which is the first row
+		selectedRow := row - 1
+		run := list.testRuns[selectedRow]
+		list.sensor.Emit(events.SelectedTestRun, run)
 	})
 
 	list.setupSensors()

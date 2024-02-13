@@ -11,9 +11,9 @@ import (
 
 func main() {
 	err := dashboard.StartDashboard(context.Background(), models.EnvironmentInformation{
-		OrganizationName: "Ana",
-		EnvironmentName:  "Empregada",
-		AgentVersion:     "0.15.5",
+		OrganizationID: "Ana",
+		EnvironmentID:  "Empregada",
+		AgentVersion:   "0.15.5",
 	}, sensors.NewSensor())
 	if err != nil {
 		fmt.Println(err.Error())

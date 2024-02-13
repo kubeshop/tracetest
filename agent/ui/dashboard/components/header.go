@@ -158,8 +158,8 @@ func (h *Header) setupSensors() {
 		var environment models.EnvironmentInformation
 		e.Unmarshal(&environment)
 
-		h.environmentTableCell.SetText(environment.EnvironmentName)
-		h.organizationTableCell.SetText(environment.OrganizationName)
+		h.environmentTableCell.SetText(environment.EnvironmentID)
+		h.organizationTableCell.SetText(environment.OrganizationID)
 		h.agentVersionTableCell.SetText(environment.AgentVersion)
 	})
 

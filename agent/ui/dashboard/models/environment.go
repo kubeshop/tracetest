@@ -1,7 +1,8 @@
 package models
 
 type EnvironmentInformation struct {
-	OrganizationName string
-	EnvironmentName  string
-	AgentVersion     string
+	OrganizationID string
+	EnvironmentID  string
+	AgentVersion   string
+	ServerEndpoint string
 }

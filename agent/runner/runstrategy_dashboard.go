@@ -17,8 +17,7 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
-func (s *Runner) RunDashboardStrategy(ctx context.Context, cfg agentConfig.Config, uiEndpoint string) error {
-	sensor := sensors.NewSensor()
+func (s *Runner) RunDashboardStrategy(ctx context.Context, cfg agentConfig.Config, uiEndpoint string, sensor sensors.Sensor) error {
 	if collector := collector.GetActiveCollector(); collector != nil {
 		collector.SetSensor(sensor)
 	}
@@ -30,9 +29,10 @@ func (s *Runner) RunDashboardStrategy(ctx context.Context, cfg agentConfig.Confi
 
 	// TODO: convert ids into names
 	return dashboard.StartDashboard(ctx, models.EnvironmentInformation{
-		OrganizationName: claims["organization_id"].(string),
-		EnvironmentName:  claims["environment_id"].(string),
-		AgentVersion:     version.Version,
+		OrganizationID: claims["organization_id"].(string),
+		EnvironmentID:  claims["environment_id"].(string),
+		AgentVersion:   version.Version,
+		ServerEndpoint: uiEndpoint,
 	}, sensor)
 }
 

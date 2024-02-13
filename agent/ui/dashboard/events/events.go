@@ -9,4 +9,6 @@ var (
 
 	SpanCountUpdated  = "span_count_updated"
 	TraceCountUpdated = "trace_count_updated"
+
+	SelectedTestRun = "selected_test_run"
 )
