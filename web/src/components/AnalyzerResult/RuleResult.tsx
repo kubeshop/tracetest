@@ -27,36 +27,46 @@ const RuleResult = ({index, data: {results, id, errorDescription}, style}: IProp
     dispatch(selectSpan({spanId}));
   }, [dispatch, spanId]);
 
+  const getTooltipOverlayFn = useMemo(
+    () =>
+      !passed && !!errors.length
+        ? () => (
+            <>
+              {errors.length > 1 && (
+                <>
+                  <div>
+                    <Typography.Text>{errorDescription}</Typography.Text>
+                  </div>
+                  <S.List>
+                    {errors.map(error => (
+                      <li key={error.value}>
+                        <Typography.Text>{error.value}</Typography.Text>
+                      </li>
+                    ))}
+                  </S.List>
+                </>
+              )}
+
+              {errors.length === 1 && (
+                <div>
+                  <Typography.Text>{errors[0].description}</Typography.Text>
+                </div>
+              )}
+
+              <RuleLink id={id} />
+            </>
+          )
+        : null,
+    [passed, errors, errorDescription, id]
+  );
+
   return (
     <div key={`${spanId}-${index}`} style={style}>
-      <S.SpanButton icon={<CaretUpFilled />} onClick={onClick} type="link" $error={!passed}>
-        {trace.flat[spanId].name ?? ''}
-      </S.SpanButton>
-
-      {!passed && errors.length > 1 && (
-        <>
-          <div>
-            <Typography.Text>{errorDescription}</Typography.Text>
-          </div>
-          <S.List>
-            {errors.map(error => (
-              <li key={error.value}>
-                <Tooltip title={error.description}>
-                  <Typography.Text>{error.value}</Typography.Text>
-                </Tooltip>
-              </li>
-            ))}
-          </S.List>
-        </>
-      )}
-
-      {!passed && errors.length === 1 && (
-        <div>
-          <Typography.Text>{errors[0].description}</Typography.Text>
-        </div>
-      )}
-
-      {!passed && <RuleLink id={id} />}
+      <Tooltip overlay={getTooltipOverlayFn}>
+        <S.SpanButton icon={<CaretUpFilled />} onClick={onClick} type="link" $error={!passed}>
+          {trace.flat[spanId].name ?? ''}
+        </S.SpanButton>
+      </Tooltip>
     </div>
   );
 };

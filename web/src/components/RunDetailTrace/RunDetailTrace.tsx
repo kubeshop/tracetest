@@ -26,7 +26,7 @@ export function getIsDAGDisabled(totalSpans: number = 0): boolean {
 
 const RunDetailTrace = ({run, runEvents, testId, skipTraceCollection}: IProps) => {
   return (
-    <S.Container>
+    <S.Container $isTimeline={false}>
       <SetupAlert />
       <ResizablePanels>
         <SpanDetailsPanel run={run} testId={testId} />

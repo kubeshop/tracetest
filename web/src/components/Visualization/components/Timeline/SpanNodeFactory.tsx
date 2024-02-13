@@ -1,35 +1,30 @@
-import {AxisScale} from '@visx/axis';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
 import {TNode} from 'types/Timeline.types';
-import TestSpanNode from './TestSpanNode/TestSpanNode';
+// import TestSpanNode from './TestSpanNode/TestSpanNode';
 import TraceSpanNode from './TraceSpanNode/TraceSpanNode';
 
 export interface IPropsComponent {
   index: number;
-  indexParent: number;
-  isCollapsed?: boolean;
-  isMatched?: boolean;
-  isSelected?: boolean;
-  minStartTime: number;
   node: TNode;
-  onClick(id: string): void;
-  onCollapse(id: string): void;
-  xScale: AxisScale;
+  style: React.CSSProperties;
 }
 
 const ComponentMap: Record<NodeTypesEnum, (props: IPropsComponent) => React.ReactElement> = {
-  [NodeTypesEnum.TestSpan]: TestSpanNode,
+  [NodeTypesEnum.TestSpan]: TraceSpanNode,
   [NodeTypesEnum.TraceSpan]: TraceSpanNode,
 };
 
-interface IProps extends IPropsComponent {
-  type: NodeTypesEnum;
+interface IProps {
+  data: TNode[];
+  index: number;
+  style: React.CSSProperties;
 }
 
-const SpanNodeFactory = ({type, ...props}: IProps) => {
-  const Component = ComponentMap[type];
+const SpanNodeFactory = ({data, ...props}: IProps) => {
+  const node = data[props.index];
+  const Component = ComponentMap[node.type];
 
-  return <Component {...props} />;
+  return <Component {...props} node={node} />;
 };
 
 export default SpanNodeFactory;

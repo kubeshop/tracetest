@@ -26,7 +26,7 @@ const TracePanel = ({run, testId, runEvents, skipTraceCollection}: TProps) => {
 
   return (
     <FillPanel>
-      <S.Container>
+      <S.Container $isTimeline={visualizationType === VisualizationType.Timeline}>
         <S.SectionLeft $hasShadow>
           <S.SearchContainer>
             <Search runId={run.id} testId={testId} />
