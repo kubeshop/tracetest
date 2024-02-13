@@ -1,0 +1,45 @@
+service: tracetest-serverless
+frameworkVersion: "3"
+
+plugins:
+  - serverless-plugin-typescript
+
+useDotenv: true
+
+custom:
+  tableName: tracetest-pokemons
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment:
+    NODE_OPTIONS: --require src/lambda-wrapper
+    COLLECTOR_ENDPOINT: ${env:TRACETEST_AGENT_ENDPOINT}
+    TABLE_NAME: ${self:custom.tableName}
+  # provider.iam.role.statements
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "Fn::GetAtt": [PokemonsTable, Arn]
+
+functions:
+  api:
+    handler: src/handler.importPokemon
+    events:
+      - httpApi:
+          path: /import
+          method: post
+resources:
+  # DynamoDB
+  - ${file(resources/dynamodb.yml)}

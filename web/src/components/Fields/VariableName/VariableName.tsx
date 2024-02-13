@@ -1,6 +1,5 @@
 import {Form} from 'antd';
-import {Editor} from 'components/Inputs';
-import {SupportedEditors} from 'constants/Editor.constants';
+import SingleLine from '../../Inputs/SingleLine';
 
 const VariableName = () => (
   <Form.Item
@@ -8,7 +7,7 @@ const VariableName = () => (
     rules={[{required: true, message: 'Please enter a valid variable name'}]}
     style={{marginBottom: 0}}
   >
-    <Editor type={SupportedEditors.Interpolation} placeholder="Enter variable name" />
+    <SingleLine placeholder="Enter variable name" />
   </Form.Item>
 );
 

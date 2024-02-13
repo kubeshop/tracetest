@@ -1,6 +1,5 @@
 import {Form} from 'antd';
-import {Editor} from 'components/Inputs';
-import {SupportedEditors} from 'constants/Editor.constants';
+import SingleLine from '../../Inputs/SingleLine';
 
 interface IProps {
   baseName: string[];
@@ -8,7 +7,7 @@ interface IProps {
 
 const AuthBearer = ({baseName}: IProps) => (
   <Form.Item data-cy="bearer-token" name={[...baseName, 'bearer', 'token']} label="Token" rules={[{required: true}]}>
-    <Editor type={SupportedEditors.Interpolation} />
+    <SingleLine />
   </Form.Item>
 );
 

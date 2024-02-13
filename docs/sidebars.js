@@ -148,6 +148,11 @@ const sidebars = {
             },
             {
               type: "doc",
+              id: "examples-tutorials/recipes/testing-lambda-functions-with-opentelemetry-tracetest",
+              label: "Testing AWS Lambda Functions",
+            },
+            {
+              type: "doc",
               id: "examples-tutorials/recipes/testing-cloudflare-workers-with-opentelemetry-tracetest",
               label: "Testing Cloudflare Workers",
             },

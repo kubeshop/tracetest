@@ -1,7 +1,6 @@
 import {Form} from 'antd';
-import {Editor} from 'components/Inputs';
-import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from './PlainAuth.styled';
+import SingleLine from '../../Inputs/SingleLine';
 
 interface IProps {
   baseName: string[];
@@ -17,7 +16,7 @@ const Fields = ({baseName}: IProps) => (
         rules={[{required: true}]}
         style={{flexBasis: '50%', overflow: 'hidden'}}
       >
-        <Editor type={SupportedEditors.Interpolation} placeholder="Kafka Plain Username" />
+        <SingleLine placeholder="Kafka Plain Username" />
       </Form.Item>
 
       <Form.Item
@@ -27,7 +26,7 @@ const Fields = ({baseName}: IProps) => (
         rules={[{required: true}]}
         style={{flexBasis: '50%', overflow: 'hidden'}}
       >
-        <Editor type={SupportedEditors.Interpolation} placeholder="Kafka Plain Password" />
+        <SingleLine placeholder="Kafka Plain Password" />
       </Form.Item>
     </S.FlexContainer>
   </S.Row>

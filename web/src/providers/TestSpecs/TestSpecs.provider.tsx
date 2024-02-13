@@ -60,11 +60,11 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
   const {test} = useTest();
   const {run} = useTestRun();
 
-  const assertionResults = useAppSelector(state => TestSpecsSelectors.selectAssertionResults(state));
-  const specs = useAppSelector(state => TestSpecsSelectors.selectSpecs(state));
-  const isDraftMode = useAppSelector(state => TestSpecsSelectors.selectIsDraftMode(state));
-  const isLoading = useAppSelector(state => TestSpecsSelectors.selectIsLoading(state));
-  const isInitialized = useAppSelector(state => TestSpecsSelectors.selectIsInitialized(state));
+  const assertionResults = useAppSelector(TestSpecsSelectors.selectAssertionResults);
+  const specs = useAppSelector(TestSpecsSelectors.selectSpecs);
+  const isDraftMode = useAppSelector(TestSpecsSelectors.selectIsDraftMode);
+  const isLoading = useAppSelector(TestSpecsSelectors.selectIsLoading);
+  const isInitialized = useAppSelector(TestSpecsSelectors.selectIsInitialized);
 
   const selectedSpec = useAppSelector(TestSpecsSelectors.selectSelectedSpec);
   const selectedTestSpec = useAppSelector(state => TestSpecsSelectors.selectAssertionBySelector(state, selectedSpec!));

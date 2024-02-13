@@ -1,4 +1,4 @@
-import {CheckCircleFilled, InfoCircleFilled, MinusCircleFilled} from '@ant-design/icons';
+import {CheckCircleFilled, CloseCircleFilled, InfoCircleFilled, MinusCircleFilled} from '@ant-design/icons';
 import {Card, Drawer, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -17,10 +17,6 @@ export const AssertionContainer = styled.div`
 export const CardContainer = styled(Card)<{$isSelected: boolean; $type: SemanticGroupNames}>`
   border: ${({$isSelected, theme}) =>
     $isSelected ? `1px solid ${theme.color.interactive}` : `1px solid ${theme.color.borderLight}`};
-
-  :not(:last-child) {
-    margin-bottom: 16px;
-  }
 
   .ant-card-head {
     border-bottom: ${({theme}) => `1px solid ${theme.color.borderLight}`};
@@ -108,5 +104,24 @@ export const SpanHeaderContainer = styled.div`
   cursor: pointer;
   display: flex;
   gap: 8px;
+`;
+
+export const Wrapper = styled.div`
+  align-items: center;
+  cursor: pointer;
+  justify-content: space-between;
+  display: flex;
   padding: 8px 12px;
+`;
+
+export const ClearSearchIcon = styled(CloseCircleFilled)`
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  color: ${({theme}) => theme.color.textLight};
+  cursor: pointer;
+`;
+
+export const SearchContainer = styled(Row)`
+  margin-bottom: 16px;
 `;

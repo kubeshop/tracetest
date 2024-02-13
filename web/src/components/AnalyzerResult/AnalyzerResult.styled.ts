@@ -47,27 +47,19 @@ export const GlobalScoreContainer = styled.div`
   justify-content: center;
 `;
 
-export const RuleContainer = styled.div`
-  border-bottom: ${({theme}) => `1px dashed ${theme.color.borderLight}`};
-  padding-bottom: 16px;
-  margin-bottom: 16px;
-  margin-left: 43px;
-`;
-
 export const RuleHeader = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 `;
 
-export const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 8px;
+export const Column = styled(RuleHeader)`
+  width: 95%;
 `;
 
-export const RuleBody = styled(Column)`
+export const RuleBody = styled(Column)<{$resultCount: number}>`
   padding-left: 20px;
+  height: ${({$resultCount}) => ($resultCount > 10 ? '100vh' : `${$resultCount * 32}px`)};
 `;
 
 export const Subtitle = styled(Typography.Title)`

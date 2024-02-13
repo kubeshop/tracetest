@@ -1,7 +1,7 @@
 import {Tabs} from 'antd';
 import {useCallback, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
-import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
+import {VisualizationType, getIsDAGDisabled} from 'components/RunDetailTrace/RunDetailTrace';
 import TestOutputs from 'components/TestOutputs';
 import TestOutputForm from 'components/TestOutputForm/TestOutputForm';
 import TestResults from 'components/TestResults';
@@ -56,7 +56,11 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
   const {
     test: {skipTraceCollection},
   } = useTest();
-  const [visualizationType, setVisualizationType] = useState(VisualizationType.Dag);
+
+  const isDAGDisabled = getIsDAGDisabled(run?.trace?.spans?.length);
+  const [visualizationType, setVisualizationType] = useState(() =>
+    isDAGDisabled ? VisualizationType.Timeline : VisualizationType.Dag
+  );
 
   const handleClose = useCallback(() => {
     onSetFocusedSpan('');
@@ -111,20 +115,23 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
           <S.SwitchContainer>
             {run.state === TestState.FINISHED && (
               <Switch
+                isDAGDisabled={isDAGDisabled}
                 onChange={type => {
                   TestRunAnalytics.onSwitchDiagramView(type);
                   setVisualizationType(type);
                 }}
                 type={visualizationType}
+                totalSpans={run?.trace?.spans?.length}
               />
             )}
           </S.SwitchContainer>
 
           {skipTraceCollection && <SkipTraceCollectionInfo runId={run.id} testId={testId} />}
           <Visualization
+            isDAGDisabled={isDAGDisabled}
             runEvents={runEvents}
             runState={run.state}
-            spans={run?.trace?.spans ?? []}
+            trace={run.trace}
             type={visualizationType}
           />
         </S.SectionLeft>
@@ -217,7 +224,6 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
             onDelete={handleDelete}
             onEdit={handleEdit}
             onRevert={handleRevert}
-            onSelectSpan={handleSelectSpan}
             selectedSpan={selectedSpan?.id}
             testSpec={selectedTestSpec}
           />

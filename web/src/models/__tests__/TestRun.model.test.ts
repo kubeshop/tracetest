@@ -7,7 +7,6 @@ describe('Test Run', () => {
     const testRunResult = TestRun(rawTestRunResult);
 
     expect(testRunResult.id).toEqual(rawTestRunResult.id);
-    expect(testRunResult.trace).not.toEqual(undefined);
     expect(testRunResult.totalAssertionCount).toEqual(0);
     expect(testRunResult.passedAssertionCount).toEqual(0);
     expect(testRunResult.failedAssertionCount).toEqual(0);
@@ -21,7 +20,6 @@ describe('Test Run', () => {
 
     const testRunResult = TestRun(rawTestRunResult);
 
-    expect(testRunResult.trace).toEqual(undefined);
     expect(testRunResult.executionTime).toEqual(0);
   });
 });

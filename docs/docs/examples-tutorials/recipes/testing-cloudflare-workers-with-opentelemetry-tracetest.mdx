@@ -52,6 +52,9 @@ The Cloudflare Worker will fetch data from an external API, transform the data a
 - Create an [environment](/concepts/environments).
 - Create an [environment token](/concepts/environment-tokens).
 - Have access to the environment's [agent API key](/configuration/agent).
+
+### Cloudflare Account
+
 - [Cloudflare Workers Account](https://workers.cloudflare.com/)
 - [Cloudflare D1 Database](https://developers.cloudflare.com/d1/get-started/)
 
@@ -68,6 +71,18 @@ Before moving forward, run `npm i` in the root folder to install the dependencie
 
 ```bash title=Terminal
 npm i
+```
+
+If you do not have [`npx`](https://www.npmjs.com/package/npx) installed, install it first.
+
+```bash title=Terminal
+npm i npx -g
+```
+
+Run the command to login to your Cloudflare Workers account.
+
+```bash title=Terminal
+npx wrangler login
 ```
 
 Run the command to create a D1 database both locally and in your Cloudflare Workers account.

@@ -29,7 +29,7 @@ const selectMatchedSpanList = createSelector(stateSelector, paramsSelector, (sta
   const {data: {trace} = {}} = TracetestAPI.instance.endpoints.getRunById.select({testId, runId})(state);
   if (!spanIdList.length) return trace?.spans || [];
 
-  return trace?.spans.filter(({id}) => spanIdList.includes(id)) || [];
+  return spanIdList.map((spanId) => trace!.flat[spanId]);
 });
 
 const AssertionSelectors = () => {

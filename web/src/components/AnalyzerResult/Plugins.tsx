@@ -1,7 +1,8 @@
 import {Space, Switch, Typography} from 'antd';
 import {useState} from 'react';
 import {LinterResultPlugin} from 'models/LinterResult.model';
-import Trace from 'models/Trace.model';
+import {useAppSelector} from 'redux/hooks';
+import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyzerAnalytics from 'services/Analytics/TraceAnalyzer.service';
 import AnalyzerService from 'services/Analyzer.service';
 import * as S from './AnalyzerResult.styled';
@@ -11,12 +12,12 @@ import Collapse, {CollapsePanel} from '../Collapse';
 
 interface IProps {
   plugins: LinterResultPlugin[];
-  trace: Trace;
 }
 
-const Plugins = ({plugins: rawPlugins, trace}: IProps) => {
+const Plugins = ({plugins: rawPlugins}: IProps) => {
   const [onlyErrors, setOnlyErrors] = useState(false);
-  const plugins = AnalyzerService.getPlugins(rawPlugins, onlyErrors);
+  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
+  const plugins = AnalyzerService.getPlugins(rawPlugins, onlyErrors, matchedSpans);
 
   return (
     <>
@@ -38,7 +39,7 @@ const Plugins = ({plugins: rawPlugins, trace}: IProps) => {
             key={plugin.name}
           >
             {plugin.rules.map(rule => (
-              <Rule rule={rule} key={rule.name} trace={trace} />
+              <Rule rule={rule} key={rule.name} />
             ))}
           </CollapsePanel>
         ))}

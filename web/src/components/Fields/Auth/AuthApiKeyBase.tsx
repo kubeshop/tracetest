@@ -1,7 +1,6 @@
 import {Form} from 'antd';
-import {Editor} from 'components/Inputs';
-import {SupportedEditors} from 'constants/Editor.constants';
 import * as S from './Auth.styled';
+import SingleLine from '../../Inputs/SingleLine';
 
 interface IProps {
   baseName: string[];
@@ -17,7 +16,7 @@ const AuthApiKeyBase = ({baseName}: IProps) => (
         label="Key"
         rules={[{required: true}]}
       >
-        <Editor type={SupportedEditors.Interpolation} placeholder="Enter key" />
+        <SingleLine placeholder="Enter key" />
       </Form.Item>
       <Form.Item
         data-cy="apiKey-value"
@@ -26,7 +25,7 @@ const AuthApiKeyBase = ({baseName}: IProps) => (
         label="Value"
         rules={[{required: true}]}
       >
-        <Editor type={SupportedEditors.Interpolation} placeholder="Enter value" />
+        <SingleLine placeholder="Enter value" />
       </Form.Item>
     </S.FlexContainer>
   </S.Row>
