@@ -15,9 +15,13 @@ import (
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/server/version"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
+	"go.uber.org/zap"
 )
 
 func (s *Runner) RunDashboardStrategy(ctx context.Context, cfg agentConfig.Config, uiEndpoint string, sensor sensors.Sensor) error {
+	enableLogger := s.disableLogger()
+	defer enableLogger()
+
 	if collector := collector.GetActiveCollector(); collector != nil {
 		collector.SetSensor(sensor)
 	}
@@ -34,6 +38,14 @@ func (s *Runner) RunDashboardStrategy(ctx context.Context, cfg agentConfig.Confi
 		AgentVersion:   version.Version,
 		ServerEndpoint: uiEndpoint,
 	}, sensor)
+}
+
+func (s *Runner) disableLogger() func() {
+	s.loggerLevel.SetLevel(zap.PanicLevel)
+
+	return func() {
+		s.loggerLevel.SetLevel(zap.DebugLevel)
+	}
 }
 
 type dashboardObserver struct {

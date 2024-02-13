@@ -15,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Runner struct {
@@ -23,6 +24,7 @@ type Runner struct {
 	ui           ui.ConsoleUI
 	mode         agentConfig.Mode
 	logger       *zap.Logger
+	loggerLevel  *zap.AtomicLevel
 	claims       jwt.MapClaims
 }
 
@@ -53,10 +55,21 @@ Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces 
 
 	if enableLogging(flags.LogLevel) {
 		var err error
+		atom := zap.NewAtomicLevel()
 		logger, err = zap.NewDevelopment()
 		if err != nil {
 			return fmt.Errorf("could not create logger: %w", err)
 		}
+
+		logger = logger.WithOptions(zap.WrapCore(func(c zapcore.Core) zapcore.Core {
+			return zapcore.NewCore(
+				zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig()),
+				zapcore.Lock(os.Stdout),
+				atom,
+			)
+		}))
+
+		s.loggerLevel = &atom
 	}
 
 	s.logger = logger
