@@ -1,7 +1,7 @@
 import {FixedSizeList as List} from 'react-window';
 import Header from './Header';
-import SpanNodeFactory from './SpanNodeFactoryV2';
-import * as S from './TimelineV2.styled';
+import SpanNodeFactory from './SpanNodeFactory';
+import * as S from './Timeline.styled';
 import {useTimeline} from './Timeline.provider';
 
 const HEADER_HEIGHT = 242;

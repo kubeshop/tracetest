@@ -1,5 +1,5 @@
 import {Badge} from 'antd';
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 
 export const Container = styled.div`
   display: flex;
@@ -11,10 +11,17 @@ export const Section = styled.div`
   flex: 1;
 `;
 
-export const SectionLeft = styled(Section)`
+export const SectionLeft = styled(Section)<{$isTimeline: boolean}>`
   background-color: ${({theme}) => theme.color.background};
   box-shadow: inset 20px 0px 24px -20px rgba(153, 155, 168, 0.18), inset -20px 0 24px -20px rgba(153, 155, 168, 0.18);
   z-index: 1;
+
+  ${({$isTimeline}) =>
+    $isTimeline &&
+    css`
+      max-size: calc(100% - 695px);
+      overflow: scroll;
+    `}
 `;
 
 export const SectionRight = styled(Section)`

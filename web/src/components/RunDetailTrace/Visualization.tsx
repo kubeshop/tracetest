@@ -9,7 +9,7 @@ import TraceSelectors from 'selectors/Trace.selectors';
 import TestRunService from 'services/TestRun.service';
 import Trace from 'models/Trace.model';
 import {TTestRunState} from 'types/TestRun.types';
-import TimelineV2 from 'components/Visualization/components/Timeline/TimelineV2';
+import Timeline from 'components/Visualization/components/Timeline';
 import {VisualizationType} from './RunDetailTrace';
 import TraceDAG from './TraceDAG';
 
@@ -58,7 +58,7 @@ const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans
       onNavigateToSpan={onNavigateToSpan}
     />
   ) : (
-    <TimelineV2
+    <Timeline
       nodeType={NodeTypesEnum.TraceSpan}
       spans={spans}
       onNavigate={onNavigateToSpan}

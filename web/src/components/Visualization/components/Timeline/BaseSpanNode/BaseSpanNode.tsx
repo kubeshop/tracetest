@@ -1,75 +1,61 @@
-import {Group} from '@visx/group';
-
-import {AxisOffset, BaseLeftPadding, NodeHeight, NodeOverlayHeight} from 'constants/Timeline.constants';
 import Span from 'models/Span.model';
-import Collapse from './Collapse';
 import Connector from './Connector';
-import Label from './Label';
 import {IPropsComponent} from '../SpanNodeFactory';
+import {useTimeline} from '../Timeline.provider';
 import * as S from '../Timeline.styled';
 
+function toPercent(value: number) {
+  return `${(value * 100).toFixed(1)}%`;
+}
+
+function getHintSide(viewStart: number, viewEnd: number) {
+  return viewStart > 1 - viewEnd ? 'left' : 'right';
+}
+
 interface IProps extends IPropsComponent {
-  className?: string;
-  header?: React.ReactNode;
   span: Span;
 }
 
-const BaseSpanNode = ({
-  className,
-  header,
-  index,
-  indexParent,
-  isCollapsed = false,
-  isMatched = false,
-  isSelected = false,
-  minStartTime,
-  node,
-  onClick,
-  onCollapse,
-  span,
-  xScale,
-}: IProps) => {
-  const isParent = Boolean(node.children);
-  const hasParent = indexParent !== -1;
-  const positionTop = index * NodeHeight;
-  const durationWidth = span.endTime - span.startTime;
-  const durationX = span.startTime - minStartTime;
-  const leftPadding = node.depth * BaseLeftPadding;
+const BaseSpanNode = ({index, node, span, style}: IProps) => {
+  const {collapsedSpans, getScale, matchedSpans, onSpanCollapse, onSpanClick, selectedSpan} = useTimeline();
+  const {start: viewStart, end: viewEnd} = getScale(span.startTime, span.endTime);
+  const hintSide = getHintSide(viewStart, viewEnd);
+  const isSelected = selectedSpan === node.data.id;
+  const isMatched = matchedSpans.includes(node.data.id);
+  const isCollapsed = collapsedSpans.includes(node.data.id);
 
   return (
-    <Group className={className} id={node.data.id} left={0} top={positionTop}>
-      {hasParent && <Connector distance={index - indexParent} leftPadding={leftPadding} />}
+    <div style={style}>
+      <S.Row
+        onClick={() => onSpanClick(node.data.id)}
+        $isEven={index % 2 === 0}
+        $isMatched={isMatched}
+        $isSelected={isSelected}
+      >
+        <S.Col>
+          <S.Header>
+            <Connector
+              hasParent={!!node.data.parentId}
+              id={node.data.id}
+              isCollapsed={isCollapsed}
+              nodeDepth={node.depth}
+              onCollapse={onSpanCollapse}
+              totalChildren={node.children}
+            />
+            <S.NameContainer>
+              <S.Title>{span.name}</S.Title>
+            </S.NameContainer>
+          </S.Header>
+          <S.Separator />
+        </S.Col>
 
-      <Group left={0} onClick={() => onClick(node.data.id)} top={0}>
-        <S.RectOverlay height={NodeOverlayHeight} rx={2} x={0} y={0} $isMatched={isMatched} $isSelected={isSelected} />
-      </Group>
-
-      <Group left={leftPadding} top={8}>
-        <Label
-          duration={span.duration}
-          header={header}
-          kind={span.kind}
-          name={span.name}
-          service={span.service}
-          system={span.system}
-          type={span.type}
-        />
-
-        {isParent && (
-          <Collapse id={node.data.id} isCollapsed={isCollapsed} onCollapse={onCollapse} totalChildren={node.children} />
-        )}
-
-        <S.RectDurationGuideline rx={3} x={50} y={46} />
-      </Group>
-
-      <S.RectDuration
-        rx={3}
-        width={Math.ceil(xScale(durationWidth)?.valueOf() ?? 0)}
-        x={Math.ceil(xScale(durationX)?.valueOf() ?? 0) + AxisOffset}
-        y={52}
-        $type={span.type}
-      />
-    </Group>
+        <S.ColDuration>
+          <S.SpanBar $type={span.type} style={{left: toPercent(viewStart), width: toPercent(viewEnd - viewStart)}}>
+            <S.SpanBarLabel $side={hintSide}>{span.duration}</S.SpanBarLabel>
+          </S.SpanBar>
+        </S.ColDuration>
+      </S.Row>
+    </div>
   );
 };
 
