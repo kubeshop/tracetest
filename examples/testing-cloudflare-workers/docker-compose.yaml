@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  cloudflare-worker:
+    image: foobar/cloudflare-worker:v1
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - 8787:8787
+    networks:
+      - tracetest
+  
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      - TRACETEST_API_KEY=ttagent_<api_key> # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+    ports:
+      - 4317:4317
+      - 4318:4318
+    command: ["--mode", "verbose"]
+    networks:
+      - tracetest
+
+  integration-tests:
+    image: foobar/integration-tests:v2
+    profiles:
+      - tests
+    build:
+      context: ./
+      dockerfile: ./test/Dockerfile
+    volumes:
+      - ./test/:/app/test/
+    depends_on:
+      tracetest-agent:
+        condition: service_started
+    networks:
+      - tracetest
+
+networks:
+  tracetest:

@@ -1,0 +1,23 @@
+{
+  "name": "tracetest-cypress",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "pw:open": "playwright test --ui",
+    "start": "playwright test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tracetest/cypress": "^0.0.27",
+    "cypress": "^13.6.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.41.2",
+    "@tracetest/playwright": "^0.0.27",
+    "@types/node": "^20.11.17",
+    "dotenv": "^16.4.1",
+    "playwright": "^1.41.2",
+    "typescript": "^5.3.3"
+  }
+}
