@@ -28,6 +28,7 @@ const (
 	SIGNOZ           SupportedDataStores = "signoz"
 	DYNATRACE        SupportedDataStores = "dynatrace"
 	SUMOLOGIC        SupportedDataStores = "sumologic"
+	INSTANA          SupportedDataStores = "instana"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed
