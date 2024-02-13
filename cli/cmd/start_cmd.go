@@ -60,6 +60,10 @@ func init() {
 	startCmd.Flags().StringVarP(&saveParams.endpoint, "endpoint", "e", defaultEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
 	startCmd.Flags().StringVarP(&saveParams.mode, "mode", "m", "desktop", "set how the agent will start")
 	startCmd.Flags().StringVarP(&saveParams.logLevel, "log-level", "l", "debug", "set the agent log level")
+
+	startCmd.Flags().MarkDeprecated("endpoint", "use --server-url instead")
+	startCmd.Flags().MarkShorthandDeprecated("e", "use --server-url instead")
+
 	rootCmd.AddCommand(startCmd)
 }
 
