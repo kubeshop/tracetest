@@ -9,6 +9,7 @@ import (
 type Sensor interface {
 	On(string, func(Event))
 	Emit(string, interface{})
+	Reset()
 }
 
 type Event struct {
@@ -35,6 +36,11 @@ func NewSensor() Sensor {
 		listeners: make(map[string][]func(Event)),
 		lastEvent: make(map[string]Event),
 	}
+}
+
+func (r *sensor) Reset() {
+	r.listeners = make(map[string][]func(Event))
+	r.lastEvent = make(map[string]Event)
 }
 
 func (r *sensor) On(eventName string, cb func(Event)) {

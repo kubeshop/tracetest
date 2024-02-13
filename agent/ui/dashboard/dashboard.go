@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/components"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/models"
@@ -39,6 +40,14 @@ func StartDashboard(ctx context.Context, environment models.EnvironmentInformati
 
 	router := NewRouter()
 	router.AddAndSwitchToPage("home", pages.NewTestRunPage(renderScheduler, sensor))
+
+	app.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		switch event.Key() {
+		case tcell.KeyCtrlC, tcell.KeyEsc:
+			app.Stop()
+		}
+		return event
+	})
 
 	if err := app.SetRoot(router, true).SetFocus(router).Run(); err != nil {
 		return fmt.Errorf("failed to start dashboard: %w", err)

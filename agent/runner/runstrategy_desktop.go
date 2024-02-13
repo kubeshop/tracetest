@@ -33,7 +33,11 @@ You can`
 		{
 			Text: "(Experimental) Open Dashboard",
 			Fn: func(ui consoleUI.ConsoleUI) {
-				s.RunDashboardStrategy(ctx, cfg, uiEndpoint, sensor)
+				sensor.Reset()
+				err := s.RunDashboardStrategy(ctx, cfg, uiEndpoint, sensor)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
 			},
 		},
 		{
