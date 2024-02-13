@@ -63,9 +63,9 @@ func (r *sensor) Emit(eventName string, event interface{}) {
 		Name: eventName,
 		data: event,
 	}
-
+  
 	r.lastEvent[eventName] = e
-
+  
 	for _, listener := range listeners {
 		listener(e)
 	}

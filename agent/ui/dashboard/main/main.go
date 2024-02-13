@@ -15,6 +15,7 @@ func main() {
 		EnvironmentID:  "Empregada",
 		AgentVersion:   "0.15.5",
 	}, sensors.NewSensor())
+  
 	if err != nil {
 		fmt.Println(err.Error())
 	}

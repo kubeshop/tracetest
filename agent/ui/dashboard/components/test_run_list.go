@@ -23,7 +23,6 @@ type TestRunList struct {
 	*tview.Table
 
 	testRuns []models.TestRun
-
 	sensor          sensors.Sensor
 	renderScheduler RenderScheduler
 }

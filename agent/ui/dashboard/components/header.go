@@ -153,7 +153,7 @@ func (h *Header) setupSensors() {
 		h.data.Metrics.Uptime = uptime
 		h.onDataChange()
 	})
-
+  
 	h.sensor.On(events.EnvironmentStart, func(e sensors.Event) {
 		var environment models.EnvironmentInformation
 		e.Unmarshal(&environment)
