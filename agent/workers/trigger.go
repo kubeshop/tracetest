@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -23,6 +24,7 @@ type TriggerWorker struct {
 	registry               *agentTrigger.Registry
 	traceCache             collector.TraceCache
 	observer               event.Observer
+	sensor                 sensors.Sensor
 	stoppableProcessRunner StoppableProcessRunner
 }
 
@@ -43,6 +45,12 @@ func WithTraceCache(cache collector.TraceCache) TriggerOption {
 func WithTriggerObserver(observer event.Observer) TriggerOption {
 	return func(tw *TriggerWorker) {
 		tw.observer = observer
+	}
+}
+
+func WithSensor(sensor sensors.Sensor) TriggerOption {
+	return func(tw *TriggerWorker) {
+		tw.sensor = sensor
 	}
 }
 
