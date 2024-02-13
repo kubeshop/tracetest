@@ -2,13 +2,11 @@ import {useCallback, useEffect} from 'react';
 
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import RunEvents from 'components/RunEvents';
-import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
-import Timeline from 'components/Visualization/components/Timeline';
+import TimelineV2 from 'components/Visualization/components/Timeline/TimelineV2';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useSpan} from 'providers/Span/Span.provider';
-import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import Trace from 'models/Trace.model';
 import TestRunService from 'services/TestRun.service';
 import {TTestRunState} from 'types/TestRun.types';
@@ -25,20 +23,10 @@ export interface IProps {
 const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans, rootSpan}, type}: IProps) => {
   const {onSelectSpan, matchedSpans, onSetFocusedSpan, selectedSpan} = useSpan();
 
-  const {isOpen} = useTestSpecForm();
-
   useEffect(() => {
     if (selectedSpan) return;
     onSelectSpan(rootSpan.id);
   }, [onSelectSpan, rootSpan, selectedSpan, spans]);
-
-  const onNodeClickTimeline = useCallback(
-    (spanId: string) => {
-      TraceAnalyticsService.onTimelineSpanClick(spanId);
-      onSelectSpan(spanId);
-    },
-    [onSelectSpan]
-  );
 
   const onNavigateToSpan = useCallback(
     (spanId: string) => {
@@ -55,12 +43,11 @@ const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans
   return type === VisualizationType.Dag && !isDAGDisabled ? (
     <TestDAG trace={trace} onNavigateToSpan={onNavigateToSpan} />
   ) : (
-    <Timeline
-      isMatchedMode={matchedSpans.length > 0 || isOpen}
+    <TimelineV2
       matchedSpans={matchedSpans}
       nodeType={NodeTypesEnum.TestSpan}
-      onNavigateToSpan={onNavigateToSpan}
-      onNodeClick={onNodeClickTimeline}
+      onNavigate={onNavigateToSpan}
+      onClick={onSelectSpan}
       selectedSpan={selectedSpan?.id ?? ''}
       spans={spans}
     />

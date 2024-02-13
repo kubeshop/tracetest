@@ -11,11 +11,11 @@ import LoadingSpinner, {SpinnerContainer} from '../LoadingSpinner';
 interface IProps {
   trace: Trace;
   onNavigateToSpan(spanId: string): void;
+  matchedSpans: string[];
+  selectedSpan: string;
 }
 
-const TraceDAG = ({trace: {spans}, onNavigateToSpan}: IProps) => {
-  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
-  const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
+const TraceDAG = ({trace: {spans}, matchedSpans, selectedSpan, onNavigateToSpan}: IProps) => {
   const nodes = useAppSelector(TraceSelectors.selectNodes);
   const edges = useAppSelector(TraceSelectors.selectEdges);
   const isMatchedMode = Boolean(matchedSpans.length);

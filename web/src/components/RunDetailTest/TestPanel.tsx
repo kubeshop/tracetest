@@ -224,7 +224,6 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
             onDelete={handleDelete}
             onEdit={handleEdit}
             onRevert={handleRevert}
-            onSelectSpan={handleSelectSpan}
             selectedSpan={selectedSpan?.id}
             testSpec={selectedTestSpec}
           />

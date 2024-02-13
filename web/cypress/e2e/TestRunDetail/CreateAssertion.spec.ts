@@ -48,7 +48,6 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=test-specs-container]').should('be.visible');
     cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
   });
 
@@ -74,7 +73,6 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=test-specs-container]').should('be.visible');
     cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
   });
 
@@ -98,8 +96,6 @@ describe('Create Assertion', () => {
     cy.selectOperator(1);
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
-
-    cy.get('[data-cy=test-specs-container]').should('be.visible');
     cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
   });
 
@@ -124,8 +120,6 @@ describe('Create Assertion', () => {
     cy.selectOperator(1);
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
-
-    cy.get('[data-cy=test-specs-container]').should('be.visible');
     cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 1);
   });
 
@@ -151,9 +145,7 @@ describe('Create Assertion', () => {
 
     cy.get('[data-cy=assertion-form-submit-button]').click();
 
-    cy.get('[data-cy=test-specs-container]').should('exist');
     cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 2);
-
     cy.get('[data-cy=trace-actions-revert-all').click();
     cy.get('[data-cy=test-spec-container]').should('have.lengthOf', 0);
   });

@@ -5,9 +5,6 @@ import Span from 'models/Span.model';
 import TimelineModel from 'models/Timeline.model';
 import {createContext, useCallback, useContext, useMemo, useState} from 'react';
 import {FixedSizeList as List} from 'react-window';
-import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {selectSpan} from 'redux/slices/Trace.slice';
-import TraceSelectors from 'selectors/Trace.selectors';
 import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
 import TimelineService, {TScaleFunction} from 'services/Timeline.service';
 import {TNode} from 'types/Timeline.types';
@@ -43,15 +40,25 @@ interface IProps {
   listRef: React.RefObject<List>;
   nodeType: NodeTypesEnum;
   spans: Span[];
+  onNavigate(spanId: string): void;
+  onClick(spanId: string): void;
+  matchedSpans: string[];
+  selectedSpan: string;
 }
 
 export const useTimeline = () => useContext(Context);
 
-const TimelineProvider = ({children, listRef, nodeType, spans}: IProps) => {
-  const dispatch = useAppDispatch();
+const TimelineProvider = ({
+  children,
+  listRef,
+  nodeType,
+  spans,
+  onClick,
+  onNavigate,
+  matchedSpans,
+  selectedSpan,
+}: IProps) => {
   const [collapsedSpans, setCollapsedSpans] = useState<string[]>([]);
-  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
-  const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
 
   const nodes = useMemo(() => TimelineModel(spans, nodeType), [spans, nodeType]);
   const filteredNodes = useMemo(() => TimelineService.getFilteredNodes(nodes, collapsedSpans), [collapsedSpans, nodes]);
@@ -61,21 +68,21 @@ const TimelineProvider = ({children, listRef, nodeType, spans}: IProps) => {
   const onSpanClick = useCallback(
     (spanId: string) => {
       TraceAnalyticsService.onTimelineSpanClick(spanId);
-      dispatch(selectSpan({spanId}));
+      onClick(spanId);
     },
-    [dispatch]
+    [onClick]
   );
 
   const onSpanNavigation = useCallback(
     (spanId: string) => {
-      dispatch(selectSpan({spanId}));
+      onNavigate(spanId);
       // TODO: Improve the method to search for the index
       const index = filteredNodes.findIndex(node => node.data.id === spanId);
       if (index !== -1) {
         listRef?.current?.scrollToItem(index, 'start');
       }
     },
-    [dispatch, filteredNodes, listRef]
+    [filteredNodes, listRef, onNavigate]
   );
 
   const onSpanCollapse = useCallback((spanId: string) => {

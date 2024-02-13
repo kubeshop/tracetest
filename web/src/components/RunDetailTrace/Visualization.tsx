@@ -24,6 +24,7 @@ interface IProps {
 const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans, rootSpan}, type}: IProps) => {
   const dispatch = useAppDispatch();
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
+  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
 
   useEffect(() => {
     if (selectedSpan) return;
@@ -38,14 +39,33 @@ const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans
     [dispatch]
   );
 
+  const onNodeClickTimeline = useCallback(
+    (spanId: string) => {
+      dispatch(selectSpan({spanId}));
+    },
+    [dispatch]
+  );
+
   if (TestRunService.shouldDisplayTraceEvents(runState, spans.length)) {
     return <RunEvents events={runEvents} stage={TestRunStage.Trace} state={runState} />;
   }
 
   return type === VisualizationType.Dag && !isDAGDisabled ? (
-    <TraceDAG trace={trace} onNavigateToSpan={onNavigateToSpan} />
+    <TraceDAG
+      matchedSpans={matchedSpans}
+      selectedSpan={selectedSpan}
+      trace={trace}
+      onNavigateToSpan={onNavigateToSpan}
+    />
   ) : (
-    <TimelineV2 nodeType={NodeTypesEnum.TraceSpan} spans={spans} />
+    <TimelineV2
+      nodeType={NodeTypesEnum.TraceSpan}
+      spans={spans}
+      onNavigate={onNavigateToSpan}
+      onClick={onNodeClickTimeline}
+      selectedSpan={selectedSpan}
+      matchedSpans={matchedSpans}
+    />
   );
 };
 

@@ -5,7 +5,7 @@ import {IPropsComponent} from '../SpanNodeFactoryV2';
 
 const TraceSpanNode = (props: IPropsComponent) => {
   const {node} = props;
-  const {span, analyzerErrors} = useSpanData(node.data.id);
+  const {span} = useSpanData(node.data.id);
 
   return (
     <BaseSpanNode
