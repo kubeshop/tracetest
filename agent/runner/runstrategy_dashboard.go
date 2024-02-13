@@ -19,6 +19,9 @@ import (
 )
 
 func (s *Runner) RunDashboardStrategy(ctx context.Context, cfg agentConfig.Config, uiEndpoint string, sensor sensors.Sensor) error {
+	// This prevents the agent logger from printing lots of messages
+	// and override the dashboard UI.
+	// By calling enableLogger() at the end of this function, the logger behavior is restored
 	enableLogger := s.disableLogger()
 	defer enableLogger()
 
