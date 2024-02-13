@@ -100,18 +100,10 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
     [revert]
   );
 
-  const handleSelectSpan = useCallback(
-    (spanId: string) => {
-      onSelectSpan(spanId);
-      onSetFocusedSpan(spanId);
-    },
-    [onSelectSpan, onSetFocusedSpan]
-  );
-
   return (
     <FillPanel>
       <S.Container>
-        <S.SectionLeft>
+        <S.SectionLeft $isTimeline={visualizationType === VisualizationType.Timeline}>
           <S.SwitchContainer>
             {run.state === TestState.FINISHED && (
               <Switch

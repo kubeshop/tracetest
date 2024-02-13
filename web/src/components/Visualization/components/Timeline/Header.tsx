@@ -1,5 +1,5 @@
 import Ticks from './Ticks/Ticks';
-import * as S from './TimelineV2.styled';
+import * as S from './Timeline.styled';
 
 const NUM_TICKS = 5;
 

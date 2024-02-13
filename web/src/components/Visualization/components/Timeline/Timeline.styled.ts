@@ -1,132 +1,151 @@
-import {Group} from '@visx/group';
+import {Typography} from 'antd';
+import {SemanticGroupNames, SemanticGroupNamesToColor} from 'constants/SemanticGroupNames.constants';
 import styled, {css} from 'styled-components';
 
-import {
-  SemanticGroupNames,
-  SemanticGroupNamesToColor,
-  SemanticGroupNamesToLightColor,
-} from 'constants/SemanticGroupNames.constants';
-
-export const Container = styled.div<{$showMatched: boolean}>`
-  height: 100%;
-  padding: 24px;
-  padding-left: 50px;
-  position: relative;
-
-  ${({$showMatched}) =>
-    $showMatched &&
-    css`
-      .timeline-node-traceSpan > g:not(.matched),
-      .timeline-node-testSpan > g:not(.matched):not(.selectedAsCurrent) {
-        opacity: 0.5;
-      }
-    `}
+export const Container = styled.div`
+  padding: 50px 24px 0 24px;
+  min-width: 1000px;
 `;
 
-export const CircleArrow = styled.circle`
+export const Row = styled.div<{$isEven: boolean; $isMatched: boolean; $isSelected: boolean}>`
+  background-color: ${({theme, $isEven}) => ($isEven ? theme.color.background : theme.color.white)};
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: 32px;
+  padding: 0px 16px;
+
+  :hover {
+    background-color: ${({theme}) => theme.color.backgroundInteractive};
+  }
+
+  ${({$isMatched}) =>
+    $isMatched &&
+    css`
+      background-color: ${({theme}) => theme.color.alertYellow};
+    `};
+
+  ${({$isSelected}) =>
+    $isSelected &&
+    css`
+      background: rgba(97, 23, 94, 0.1);
+
+      :hover {
+        background: rgba(97, 23, 94, 0.1);
+      }
+    `};
+`;
+
+export const Col = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 8px;
+`;
+
+export const ColDuration = styled.div`
+  overflow: hidden;
+  position: relative;
+`;
+
+export const Header = styled.div`
+  align-items: center;
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+export const NameContainer = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+export const Separator = styled.div`
+  border-left: 1px solid rgb(222, 227, 236);
+  cursor: ew-resize;
+  height: 32px;
+  padding: 0px 3px;
+  width: 1px;
+`;
+
+export const Title = styled(Typography.Text)`
+  color: ${({theme}) => theme.color.text};
+  font-size: ${({theme}) => theme.size.sm};
+  font-weight: 400;
+`;
+
+export const Connector = styled.svg`
+  flex-shrink: 0;
+  overflow: hidden;
+  overflow-clip-margin: content-box;
+`;
+
+export const SpanBar = styled.div<{$type: SemanticGroupNames}>`
+  background-color: ${({$type}) => SemanticGroupNamesToColor[$type]};
+  border-radius: 3px;
+  height: 18px;
+  min-width: 2px;
+  position: absolute;
+  top: 7px;
+`;
+
+export const SpanBarLabel = styled.div<{$side: 'left' | 'right'}>`
+  color: ${({theme}) => theme.color.textSecondary};
+  font-size: ${({theme}) => theme.size.xs};
+  padding: 1px 4px 0 4px;
+  position: absolute;
+
+  ${({$side}) =>
+    $side === 'left'
+      ? css`
+          right: 100%;
+        `
+      : css`
+          left: 100%;
+        `};
+`;
+
+export const TextConnector = styled.text<{$isActive?: boolean}>`
+  fill: ${({theme, $isActive}) => ($isActive ? theme.color.white : theme.color.text)};
+  font-size: ${({theme}) => theme.size.xs};
+`;
+
+export const CircleDot = styled.circle`
+  fill: ${({theme}) => theme.color.textSecondary};
+  stroke-width: 2;
+  stroke: ${({theme}) => theme.color.white};
+`;
+
+export const LineBase = styled.line`
+  stroke: ${({theme}) => theme.color.borderLight};
+`;
+
+export const RectBase = styled.rect<{$isActive?: boolean}>`
+  fill: ${({theme, $isActive}) => ($isActive ? theme.color.primary : theme.color.white)};
+  stroke: ${({theme}) => theme.color.textSecondary};
+`;
+
+export const RectBaseTransparent = styled(RectBase)`
+  cursor: pointer;
   fill: transparent;
 `;
 
-export const CircleCheck = styled.circle<{$passed: boolean}>`
-  fill: ${({$passed, theme}) => ($passed ? theme.color.success : theme.color.error)};
+export const HeaderRow = styled.div`
+  background-color: ${({theme}) => theme.color.white};
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: 32px;
+  padding: 0px 16px;
 `;
 
-export const CircleNumber = styled.circle`
-  fill: ${({theme}) => theme.color.borderLight};
+export const HeaderContent = styled.div`
+  align-items: center;
+  display: flex;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
-export const GroupCollapse = styled(Group)`
-  cursor: pointer;
-`;
-
-export const Image = styled.image<{$width?: number; $height?: number}>`
-  height: ${({$height}) => $height ?? 8}px;
-  width: ${({$width}) => $width ?? 8}px;
-`;
-
-export const LineConnector = styled.line`
-  stroke: ${({theme}) => theme.color.textLight};
-`;
-
-export const PathArrow = styled.path`
-  fill: ${({theme}) => theme.color.textLight};
-  transform: scale(0.6);
-`;
-
-export const RectBadge = styled.rect<{$type: SemanticGroupNames}>`
-  fill: ${({$type}) => SemanticGroupNamesToLightColor[$type]};
-  height: 12px;
-  width: 50px;
-  pointer-events: none;
-`;
-
-export const RectDuration = styled.rect<{$type: SemanticGroupNames}>`
-  fill: ${({$type}) => SemanticGroupNamesToColor[$type]};
-  height: 6px;
-  pointer-events: none;
-`;
-
-export const RectDurationGuideline = styled.rect`
-  fill: ${({theme}) => theme.color.borderLight};
-  height: 1px;
-  pointer-events: none;
-  width: 100%;
-`;
-
-export const RectSelectAsCurrent = styled.rect`
-  cursor: pointer;
-  fill: ${({theme}) => theme.color.interactive};
-  height: 12px;
-  width: 124px;
-`;
-
-export const RectOutput = styled.rect`
-  fill: ${({theme}) => theme.color.warningYellow};
-  height: 12px;
-  width: 12px;
-`;
-
-export const RectOverlay = styled.rect<{$isMatched: boolean; $isSelected: boolean}>`
-  cursor: grab;
-  fill: ${({$isSelected, theme}) => ($isSelected ? theme.color.backgroundInteractive : 'transparent')};
-  stroke: ${({$isMatched, theme}) => $isMatched && theme.color.text};
-  stroke: ${({$isSelected, theme}) => $isSelected && theme.color.interactive};
-  width: 100%;
-
-  :hover {
-    fill: ${({theme}) => theme.color.backgroundInteractive};
+export const HeaderTitle = styled(Typography.Title)`
+  && {
+    margin: 0;
   }
-`;
-
-export const TextBadge = styled.text`
-  fill: ${({theme}) => theme.color.text};
-  font-size: 8px;
-  pointer-events: none;
-  text-transform: uppercase;
-`;
-
-export const TextDescription = styled.text`
-  fill: ${({theme}) => theme.color.text};
-  font-size: ${({theme}) => theme.size.xs};
-  pointer-events: none;
-`;
-
-export const TextName = styled.text`
-  fill: ${({theme}) => theme.color.text};
-  font-size: ${({theme}) => theme.size.sm};
-  font-weight: 600;
-  pointer-events: none;
-`;
-
-export const TextNumber = styled.text`
-  fill: ${({theme}) => theme.color.textLight};
-  font-size: ${({theme}) => theme.size.sm};
-  pointer-events: none;
-`;
-
-export const TextOutput = styled.text`
-  fill: ${({theme}) => theme.color.white};
-  font-size: ${({theme}) => theme.size.xs};
-  font-weight: bold;
-  pointer-events: none;
 `;

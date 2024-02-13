@@ -2,7 +2,7 @@ import {useCallback, useEffect} from 'react';
 
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import RunEvents from 'components/RunEvents';
-import TimelineV2 from 'components/Visualization/components/Timeline/TimelineV2';
+import Timeline from 'components/Visualization/components/Timeline';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
@@ -43,7 +43,7 @@ const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans
   return type === VisualizationType.Dag && !isDAGDisabled ? (
     <TestDAG trace={trace} onNavigateToSpan={onNavigateToSpan} />
   ) : (
-    <TimelineV2
+    <Timeline
       matchedSpans={matchedSpans}
       nodeType={NodeTypesEnum.TestSpan}
       onNavigate={onNavigateToSpan}
