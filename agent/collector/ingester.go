@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/event"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opencensus.io/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
@@ -27,6 +29,8 @@ type ingester interface {
 
 	Statistics() Statistics
 	ResetStatistics()
+
+	SetSensor(sensors.Sensor)
 }
 
 func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, startRemoteServer bool) (ingester, error) {
@@ -34,9 +38,11 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 		BatchTimeout:   batchTimeout,
 		RemoteIngester: cfg,
 		buffer:         &buffer{},
+		traceIDs:       make(map[string]bool, 0),
 		done:           make(chan bool),
 		traceCache:     cfg.traceCache,
 		logger:         cfg.logger,
+		sensor:         cfg.sensor,
 	}
 
 	if startRemoteServer {
@@ -63,9 +69,11 @@ type forwardIngester struct {
 	RemoteIngester remoteIngesterConfig
 	client         pb.TraceServiceClient
 	buffer         *buffer
+	traceIDs       map[string]bool
 	done           chan bool
 	traceCache     TraceCache
 	logger         *zap.Logger
+	sensor         sensors.Sensor
 
 	statistics Statistics
 }
@@ -77,6 +85,7 @@ type remoteIngesterConfig struct {
 	startRemoteServer bool
 	logger            *zap.Logger
 	observer          event.Observer
+	sensor            sensors.Sensor
 }
 
 type buffer struct {
@@ -92,6 +101,10 @@ func (i *forwardIngester) ResetStatistics() {
 	i.statistics = Statistics{}
 }
 
+func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
+	i.sensor = sensor
+}
+
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
 	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
@@ -99,6 +112,8 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
 	i.statistics.SpanCount += int64(spanCount)
 	i.statistics.LastSpanTimestamp = time.Now()
+
+	i.sensor.Emit(events.SpanCountUpdated, i.statistics.SpanCount)
 
 	i.buffer.mutex.Unlock()
 	i.logger.Debug("received spans", zap.Int("count", spanCount))
@@ -108,6 +123,7 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 		// In case of OTLP datastore, those spans will be polled from this cache instead
 		// of a real datastore
 		i.cacheTestSpans(request.ResourceSpans)
+		i.sensor.Emit(events.TraceCountUpdated, len(i.traceIDs))
 	}
 
 	return &pb.ExportTraceServiceResponse{
@@ -208,6 +224,7 @@ func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
 	i.logger.Debug("caching test spans", zap.Int("count", len(spans)))
 
 	for traceID, spans := range spans {
+		i.traceIDs[traceID] = true
 		if _, ok := i.traceCache.Get(traceID); !ok {
 			i.logger.Debug("traceID is not part of a test", zap.String("traceID", traceID))
 			// traceID is not part of a test

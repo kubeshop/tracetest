@@ -1,5 +1,6 @@
 import {autocompletion} from '@codemirror/autocomplete';
 import {linter} from '@codemirror/lint';
+import {EditorState} from '@codemirror/state';
 import {EditorView} from '@codemirror/view';
 import CodeMirror from '@uiw/react-codemirror';
 import {useMemo} from 'react';
@@ -31,7 +32,13 @@ const Selector = ({
   const editorTheme = useEditorTheme();
 
   const extensionList = useMemo(
-    () => [autocompletion({override: [completionFn]}), linter(lintFn), selectorQL(), EditorView.lineWrapping],
+    () => [
+      autocompletion({override: [completionFn]}),
+      linter(lintFn),
+      selectorQL(),
+      EditorView.lineWrapping,
+      EditorState.transactionFilter.of(tr => (tr.newDoc.lines > 1 ? [] : tr)),
+    ],
     [completionFn, lintFn]
   );
 
@@ -39,7 +46,7 @@ const Selector = ({
     <S.SelectorEditorContainer $isEditable={editable}>
       <CodeMirror
         id="selector-editor"
-        basicSetup={basicSetup}
+        basicSetup={{...basicSetup, lineNumbers: false}}
         data-cy="selector-editor"
         value={value}
         maxHeight="120px"

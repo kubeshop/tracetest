@@ -8,6 +8,7 @@ import SelectedSpans, {TRawSelectedSpans} from 'models/SelectedSpans.model';
 import Test from 'models/Test.model';
 import TestRun, {TRawTestRun} from 'models/TestRun.model';
 import TestRunEvent, {TRawTestRunEvent} from 'models/TestRunEvent.model';
+import SearchSpansResult, {TRawSearchSpansResult} from 'models/SearchSpansResult.model';
 import {KnownSources} from 'models/RunMetadata.model';
 import {TRawTestSpecs} from 'models/TestSpecs.model';
 import {TTestApiEndpointBuilder} from '../Tracetest.api';
@@ -112,6 +113,14 @@ export const testRunEndpoints = (builder: TTestApiEndpointBuilder) => ({
     query: ({testId, runId, query}) => `/tests/${testId}/run/${runId}/select?query=${encodeURIComponent(query)}`,
     providesTags: (result, error, {query}) => (result ? [{type: TracetestApiTags.SPAN, id: `${query}-LIST`}] : []),
     transformResponse: (rawSpanList: TRawSelectedSpans) => SelectedSpans(rawSpanList),
+  }),
+  getSearchedSpans: builder.mutation<SearchSpansResult, {query: string; testId: string; runId: number}>({
+    query: ({query, testId, runId}) => ({
+      url: `/tests/${testId}/run/${runId}/search-spans`,
+      method: HTTP_METHOD.POST,
+      body: JSON.stringify({query}),
+    }),
+    transformResponse: (raw: TRawSearchSpansResult) => SearchSpansResult(raw),
   }),
 
   getRunEvents: builder.query<TestRunEvent[], {runId: number; testId: string}>({

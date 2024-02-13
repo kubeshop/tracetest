@@ -1,10 +1,12 @@
 package components
 
 import (
-	"fmt"
 	"strings"
+	"time"
 
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/models"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/styles"
 	"github.com/rivo/tview"
 )
@@ -14,21 +16,22 @@ var headers = []string{
 	"Type",
 	"Endpoint",
 	"Status",
-	"When",
+	"Age",
 }
 
 type TestRunList struct {
 	*tview.Table
 
 	testRuns []models.TestRun
-
+	sensor          sensors.Sensor
 	renderScheduler RenderScheduler
 }
 
-func NewTestRunList(renderScheduler RenderScheduler) *TestRunList {
+func NewTestRunList(renderScheduler RenderScheduler, sensor sensors.Sensor) *TestRunList {
 	list := &TestRunList{
 		Table:           tview.NewTable(),
 		renderScheduler: renderScheduler,
+		sensor:          sensor,
 	}
 
 	for i, header := range headers {
@@ -45,8 +48,17 @@ func NewTestRunList(renderScheduler RenderScheduler) *TestRunList {
 	list.SetSelectable(true, false)
 	list.Select(0, 0)
 	list.SetSelectedFunc(func(row, column int) {
-		fmt.Println(row, column)
+		// ignore the header which is the first row
+		if row == 0 {
+			return
+		}
+
+		selectedRow := row - 1
+		run := list.testRuns[selectedRow]
+		list.sensor.Emit(events.SelectedTestRun, run)
 	})
+
+	list.setupSensors()
 
 	return list
 }
@@ -54,6 +66,17 @@ func NewTestRunList(renderScheduler RenderScheduler) *TestRunList {
 func (l *TestRunList) SetTestRuns(runs []models.TestRun) {
 	l.testRuns = runs
 	l.renderScheduler.Render(func() {
+		l.renderRuns()
+	})
+}
+
+func (l *TestRunList) setupSensors() {
+	l.sensor.On(events.TimeChanged, func(e sensors.Event) {
+		for i, run := range l.testRuns {
+			run.When = time.Since(run.Started).Round(time.Second)
+			l.testRuns[i] = run
+		}
+
 		l.renderRuns()
 	})
 }

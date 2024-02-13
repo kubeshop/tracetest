@@ -1,7 +1,7 @@
 import {Col, Form, Row, Select} from 'antd';
 import {HTTP_METHOD} from 'constants/Common.constants';
-import {SupportedEditors} from 'constants/Editor.constants';
-import {Editor, DockerTip} from 'components/Inputs';
+import {DockerTip} from 'components/Inputs';
+import SingleLine from '../../Inputs/SingleLine';
 
 interface IProps {
   showMethodSelector?: boolean;
@@ -37,7 +37,7 @@ const URL = ({showMethodSelector = true}: IProps) => (
           rules={[{required: true, message: 'Please enter a valid URL'}]}
           style={{marginBottom: 0}}
         >
-          <Editor type={SupportedEditors.Interpolation} placeholder="Enter URL" />
+          <SingleLine placeholder="Enter URL" />
         </Form.Item>
       </Col>
     </Row>

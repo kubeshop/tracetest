@@ -26,6 +26,7 @@ const TestSpecsActions = () => ({
       const specs = TestSpecsSelectors.selectSpecs(getState() as RootState).filter(def => !def.isDeleted);
       const outputs = selectTestOutputs(getState() as RootState);
       const rawTest = await TestService.getUpdatedRawTest(test, {definition: {specs}, outputs});
+
       await dispatch(TestGateway.edit(rawTest, testId));
       return dispatch(TestRunGateway.reRun(testId, runId)).unwrap();
     }

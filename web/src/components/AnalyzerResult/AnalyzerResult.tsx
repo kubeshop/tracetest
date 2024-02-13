@@ -2,7 +2,6 @@ import BetaBadge from 'components/BetaBadge/BetaBadge';
 import Link from 'components/Link';
 import {COMMUNITY_SLACK_URL, OCTOLIINT_ISSUE_URL} from 'constants/Common.constants';
 import LinterResult from 'models/LinterResult.model';
-import Trace from 'models/Trace.model';
 import {useSettingsValues} from 'providers/SettingsValues/SettingsValues.provider';
 import * as S from './AnalyzerResult.styled';
 import Empty from './Empty';
@@ -11,10 +10,9 @@ import Plugins from './Plugins';
 
 interface IProps {
   result: LinterResult;
-  trace: Trace;
 }
 
-const AnalyzerResult = ({result: {score, minimumScore, plugins = [], passed}, trace}: IProps) => {
+const AnalyzerResult = ({result: {score, minimumScore, plugins = [], passed}}: IProps) => {
   const {linter} = useSettingsValues();
 
   return (
@@ -31,13 +29,13 @@ const AnalyzerResult = ({result: {score, minimumScore, plugins = [], passed}, tr
             It can be globally disabled for all tests in <Link to="/settings?tab=analyzer">the settings page</Link>.{' '}
           </>
         )}
-        We value your feedback on this beta release. Share your thoughts on <a href={COMMUNITY_SLACK_URL}>Slack</a> or add
-        them to this <a href={OCTOLIINT_ISSUE_URL}>Issue</a>.
+        We value your feedback on this beta release. Share your thoughts on <a href={COMMUNITY_SLACK_URL}>Slack</a> or
+        add them to this <a href={OCTOLIINT_ISSUE_URL}>Issue</a>.
       </S.Description>
       {plugins.length ? (
         <>
           <GlobalResult score={score} minimumScore={minimumScore} allRulesPassed={passed} />
-          <Plugins plugins={plugins} trace={trace} />
+          <Plugins plugins={plugins} />
         </>
       ) : (
         <Empty />

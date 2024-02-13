@@ -56,6 +56,8 @@
     "react-scripts": "5.0.1",
     "react-spaces": "0.3.8",
     "react-syntax-highlighter": "15.5.0",
+    "react-virtualized-auto-sizer": "1.0.22",
+    "react-window": "1.8.10",
     "redux-first-history": "5.0.12",
     "styled-components": "5.3.3",
     "typescript": "5.0.2"
@@ -81,6 +83,8 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:ci": "cypress run --parallel --record --key $CYPRESS_RECORD_KEY",
+    "cy:local:run": "POKEMON_HTTP_ENDPOINT=http://demo-api:8081 cypress run",
+    "cy:local:open": "POKEMON_HTTP_ENDPOINT=http://demo-api:8081 cypress open",
     "prettier": "prettier --write ./src",
     "less": "lessc --js src/antd-theme/antd-customized.less src/antd-theme/antd-customized.css"
   },
@@ -122,6 +126,7 @@
     "@types/lodash": "4.14.181",
     "@types/postman-collection": "3.5.7",
     "@types/react-syntax-highlighter": "15.5.7",
+    "@types/react-window": "1.8.8",
     "@types/styled-components": "5.1.21",
     "concurrently": "7.2.1",
     "cypress": "13.2.0",

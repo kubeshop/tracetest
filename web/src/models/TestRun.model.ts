@@ -20,7 +20,7 @@ type TestRun = Model<
   TRawTestRun,
   {
     result: AssertionResults;
-    trace?: Trace;
+    trace: Trace;
     totalAssertionCount: number;
     failedAssertionCount: number;
     passedAssertionCount: number;
@@ -138,7 +138,7 @@ const TestRun = ({
     spanId,
     state,
     testVersion,
-    trace: trace ? Trace(trace) : undefined,
+    trace: trace ? Trace(trace) : Trace(),
     totalAssertionCount: getTestResultCount(result),
     failedAssertionCount: getTestResultCount(result, 'failed'),
     passedAssertionCount: getTestResultCount(result, 'passed'),

@@ -11,10 +11,13 @@ export const Container = styled.div`
   padding: 7px;
 `;
 
-export const DAGIcon = styled(ClusterOutlined)<{$isSelected?: boolean}>`
+export const DAGIcon = styled(ClusterOutlined)<{$isDisabled?: boolean; $isSelected?: boolean}>`
   color: ${({$isSelected = false, theme}) => ($isSelected ? theme.color.primary : theme.color.textSecondary)};
-  cursor: pointer;
   font-size: ${({theme}) => theme.size.xl};
+
+  && {
+    cursor: ${({$isDisabled}) => ($isDisabled ? 'not-allowed' : 'pointer')};
+  }
 `;
 
 export const TimelineIcon = styled(BarsOutlined)<{$isSelected?: boolean}>`

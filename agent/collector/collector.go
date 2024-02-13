@@ -9,10 +9,13 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/event"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
+
+var activeCollector Collector
 
 type Config struct {
 	HTTPPort          int
@@ -48,6 +51,12 @@ func WithObserver(observer event.Observer) CollectorOption {
 	}
 }
 
+func WithSensor(sensor sensors.Sensor) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.sensor = sensor
+	}
+}
+
 type collector struct {
 	grpcServer stoppable
 	httpServer stoppable
@@ -60,6 +69,8 @@ type Collector interface {
 
 	Statistics() Statistics
 	ResetStatistics()
+
+	SetSensor(sensors.Sensor)
 }
 
 // Stop implements stoppable.
@@ -76,12 +87,21 @@ func (c *collector) ResetStatistics() {
 	c.ingester.ResetStatistics()
 }
 
+func (c *collector) SetSensor(sensor sensors.Sensor) {
+	c.ingester.SetSensor(sensor)
+}
+
+func GetActiveCollector() Collector {
+	return activeCollector
+}
+
 func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...CollectorOption) (Collector, error) {
 	ingesterConfig := remoteIngesterConfig{
 		URL:      config.RemoteServerURL,
 		Token:    config.RemoteServerToken,
 		logger:   zap.NewNop(),
 		observer: event.NewNopObserver(),
+		sensor:   sensors.NewSensor(),
 	}
 
 	for _, opt := range opts {
@@ -115,7 +135,8 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...Coll
 		return nil, fmt.Errorf("could not start HTTP OTLP listener: %w", err)
 	}
 
-	return &collector{grpcServer: grpcServer, httpServer: httpServer, ingester: ingester}, nil
+	activeCollector = &collector{grpcServer: grpcServer, httpServer: httpServer, ingester: ingester}
+	return activeCollector, nil
 }
 
 func onProcessTermination(callback func()) {

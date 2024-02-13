@@ -87,3 +87,12 @@ export const getParsedURL = (rawUrl: string): URL => {
 
   return new URL(rawUrl);
 };
+
+export const withLowPriority =
+  <T extends (...args: any[]) => any>(fn: T): ((...args: Parameters<T>) => Promise<ReturnType<T>>) =>
+  (...args: Parameters<T>): Promise<ReturnType<T>> =>
+    new Promise(resolve => {
+      setTimeout(() => {
+        resolve(fn(...args));
+      }, 0);
+    });

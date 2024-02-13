@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
+	"github.com/kubeshop/tracetest/agent/ui/dashboard/models"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/styles"
 	"github.com/rivo/tview"
@@ -41,7 +42,12 @@ type Header struct {
 	sensor          sensors.Sensor
 	data            HeaderData
 
-	messageBanner   *MessageBanner
+	messageBanner *MessageBanner
+
+	organizationTableCell *tview.TableCell
+	environmentTableCell  *tview.TableCell
+	agentVersionTableCell *tview.TableCell
+
 	uptimeTableCell *tview.TableCell
 	runsTableCell   *tview.TableCell
 	tracesTableCell *tview.TableCell
@@ -50,14 +56,17 @@ type Header struct {
 
 func NewHeader(renderScheduler RenderScheduler, sensor sensors.Sensor) *Header {
 	h := &Header{
-		Flex:            tview.NewFlex(),
-		renderScheduler: renderScheduler,
-		sensor:          sensor,
-		messageBanner:   NewMessageBanner(renderScheduler),
-		uptimeTableCell: tview.NewTableCell("0s").SetStyle(styles.MetricValueStyle),
-		runsTableCell:   tview.NewTableCell("0").SetStyle(styles.MetricValueStyle),
-		tracesTableCell: tview.NewTableCell("0").SetStyle(styles.MetricValueStyle),
-		spansTableCell:  tview.NewTableCell("0").SetStyle(styles.MetricValueStyle),
+		Flex:                  tview.NewFlex(),
+		renderScheduler:       renderScheduler,
+		sensor:                sensor,
+		messageBanner:         NewMessageBanner(renderScheduler),
+		organizationTableCell: tview.NewTableCell("").SetStyle(styles.MetricValueStyle),
+		environmentTableCell:  tview.NewTableCell("").SetStyle(styles.MetricValueStyle),
+		agentVersionTableCell: tview.NewTableCell("").SetStyle(styles.MetricValueStyle),
+		uptimeTableCell:       tview.NewTableCell("0s").SetStyle(styles.MetricValueStyle),
+		runsTableCell:         tview.NewTableCell("0").SetStyle(styles.MetricValueStyle),
+		tracesTableCell:       tview.NewTableCell("0").SetStyle(styles.MetricValueStyle),
+		spansTableCell:        tview.NewTableCell("0").SetStyle(styles.MetricValueStyle),
 	}
 
 	h.draw()
@@ -99,13 +108,13 @@ func (h *Header) getEnvironmentInformationTable() tview.Primitive {
 	table.SetBackgroundColor(styles.HeaderBackgroundColor)
 	table.SetBorder(true).SetTitle("Environment").SetTitleColor(styles.HighlighColor)
 	table.SetCell(0, 0, tview.NewTableCell("Organization: ").SetStyle(styles.MetricNameStyle))
-	table.SetCell(0, 1, tview.NewTableCell("my-company").SetStyle(styles.MetricValueStyle))
+	table.SetCell(0, 1, h.organizationTableCell)
 	table.SetCell(1, 0, tview.NewTableCell("Environment: ").SetStyle(styles.MetricNameStyle))
-	table.SetCell(1, 1, tview.NewTableCell("steve-dev").SetStyle(styles.MetricValueStyle))
+	table.SetCell(1, 1, h.environmentTableCell)
 	table.SetCell(2, 0, tview.NewTableCell("Last Tracing Backend: ").SetStyle(styles.MetricNameStyle))
-	table.SetCell(2, 1, tview.NewTableCell("Jaeger").SetStyle(styles.MetricValueStyle))
+	table.SetCell(2, 1, tview.NewTableCell("<not set>").SetStyle(styles.MetricValueStyle))
 	table.SetCell(3, 0, tview.NewTableCell("Version: ").SetStyle(styles.MetricNameStyle))
-	table.SetCell(3, 1, tview.NewTableCell("v0.15.5").SetStyle(styles.MetricValueStyle))
+	table.SetCell(3, 1, h.agentVersionTableCell)
 	table.SetBorderPadding(1, 1, 2, 1)
 
 	return table
@@ -137,11 +146,42 @@ func (h *Header) hideMessageBanner() {
 }
 
 func (h *Header) setupSensors() {
-	h.sensor.On(events.UptimeChanged, func(e sensors.Event) {
+	h.sensor.On(events.TimeChanged, func(e sensors.Event) {
 		var uptime time.Duration
 		e.Unmarshal(&uptime)
 
 		h.data.Metrics.Uptime = uptime
+		h.onDataChange()
+	})
+  
+	h.sensor.On(events.EnvironmentStart, func(e sensors.Event) {
+		var environment models.EnvironmentInformation
+		e.Unmarshal(&environment)
+
+		h.environmentTableCell.SetText(environment.EnvironmentID)
+		h.organizationTableCell.SetText(environment.OrganizationID)
+		h.agentVersionTableCell.SetText(environment.AgentVersion)
+	})
+
+	h.sensor.On(events.SpanCountUpdated, func(e sensors.Event) {
+		var count int64
+		e.Unmarshal(&count)
+
+		h.data.Metrics.Spans = count
+		h.onDataChange()
+	})
+
+	h.sensor.On(events.TraceCountUpdated, func(e sensors.Event) {
+		var count int
+		e.Unmarshal(&count)
+
+		h.data.Metrics.Traces = int64(count)
+		h.onDataChange()
+	})
+
+	h.sensor.On(events.NewTestRun, func(e sensors.Event) {
+		h.data.Metrics.TestRuns++
+
 		h.onDataChange()
 	})
 }

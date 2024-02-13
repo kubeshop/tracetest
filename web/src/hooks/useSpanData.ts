@@ -28,6 +28,8 @@ const useSpanData = (id: string): IUseSpanData => {
 
   const span = useAppSelector(state => selectSpanById(state, {testId, runId, spanId: id}));
 
+  // TODO: should we get analyzerErrors, testSpecs and testOutputs as part of the trace struct from the BE?
+  // Right now we are getting them from the testRun struct for each span by spanId
   const analyzerErrors = useAppSelector(state => selectAnalyzerErrorsBySpanId(state, {testId, runId, spanId: id}));
 
   const testSpecs = useAppSelector(state => selectTestSpecsBySpanId(state, {testId, runId, spanId: id}));

@@ -1,16 +1,35 @@
-import { TTraceSchemas } from 'types/Common.types';
+import {TTraceSchemas} from 'types/Common.types';
 import Span from './Span.model';
 
 export type TRawTrace = TTraceSchemas['Trace'];
+export type TSpanMap = Record<string, Span>;
 type Trace = {
+  flat: TSpanMap;
   spans: Span[];
   traceId: string;
+  rootSpan: Span;
 };
 
-const Trace = ({traceId = '', flat = {}}: TRawTrace): Trace => {
+const defaultTrace: TRawTrace = {
+  traceId: '',
+  flat: {},
+  tree: {},
+};
+
+const Trace = ({traceId = '', flat: rawFlat = {}, tree = {}} = defaultTrace): Trace => {
+  const flat: TSpanMap = {};
+  const spans = Object.values(rawFlat).map(raw => {
+    const span = Span(raw);
+    flat[span.id || ''] = span;
+
+    return span;
+  });
+
   return {
     traceId,
-    spans: Object.values(flat).map(rawSpan => Span(rawSpan)),
+    rootSpan: Span(tree),
+    flat,
+    spans,
   };
 };
 

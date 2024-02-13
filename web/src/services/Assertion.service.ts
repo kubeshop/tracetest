@@ -53,9 +53,10 @@ const AssertionService = () => ({
       .some(result => !!result);
   },
 
-  getResultsHashedBySpanId(resultList: AssertionResult[]) {
+  getResultsHashedBySpanId(resultList: AssertionResult[], spanIds: string[] = []) {
     return resultList
       .flatMap(({assertion, spanResults}) => spanResults.map(spanResult => ({result: spanResult, assertion})))
+      .filter(({result}) => !spanIds.length || spanIds.includes(result.spanId))
       .reduce((prev: Record<string, ICheckResult[]>, curr) => {
         const items = prev[curr.result.spanId] || [];
         items.push(curr);

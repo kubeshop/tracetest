@@ -1,66 +1,32 @@
 import {useCallback, useEffect} from 'react';
-import {Node, NodeChange} from 'react-flow-renderer';
 
 import {VisualizationType} from 'components/RunDetailTrace/RunDetailTrace';
 import RunEvents from 'components/RunEvents';
-import {useTestSpecForm} from 'components/TestSpecForm/TestSpecForm.provider';
-import DAG from 'components/Visualization/components/DAG';
-import Timeline from 'components/Visualization/components/Timeline';
+import TimelineV2 from 'components/Visualization/components/Timeline/TimelineV2';
 import {TestRunStage} from 'constants/TestRunEvents.constants';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
-import Span from 'models/Span.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useSpan} from 'providers/Span/Span.provider';
-import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {initNodes, onNodesChange as onNodesChangeAction} from 'redux/slices/DAG.slice';
-import DAGSelectors from 'selectors/DAG.selectors';
-import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
+import Trace from 'models/Trace.model';
 import TestRunService from 'services/TestRun.service';
 import {TTestRunState} from 'types/TestRun.types';
+import TestDAG from './TestDAG';
 
 export interface IProps {
+  isDAGDisabled: boolean;
   runEvents: TestRunEvent[];
   runState: TTestRunState;
-  spans: Span[];
   type: VisualizationType;
+  trace: Trace;
 }
 
-const Visualization = ({runEvents, runState, spans, type}: IProps) => {
-  const dispatch = useAppDispatch();
-  const edges = useAppSelector(DAGSelectors.selectEdges);
-  const nodes = useAppSelector(DAGSelectors.selectNodes);
-  const {onSelectSpan, matchedSpans, onSetFocusedSpan, focusedSpan, selectedSpan} = useSpan();
-
-  const {isOpen} = useTestSpecForm();
-
-  useEffect(() => {
-    dispatch(initNodes({spans}));
-  }, [dispatch, spans]);
+const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans, rootSpan}, type}: IProps) => {
+  const {onSelectSpan, matchedSpans, onSetFocusedSpan, selectedSpan} = useSpan();
 
   useEffect(() => {
     if (selectedSpan) return;
-    const firstSpan = spans.find(span => !span.parentId);
-    onSelectSpan(firstSpan?.id ?? '');
-  }, [onSelectSpan, selectedSpan, spans]);
-
-  const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(onNodesChangeAction({changes})), [dispatch]);
-
-  const onNodeClick = useCallback(
-    (event, {id}: Node) => {
-      TraceDiagramAnalyticsService.onClickSpan(id);
-      onSelectSpan(id);
-    },
-    [onSelectSpan]
-  );
-
-  const onNodeClickTimeline = useCallback(
-    (spanId: string) => {
-      TraceAnalyticsService.onTimelineSpanClick(spanId);
-      onSelectSpan(spanId);
-    },
-    [onSelectSpan]
-  );
+    onSelectSpan(rootSpan.id);
+  }, [onSelectSpan, rootSpan, selectedSpan, spans]);
 
   const onNavigateToSpan = useCallback(
     (spanId: string) => {
@@ -74,24 +40,14 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     return <RunEvents events={runEvents} stage={TestRunStage.Trace} state={runState} />;
   }
 
-  return type === VisualizationType.Dag ? (
-    <DAG
-      edges={edges}
-      isMatchedMode={matchedSpans.length > 0 || isOpen}
-      matchedSpans={matchedSpans}
-      nodes={nodes}
-      onNavigateToSpan={onNavigateToSpan}
-      onNodesChange={onNodesChange}
-      onNodeClick={onNodeClick}
-      selectedSpan={focusedSpan}
-    />
+  return type === VisualizationType.Dag && !isDAGDisabled ? (
+    <TestDAG trace={trace} onNavigateToSpan={onNavigateToSpan} />
   ) : (
-    <Timeline
-      isMatchedMode={matchedSpans.length > 0 || isOpen}
+    <TimelineV2
       matchedSpans={matchedSpans}
       nodeType={NodeTypesEnum.TestSpan}
-      onNavigateToSpan={onNavigateToSpan}
-      onNodeClick={onNodeClickTimeline}
+      onNavigate={onNavigateToSpan}
+      onClick={onSelectSpan}
       selectedSpan={selectedSpan?.id ?? ''}
       spans={spans}
     />
