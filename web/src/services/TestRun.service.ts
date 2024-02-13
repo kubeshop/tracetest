@@ -2,10 +2,12 @@ import {filter, findLastIndex, flow} from 'lodash';
 import {TestRunStage, TraceEventType} from 'constants/TestRunEvents.constants';
 import AssertionResults from 'models/AssertionResults.model';
 import LinterResult from 'models/LinterResult.model';
-import {isRunStateAnalyzingError, isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
+import TestRun, {isRunStateAnalyzingError, isRunStateStopped, isRunStateSucceeded} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import TestRunOutput from 'models/TestRunOutput.model';
 import {TAnalyzerErrorsBySpan, TTestOutputsBySpan, TTestRunState, TTestSpecsBySpan} from 'types/TestRun.types';
+import Date from 'utils/Date';
+import {singularOrPlural} from 'utils/Common';
 
 const TestRunService = () => ({
   shouldDisplayTraceEvents(state: TTestRunState, numberOfSpans: number) {
@@ -95,6 +97,14 @@ const TestRunService = () => ({
       const value = prev[curr.spanId] || [];
       return {...prev, [curr.spanId]: [...value, curr]};
     }, {});
+  },
+
+  getHeaderInfo({createdAt, testVersion, metadata: {source = ''}, trace}: TestRun, triggerType: string) {
+    const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
+
+    return `v${testVersion} • ${triggerType} • Ran ${createdTimeAgo} • ${
+      !!trace?.spans.length && `${trace.spans.length} ${singularOrPlural('span', trace?.spans.length)}`
+    } ${source && `• Run via ${source.toUpperCase()}`}`;
   },
 });
 

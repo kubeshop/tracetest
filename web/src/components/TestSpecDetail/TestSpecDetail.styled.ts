@@ -1,4 +1,4 @@
-import {CheckCircleFilled, InfoCircleFilled, MinusCircleFilled} from '@ant-design/icons';
+import {CheckCircleFilled, CloseCircleFilled, InfoCircleFilled, MinusCircleFilled} from '@ant-design/icons';
 import {Card, Drawer, Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -112,4 +112,16 @@ export const Wrapper = styled.div`
   justify-content: space-between;
   display: flex;
   padding: 8px 12px;
+`;
+
+export const ClearSearchIcon = styled(CloseCircleFilled)`
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  color: ${({theme}) => theme.color.textLight};
+  cursor: pointer;
+`;
+
+export const SearchContainer = styled(Row)`
+  margin-bottom: 16px;
 `;
