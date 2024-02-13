@@ -45,6 +45,7 @@ const SpanService = () => ({
     ).trim()}]`;
   },
 
+  // TODO: this is very costly, we might need to move this to the backend
   searchSpanList(spanList: Span[], searchText: string) {
     if (!searchText.trim()) return [];
 

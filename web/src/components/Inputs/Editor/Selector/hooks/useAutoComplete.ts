@@ -11,8 +11,8 @@ import {
   Tokens,
 } from 'constants/Editor.constants';
 import {useAppStore} from 'redux/hooks';
-import AssertionSelectors from 'selectors/Assertion.selectors';
 import {escapeString} from 'utils/Common';
+import {selectSelectorAttributeList} from 'selectors/Editor.selectors';
 
 interface IProps {
   testId: string;
@@ -22,12 +22,10 @@ interface IProps {
 const useAutoComplete = ({testId, runId}: IProps) => {
   const {getState} = useAppStore();
 
-  const getAttributeList = useCallback(() => {
-    const state = getState();
-    const defaultList = AssertionSelectors.selectAllAttributeList(state, testId, runId);
-
-    return defaultList;
-  }, [getState, runId, testId]);
+  const getAttributeList = useCallback(
+    () => selectSelectorAttributeList(getState(), testId, runId),
+    [getState, runId, testId]
+  );
 
   return useCallback(
     async (context: CompletionContext) => {
@@ -55,7 +53,9 @@ const useAutoComplete = ({testId, runId}: IProps) => {
         const uniqueList = uniqBy(attributeList, 'key');
         const identifierText = state.doc.sliceString(nodeBefore.from, nodeBefore.to);
         const isIdentifier = nodeBefore.name === Tokens.Identifier;
-        const list = isIdentifier ? uniqueList.filter(({key}) => key.toLowerCase().includes(identifierText.toLowerCase())) : uniqueList;
+        const list = isIdentifier
+          ? uniqueList.filter(({key}) => key.toLowerCase().includes(identifierText.toLowerCase()))
+          : uniqueList;
 
         return {
           from: isIdentifier ? nodeBefore.from : word.from,

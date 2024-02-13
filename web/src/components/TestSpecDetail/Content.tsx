@@ -1,24 +1,21 @@
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
+import {FixedSizeList as List} from 'react-window';
+import AutoSizer, {Size} from 'react-virtualized-auto-sizer';
 
-import {SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
-import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import {useAppSelector} from 'redux/hooks';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionService from 'services/Assertion.service';
+import TraceSelectors from 'selectors/Trace.selectors';
 import {TAssertionResultEntry} from 'models/AssertionResults.model';
-import {useTest} from 'providers/Test/Test.provider';
-import useScrollTo from 'hooks/useScrollTo';
-import Assertion from './Assertion';
 import Header from './Header';
-import SpanHeader from './SpanHeader';
-import * as S from './TestSpecDetail.styled';
+import ResultCard from './ResultCard';
+import Search from './Search';
 
 interface IProps {
   onClose(): void;
   onDelete(selector: string): void;
   onEdit(assertionResult: TAssertionResultEntry, name: string): void;
   onRevert(originalSelector: string): void;
-  onSelectSpan(spanId: string): void;
   selectedSpan?: string;
   testSpec: TAssertionResultEntry;
 }
@@ -28,17 +25,10 @@ const Content = ({
   onDelete,
   onEdit,
   onRevert,
-  onSelectSpan,
   selectedSpan,
   testSpec,
   testSpec: {resultList, selector, spanIds},
 }: IProps) => {
-  const {
-    run: {trace, id: runId},
-  } = useTestRun();
-  const {
-    test: {id: testId},
-  } = useTest();
   const {
     isDeleted = false,
     isDraft = false,
@@ -46,12 +36,28 @@ const Content = ({
     name = '',
   } = useAppSelector(state => TestSpecsSelectors.selectSpecBySelector(state, selector)) || {};
   const totalPassedChecks = useMemo(() => AssertionService.getTotalPassedChecks(resultList), [resultList]);
-  const results = useMemo(() => AssertionService.getResultsHashedBySpanId(resultList), [resultList]);
-  const scrollTo = useScrollTo();
+  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
+  const results = useMemo(
+    () => Object.entries(AssertionService.getResultsHashedBySpanId(resultList, matchedSpans)),
+    [matchedSpans, resultList]
+  );
+
+  const listRef = useRef<List>(null);
 
   useEffect(() => {
-    scrollTo(`assertion-result-${selectedSpan}`);
-  }, [scrollTo, selectedSpan]);
+    if (listRef.current) {
+      const index = results.findIndex(([spanId]) => spanId === selectedSpan);
+      if (index !== -1) {
+        listRef?.current?.scrollToItem(index, 'smart');
+      }
+    }
+  }, [results, selectedSpan]);
+
+  const itemSize = useMemo(() => {
+    const [, checkResults = []] = results[0];
+
+    return checkResults.length * 72.59 + 40 + 16;
+  }, [results]);
 
   return (
     <>
@@ -76,33 +82,22 @@ const Content = ({
         title={!selector && !name ? 'All Spans' : name}
       />
 
-      {Object.entries(results).map(([spanId, checkResults]) => {
-        const span = trace?.spans.find(({id}) => id === spanId);
+      <Search />
 
-        return (
-          <S.CardContainer
-            key={`${testSpec?.id}-${spanId}`}
-            size="small"
-            title={<SpanHeader onSelectSpan={onSelectSpan} span={span} />}
-            type="inner"
-            $isSelected={spanId === selectedSpan}
-            $type={span?.type ?? SemanticGroupNames.General}
-            id={`assertion-result-${spanId}`}
+      <AutoSizer>
+        {({height, width}: Size) => (
+          <List
+            ref={listRef}
+            height={height}
+            itemCount={results.length}
+            itemData={results}
+            itemSize={itemSize}
+            width={width}
           >
-            <S.AssertionsContainer onClick={() => onSelectSpan(span?.id ?? '')}>
-              {checkResults.map(checkResult => (
-                <Assertion
-                  testId={testId}
-                  runId={runId}
-                  selector={selector}
-                  check={checkResult}
-                  key={`${checkResult.result.spanId}-${checkResult.assertion}`}
-                />
-              ))}
-            </S.AssertionsContainer>
-          </S.CardContainer>
-        );
-      })}
+            {ResultCard}
+          </List>
+        )}
+      </AutoSizer>
     </>
   );
 };

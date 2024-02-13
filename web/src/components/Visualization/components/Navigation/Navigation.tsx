@@ -13,6 +13,7 @@ interface IProps {
 }
 
 const Navigation = ({matchedSpans, onNavigateToSpan, selectedSpan}: IProps) => {
+  // TODO: save matched spans in a different data structure
   const index = matchedSpans.findIndex(spanId => spanId === selectedSpan) + 1;
 
   const navigate = useCallback(

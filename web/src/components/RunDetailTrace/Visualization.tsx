@@ -3,64 +3,43 @@ import {TestRunStage} from 'constants/TestRunEvents.constants';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
 import TestRunEvent from 'models/TestRunEvent.model';
 import {useCallback, useEffect} from 'react';
-import {Node, NodeChange} from 'react-flow-renderer';
 import {useAppDispatch, useAppSelector} from 'redux/hooks';
-import {changeNodes, initNodes, selectSpan} from 'redux/slices/Trace.slice';
+import {selectSpan} from 'redux/slices/Trace.slice';
 import TraceSelectors from 'selectors/Trace.selectors';
-import TraceAnalyticsService from 'services/Analytics/TestRunAnalytics.service';
-import TraceDiagramAnalyticsService from 'services/Analytics/TraceDiagramAnalytics.service';
 import TestRunService from 'services/TestRun.service';
+import Trace from 'models/Trace.model';
 import {TTestRunState} from 'types/TestRun.types';
-import Span from 'models/Span.model';
-import DAG from '../Visualization/components/DAG';
-import Timeline from '../Visualization/components/Timeline';
+import TimelineV2 from 'components/Visualization/components/Timeline/TimelineV2';
 import {VisualizationType} from './RunDetailTrace';
+import TraceDAG from './TraceDAG';
 
 interface IProps {
+  isDAGDisabled: boolean;
   runEvents: TestRunEvent[];
   runState: TTestRunState;
-  spans: Span[];
+  trace: Trace;
   type: VisualizationType;
 }
 
-const Visualization = ({runEvents, runState, spans, type}: IProps) => {
+const Visualization = ({isDAGDisabled, runEvents, runState, trace, trace: {spans, rootSpan}, type}: IProps) => {
   const dispatch = useAppDispatch();
-  const edges = useAppSelector(TraceSelectors.selectEdges);
-  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
-  const nodes = useAppSelector(TraceSelectors.selectNodes);
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
-  const isMatchedMode = Boolean(matchedSpans.length);
-
-  useEffect(() => {
-    dispatch(initNodes({spans}));
-  }, [dispatch, spans]);
+  const matchedSpans = useAppSelector(TraceSelectors.selectMatchedSpans);
 
   useEffect(() => {
     if (selectedSpan) return;
-    const firstSpan = spans.find(span => !span.parentId);
-    dispatch(selectSpan({spanId: firstSpan?.id ?? ''}));
-  }, [dispatch, selectedSpan, spans]);
 
-  const onNodesChange = useCallback((changes: NodeChange[]) => dispatch(changeNodes({changes})), [dispatch]);
+    dispatch(selectSpan({spanId: rootSpan.id ?? ''}));
+  }, [dispatch, rootSpan.id, selectedSpan, spans]);
 
-  const onNodeClick = useCallback(
-    (event: React.MouseEvent, {id}: Node) => {
-      event.stopPropagation();
-      TraceDiagramAnalyticsService.onClickSpan(id);
-      dispatch(selectSpan({spanId: id}));
-    },
-    [dispatch]
-  );
-
-  const onNodeClickTimeline = useCallback(
+  const onNavigateToSpan = useCallback(
     (spanId: string) => {
-      TraceAnalyticsService.onTimelineSpanClick(spanId);
       dispatch(selectSpan({spanId}));
     },
     [dispatch]
   );
 
-  const onNavigateToSpan = useCallback(
+  const onNodeClickTimeline = useCallback(
     (spanId: string) => {
       dispatch(selectSpan({spanId}));
     },
@@ -71,26 +50,21 @@ const Visualization = ({runEvents, runState, spans, type}: IProps) => {
     return <RunEvents events={runEvents} stage={TestRunStage.Trace} state={runState} />;
   }
 
-  return type === VisualizationType.Dag ? (
-    <DAG
-      edges={edges}
-      isMatchedMode={isMatchedMode}
+  return type === VisualizationType.Dag && !isDAGDisabled ? (
+    <TraceDAG
       matchedSpans={matchedSpans}
-      nodes={nodes}
-      onNavigateToSpan={onNavigateToSpan}
-      onNodesChange={onNodesChange}
-      onNodeClick={onNodeClick}
       selectedSpan={selectedSpan}
+      trace={trace}
+      onNavigateToSpan={onNavigateToSpan}
     />
   ) : (
-    <Timeline
-      isMatchedMode={isMatchedMode}
-      matchedSpans={matchedSpans}
+    <TimelineV2
       nodeType={NodeTypesEnum.TraceSpan}
-      onNavigateToSpan={onNavigateToSpan}
-      onNodeClick={onNodeClickTimeline}
-      selectedSpan={selectedSpan}
       spans={spans}
+      onNavigate={onNavigateToSpan}
+      onClick={onNodeClickTimeline}
+      selectedSpan={selectedSpan}
+      matchedSpans={matchedSpans}
     />
   );
 };

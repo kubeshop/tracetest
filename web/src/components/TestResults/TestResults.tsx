@@ -31,7 +31,7 @@ const TestResults = ({onDelete, onEdit, onRevert}: IProps) => {
       onSelectSpan(testSpec?.spanIds[0] || '');
       setSelectedSpec(testSpec?.selector);
     },
-    [assertionResults?.resultList, onSelectSpan, onSetFocusedSpan, setSelectedSpec]
+    [assertionResults, onSelectSpan, onSetFocusedSpan, setSelectedSpec]
   );
 
   return (

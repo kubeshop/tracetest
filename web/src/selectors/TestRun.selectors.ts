@@ -15,7 +15,7 @@ const selectTestRun = (state: RootState, params: {testId: string; runId: number;
 
 export const selectSpanById = createSelector([selectTestRun, selectParams], (testRun, params) => {
   const {trace} = testRun;
-  return trace?.spans?.find(span => span.id === params.spanId) ?? Span({id: params.spanId});
+  return trace.flat[params.spanId] || Span({id: params.spanId});
 });
 
 const selectAnalyzerErrors = createSelector([selectTestRun], testRun => {

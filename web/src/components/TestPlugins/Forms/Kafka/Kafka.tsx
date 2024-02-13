@@ -6,6 +6,7 @@ import useQueryTabs from 'hooks/useQueryTabs';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {TDraftTest} from 'types/Test.types';
 import * as S from './Kafka.styled';
+import SingleLine from '../../../Inputs/SingleLine';
 
 const Kafka = () => {
   const [activeKey, setActiveKey] = useQueryTabs('auth', 'triggerTab');
@@ -25,7 +26,7 @@ const Kafka = () => {
 
       <Tabs.TabPane forceRender tab={<TriggerTab hasContent={!!messageValue} label="Message" />} key="message">
         <Form.Item label="Key" data-cy="message-key" name="messageKey">
-          <Editor type={SupportedEditors.Interpolation} placeholder="my-message-name" />
+          <SingleLine placeholder="my-message-name" />
         </Form.Item>
 
         <Form.Item
@@ -40,7 +41,7 @@ const Kafka = () => {
 
       <Tabs.TabPane forceRender tab={<TriggerTab hasContent={!!topic} label="Topic" />} key="topic">
         <Form.Item data-cy="topic" name="topic" rules={[{required: true, message: 'Please enter a topic'}]}>
-          <Editor type={SupportedEditors.Interpolation} placeholder="my-topic" />
+          <SingleLine placeholder="my-topic" />
         </Form.Item>
       </Tabs.TabPane>
 

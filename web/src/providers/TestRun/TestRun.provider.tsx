@@ -5,6 +5,7 @@ import TestRun, {isRunStateFinished} from 'models/TestRun.model';
 import TestRunEvent from 'models/TestRunEvent.model';
 import TracetestAPI from 'redux/apis/Tracetest';
 import TestProvider from '../Test';
+import LoadingSpinner, { SpinnerContainer } from '../../components/LoadingSpinner';
 
 const {useGetRunByIdQuery, useGetRunEventsQuery, useStopRunMutation, useSkipPollingMutation} = TracetestAPI.instance;
 
@@ -76,7 +77,9 @@ const TestRunProvider = ({children, testId, runId = 0}: IProps) => {
       </TestProvider>
     </Context.Provider>
   ) : (
-    <div data-cy="loading_test_run" />
+    <SpinnerContainer data-cy="loading_test_run">
+      <LoadingSpinner />
+    </SpinnerContainer>
   );
 };
 

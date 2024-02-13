@@ -1,9 +1,8 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, Form} from 'antd';
-import {Editor} from 'components/Inputs';
-import {SupportedEditors} from 'constants/Editor.constants';
 import {IKeyValue} from 'constants/Test.constants';
 import * as S from './KeyValueList.styled';
+import SingleLine from '../../Inputs/SingleLine';
 
 interface IProps {
   name?: string;
@@ -31,13 +30,13 @@ const KeyValueList = ({
             <S.KeyValueContainer key={field.name}>
               <S.Item>
                 <Form.Item name={[field.name, 'key']} noStyle>
-                  <Editor type={SupportedEditors.Interpolation} placeholder={`${keyPlaceholder} ${index + 1}`} />
+                  <SingleLine placeholder={`${keyPlaceholder} ${index + 1}`} />
                 </Form.Item>
               </S.Item>
 
               <S.Item>
                 <Form.Item name={[field.name, 'value']} noStyle>
-                  <Editor type={SupportedEditors.Interpolation} placeholder={`${valuePlaceholder} ${index + 1}`} />
+                  <SingleLine placeholder={`${valuePlaceholder} ${index + 1}`} />
                 </Form.Item>
               </S.Item>
 
