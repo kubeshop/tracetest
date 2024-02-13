@@ -50,6 +50,10 @@ func NewTestRunList(renderScheduler RenderScheduler, sensor sensors.Sensor) *Tes
 	list.Select(0, 0)
 	list.SetSelectedFunc(func(row, column int) {
 		// ignore the header which is the first row
+		if row == 0 {
+			return
+		}
+
 		selectedRow := row - 1
 		run := list.testRuns[selectedRow]
 		list.sensor.Emit(events.SelectedTestRun, run)
