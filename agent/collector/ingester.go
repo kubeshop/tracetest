@@ -38,7 +38,7 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 		BatchTimeout:   batchTimeout,
 		RemoteIngester: cfg,
 		buffer:         &buffer{},
-		uniqueTraceIDs: 0,
+		traceIDs:       make(map[string]bool, 0),
 		done:           make(chan bool),
 		traceCache:     cfg.traceCache,
 		logger:         cfg.logger,
@@ -69,13 +69,15 @@ type forwardIngester struct {
 	RemoteIngester remoteIngesterConfig
 	client         pb.TraceServiceClient
 	buffer         *buffer
-	uniqueTraceIDs int
+	traceIDs       map[string]bool
 	done           chan bool
 	traceCache     TraceCache
 	logger         *zap.Logger
 	sensor         sensors.Sensor
 
 	statistics Statistics
+
+	sync.Mutex
 }
 
 type remoteIngesterConfig struct {
@@ -123,7 +125,7 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 		// In case of OTLP datastore, those spans will be polled from this cache instead
 		// of a real datastore
 		i.cacheTestSpans(request.ResourceSpans)
-		i.sensor.Emit(events.TraceCountUpdated, i.uniqueTraceIDs)
+		i.sensor.Emit(events.TraceCountUpdated, len(i.traceIDs))
 	}
 
 	return &pb.ExportTraceServiceResponse{
@@ -224,7 +226,9 @@ func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
 	i.logger.Debug("caching test spans", zap.Int("count", len(spans)))
 
 	for traceID, spans := range spans {
-		i.uniqueTraceIDs += 1
+		i.Lock()
+		i.traceIDs[traceID] = true
+		i.Unlock()
 		if _, ok := i.traceCache.Get(traceID); !ok {
 			i.logger.Debug("traceID is not part of a test", zap.String("traceID", traceID))
 			// traceID is not part of a test
