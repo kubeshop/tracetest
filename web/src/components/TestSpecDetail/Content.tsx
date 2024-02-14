@@ -1,5 +1,5 @@
-import {useEffect, useMemo, useRef} from 'react';
-import {FixedSizeList as List} from 'react-window';
+import {useCallback, useEffect, useMemo, useRef} from 'react';
+import {VariableSizeList as List} from 'react-window';
 import AutoSizer, {Size} from 'react-virtualized-auto-sizer';
 
 import {useAppSelector} from 'redux/hooks';
@@ -10,6 +10,7 @@ import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import Header from './Header';
 import ResultCard from './ResultCard';
 import Search from './Search';
+import * as S from './TestSpecDetail.styled';
 
 interface IProps {
   onClose(): void;
@@ -53,51 +54,58 @@ const Content = ({
     }
   }, [results, selectedSpan]);
 
-  const itemSize = useMemo(() => {
-    const [, checkResults = []] = results[0];
+  const getItemSize = useCallback(
+    index => {
+      const [, checkResults = []] = results[index];
 
-    return checkResults.length * 72.59 + 40 + 16;
-  }, [results]);
+      return checkResults.length * 72.59 + 40 + 16;
+    },
+    [results]
+  );
 
   return (
     <>
-      <Header
-        affectedSpans={spanIds?.length ?? 0}
-        assertionsFailed={totalPassedChecks?.false ?? 0}
-        assertionsPassed={totalPassedChecks?.true ?? 0}
-        isDeleted={isDeleted}
-        isDraft={isDraft}
-        onClose={onClose}
-        onDelete={() => {
-          onDelete(testSpec.selector);
-          onClose();
-        }}
-        onEdit={() => {
-          onEdit(testSpec, name);
-        }}
-        onRevert={() => {
-          onRevert(originalSelector);
-        }}
-        selector={selector}
-        title={!selector && !name ? 'All Spans' : name}
-      />
+      <div>
+        <Header
+          affectedSpans={spanIds?.length ?? 0}
+          assertionsFailed={totalPassedChecks?.false ?? 0}
+          assertionsPassed={totalPassedChecks?.true ?? 0}
+          isDeleted={isDeleted}
+          isDraft={isDraft}
+          onClose={onClose}
+          onDelete={() => {
+            onDelete(testSpec.selector);
+            onClose();
+          }}
+          onEdit={() => {
+            onEdit(testSpec, name);
+          }}
+          onRevert={() => {
+            onRevert(originalSelector);
+          }}
+          selector={selector}
+          title={!selector && !name ? 'All Spans' : name}
+        />
 
-      <Search />
+        <Search />
+      </div>
 
-      <AutoSizer>
-        {({height, width}: Size) => (
-          <List
-            ref={listRef}
-            height={height}
-            itemCount={results.length}
-            itemData={results}
-            itemSize={itemSize}
-            width={width}
-          >
-            {ResultCard}
-          </List>
-        )}
-      </AutoSizer>
+      <S.DrawerRow>
+        <AutoSizer>
+          {({height, width}: Size) => (
+            <List
+              ref={listRef}
+              height={height}
+              itemCount={results.length}
+              itemData={results}
+              itemSize={getItemSize}
+              width={width}
+            >
+              {ResultCard}
+            </List>
+          )}
+        </AutoSizer>
+      </S.DrawerRow>
     </>
   );
 };

@@ -38,7 +38,7 @@ interface IProps {
 
 const TestPanel = ({run, testId, runEvents}: IProps) => {
   const [query, updateQuery] = useSearchParams();
-  const {selectedSpan, onSetFocusedSpan, onSelectSpan} = useSpan();
+  const {selectedSpan, onSetFocusedSpan} = useSpan();
   const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector, specs} =
     useTestSpecs();
   const {isOpen: isTestSpecFormOpen, formProps, onSubmit, open, close, isValid, onIsValid} = useTestSpecForm();
