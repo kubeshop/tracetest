@@ -2,7 +2,6 @@
 import fs from 'fs';
 import { Pokemon } from './types';
 import Tracetest from '@tracetest/client';
-import { TestResource } from '@tracetest/client/dist/modules/openapi-client';
 
 // To use the @tracetest/client, you must have a token for the environment. This is created on the Settings 
 // page under Tokens by the administrator for the environment. The token below has been given the 'engineer'
