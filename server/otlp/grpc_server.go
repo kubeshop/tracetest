@@ -36,7 +36,11 @@ func (s *grpcServer) SetLogger(logger *zap.Logger) {
 }
 
 func (s *grpcServer) Start() error {
-	s.gServer = grpc.NewServer()
+	size := 1024 * 1024 * 50
+	s.gServer = grpc.NewServer(
+		grpc.MaxSendMsgSize(size),
+		grpc.MaxRecvMsgSize(size),
+	)
 	listener, err := net.Listen("tcp", s.addr)
 	if err != nil {
 		return fmt.Errorf("cannot listen on address %s: %w", s.addr, err)
