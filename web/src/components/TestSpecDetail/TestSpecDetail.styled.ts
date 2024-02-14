@@ -37,6 +37,15 @@ export const CardContainer = styled(Card)<{$isSelected: boolean; $type: Semantic
 export const DrawerContainer = styled(Drawer)`
   position: absolute;
   overflow: hidden;
+
+  .ant-drawer-body {
+    display: flex;
+    flex-direction: column;
+  }
+`;
+
+export const DrawerRow = styled.div`
+  flex: 1;
 `;
 
 export const GridContainer = styled.div`
