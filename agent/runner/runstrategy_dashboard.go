@@ -44,6 +44,11 @@ func (s *Runner) RunDashboardStrategy(ctx context.Context, cfg agentConfig.Confi
 }
 
 func (s *Runner) disableLogger() func() {
+	if s.loggerLevel == nil {
+		// logger is not active, so it's safe to do nothing
+		return func() {}
+	}
+
 	oldLevel := s.loggerLevel.Level()
 	s.loggerLevel.SetLevel(zap.PanicLevel)
 
