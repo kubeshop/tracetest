@@ -2,6 +2,7 @@ package sensors
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/fluidtruck/deepcopy"
 )
@@ -29,6 +30,8 @@ func (e *Event) Unmarshal(target interface{}) error {
 type sensor struct {
 	listeners map[string][]func(Event)
 	lastEvent map[string]Event
+
+	sync.Mutex
 }
 
 func NewSensor() Sensor {
@@ -39,11 +42,17 @@ func NewSensor() Sensor {
 }
 
 func (r *sensor) Reset() {
+	r.Lock()
+	defer r.Unlock()
+
 	r.listeners = make(map[string][]func(Event))
 	r.lastEvent = make(map[string]Event)
 }
 
 func (r *sensor) On(eventName string, cb func(Event)) {
+	r.Lock()
+	defer r.Unlock()
+
 	var slice []func(Event)
 	if existingSlice, ok := r.listeners[eventName]; ok {
 		slice = existingSlice
@@ -58,14 +67,17 @@ func (r *sensor) On(eventName string, cb func(Event)) {
 }
 
 func (r *sensor) Emit(eventName string, event interface{}) {
+	r.Lock()
+	defer r.Unlock()
+
 	listeners := r.listeners[eventName]
 	e := Event{
 		Name: eventName,
 		data: event,
 	}
-  
+
 	r.lastEvent[eventName] = e
-  
+
 	for _, listener := range listeners {
 		listener(e)
 	}
