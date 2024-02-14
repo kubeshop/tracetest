@@ -64,7 +64,6 @@ const main = async () => {
     await deletePokemon();
     
     console.log(await tracetest.getSummary());
+};
 
- };
-
- main();
+main();
