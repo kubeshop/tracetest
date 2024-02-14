@@ -24,9 +24,7 @@ var startCmd = &cobra.Command{
 	Short:   "Start Tracetest",
 	Long:    "Start using Tracetest",
 	PreRun:  setupCommand(SkipConfigValidation(), SkipVersionMismatchCheck()),
-	Run: WithResultHandler((func(_ *cobra.Command, _ []string) (string, error) {
-		ctx := context.Background()
-
+	Run: WithResultHandler((func(ctx context.Context, _ *cobra.Command, _ []string) (string, error) {
 		flags := agentConfig.Flags{
 			OrganizationID: saveParams.organizationID,
 			EnvironmentID:  saveParams.environmentID,

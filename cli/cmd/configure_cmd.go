@@ -21,8 +21,7 @@ var configureCmd = &cobra.Command{
 	Short:   "Configure your tracetest CLI",
 	Long:    "Configure your tracetest CLI",
 	PreRun:  setupLogger,
-	Run: WithResultHandler(WithParamsHandler(configParams)(func(cmd *cobra.Command, _ []string) (string, error) {
-		ctx := context.Background()
+	Run: WithResultHandler(WithParamsHandler(configParams)(func(ctx context.Context, cmd *cobra.Command, _ []string) (string, error) {
 		flags := agentConfig.Flags{
 			CI: configParams.CI,
 		}

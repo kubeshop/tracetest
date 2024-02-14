@@ -17,16 +17,38 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type RunFn func(cmd *cobra.Command, args []string) (string, error)
+type RunFn func(ctx context.Context, cmd *cobra.Command, args []string) (string, error)
 type CobraRunFn func(cmd *cobra.Command, args []string)
 type MiddlewareWrapper func(RunFn) RunFn
 
+type keyCmd struct{}
+
+var cmdKey keyCmd
+
+func ContextWithCmd(cmd *cobra.Command, args []string) context.Context {
+	return context.WithValue(
+		context.Background(),
+		cmdKey,
+		buildCmdLine(cmd, args),
+	)
+}
+
+func ContextGetCmd(ctx context.Context) string {
+	v := ctx.Value(cmdKey)
+	if v == nil {
+		return ""
+	}
+	return v.(string)
+}
+
 func WithResultHandler(runFn RunFn) CobraRunFn {
 	return func(cmd *cobra.Command, args []string) {
-		res, err := runFn(cmd, args)
+		ctx := ContextWithCmd(cmd, args)
+
+		res, err := runFn(ctx, cmd, args)
 
 		if err != nil {
-			handleError(err, cmd, args)
+			handleError(ctx, err)
 			return
 		}
 
@@ -36,26 +58,29 @@ func WithResultHandler(runFn RunFn) CobraRunFn {
 	}
 }
 
-func handleError(err error, cmd *cobra.Command, args []string) {
+func handleError(ctx context.Context, err error) {
 	reqErr := resourcemanager.RequestError{}
 	if errors.As(err, &reqErr) && reqErr.IsAuthError {
-		handleAuthError(cmd, args)
+		handleAuthError(ctx)
 	} else {
 		OnError(err)
 	}
 }
 
-func handleAuthError(cmd *cobra.Command, args []string) {
+func handleAuthError(ctx context.Context) {
 	ui.DefaultUI.Warning("Your authentication token has expired, please log in again.")
 	configurator.
 		WithOnFinish(func(ctx context.Context, _ config.Config) {
-			retryCommand(cmd, args)
+			retryCommand(ctx)
 		}).
-		ExecuteUserLogin(context.Background(), cliConfig)
+		ExecuteUserLogin(ctx, cliConfig)
 }
 
-func retryCommand(cmd *cobra.Command, args []string) {
-	cmdLine := buildCmdLine(cmd, args)
+func retryCommand(ctx context.Context) {
+	cmdLine := ContextGetCmd(ctx)
+	if cmdLine == "" {
+		os.Exit(1)
+	}
 	execCmd := exec.Command("sh", "-c", cmdLine)
 	execCmd.Stdout = os.Stdout
 	execCmd.Stderr = os.Stderr
@@ -64,7 +89,7 @@ func retryCommand(cmd *cobra.Command, args []string) {
 	if err != nil {
 		exitWithCmdStatus(err)
 	} else {
-		os.Exit(0)
+		os.Exit(1)
 	}
 }
 
@@ -122,7 +147,7 @@ func handleErrorMessage(err error) string {
 
 func WithParamsHandler(validators ...Validator) MiddlewareWrapper {
 	return func(runFn RunFn) RunFn {
-		return func(cmd *cobra.Command, args []string) (string, error) {
+		return func(ctx context.Context, cmd *cobra.Command, args []string) (string, error) {
 			errors := make([]error, 0)
 
 			for _, validator := range validators {
@@ -138,7 +163,7 @@ func WithParamsHandler(validators ...Validator) MiddlewareWrapper {
 				return "", fmt.Errorf(errorText)
 			}
 
-			return runFn(cmd, args)
+			return runFn(ctx, cmd, args)
 		}
 	}
 }
