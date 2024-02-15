@@ -1,10 +1,13 @@
 package pipeline
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type NatsDriver[T any] struct {
@@ -22,14 +25,20 @@ func NewNatsDriver[T any](conn *nats.Conn, topic string) *NatsDriver[T] {
 	}
 }
 
-func (d *NatsDriver[T]) Enqueue(msg T) {
+func (d *NatsDriver[T]) Enqueue(ctx context.Context, msg T) {
 	msgJson, err := json.Marshal(msg)
 	if err != nil {
 		fmt.Printf("could not marshal message: %s\n", err.Error())
 	}
 
+	header := make(nats.Header)
+	if propagator := otel.GetTextMapPropagator(); propagator != nil {
+		propagator.Inject(ctx, propagation.HeaderCarrier(header))
+	}
+
 	err = d.conn.PublishMsg(&nats.Msg{
 		Subject: d.topic,
+		Header:  header,
 		Data:    msgJson,
 	})
 
@@ -47,8 +56,13 @@ func (d *NatsDriver[T]) SetListener(listener Listener[T]) {
 			fmt.Printf(`could not unmarshal message got in queue "%s": %s\n`, d.topic, err.Error())
 		}
 
+		ctx := context.Background()
+		if propagator := otel.GetTextMapPropagator(); propagator != nil {
+			ctx = propagator.Extract(ctx, propagation.HeaderCarrier(msg.Header))
+		}
+
 		// TODO: We probably should return an error for acking or nacking this message
-		listener.Listen(target)
+		listener.Listen(ctx, target)
 
 		msg.Ack()
 	})

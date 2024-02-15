@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"github.com/alitto/pond"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/metric"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type Enqueuer[T any] interface {
@@ -16,11 +18,11 @@ type QueueItemProcessor[T any] interface {
 	ProcessItem(context.Context, T)
 }
 type Listener[T any] interface {
-	Listen(T)
+	Listen(context.Context, T)
 }
 
 type QueueDriver[T any] interface {
-	Enqueue(T)
+	Enqueue(context.Context, T)
 	SetListener(Listener[T])
 }
 
@@ -78,6 +80,12 @@ func (q Queue[T]) Enqueue(ctx context.Context, item T) {
 		return
 	}
 
+	workerCtx := context.Background()
+	if propagator := otel.GetTextMapPropagator(); propagator != nil {
+		var carrier propagation.HeaderCarrier
+		workerCtx = propagator.Extract(workerCtx, carrier)
+	}
+
 	// use a worker to enqueue the job in case the driver takes a bit to actually enqueue
 	// this way we release the caller as soon as possible
 	q.workerPool.Submit(func() {
@@ -88,13 +96,11 @@ func (q Queue[T]) Enqueue(ctx context.Context, item T) {
 		q.enqueueHistogram.Record(ctx, 1, metric.WithAttributes(
 			attribute.String("queue.name", q.name),
 		))
-		q.driver.Enqueue(item)
+		q.driver.Enqueue(workerCtx, item)
 	})
 }
 
-func (q Queue[T]) Listen(item T) {
-	ctx := context.Background()
-
+func (q Queue[T]) Listen(ctx context.Context, item T) {
 	if q.ListenPreprocessorFn != nil {
 		ctx, item = q.ListenPreprocessorFn(ctx, item)
 	}

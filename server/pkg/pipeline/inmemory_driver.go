@@ -1,21 +1,27 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
 )
 
 func NewInMemoryQueueDriver[T any](name string) *InMemoryQueueDriver[T] {
 	return &InMemoryQueueDriver[T]{
 		log:   newLoggerFn(fmt.Sprintf("InMemoryQueueDriver - %s", name)),
-		queue: make(chan T),
+		queue: make(chan queueMessage[T]),
 		exit:  make(chan bool),
 		name:  name,
 	}
 }
 
+type queueMessage[T any] struct {
+	ctx     context.Context
+	message T
+}
+
 type InMemoryQueueDriver[T any] struct {
 	log      loggerFn
-	queue    chan T
+	queue    chan queueMessage[T]
 	exit     chan bool
 	listener Listener[T]
 	name     string
@@ -25,8 +31,8 @@ func (qd *InMemoryQueueDriver[T]) SetListener(l Listener[T]) {
 	qd.listener = l
 }
 
-func (qd InMemoryQueueDriver[T]) Enqueue(item T) {
-	qd.queue <- item
+func (qd InMemoryQueueDriver[T]) Enqueue(ctx context.Context, item T) {
+	qd.queue <- queueMessage[T]{ctx, item}
 }
 
 func (qd InMemoryQueueDriver[T]) Start() {
@@ -38,7 +44,7 @@ func (qd InMemoryQueueDriver[T]) Start() {
 				qd.log("exit")
 				return
 			case job := <-qd.queue:
-				qd.listener.Listen(job)
+				qd.listener.Listen(job.ctx, job.message)
 			}
 		}
 	}()
