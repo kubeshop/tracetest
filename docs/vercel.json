@@ -1,0 +1,74 @@
+{
+  "redirects": [
+    {
+      "destination": "/core/deployment/docker",
+      "source": "/deployment/overview/docker",
+      "statusCode": 301
+    },
+    {
+      "destination": "/core/deployment/docker",
+      "source": "/deployment/docker",
+      "statusCode": 301
+    },
+    {
+      "destination": "/core/deployment/kubernetes",
+      "source": "/deployment/overview/kubernetes",
+      "statusCode": 301
+    },
+    {
+      "destination": "/core/deployment/kubernetes",
+      "source": "/deployment/kubernetes",
+      "statusCode": 301
+    },
+    {
+      "destination": "/configuration/overview",
+      "source": "/supported-backends",
+      "statusCode": 301
+    },
+    {
+      "destination": "/web-ui/creating-test-specifications",
+      "source": "/adding-assertions",
+      "statusCode": 301
+    },
+    {
+      "destination": "/core/configuration/server", 
+      "source": "/configuration/server",
+      "statusCode": 301
+    },
+    {
+      "destination": "/core/configuration/provisioning", 
+      "source": "/configuration/provisioning",
+      "statusCode": 301
+    },
+    {
+      "destination": "/core/configuration/analytics", 
+      "source": "/configuration/analytics",
+      "statusCode": 301
+    },
+    {
+      "destination": "/core/configuration/telemetry", 
+      "source": "/configuration/telemetry",
+      "statusCode": 301
+    },
+    {
+      "destination": "/core/configuration/upgrade", 
+      "source": "/configuration/upgrade",
+      "statusCode": 301
+    },
+    {
+      "destination": "/live-examples/pokeshop/use-cases/add-pokemon",
+      "source": "/pokeshop/add-pokemon/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/live-examples/pokeshop/use-cases/import-pokemon",
+      "source": "/pokeshop/import-pokemon/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/live-examples/pokeshop/overview",
+      "source": "/pokeshop",
+      "statusCode": 301
+    }
+  ]
+}
