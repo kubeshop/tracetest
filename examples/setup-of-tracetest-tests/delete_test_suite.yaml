@@ -1,0 +1,8 @@
+type: TestSuite
+spec:
+  id: bS4cix2IR
+  name: Delete with Setup
+  description: A test of the deletion end point with setup test which adds the pokemon as a setup step.
+  steps:
+  - setup-pokemon
+  - delete-pokemon
