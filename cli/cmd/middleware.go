@@ -17,27 +17,9 @@ type RunFn func(ctx context.Context, cmd *cobra.Command, args []string) (string,
 type CobraRunFn func(cmd *cobra.Command, args []string)
 type MiddlewareWrapper func(RunFn) RunFn
 
-// type keyCmd struct{}
-
-// var cmdKey keyCmd
-
-// func ContextWithCmd(cmd *cobra.Command, args []string) context.Context {
-// 	return context.WithValue(
-// 		cmd.Context(),
-// 		cmdKey,
-// 		buildCmdLine(cmd, args),
-// 	)
-// }
-
-// func ContextGetCmd(ctx context.Context) string {
-// 	v := ctx.Value(cmdKey)
-// 	if v == nil {
-// 		return ""
-// 	}
-// 	return v.(string)
-// }
-
 func rootCtx(cmd *cobra.Command) context.Context {
+	// cobra does not correctly progpagate rootcmd context to sub commands,
+	// so we need to manually traverse the command tree to find the root context
 	if cmd == nil {
 		return nil
 	}
@@ -61,6 +43,7 @@ func rootCtx(cmd *cobra.Command) context.Context {
 
 func WithResultHandler(runFn RunFn) CobraRunFn {
 	return func(cmd *cobra.Command, args []string) {
+		// we need the root cmd context in case of an error caused rerun
 		ctx := rootCtx(cmd)
 
 		res, err := runFn(ctx, cmd, args)
@@ -97,23 +80,6 @@ func handleAuthError(ctx context.Context) {
 func retryCommand(ctx context.Context) {
 	handleRootExecErr(rootCmd.ExecuteContext(ctx))
 }
-
-// func buildCmdLine(cmd *cobra.Command, args []string) string {
-// 	cmdLine := append([]string{cmd.CommandPath()}, args...)
-// 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-// 		if flag.Changed {
-// 			cmdLine = append(cmdLine, fmt.Sprintf("--%s=%s", flag.Name, flag.Value.String()))
-// 		}
-// 	})
-// 	return strings.Join(cmdLine, " ")
-// }
-
-// func exitWithCmdStatus(err error) {
-// 	if exitError, ok := err.(*exec.ExitError); ok {
-// 		ws := exitError.Sys().(syscall.WaitStatus)
-// 		os.Exit(ws.ExitStatus())
-// 	}
-// }
 
 type errorMessageRenderer interface {
 	Render()
