@@ -6,6 +6,8 @@ import (
 	"fmt"
 
 	"github.com/nats-io/nats.go"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 type NatsDriver[T any] struct {
@@ -29,8 +31,12 @@ func (d *NatsDriver[T]) Enqueue(ctx context.Context, msg T) {
 		fmt.Printf("could not marshal message: %s\n", err.Error())
 	}
 
+	header := make(nats.Header)
+	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(header))
+
 	err = d.conn.PublishMsg(&nats.Msg{
 		Subject: d.topic,
+		Header:  header,
 		Data:    msgJson,
 	})
 
