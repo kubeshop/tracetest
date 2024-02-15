@@ -14,11 +14,9 @@ interface IProps {
 const Selector = ({onSelect, selectedBackend}: IProps) => {
   return (
     <S.Container>
-      <Typography.Title level={1}>How should Tracetest receive telemetry from your application?</Typography.Title>
+      <Typography.Title level={1}>Tell us how Tracetest should ingest traces from your application</Typography.Title>
 
-      <Typography.Paragraph type="secondary">
-        Tell us how Tracetest should get or receive traces from your application
-      </Typography.Paragraph>
+      <Typography.Paragraph type="secondary">Select your Tracing Backend</Typography.Paragraph>
 
       <S.BackendSelector>
         {backends.map(backend => (

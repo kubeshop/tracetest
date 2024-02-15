@@ -6,7 +6,7 @@ import CreateTest, {CreateTestTab} from '../Steps/CreateTest';
 const steps: TWizardMap = {
   agent: undefined,
   tracing_backend: {
-    name: 'Configure access to your OTel traces',
+    name: 'Configure trace ingestion',
     description: '',
     component: TracingBackend,
     tabComponent: TracingBackendTab,

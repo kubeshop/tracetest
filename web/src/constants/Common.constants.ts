@@ -42,6 +42,7 @@ export const POKESHOP_GITHUB = 'https://github.com/kubeshop/pokeshop';
 export const OTEL_DEMO_GITHUB = 'https://github.com/open-telemetry/opentelemetry-demo';
 
 export const AGENT_DOCS_URL = 'https://docs.tracetest.io/concepts/agent';
+export const CLOUD_AGENT_DOCS_URL = 'https://docs.tracetest.io/concepts/cloud-agent';
 
 export enum HTTP_METHOD {
   GET = 'GET',
