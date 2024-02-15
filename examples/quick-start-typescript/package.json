@@ -19,7 +19,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@tracetest/client": "^0.0.27",
+    "@tracetest/client": "^0.0.28",
     "dotenv": "^16.3.2"
   }
 }
