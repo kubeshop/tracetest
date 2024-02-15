@@ -54,8 +54,9 @@ func (d *NatsDriver[T]) SetListener(listener Listener[T]) {
 			fmt.Printf(`could not unmarshal message got in queue "%s": %s\n`, d.topic, err.Error())
 		}
 
+		ctx := otel.GetTextMapPropagator().Extract(context.Background(), propagation.HeaderCarrier(msg.Header))
 		// TODO: We probably should return an error for acking or nacking this message
-		listener.Listen(target)
+		listener.Listen(ctx, target)
 
 		msg.Ack()
 	})

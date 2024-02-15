@@ -16,7 +16,7 @@ type QueueItemProcessor[T any] interface {
 	ProcessItem(context.Context, T)
 }
 type Listener[T any] interface {
-	Listen(T)
+	Listen(context.Context, T)
 }
 
 type QueueDriver[T any] interface {
@@ -92,9 +92,7 @@ func (q Queue[T]) Enqueue(ctx context.Context, item T) {
 	})
 }
 
-func (q Queue[T]) Listen(item T) {
-	ctx := context.Background()
-
+func (q Queue[T]) Listen(ctx context.Context, item T) {
 	if q.ListenPreprocessorFn != nil {
 		ctx, item = q.ListenPreprocessorFn(ctx, item)
 	}
