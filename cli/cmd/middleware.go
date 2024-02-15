@@ -5,45 +5,63 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
-	"strings"
-	"syscall"
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/ui"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 type RunFn func(ctx context.Context, cmd *cobra.Command, args []string) (string, error)
 type CobraRunFn func(cmd *cobra.Command, args []string)
 type MiddlewareWrapper func(RunFn) RunFn
 
-type keyCmd struct{}
+// type keyCmd struct{}
 
-var cmdKey keyCmd
+// var cmdKey keyCmd
 
-func ContextWithCmd(cmd *cobra.Command, args []string) context.Context {
-	return context.WithValue(
-		context.Background(),
-		cmdKey,
-		buildCmdLine(cmd, args),
-	)
-}
+// func ContextWithCmd(cmd *cobra.Command, args []string) context.Context {
+// 	return context.WithValue(
+// 		cmd.Context(),
+// 		cmdKey,
+// 		buildCmdLine(cmd, args),
+// 	)
+// }
 
-func ContextGetCmd(ctx context.Context) string {
-	v := ctx.Value(cmdKey)
-	if v == nil {
-		return ""
+// func ContextGetCmd(ctx context.Context) string {
+// 	v := ctx.Value(cmdKey)
+// 	if v == nil {
+// 		return ""
+// 	}
+// 	return v.(string)
+// }
+
+func rootCtx(cmd *cobra.Command) context.Context {
+	if cmd == nil {
+		return nil
 	}
-	return v.(string)
+
+	var (
+		ctx = cmd.Context()
+		p   = cmd.Parent()
+	)
+	if cmd.Parent() == nil {
+		return ctx
+	}
+	for {
+		ctx = p.Context()
+		p = p.Parent()
+		if p == nil {
+			break
+		}
+	}
+	return ctx
 }
 
 func WithResultHandler(runFn RunFn) CobraRunFn {
 	return func(cmd *cobra.Command, args []string) {
-		ctx := ContextWithCmd(cmd, args)
+		ctx := rootCtx(cmd)
 
 		res, err := runFn(ctx, cmd, args)
 
@@ -77,38 +95,25 @@ func handleAuthError(ctx context.Context) {
 }
 
 func retryCommand(ctx context.Context) {
-	cmdLine := ContextGetCmd(ctx)
-	if cmdLine == "" {
-		os.Exit(1)
-	}
-	execCmd := exec.Command("sh", "-c", cmdLine)
-	execCmd.Stdout = os.Stdout
-	execCmd.Stderr = os.Stderr
-	err := execCmd.Run()
-
-	if err != nil {
-		exitWithCmdStatus(err)
-	} else {
-		os.Exit(1)
-	}
+	handleRootExecErr(rootCmd.ExecuteContext(ctx))
 }
 
-func buildCmdLine(cmd *cobra.Command, args []string) string {
-	cmdLine := append([]string{cmd.CommandPath()}, args...)
-	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
-		if flag.Changed {
-			cmdLine = append(cmdLine, fmt.Sprintf("--%s=%s", flag.Name, flag.Value.String()))
-		}
-	})
-	return strings.Join(cmdLine, " ")
-}
+// func buildCmdLine(cmd *cobra.Command, args []string) string {
+// 	cmdLine := append([]string{cmd.CommandPath()}, args...)
+// 	cmd.Flags().VisitAll(func(flag *pflag.Flag) {
+// 		if flag.Changed {
+// 			cmdLine = append(cmdLine, fmt.Sprintf("--%s=%s", flag.Name, flag.Value.String()))
+// 		}
+// 	})
+// 	return strings.Join(cmdLine, " ")
+// }
 
-func exitWithCmdStatus(err error) {
-	if exitError, ok := err.(*exec.ExitError); ok {
-		ws := exitError.Sys().(syscall.WaitStatus)
-		os.Exit(ws.ExitStatus())
-	}
-}
+// func exitWithCmdStatus(err error) {
+// 	if exitError, ok := err.(*exec.ExitError); ok {
+// 		ws := exitError.Sys().(syscall.WaitStatus)
+// 		os.Exit(ws.ExitStatus())
+// 	}
+// }
 
 type errorMessageRenderer interface {
 	Render()
