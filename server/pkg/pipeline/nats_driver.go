@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -22,7 +23,7 @@ func NewNatsDriver[T any](conn *nats.Conn, topic string) *NatsDriver[T] {
 	}
 }
 
-func (d *NatsDriver[T]) Enqueue(msg T) {
+func (d *NatsDriver[T]) Enqueue(ctx context.Context, msg T) {
 	msgJson, err := json.Marshal(msg)
 	if err != nil {
 		fmt.Printf("could not marshal message: %s\n", err.Error())

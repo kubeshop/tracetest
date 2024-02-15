@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
 )
 
@@ -25,7 +26,7 @@ func (qd *InMemoryQueueDriver[T]) SetListener(l Listener[T]) {
 	qd.listener = l
 }
 
-func (qd InMemoryQueueDriver[T]) Enqueue(item T) {
+func (qd InMemoryQueueDriver[T]) Enqueue(ctx context.Context, item T) {
 	qd.queue <- item
 }
 

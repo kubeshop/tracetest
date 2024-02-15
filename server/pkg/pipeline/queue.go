@@ -20,7 +20,7 @@ type Listener[T any] interface {
 }
 
 type QueueDriver[T any] interface {
-	Enqueue(T)
+	Enqueue(context.Context, T)
 	SetListener(Listener[T])
 }
 
@@ -88,7 +88,7 @@ func (q Queue[T]) Enqueue(ctx context.Context, item T) {
 		q.enqueueHistogram.Record(ctx, 1, metric.WithAttributes(
 			attribute.String("queue.name", q.name),
 		))
-		q.driver.Enqueue(item)
+		q.driver.Enqueue(ctx, item)
 	})
 }
 
