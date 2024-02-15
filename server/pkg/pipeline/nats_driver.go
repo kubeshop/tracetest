@@ -32,7 +32,9 @@ func (d *NatsDriver[T]) Enqueue(ctx context.Context, msg T) {
 	}
 
 	header := make(nats.Header)
-	otel.GetTextMapPropagator().Inject(ctx, propagation.HeaderCarrier(header))
+	if propagator := otel.GetTextMapPropagator(); propagator != nil {
+		propagator.Inject(ctx, propagation.HeaderCarrier(header))
+	}
 
 	err = d.conn.PublishMsg(&nats.Msg{
 		Subject: d.topic,
@@ -54,7 +56,11 @@ func (d *NatsDriver[T]) SetListener(listener Listener[T]) {
 			fmt.Printf(`could not unmarshal message got in queue "%s": %s\n`, d.topic, err.Error())
 		}
 
-		ctx := otel.GetTextMapPropagator().Extract(context.Background(), propagation.HeaderCarrier(msg.Header))
+		ctx := context.Background()
+		if propagator := otel.GetTextMapPropagator(); propagator != nil {
+			ctx = propagator.Extract(ctx, propagation.HeaderCarrier(msg.Header))
+		}
+
 		// TODO: We probably should return an error for acking or nacking this message
 		listener.Listen(ctx, target)
 
