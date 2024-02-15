@@ -36,7 +36,7 @@ func Execute() {
 
 func handleRootExecErr(err error) {
 	if err == nil {
-		return
+		ExitCLI(0)
 	}
 
 	fmt.Fprintln(os.Stderr, err)
