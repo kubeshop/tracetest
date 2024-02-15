@@ -2,10 +2,9 @@ import {Typography} from 'antd';
 import styled from 'styled-components';
 
 export const ButtonContainer = styled.div`
-  margin-top: 44px;
-
   display: flex;
   justify-content: flex-end;
+  margin-top: 4px;
 `;
 
 export const TabText = styled(Typography.Text)`

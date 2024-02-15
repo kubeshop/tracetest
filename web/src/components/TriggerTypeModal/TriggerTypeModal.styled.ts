@@ -54,7 +54,7 @@ export const CardList = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
 `;
 
 export const IntegrationCardList = styled(CardList)`

@@ -4,6 +4,7 @@ import styled, {css} from 'styled-components';
 export const Content = styled(LayoutAntd.Content)<{$hasMenu: boolean}>`
   display: flex;
   flex-direction: column;
+  padding-bottom: 40px;
 
   ${({$hasMenu}) =>
     $hasMenu &&
