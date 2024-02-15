@@ -20,10 +20,12 @@ const useDeleteResource = () => {
   const onConfirmDelete = useCallback(
     async (id: string, type: ResourceType) => {
       try {
+        let path = '/tests';
         if (type === ResourceType.Test) {
           TestAnalyticsService.onDeleteTest();
           await deleteTestMutation({testId: id}).unwrap();
         } else if (type === ResourceType.TestSuite) {
+          path = '/testsuites';
           await deleteTestSuiteMutation({testSuiteId: id}).unwrap();
         }
 
@@ -31,7 +33,8 @@ const useDeleteResource = () => {
           type: 'success',
           title: `${capitalize(type)} deleted successfully`,
         });
-        navigate('/');
+
+        navigate(path);
       } catch (error) {
         showNotification({
           type: 'error',
