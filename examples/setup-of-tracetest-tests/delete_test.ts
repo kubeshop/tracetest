@@ -58,7 +58,7 @@ const main = async () => {
         // run deletes pokemon test
         console.log('Running the delete-pokemon test...');
         const run = await tracetest.runTest(test, { variables: getVariables(String(pokemonId)) });
-        run.wait();
+        await run.wait();
     };
 
     await deletePokemon();
