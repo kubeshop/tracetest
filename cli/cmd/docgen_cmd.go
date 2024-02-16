@@ -42,6 +42,8 @@ var docGenCmd = &cobra.Command{
 				fmt.Println(fmt.Errorf("could not create docusaurus sidebar file: %w", err).Error())
 				ExitCLI(1)
 			}
+
+			fixCodeBlocks(docsOutputDir)
 		}
 	},
 	PostRun: teardownCommand,
@@ -98,6 +100,50 @@ func generateContentItems(inputDir string, docusaurusRootFolder string) (string,
 	}
 
 	return entries.String(), nil
+}
+
+func fixCodeBlocks(inputDir string) error {
+	path, err := filepath.Abs(inputDir)
+	if err != nil {
+		return fmt.Errorf("could not get absolute path: %w", err)
+	}
+
+	files, err := os.ReadDir(inputDir)
+	if err != nil {
+		return fmt.Errorf("could not read dir: %w", err)
+	}
+
+	for _, file := range files {
+		filePath := filepath.Join(path, file.Name())
+		if !strings.HasSuffix(filePath, ".md") {
+			// ignore non-markdown files
+			continue
+		}
+
+		fileContent, err := os.ReadFile(filePath)
+		if err != nil {
+			return fmt.Errorf("could not read file (%s) content: %w", filePath, err)
+		}
+
+		fileChanged := false
+		lines := strings.Split(string(fileContent), "\n")
+		for i, line := range lines {
+			if len(line) > 0 && line[0] == '\t' {
+				lines[i] = fmt.Sprintf("```\n%s\n```", strings.TrimPrefix(line, "\t"))
+				fileChanged = true
+			}
+		}
+
+		if fileChanged {
+			fileContent := strings.Join(lines, "\n")
+			err = os.WriteFile(filePath, []byte(fileContent), os.ModeAppend.Perm())
+			if err != nil {
+				return fmt.Errorf("could not update file %s: %w", filePath, err)
+			}
+		}
+	}
+
+	return nil
 }
 
 func init() {
