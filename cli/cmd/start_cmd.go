@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/runner"
 	"github.com/kubeshop/tracetest/agent/ui"
@@ -48,8 +47,6 @@ var startCmd = &cobra.Command{
 		if serverURL := config.ContextGetServerURL(ctx); serverURL != "" {
 			flags.ServerURL = serverURL
 		}
-
-		spew.Dump(flags, config.ContextGetServerURL(ctx))
 
 		cfg, err := agentConfig.LoadConfig()
 		if err != nil {
