@@ -4,13 +4,13 @@ import styled, {css} from 'styled-components';
 export const Content = styled(LayoutAntd.Content)<{$hasMenu: boolean}>`
   display: flex;
   flex-direction: column;
-  padding-bottom: 40px;
 
   ${({$hasMenu}) =>
     $hasMenu &&
     css`
       height: 100%;
       overflow-y: scroll;
+      padding-bottom: 40px;
     `}
 `;
 

@@ -29,3 +29,22 @@ export const EmptyTitle = styled(Typography.Title).attrs({level: 3})``;
 export const SnippetsContainer = styled.div`
   margin: 16px 0;
 `;
+
+export const ListContainer = styled.div`
+  flex: 1;
+`;
+
+export const HiddenElementContainer = styled.div`
+  position: absolute;
+  visibility: hidden;
+  z-index: -1;
+`;
+
+export const HiddenElement = styled.div`
+  font-family: monospace;
+  font-size: ${({theme}) => theme.size.md};
+  line-height: 1.4;
+  padding: 4px 96px 76px 4px;
+  visibility: hidden;
+  width: 100%;
+`;
