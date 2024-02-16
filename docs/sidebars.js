@@ -669,12 +669,12 @@ const sidebars = {
         {
           type: "doc",
           id: "concepts/agent",
-          label: "Agent",
+          label: "Tracetest Agent",
         },
         {
           type: "doc",
           id: "concepts/cloud-agent",
-          label: "Cloud Agent (Beta)",
+          label: "Tracetest Cloud Agent (Beta)",
         },
         {
           type: "doc",
