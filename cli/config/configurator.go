@@ -63,12 +63,13 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 	if c.flags.Token != "" {
 		serverURL = lastUsedURL(prev)
 	} else {
-		serverURL, err := c.getServerURL(prev)
-		c.finalServerURL = serverURL
+		var err error
+		serverURL, err = c.getServerURL(prev)
 		if err != nil {
 			return err
 		}
 	}
+	c.finalServerURL = serverURL
 
 	cfg, err := c.createConfig(serverURL)
 	if err != nil {
