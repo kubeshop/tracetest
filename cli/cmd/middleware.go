@@ -74,7 +74,7 @@ func handleAuthError(ctx context.Context) {
 		WithOnFinish(func(ctx context.Context, _ config.Config) {
 			retryCommand(ctx)
 		}).
-		ExecuteUserLogin(ctx, cliConfig)
+		ExecuteUserLogin(ctx, cliConfig, nil)
 }
 
 func retryCommand(ctx context.Context) {

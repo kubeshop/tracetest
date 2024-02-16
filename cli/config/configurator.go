@@ -179,7 +179,7 @@ func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Con
 }
 
 func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config, flags agentConfig.Flags) (Config, error) {
-	if prev != nil && cfg.URL() == prev.URL() {
+	if prev != nil && cfg.UIEndpoint == prev.UIEndpoint {
 		if prev != nil && prev.Jwt != "" {
 			cfg.Jwt = prev.Jwt
 			cfg.Token = prev.Token
@@ -205,10 +205,10 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 		return cfg, nil
 	}
 
-	return c.ExecuteUserLogin(ctx, cfg)
+	return c.ExecuteUserLogin(ctx, cfg, prev)
 }
 
-func (c Configurator) ExecuteUserLogin(ctx context.Context, cfg Config) (Config, error) {
+func (c Configurator) ExecuteUserLogin(ctx context.Context, cfg Config, prev *Config) (Config, error) {
 	oauthServer := oauth.NewOAuthServer(cfg.OAuthEndpoint(), cfg.UIEndpoint)
 	err := oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg, prev)).
 		WithOnFailure(c.onOAuthFailure).
