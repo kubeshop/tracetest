@@ -20,9 +20,8 @@ func init() {
 		Short:   "Get resource",
 		Long:    "Get a resource from your Tracetest server",
 		PreRun:  setupCommand(),
-		Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
+		Run: WithResourceMiddleware(func(ctx context.Context, _ *cobra.Command, args []string) (string, error) {
 			resourceType := resourceParams.ResourceName
-			ctx := context.Background()
 
 			resourceClient, err := resources.Get(resourceType)
 			if err != nil {

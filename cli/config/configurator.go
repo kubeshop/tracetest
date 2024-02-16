@@ -20,6 +20,7 @@ type Configurator struct {
 	resources      *resourcemanager.Registry
 	ui             cliUI.UI
 	onFinish       onFinishFn
+	errorHandlerFn errorHandlerFn
 	flags          agentConfig.Flags
 	finalServerURL string
 }
@@ -34,12 +35,22 @@ func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 			ui.Success("Successfully configured Tracetest CLI")
 			ui.Finish()
 		},
+		errorHandlerFn: func(ctx context.Context, err error) {
+			ui.Exit(err.Error())
+		},
 		flags: agentConfig.Flags{},
 	}
 }
 
 func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
 	c.onFinish = onFinish
+	return c
+}
+
+type errorHandlerFn func(ctx context.Context, err error)
+
+func (c Configurator) WithErrorHandler(fn errorHandlerFn) Configurator {
+	c.errorHandlerFn = fn
 	return c
 }
 
@@ -67,7 +78,7 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 	}
 
 	if flags.CI {
-		err = Save(cfg)
+		_, err = Save(ctx, cfg)
 		if err != nil {
 			return err
 		}
@@ -143,7 +154,7 @@ func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Con
 
 	serverType := version.GetType()
 	if serverType == "oss" {
-		err := Save(cfg)
+		_, err = Save(ctx, cfg)
 		if err != nil {
 			return Config{}, fmt.Errorf("could not save configuration: %w", err), false
 		}
@@ -187,6 +198,10 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 		return cfg, nil
 	}
 
+	return c.ExecuteUserLogin(ctx, cfg)
+}
+
+func (c Configurator) ExecuteUserLogin(ctx context.Context, cfg Config) (Config, error) {
 	oauthServer := oauth.NewOAuthServer(cfg.OAuthEndpoint(), cfg.UIEndpoint)
 	err := oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
 		WithOnFailure(c.onOAuthFailure).
@@ -195,7 +210,7 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 		return Config{}, err
 	}
 
-	return cfg, nil
+	return cfg, err
 }
 
 func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
@@ -245,7 +260,7 @@ func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config) func(token
 }
 
 func (c Configurator) onOAuthFailure(err error) {
-	c.ui.Exit(err.Error())
+	c.errorHandlerFn(context.Background(), err)
 }
 
 func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, flags agentConfig.Flags) {
@@ -253,7 +268,7 @@ func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, 
 	if cfg.OrganizationID == "" && flags.AgentApiKey == "" {
 		orgID, err := c.organizationSelector(ctx, cfg)
 		if err != nil {
-			c.ui.Exit(err.Error())
+			c.errorHandlerFn(ctx, err)
 			return
 		}
 
@@ -264,16 +279,16 @@ func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, 
 	if cfg.EnvironmentID == "" && flags.AgentApiKey == "" {
 		envID, err := c.environmentSelector(ctx, cfg)
 		if err != nil {
-			c.ui.Exit(err.Error())
+			c.errorHandlerFn(ctx, err)
 			return
 		}
 
 		cfg.EnvironmentID = envID
 	}
 
-	err := Save(cfg)
+	ctx, err := Save(ctx, cfg)
 	if err != nil {
-		c.ui.Exit(err.Error())
+		c.errorHandlerFn(ctx, err)
 		return
 	}
 

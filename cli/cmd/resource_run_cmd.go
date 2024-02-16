@@ -24,8 +24,7 @@ func init() {
 		Short:   "run resources",
 		Long:    "run resources",
 		PreRun:  setupCommand(WithOptionalResourceName()),
-		Run: WithResourceMiddleware(func(_ *cobra.Command, args []string) (string, error) {
-			ctx := context.Background()
+		Run: WithResourceMiddleware(func(ctx context.Context, _ *cobra.Command, args []string) (string, error) {
 			resourceType, err := getResourceType(runParams, resourceParams)
 			if err != nil {
 				return "", err

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/ui"
@@ -13,7 +14,7 @@ var dashboardCmd = &cobra.Command{
 	Short:   "Opens the Tracetest Dashboard URL",
 	Long:    "Opens the Tracetest Dashboard URL",
 	PreRun:  setupCommand(),
-	Run: WithResultHandler(func(_ *cobra.Command, _ []string) (string, error) {
+	Run: WithResultHandler(func(_ context.Context, _ *cobra.Command, _ []string) (string, error) {
 		if cliConfig.IsEmpty() {
 			return "", fmt.Errorf("missing Tracetest endpoint configuration")
 		}

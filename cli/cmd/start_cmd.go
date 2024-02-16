@@ -4,14 +4,16 @@ import (
 	"context"
 	"os"
 
+	"github.com/davecgh/go-spew/spew"
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/runner"
 	"github.com/kubeshop/tracetest/agent/ui"
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/spf13/cobra"
 )
 
 var (
-	agentRunner     = runner.NewRunner(configurator, resources, ui.DefaultUI)
+	agentRunner     = runner.NewRunner(configurator.WithErrorHandler(handleError), resources, ui.DefaultUI)
 	defaultToken    = os.Getenv("TRACETEST_TOKEN")
 	defaultEndpoint = os.Getenv("TRACETEST_SERVER_URL")
 	defaultAPIKey   = os.Getenv("TRACETEST_API_KEY")
@@ -24,9 +26,7 @@ var startCmd = &cobra.Command{
 	Short:   "Start Tracetest",
 	Long:    "Start using Tracetest",
 	PreRun:  setupCommand(SkipConfigValidation(), SkipVersionMismatchCheck()),
-	Run: WithResultHandler((func(_ *cobra.Command, _ []string) (string, error) {
-		ctx := context.Background()
-
+	Run: WithResultHandler((func(ctx context.Context, _ *cobra.Command, _ []string) (string, error) {
 		flags := agentConfig.Flags{
 			OrganizationID: saveParams.organizationID,
 			EnvironmentID:  saveParams.environmentID,
@@ -36,6 +36,17 @@ var startCmd = &cobra.Command{
 			Mode:           agentConfig.Mode(saveParams.mode),
 			LogLevel:       saveParams.logLevel,
 		}
+
+		// override organization and environment id from context.
+		// this happens when auto rerunning the cmd after relogin
+		if orgID := config.ContextGetOrganizationID(ctx); orgID != "" {
+			flags.OrganizationID = orgID
+		}
+		if envID := config.ContextGetEnvironmentID(ctx); envID != "" {
+			flags.EnvironmentID = envID
+		}
+
+		spew.Dump(flags)
 
 		cfg, err := agentConfig.LoadConfig()
 		if err != nil {
