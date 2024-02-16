@@ -10,18 +10,20 @@ import (
 	"github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/server/telemetry"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 )
 
 type GrpcServerMock struct {
 	proto.UnimplementedOrchestratorServer
 	port                      int
-	triggerChannel            chan *proto.TriggerRequest
-	pollingChannel            chan *proto.PollingRequest
-	otlpConnectionTestChannel chan *proto.OTLPConnectionTestRequest
-	terminationChannel        chan *proto.ShutdownRequest
-	dataStoreTestChannel      chan *proto.DataStoreConnectionTestRequest
+	triggerChannel            chan Message[*proto.TriggerRequest]
+	pollingChannel            chan Message[*proto.PollingRequest]
+	otlpConnectionTestChannel chan Message[*proto.OTLPConnectionTestRequest]
+	terminationChannel        chan Message[*proto.ShutdownRequest]
+	dataStoreTestChannel      chan Message[*proto.DataStoreConnectionTestRequest]
 
 	lastTriggerResponse             *proto.TriggerResponse
 	lastPollingResponse             *proto.PollingResponse
@@ -31,13 +33,18 @@ type GrpcServerMock struct {
 	server *grpc.Server
 }
 
+type Message[T any] struct {
+	Context context.Context
+	Data    T
+}
+
 func NewGrpcServer() *GrpcServerMock {
 	server := &GrpcServerMock{
-		triggerChannel:            make(chan *proto.TriggerRequest),
-		pollingChannel:            make(chan *proto.PollingRequest),
-		terminationChannel:        make(chan *proto.ShutdownRequest),
-		dataStoreTestChannel:      make(chan *proto.DataStoreConnectionTestRequest),
-		otlpConnectionTestChannel: make(chan *proto.OTLPConnectionTestRequest),
+		triggerChannel:            make(chan Message[*proto.TriggerRequest]),
+		pollingChannel:            make(chan Message[*proto.PollingRequest]),
+		terminationChannel:        make(chan Message[*proto.ShutdownRequest]),
+		dataStoreTestChannel:      make(chan Message[*proto.DataStoreConnectionTestRequest]),
+		otlpConnectionTestChannel: make(chan Message[*proto.OTLPConnectionTestRequest]),
 	}
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -66,7 +73,13 @@ func (s *GrpcServerMock) start(wg *sync.WaitGroup, port int) error {
 
 	s.port = lis.Addr().(*net.TCPAddr).Port
 
-	server := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor(
+			otelgrpc.WithPropagators(
+				propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}),
+			),
+		)),
+	)
 	proto.RegisterOrchestratorServer(server, s)
 
 	s.server = server
@@ -108,7 +121,12 @@ func (s *GrpcServerMock) RegisterTriggerAgent(id *proto.AgentIdentification, str
 
 	for {
 		triggerRequest := <-s.triggerChannel
-		err := stream.Send(triggerRequest)
+		err := telemetry.InjectContextIntoStream(triggerRequest.Context, stream)
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		err = stream.Send(triggerRequest.Data)
 		if err != nil {
 			log.Println("could not send trigger request to agent: %w", err)
 		}
@@ -132,7 +150,7 @@ func (s *GrpcServerMock) RegisterPollerAgent(id *proto.AgentIdentification, stre
 
 	for {
 		pollerRequest := <-s.pollingChannel
-		err := stream.Send(pollerRequest)
+		err := stream.Send(pollerRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -146,7 +164,7 @@ func (s *GrpcServerMock) RegisterDataStoreConnectionTestAgent(id *proto.AgentIde
 
 	for {
 		dsTestRequest := <-s.dataStoreTestChannel
-		err := stream.Send(dsTestRequest)
+		err := stream.Send(dsTestRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -160,7 +178,7 @@ func (s *GrpcServerMock) RegisterOTLPConnectionTestListener(id *proto.AgentIdent
 
 	for {
 		testRequest := <-s.otlpConnectionTestChannel
-		err := stream.Send(testRequest)
+		err := stream.Send(testRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -197,7 +215,7 @@ func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.Poll
 func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.AgentIdentification, stream proto.Orchestrator_RegisterShutdownListenerServer) error {
 	for {
 		shutdownRequest := <-s.terminationChannel
-		err := stream.Send(shutdownRequest)
+		err := stream.Send(shutdownRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -207,19 +225,19 @@ func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.AgentIdentification, 
 // Test methods
 
 func (s *GrpcServerMock) SendTriggerRequest(ctx context.Context, request *proto.TriggerRequest) {
-	s.triggerChannel <- request
+	s.triggerChannel <- Message[*proto.TriggerRequest]{Context: ctx, Data: request}
 }
 
 func (s *GrpcServerMock) SendPollingRequest(ctx context.Context, request *proto.PollingRequest) {
-	s.pollingChannel <- request
+	s.pollingChannel <- Message[*proto.PollingRequest]{Context: ctx, Data: request}
 }
 
 func (s *GrpcServerMock) SendDataStoreConnectionTestRequest(ctx context.Context, request *proto.DataStoreConnectionTestRequest) {
-	s.dataStoreTestChannel <- request
+	s.dataStoreTestChannel <- Message[*proto.DataStoreConnectionTestRequest]{Context: ctx, Data: request}
 }
 
 func (s *GrpcServerMock) SendOTLPConnectionTestRequest(ctx context.Context, request *proto.OTLPConnectionTestRequest) {
-	s.otlpConnectionTestChannel <- request
+	s.otlpConnectionTestChannel <- Message[*proto.OTLPConnectionTestRequest]{Context: ctx, Data: request}
 }
 
 func (s *GrpcServerMock) GetLastTriggerResponse() *proto.TriggerResponse {
@@ -238,9 +256,10 @@ func (s *GrpcServerMock) GetLastDataStoreConnectionResponse() *proto.DataStoreCo
 	return s.lastDataStoreConnectionResponse
 }
 
-func (s *GrpcServerMock) TerminateConnection(reason string) {
-	s.terminationChannel <- &proto.ShutdownRequest{
-		Reason: reason,
+func (s *GrpcServerMock) TerminateConnection(ctx context.Context, reason string) {
+	s.terminationChannel <- Message[*proto.ShutdownRequest]{
+		Context: ctx,
+		Data:    &proto.ShutdownRequest{Reason: reason},
 	}
 }
 

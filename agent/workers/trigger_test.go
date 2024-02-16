@@ -14,6 +14,8 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func setupTriggerWorker(t *testing.T) (*mocks.GrpcServerMock, collector.TraceCache) {
@@ -144,9 +146,53 @@ func TestTriggerInexistentAPI(t *testing.T) {
 	assert.Contains(t, response.TriggerResult.Error.Message, "connection refused")
 }
 
+func TestTriggerWorkerTracePropagation(t *testing.T) {
+	ctx, span := getTracer().Start(context.Background(), "root span")
+	defer span.End()
+
+	controlPlane, cache := setupTriggerWorker(t)
+
+	targetServer := createHelloWorldApi()
+	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
+
+	triggerRequest := &proto.TriggerRequest{
+		TestID:  "my test",
+		RunID:   1,
+		TraceID: traceID,
+		Trigger: &proto.Trigger{
+			Type: "http",
+			Http: &proto.HttpRequest{
+				Method: "GET",
+				Url:    targetServer.URL,
+				Headers: []*proto.HttpHeader{
+					{Key: "Content-Type", Value: "application/json"},
+				},
+			},
+		},
+	}
+
+	// make the control plane send a trigger request to the agent
+	controlPlane.SendTriggerRequest(ctx, triggerRequest)
+	time.Sleep(1 * time.Second)
+
+	response := controlPlane.GetLastTriggerResponse()
+
+	require.NotNil(t, response)
+	assert.Equal(t, "http", response.TriggerResult.Type)
+	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
+	assert.JSONEq(t, `{"hello": "world"}`, string(response.TriggerResult.Http.Body))
+
+	_, traceIdIsWatched := cache.Get(traceID)
+	assert.True(t, traceIdIsWatched)
+}
+
 func createHelloWorldApi() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"hello": "world"}`))
 		w.WriteHeader(http.StatusOK)
 	}))
+}
+
+func getTracer() trace.Tracer {
+	return tracesdk.NewTracerProvider().Tracer("asd")
 }

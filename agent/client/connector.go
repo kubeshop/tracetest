@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -75,6 +76,11 @@ func (c *Client) connect(ctx context.Context) error {
 		grpc.WithDefaultServiceConfig(retryPolicy),
 		grpc.WithIdleTimeout(0), // disable grpc idle timeout
 		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor(
+			otelgrpc.WithPropagators(
+				propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}),
+			),
+		)),
 	)
 	if err != nil {
 		return fmt.Errorf("could not connect to server: %w", err)
