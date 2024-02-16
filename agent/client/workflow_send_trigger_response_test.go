@@ -40,11 +40,11 @@ func TestSendTriggerResult(t *testing.T) {
 
 	receivedTriggerResponse := server.GetLastTriggerResponse()
 
-	assert.Equal(t, triggerResponse.TestID, receivedTriggerResponse.TestID)
-	assert.Equal(t, triggerResponse.RunID, receivedTriggerResponse.RunID)
-	assert.Equal(t, triggerResponse.TriggerResult.Type, receivedTriggerResponse.TriggerResult.Type)
-	assert.Equal(t, triggerResponse.TriggerResult.Http.StatusCode, receivedTriggerResponse.TriggerResult.Http.StatusCode)
-	assert.Equal(t, triggerResponse.TriggerResult.Http.Status, receivedTriggerResponse.TriggerResult.Http.Status)
-	assert.Equal(t, len(triggerResponse.TriggerResult.Http.Headers), len(receivedTriggerResponse.TriggerResult.Http.Headers))
-	assert.Equal(t, triggerResponse.TriggerResult.Http.Body, receivedTriggerResponse.TriggerResult.Http.Body)
+	assert.Equal(t, triggerResponse.TestID, receivedTriggerResponse.Data.TestID)
+	assert.Equal(t, triggerResponse.RunID, receivedTriggerResponse.Data.RunID)
+	assert.Equal(t, triggerResponse.TriggerResult.Type, receivedTriggerResponse.Data.TriggerResult.Type)
+	assert.Equal(t, triggerResponse.TriggerResult.Http.StatusCode, receivedTriggerResponse.Data.TriggerResult.Http.StatusCode)
+	assert.Equal(t, triggerResponse.TriggerResult.Http.Status, receivedTriggerResponse.Data.TriggerResult.Http.Status)
+	assert.Equal(t, len(triggerResponse.TriggerResult.Http.Headers), len(receivedTriggerResponse.Data.TriggerResult.Http.Headers))
+	assert.Equal(t, triggerResponse.TriggerResult.Http.Body, receivedTriggerResponse.Data.TriggerResult.Http.Body)
 }

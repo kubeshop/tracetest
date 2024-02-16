@@ -63,7 +63,7 @@ func TestPollerWorker(t *testing.T) {
 	// Very rudimentar sorting algorithm for only two items in the array
 	// first item is always the root span, second is it's child
 	var spans = make([]*proto.Span, 2)
-	for _, span := range pollingResponse.Spans {
+	for _, span := range pollingResponse.Data.Spans {
 		if span.ParentId == "" {
 			spans[0] = span
 		} else {
@@ -154,8 +154,8 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 	pollingResponse := controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
 
-	assert.False(t, pollingResponse.TraceFound)
-	assert.Len(t, pollingResponse.Spans, 0)
+	assert.False(t, pollingResponse.Data.TraceFound)
+	assert.Len(t, pollingResponse.Data.Spans, 0)
 
 	span1ID := id.NewRandGenerator().SpanID()
 	span2ID := id.NewRandGenerator().SpanID()
@@ -173,8 +173,8 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 	pollingResponse = controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
 
-	assert.True(t, pollingResponse.TraceFound)
-	assert.Len(t, pollingResponse.Spans, 2)
+	assert.True(t, pollingResponse.Data.TraceFound)
+	assert.Len(t, pollingResponse.Data.Spans, 2)
 }
 
 func TestPollerWithInvalidDataStore(t *testing.T) {
@@ -214,6 +214,6 @@ func TestPollerWithInvalidDataStore(t *testing.T) {
 
 	pollingResponse := controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
-	require.NotNil(t, pollingResponse.Error)
-	assert.Contains(t, pollingResponse.Error.Message, "connection refused")
+	require.NotNil(t, pollingResponse.Data.Error)
+	assert.Contains(t, pollingResponse.Data.Error.Message, "connection refused")
 }

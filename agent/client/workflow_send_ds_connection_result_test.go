@@ -37,7 +37,7 @@ func TestDataStoreConnectionResult(t *testing.T) {
 
 	receivedResponse := server.GetLastDataStoreConnectionResponse()
 
-	assert.Equal(t, result.RequestID, receivedResponse.RequestID)
+	assert.Equal(t, result.RequestID, receivedResponse.Data.RequestID)
 	assert.True(t, result.Successful)
 	assert.True(t, result.Steps.PortCheck.Passed)
 }

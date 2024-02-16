@@ -25,10 +25,10 @@ type GrpcServerMock struct {
 	terminationChannel        chan Message[*proto.ShutdownRequest]
 	dataStoreTestChannel      chan Message[*proto.DataStoreConnectionTestRequest]
 
-	lastTriggerResponse             *proto.TriggerResponse
-	lastPollingResponse             *proto.PollingResponse
-	lastOtlpConnectionResponse      *proto.OTLPConnectionTestResponse
-	lastDataStoreConnectionResponse *proto.DataStoreConnectionTestResponse
+	lastTriggerResponse             Message[*proto.TriggerResponse]
+	lastPollingResponse             Message[*proto.PollingResponse]
+	lastOtlpConnectionResponse      Message[*proto.OTLPConnectionTestResponse]
+	lastDataStoreConnectionResponse Message[*proto.DataStoreConnectionTestResponse]
 
 	server *grpc.Server
 }
@@ -139,7 +139,7 @@ func (s *GrpcServerMock) SendTriggerResult(ctx context.Context, result *proto.Tr
 		return nil, fmt.Errorf("could not validate token")
 	}
 
-	s.lastTriggerResponse = result
+	s.lastTriggerResponse = Message[*proto.TriggerResponse]{Data: result, Context: ctx}
 	return &proto.Empty{}, nil
 }
 
@@ -190,7 +190,7 @@ func (s *GrpcServerMock) SendOTLPConnectionTestResult(ctx context.Context, resul
 		return nil, fmt.Errorf("could not validate token")
 	}
 
-	s.lastOtlpConnectionResponse = result
+	s.lastOtlpConnectionResponse = Message[*proto.OTLPConnectionTestResponse]{Data: result, Context: ctx}
 	return &proto.Empty{}, nil
 }
 
@@ -199,7 +199,7 @@ func (s *GrpcServerMock) SendDataStoreConnectionTestResult(ctx context.Context, 
 		return nil, fmt.Errorf("could not validate token")
 	}
 
-	s.lastDataStoreConnectionResponse = result
+	s.lastDataStoreConnectionResponse = Message[*proto.DataStoreConnectionTestResponse]{Data: result, Context: ctx}
 	return &proto.Empty{}, nil
 }
 
@@ -208,7 +208,7 @@ func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.Poll
 		return nil, fmt.Errorf("could not validate token")
 	}
 
-	s.lastPollingResponse = result
+	s.lastPollingResponse = Message[*proto.PollingResponse]{Data: result, Context: ctx}
 	return &proto.Empty{}, nil
 }
 
@@ -240,19 +240,19 @@ func (s *GrpcServerMock) SendOTLPConnectionTestRequest(ctx context.Context, requ
 	s.otlpConnectionTestChannel <- Message[*proto.OTLPConnectionTestRequest]{Context: ctx, Data: request}
 }
 
-func (s *GrpcServerMock) GetLastTriggerResponse() *proto.TriggerResponse {
+func (s *GrpcServerMock) GetLastTriggerResponse() Message[*proto.TriggerResponse] {
 	return s.lastTriggerResponse
 }
 
-func (s *GrpcServerMock) GetLastPollingResponse() *proto.PollingResponse {
+func (s *GrpcServerMock) GetLastPollingResponse() Message[*proto.PollingResponse] {
 	return s.lastPollingResponse
 }
 
-func (s *GrpcServerMock) GetLastOTLPConnectionResponse() *proto.OTLPConnectionTestResponse {
+func (s *GrpcServerMock) GetLastOTLPConnectionResponse() Message[*proto.OTLPConnectionTestResponse] {
 	return s.lastOtlpConnectionResponse
 }
 
-func (s *GrpcServerMock) GetLastDataStoreConnectionResponse() *proto.DataStoreConnectionTestResponse {
+func (s *GrpcServerMock) GetLastDataStoreConnectionResponse() Message[*proto.DataStoreConnectionTestResponse] {
 	return s.lastDataStoreConnectionResponse
 }
 

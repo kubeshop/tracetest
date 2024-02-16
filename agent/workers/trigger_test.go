@@ -72,9 +72,9 @@ func TestTrigger(t *testing.T) {
 	response := controlPlane.GetLastTriggerResponse()
 
 	require.NotNil(t, response)
-	assert.Equal(t, "http", response.TriggerResult.Type)
-	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
-	assert.JSONEq(t, `{"hello": "world"}`, string(response.TriggerResult.Http.Body))
+	assert.Equal(t, "http", response.Data.TriggerResult.Type)
+	assert.Equal(t, int32(http.StatusOK), response.Data.TriggerResult.Http.StatusCode)
+	assert.JSONEq(t, `{"hello": "world"}`, string(response.Data.TriggerResult.Http.Body))
 
 	_, traceIdIsWatched := cache.Get(traceID)
 	assert.True(t, traceIdIsWatched)
@@ -109,8 +109,8 @@ func TestTriggerAgainstGoogle(t *testing.T) {
 	response := controlPlane.GetLastTriggerResponse()
 
 	require.NotNil(t, response)
-	assert.Equal(t, "http", response.TriggerResult.Type)
-	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
+	assert.Equal(t, "http", response.Data.TriggerResult.Type)
+	assert.Equal(t, int32(http.StatusOK), response.Data.TriggerResult.Http.StatusCode)
 }
 
 func TestTriggerInexistentAPI(t *testing.T) {
@@ -142,8 +142,8 @@ func TestTriggerInexistentAPI(t *testing.T) {
 	response := controlPlane.GetLastTriggerResponse()
 
 	require.NotNil(t, response)
-	assert.NotNil(t, response.TriggerResult.Error)
-	assert.Contains(t, response.TriggerResult.Error.Message, "connection refused")
+	assert.NotNil(t, response.Data.TriggerResult.Error)
+	assert.Contains(t, response.Data.TriggerResult.Error.Message, "connection refused")
 }
 
 func TestTriggerWorkerTracePropagation(t *testing.T) {
@@ -178,9 +178,9 @@ func TestTriggerWorkerTracePropagation(t *testing.T) {
 	response := controlPlane.GetLastTriggerResponse()
 
 	require.NotNil(t, response)
-	assert.Equal(t, "http", response.TriggerResult.Type)
-	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
-	assert.JSONEq(t, `{"hello": "world"}`, string(response.TriggerResult.Http.Body))
+	assert.Equal(t, "http", response.Data.TriggerResult.Type)
+	assert.Equal(t, int32(http.StatusOK), response.Data.TriggerResult.Http.StatusCode)
+	assert.JSONEq(t, `{"hello": "world"}`, string(response.Data.TriggerResult.Http.Body))
 
 	_, traceIdIsWatched := cache.Get(traceID)
 	assert.True(t, traceIdIsWatched)

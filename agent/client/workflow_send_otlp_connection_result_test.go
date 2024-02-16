@@ -35,7 +35,7 @@ func TestOTLPConnectionResultTrace(t *testing.T) {
 
 	receivedResponse := server.GetLastOTLPConnectionResponse()
 
-	assert.Equal(t, result.RequestID, receivedResponse.RequestID)
-	assert.Equal(t, result.SpanCount, receivedResponse.SpanCount)
-	assert.Equal(t, result.LastSpanTimestamp, receivedResponse.LastSpanTimestamp)
+	assert.Equal(t, result.RequestID, receivedResponse.Data.RequestID)
+	assert.Equal(t, result.SpanCount, receivedResponse.Data.SpanCount)
+	assert.Equal(t, result.LastSpanTimestamp, receivedResponse.Data.LastSpanTimestamp)
 }
