@@ -21,7 +21,7 @@ type Configurator struct {
 	ui             cliUI.UI
 	onFinish       onFinishFn
 	errorHandlerFn errorHandlerFn
-	flags          agentConfig.Flags
+	flags          *agentConfig.Flags
 	finalServerURL string
 }
 
@@ -38,7 +38,7 @@ func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 		errorHandlerFn: func(ctx context.Context, err error) {
 			ui.Exit(err.Error())
 		},
-		flags: agentConfig.Flags{},
+		flags: &agentConfig.Flags{},
 	}
 }
 
@@ -55,12 +55,21 @@ func (c Configurator) WithErrorHandler(fn errorHandlerFn) Configurator {
 }
 
 func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig.Flags) error {
-	c.flags = flags
-	serverURL, err := c.getServerURL(prev, flags)
-	c.finalServerURL = serverURL
-	if err != nil {
-		return err
+	c.flags = &flags
+	var serverURL string
+
+	// if token is passed, we cannot assume an interactive environment,
+	// so fallback to last used
+	if c.flags.Token != "" {
+		serverURL = lastUsedURL(prev)
+	} else {
+		var err error
+		serverURL, err = c.getServerURL(prev)
+		if err != nil {
+			return err
+		}
 	}
+	c.finalServerURL = serverURL
 
 	cfg, err := c.createConfig(serverURL)
 	if err != nil {
@@ -77,7 +86,7 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 		return nil
 	}
 
-	if flags.CI {
+	if c.flags.CI {
 		_, err = Save(ctx, cfg)
 		if err != nil {
 			return err
@@ -85,7 +94,7 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 		return nil
 	}
 
-	_, err = c.handleOAuth(ctx, cfg, prev, flags)
+	_, err = c.handleOAuth(ctx, cfg, prev)
 	if err != nil {
 		return err
 	}
@@ -93,19 +102,22 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 	return nil
 }
 
-func (c Configurator) getServerURL(prev *Config, flags agentConfig.Flags) (string, error) {
-	serverURL := flags.ServerURL
+func lastUsedURL(prev *Config) string {
+	possibleValues := []string{}
+	if prev != nil {
+		possibleValues = append(possibleValues, prev.UIEndpoint, prev.URL())
+	}
+	possibleValues = append(possibleValues, DefaultCloudEndpoint)
+
+	return getFirstNonEmptyString(possibleValues)
+}
+
+func (c Configurator) getServerURL(prev *Config) (string, error) {
+	serverURL := c.flags.ServerURL
 
 	// if flag was passed, don't show prompt
-	if flags.ServerURL == "" {
-		possibleValues := []string{}
-		if prev != nil {
-			possibleValues = append(possibleValues, prev.UIEndpoint, prev.URL())
-		}
-		possibleValues = append(possibleValues, DefaultCloudEndpoint)
-
-		lastUsed := getFirstNonEmptyString(possibleValues)
-		serverURL = c.ui.TextInput("What tracetest server do you want to use?", lastUsed)
+	if c.flags.ServerURL == "" {
+		serverURL = c.ui.TextInput("What tracetest server do you want to use?", lastUsedURL(prev))
 	}
 
 	if err := validateServerURL(serverURL); err != nil {
@@ -178,7 +190,7 @@ func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Con
 	return cfg, nil, false
 }
 
-func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config, flags agentConfig.Flags) (Config, error) {
+func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config) (Config, error) {
 	if prev != nil && cfg.UIEndpoint == prev.UIEndpoint {
 		if prev != nil && prev.Jwt != "" {
 			cfg.Jwt = prev.Jwt
@@ -186,22 +198,22 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 		}
 	}
 
-	if flags.Token != "" {
+	if c.flags.Token != "" {
 		var err error
-		cfg, err = c.exchangeToken(cfg, flags.Token)
+		cfg, err = c.exchangeToken(cfg, c.flags.Token)
 		if err != nil {
 			return Config{}, err
 		}
 	}
 
-	if flags.AgentApiKey != "" {
-		cfg.AgentApiKey = flags.AgentApiKey
-		c.showOrganizationSelector(ctx, prev, cfg, flags)
+	if c.flags.AgentApiKey != "" {
+		cfg.AgentApiKey = c.flags.AgentApiKey
+		c.showOrganizationSelector(ctx, prev, cfg)
 		return cfg, nil
 	}
 
 	if cfg.Jwt != "" {
-		c.showOrganizationSelector(ctx, prev, cfg, flags)
+		c.showOrganizationSelector(ctx, prev, cfg)
 		return cfg, nil
 	}
 
@@ -262,7 +274,7 @@ func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config, prev *Conf
 		cfg.Jwt = jwt
 		cfg.Token = token
 
-		c.showOrganizationSelector(ctx, prev, cfg, c.flags)
+		c.showOrganizationSelector(ctx, prev, cfg)
 	}
 }
 
@@ -270,9 +282,9 @@ func (c Configurator) onOAuthFailure(err error) {
 	c.errorHandlerFn(context.Background(), err)
 }
 
-func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config, cfg Config, flags agentConfig.Flags) {
-	cfg.OrganizationID = flags.OrganizationID
-	if cfg.OrganizationID == "" && flags.AgentApiKey == "" {
+func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config, cfg Config) {
+	cfg.OrganizationID = c.flags.OrganizationID
+	if cfg.OrganizationID == "" && c.flags.AgentApiKey == "" {
 		orgID, err := c.organizationSelector(ctx, cfg, prev)
 		if err != nil {
 			c.errorHandlerFn(ctx, err)
@@ -282,8 +294,8 @@ func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config
 		cfg.OrganizationID = orgID
 	}
 
-	cfg.EnvironmentID = flags.EnvironmentID
-	if cfg.EnvironmentID == "" && flags.AgentApiKey == "" {
+	cfg.EnvironmentID = c.flags.EnvironmentID
+	if cfg.EnvironmentID == "" && c.flags.AgentApiKey == "" {
 		envID, err := c.environmentSelector(ctx, cfg, prev)
 		if err != nil {
 			c.errorHandlerFn(ctx, err)
