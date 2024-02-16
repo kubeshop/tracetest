@@ -21,10 +21,14 @@ var configureCmd = &cobra.Command{
 	Short:   "Configure your tracetest CLI",
 	Long:    "Configure your tracetest CLI",
 	PreRun:  setupLogger,
-	Run: WithResultHandler(WithParamsHandler(configParams)(func(cmd *cobra.Command, _ []string) (string, error) {
-		ctx := context.Background()
+	Run: WithResultHandler(WithParamsHandler(configParams)(func(ctx context.Context, cmd *cobra.Command, _ []string) (string, error) {
 		flags := agentConfig.Flags{
 			CI: configParams.CI,
+		}
+
+		config, err := config.LoadConfig("")
+		if err != nil {
+			return "", err
 		}
 
 		if flagProvided(cmd, "server-url") || flagProvided(cmd, "endpoint") {
@@ -43,7 +47,7 @@ var configureCmd = &cobra.Command{
 			flags.OrganizationID = configParams.OrganizationID
 		}
 
-		return "", configurator.Start(ctx, nil, flags)
+		return "", configurator.Start(ctx, &config, flags)
 	})),
 	PostRun: teardownCommand,
 }

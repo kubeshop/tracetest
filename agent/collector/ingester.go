@@ -76,6 +76,8 @@ type forwardIngester struct {
 	sensor         sensors.Sensor
 
 	statistics Statistics
+
+	sync.Mutex
 }
 
 type remoteIngesterConfig struct {
@@ -224,7 +226,9 @@ func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
 	i.logger.Debug("caching test spans", zap.Int("count", len(spans)))
 
 	for traceID, spans := range spans {
+		i.Lock()
 		i.traceIDs[traceID] = true
+		i.Unlock()
 		if _, ok := i.traceCache.Get(traceID); !ok {
 			i.logger.Debug("traceID is not part of a test", zap.String("traceID", traceID))
 			// traceID is not part of a test

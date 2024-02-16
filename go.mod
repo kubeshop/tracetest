@@ -25,6 +25,7 @@ require (
 	github.com/fluidtruck/deepcopy v1.0.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/fullstorydev/grpcurl v1.8.6
+	github.com/gdamore/tcell/v2 v2.7.0
 	github.com/goccy/go-yaml v1.11.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang-jwt/jwt v3.2.1+incompatible
@@ -49,6 +50,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
 	github.com/pterm/pterm v0.12.69
+	github.com/rivo/tview v0.0.0-20240122063236-8526c9fe1b54
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
@@ -113,7 +115,6 @@ require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
-	github.com/gdamore/tcell/v2 v2.7.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
@@ -162,7 +163,6 @@ require (
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
-	github.com/rivo/tview v0.0.0-20240122063236-8526c9fe1b54 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/segmentio/backo-go v1.0.0 // indirect

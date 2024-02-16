@@ -1,25 +1,55 @@
 package cmd
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 
+	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/cli/ui"
 
 	"github.com/spf13/cobra"
 )
 
-type RunFn func(cmd *cobra.Command, args []string) (string, error)
+type RunFn func(ctx context.Context, cmd *cobra.Command, args []string) (string, error)
 type CobraRunFn func(cmd *cobra.Command, args []string)
 type MiddlewareWrapper func(RunFn) RunFn
 
+func rootCtx(cmd *cobra.Command) context.Context {
+	// cobra does not correctly progpagate rootcmd context to sub commands,
+	// so we need to manually traverse the command tree to find the root context
+	if cmd == nil {
+		return nil
+	}
+
+	var (
+		ctx = cmd.Context()
+		p   = cmd.Parent()
+	)
+	if cmd.Parent() == nil {
+		return ctx
+	}
+	for {
+		ctx = p.Context()
+		p = p.Parent()
+		if p == nil {
+			break
+		}
+	}
+	return ctx
+}
+
 func WithResultHandler(runFn RunFn) CobraRunFn {
 	return func(cmd *cobra.Command, args []string) {
-		res, err := runFn(cmd, args)
+		// we need the root cmd context in case of an error caused rerun
+		ctx := rootCtx(cmd)
+
+		res, err := runFn(ctx, cmd, args)
 
 		if err != nil {
-			OnError(err)
+			handleError(ctx, err)
 			return
 		}
 
@@ -27,6 +57,28 @@ func WithResultHandler(runFn RunFn) CobraRunFn {
 			fmt.Println(res)
 		}
 	}
+}
+
+func handleError(ctx context.Context, err error) {
+	reqErr := resourcemanager.RequestError{}
+	if errors.As(err, &reqErr) && reqErr.IsAuthError {
+		handleAuthError(ctx)
+	} else {
+		OnError(err)
+	}
+}
+
+func handleAuthError(ctx context.Context) {
+	ui.DefaultUI.Warning("Your authentication token has expired, please log in again.")
+	configurator.
+		WithOnFinish(func(ctx context.Context, _ config.Config) {
+			retryCommand(ctx)
+		}).
+		ExecuteUserLogin(ctx, cliConfig)
+}
+
+func retryCommand(ctx context.Context) {
+	handleRootExecErr(rootCmd.ExecuteContext(ctx))
 }
 
 type errorMessageRenderer interface {
@@ -66,7 +118,7 @@ func handleErrorMessage(err error) string {
 
 func WithParamsHandler(validators ...Validator) MiddlewareWrapper {
 	return func(runFn RunFn) RunFn {
-		return func(cmd *cobra.Command, args []string) (string, error) {
+		return func(ctx context.Context, cmd *cobra.Command, args []string) (string, error) {
 			errors := make([]error, 0)
 
 			for _, validator := range validators {
@@ -82,7 +134,7 @@ func WithParamsHandler(validators ...Validator) MiddlewareWrapper {
 				return "", fmt.Errorf(errorText)
 			}
 
-			return runFn(cmd, args)
+			return runFn(ctx, cmd, args)
 		}
 	}
 }

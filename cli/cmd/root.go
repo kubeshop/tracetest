@@ -31,10 +31,16 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		ExitCLI(1)
+	handleRootExecErr(rootCmd.Execute())
+}
+
+func handleRootExecErr(err error) {
+	if err == nil {
+		ExitCLI(0)
 	}
+
+	fmt.Fprintln(os.Stderr, err)
+	ExitCLI(1)
 }
 
 func ExitCLI(errorCode int) {

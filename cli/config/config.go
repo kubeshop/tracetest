@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -126,7 +127,7 @@ func loadConfig(configFile string) (Config, error) {
 	return config, nil
 }
 
-func ValidateServerURL(serverURL string) error {
+func validateServerURL(serverURL string) error {
 	if !strings.HasPrefix(serverURL, "http://") && !strings.HasPrefix(serverURL, "https://") {
 		return fmt.Errorf(`the server URL must start with the scheme, either "http://" or "https://"`)
 	}
@@ -143,15 +144,45 @@ func ParseServerURL(serverURL string) (scheme, endpoint, serverPath string, err 
 	return url.Scheme, url.Host, url.Path, nil
 }
 
-func Save(config Config) error {
+type orgIDKeyType struct{}
+type envIDKeyType struct{}
+
+var orgIDKey = orgIDKeyType{}
+var envIDKey = envIDKeyType{}
+
+func ContextWithOrganizationID(ctx context.Context, orgID string) context.Context {
+	return context.WithValue(ctx, orgIDKey, orgID)
+}
+
+func ContextWithEnvironmentID(ctx context.Context, envID string) context.Context {
+	return context.WithValue(ctx, envIDKey, envID)
+}
+
+func ContextGetOrganizationID(ctx context.Context) string {
+	v := ctx.Value(orgIDKey)
+	if v == nil {
+		return ""
+	}
+	return v.(string)
+}
+
+func ContextGetEnvironmentID(ctx context.Context) string {
+	v := ctx.Value(envIDKey)
+	if v == nil {
+		return ""
+	}
+	return v.(string)
+}
+
+func Save(ctx context.Context, config Config) (context.Context, error) {
 	configPath, err := GetConfigurationPath()
 	if err != nil {
-		return fmt.Errorf("could not get configuration path: %w", err)
+		return ctx, fmt.Errorf("could not get configuration path: %w", err)
 	}
 
 	configYml, err := yaml.Marshal(config)
 	if err != nil {
-		return fmt.Errorf("could not marshal configuration into yml: %w", err)
+		return ctx, fmt.Errorf("could not marshal configuration into yml: %w", err)
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
@@ -159,10 +190,13 @@ func Save(config Config) error {
 	}
 	err = os.WriteFile(configPath, configYml, 0755)
 	if err != nil {
-		return fmt.Errorf("could not write file: %w", err)
+		return ctx, fmt.Errorf("could not write file: %w", err)
 	}
 
-	return nil
+	ctx = ContextWithOrganizationID(ctx, config.OrganizationID)
+	ctx = ContextWithEnvironmentID(ctx, config.EnvironmentID)
+
+	return ctx, nil
 }
 
 func GetConfigurationPath() (string, error) {
