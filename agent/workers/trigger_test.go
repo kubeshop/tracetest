@@ -147,9 +147,6 @@ func TestTriggerInexistentAPI(t *testing.T) {
 }
 
 func TestTriggerWorkerTracePropagation(t *testing.T) {
-	ctx, span := getTracer().Start(context.Background(), "root span")
-	defer span.End()
-
 	controlPlane, cache := setupTriggerWorker(t)
 
 	targetServer := createHelloWorldApi()
@@ -171,6 +168,8 @@ func TestTriggerWorkerTracePropagation(t *testing.T) {
 		},
 	}
 
+	ctx := ContextWithTracingEnabled()
+
 	// make the control plane send a trigger request to the agent
 	controlPlane.SendTriggerRequest(ctx, triggerRequest)
 	time.Sleep(1 * time.Second)
@@ -184,6 +183,8 @@ func TestTriggerWorkerTracePropagation(t *testing.T) {
 
 	_, traceIdIsWatched := cache.Get(traceID)
 	assert.True(t, traceIdIsWatched)
+
+	assert.True(t, SameTraceID(ctx, response.Context))
 }
 
 func createHelloWorldApi() *httptest.Server {
