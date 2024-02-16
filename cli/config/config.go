@@ -127,7 +127,7 @@ func loadConfig(configFile string) (Config, error) {
 	return config, nil
 }
 
-func ValidateServerURL(serverURL string) error {
+func validateServerURL(serverURL string) error {
 	if !strings.HasPrefix(serverURL, "http://") && !strings.HasPrefix(serverURL, "https://") {
 		return fmt.Errorf(`the server URL must start with the scheme, either "http://" or "https://"`)
 	}

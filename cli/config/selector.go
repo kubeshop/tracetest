@@ -14,7 +14,7 @@ type Entry struct {
 	Name string `json:"name"`
 }
 
-func (c Configurator) organizationSelector(ctx context.Context, cfg Config) (string, error) {
+func (c Configurator) organizationSelector(ctx context.Context, cfg Config, prev *Config) (string, error) {
 	resource, err := c.resources.Get("organization")
 	if err != nil {
 		return "", err
@@ -33,6 +33,8 @@ Defaulting to only available Organization: %s`, elements[0].Name))
 
 	orgID := ""
 	options := make([]cliUI.Option, len(elements))
+
+	defaultIndex := 0
 	for i, org := range elements {
 		options[i] = cliUI.Option{
 			Text: fmt.Sprintf("%s (%s)", org.Name, org.ID),
@@ -42,16 +44,20 @@ Defaulting to only available Organization: %s`, elements[0].Name))
 				}
 			}(org),
 		}
+
+		// if we have a previous organization, set it as default
+		if prev != nil && prev.OrganizationID == org.ID {
+			defaultIndex = i
+		}
 	}
 
-	option := c.ui.Select(`
-What Organization do you want to use?`, options, 0)
+	option := c.ui.Select(`What Organization do you want to use?`, options, defaultIndex)
 	option.Fn(c.ui)
 
 	return orgID, nil
 }
 
-func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (string, error) {
+func (c Configurator) environmentSelector(ctx context.Context, cfg Config, prev *Config) (string, error) {
 	resource, err := c.resources.Get("env")
 	if err != nil {
 		return "", err
@@ -72,6 +78,7 @@ func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (stri
 
 	envID := ""
 	options := make([]cliUI.Option, len(elements))
+	defaultIndex := 0
 	for i, env := range elements {
 		options[i] = cliUI.Option{
 			Text: fmt.Sprintf("%s (%s)", env.Name, env.ID),
@@ -81,9 +88,13 @@ func (c Configurator) environmentSelector(ctx context.Context, cfg Config) (stri
 				}
 			}(env),
 		}
+		// if we have a previous env, set it as default
+		if prev != nil && prev.EnvironmentID == env.ID {
+			defaultIndex = i
+		}
 	}
 
-	option := c.ui.Select("What Environment do you want to use?", options, 0)
+	option := c.ui.Select("What Environment do you want to use?", options, defaultIndex)
 	option.Fn(c.ui)
 
 	return envID, err

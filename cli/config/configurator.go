@@ -94,16 +94,21 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 }
 
 func (c Configurator) getServerURL(prev *Config, flags agentConfig.Flags) (string, error) {
-	var prevUIEndpoint string
-	if prev != nil {
-		prevUIEndpoint = prev.UIEndpoint
-	}
-	serverURL := getFirstValidString(flags.ServerURL, prevUIEndpoint)
-	if serverURL == "" {
-		serverURL = c.ui.TextInput("What tracetest server do you want to use?", DefaultCloudEndpoint)
+	serverURL := flags.ServerURL
+
+	// if flag was passed, don't show prompt
+	if flags.ServerURL == "" {
+		possibleValues := []string{}
+		if prev != nil {
+			possibleValues = append(possibleValues, prev.UIEndpoint, prev.URL())
+		}
+		possibleValues = append(possibleValues, DefaultCloudEndpoint)
+
+		lastUsed := getFirstNonEmptyString(possibleValues)
+		serverURL = c.ui.TextInput("What tracetest server do you want to use?", lastUsed)
 	}
 
-	if err := ValidateServerURL(serverURL); err != nil {
+	if err := validateServerURL(serverURL); err != nil {
 		return "", err
 	}
 
@@ -174,9 +179,11 @@ func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Con
 }
 
 func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config, flags agentConfig.Flags) (Config, error) {
-	if prev != nil && prev.Jwt != "" {
-		cfg.Jwt = prev.Jwt
-		cfg.Token = prev.Token
+	if prev != nil && cfg.URL() == prev.URL() {
+		if prev != nil && prev.Jwt != "" {
+			cfg.Jwt = prev.Jwt
+			cfg.Token = prev.Token
+		}
 	}
 
 	if flags.Token != "" {
@@ -189,12 +196,12 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 
 	if flags.AgentApiKey != "" {
 		cfg.AgentApiKey = flags.AgentApiKey
-		c.ShowOrganizationSelector(ctx, cfg, flags)
+		c.showOrganizationSelector(ctx, prev, cfg, flags)
 		return cfg, nil
 	}
 
 	if cfg.Jwt != "" {
-		c.ShowOrganizationSelector(ctx, cfg, flags)
+		c.showOrganizationSelector(ctx, prev, cfg, flags)
 		return cfg, nil
 	}
 
@@ -203,7 +210,7 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config,
 
 func (c Configurator) ExecuteUserLogin(ctx context.Context, cfg Config) (Config, error) {
 	oauthServer := oauth.NewOAuthServer(cfg.OAuthEndpoint(), cfg.UIEndpoint)
-	err := oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg)).
+	err := oauthServer.WithOnSuccess(c.onOAuthSuccess(ctx, cfg, prev)).
 		WithOnFailure(c.onOAuthFailure).
 		GetAuthJWT()
 	if err != nil {
@@ -240,7 +247,7 @@ func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
 	return cfg, nil
 }
 
-func getFirstValidString(values ...string) string {
+func getFirstNonEmptyString(values []string) string {
 	for _, v := range values {
 		if v != "" {
 			return v
@@ -250,12 +257,12 @@ func getFirstValidString(values ...string) string {
 	return ""
 }
 
-func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config) func(token, jwt string) {
+func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config, prev *Config) func(token, jwt string) {
 	return func(token, jwt string) {
 		cfg.Jwt = jwt
 		cfg.Token = token
 
-		c.ShowOrganizationSelector(ctx, cfg, c.flags)
+		c.showOrganizationSelector(ctx, prev, cfg, c.flags)
 	}
 }
 
@@ -263,10 +270,10 @@ func (c Configurator) onOAuthFailure(err error) {
 	c.errorHandlerFn(context.Background(), err)
 }
 
-func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, flags agentConfig.Flags) {
+func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config, cfg Config, flags agentConfig.Flags) {
 	cfg.OrganizationID = flags.OrganizationID
 	if cfg.OrganizationID == "" && flags.AgentApiKey == "" {
-		orgID, err := c.organizationSelector(ctx, cfg)
+		orgID, err := c.organizationSelector(ctx, cfg, prev)
 		if err != nil {
 			c.errorHandlerFn(ctx, err)
 			return
@@ -277,7 +284,7 @@ func (c Configurator) ShowOrganizationSelector(ctx context.Context, cfg Config, 
 
 	cfg.EnvironmentID = flags.EnvironmentID
 	if cfg.EnvironmentID == "" && flags.AgentApiKey == "" {
-		envID, err := c.environmentSelector(ctx, cfg)
+		envID, err := c.environmentSelector(ctx, cfg, prev)
 		if err != nil {
 			c.errorHandlerFn(ctx, err)
 			return
