@@ -150,7 +150,12 @@ func (s *GrpcServerMock) RegisterPollerAgent(id *proto.AgentIdentification, stre
 
 	for {
 		pollerRequest := <-s.pollingChannel
-		err := stream.Send(pollerRequest.Data)
+		err := telemetry.InjectContextIntoStream(pollerRequest.Context, stream)
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		err = stream.Send(pollerRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -164,7 +169,12 @@ func (s *GrpcServerMock) RegisterDataStoreConnectionTestAgent(id *proto.AgentIde
 
 	for {
 		dsTestRequest := <-s.dataStoreTestChannel
-		err := stream.Send(dsTestRequest.Data)
+		err := telemetry.InjectContextIntoStream(dsTestRequest.Context, stream)
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		err = stream.Send(dsTestRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -178,7 +188,12 @@ func (s *GrpcServerMock) RegisterOTLPConnectionTestListener(id *proto.AgentIdent
 
 	for {
 		testRequest := <-s.otlpConnectionTestChannel
-		err := stream.Send(testRequest.Data)
+		err := telemetry.InjectContextIntoStream(testRequest.Context, stream)
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		err = stream.Send(testRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -215,7 +230,12 @@ func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.Poll
 func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.AgentIdentification, stream proto.Orchestrator_RegisterShutdownListenerServer) error {
 	for {
 		shutdownRequest := <-s.terminationChannel
-		err := stream.Send(shutdownRequest.Data)
+		err := telemetry.InjectContextIntoStream(shutdownRequest.Context, stream)
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		err = stream.Send(shutdownRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}

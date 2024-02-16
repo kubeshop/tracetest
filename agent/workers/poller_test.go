@@ -20,7 +20,7 @@ import (
 )
 
 func TestPollerWorker(t *testing.T) {
-	ctx := context.Background()
+	ctx := ContextWithTracingEnabled()
 	controlPlane := mocks.NewGrpcServer()
 
 	client, err := client.Connect(ctx, controlPlane.Addr())
@@ -74,6 +74,8 @@ func TestPollerWorker(t *testing.T) {
 	assert.Len(t, spans, 2)
 	assert.Equal(t, "", spans[0].ParentId)
 	assert.Equal(t, spans[0].Id, spans[1].ParentId)
+
+	assert.True(t, SameTraceID(ctx, pollingResponse.Context))
 }
 
 func createTempoFakeApi() *httptest.Server {
