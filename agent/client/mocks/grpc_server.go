@@ -10,6 +10,7 @@ import (
 	"github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 )
 
@@ -65,7 +66,7 @@ func (s *GrpcServerMock) start(wg *sync.WaitGroup, port int) error {
 
 	s.port = lis.Addr().(*net.TCPAddr).Port
 
-	server := grpc.NewServer()
+	server := grpc.NewServer(grpc.StatsHandler(otelgrpc.NewServerHandler()))
 	proto.RegisterOrchestratorServer(server, s)
 
 	s.server = server
@@ -205,19 +206,19 @@ func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.AgentIdentification, 
 
 // Test methods
 
-func (s *GrpcServerMock) SendTriggerRequest(request *proto.TriggerRequest) {
+func (s *GrpcServerMock) SendTriggerRequest(ctx context.Context, request *proto.TriggerRequest) {
 	s.triggerChannel <- request
 }
 
-func (s *GrpcServerMock) SendPollingRequest(request *proto.PollingRequest) {
+func (s *GrpcServerMock) SendPollingRequest(ctx context.Context, request *proto.PollingRequest) {
 	s.pollingChannel <- request
 }
 
-func (s *GrpcServerMock) SendDataStoreConnectionTestRequest(request *proto.DataStoreConnectionTestRequest) {
+func (s *GrpcServerMock) SendDataStoreConnectionTestRequest(ctx context.Context, request *proto.DataStoreConnectionTestRequest) {
 	s.dataStoreTestChannel <- request
 }
 
-func (s *GrpcServerMock) SendOTLPConnectionTestRequest(request *proto.OTLPConnectionTestRequest) {
+func (s *GrpcServerMock) SendOTLPConnectionTestRequest(ctx context.Context, request *proto.OTLPConnectionTestRequest) {
 	s.otlpConnectionTestChannel <- request
 }
 

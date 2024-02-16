@@ -41,6 +41,7 @@ func setupTriggerWorker(t *testing.T) (*mocks.GrpcServerMock, collector.TraceCac
 }
 
 func TestTrigger(t *testing.T) {
+	ctx := context.Background()
 	controlPlane, cache := setupTriggerWorker(t)
 
 	targetServer := createHelloWorldApi()
@@ -63,7 +64,7 @@ func TestTrigger(t *testing.T) {
 	}
 
 	// make the control plane send a trigger request to the agent
-	controlPlane.SendTriggerRequest(triggerRequest)
+	controlPlane.SendTriggerRequest(ctx, triggerRequest)
 	time.Sleep(1 * time.Second)
 
 	response := controlPlane.GetLastTriggerResponse()
@@ -78,6 +79,7 @@ func TestTrigger(t *testing.T) {
 }
 
 func TestTriggerAgainstGoogle(t *testing.T) {
+	ctx := context.Background()
 	controlPlane, _ := setupTriggerWorker(t)
 
 	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
@@ -99,7 +101,7 @@ func TestTriggerAgainstGoogle(t *testing.T) {
 	}
 
 	// make the control plane send a trigger request to the agent
-	controlPlane.SendTriggerRequest(triggerRequest)
+	controlPlane.SendTriggerRequest(ctx, triggerRequest)
 	time.Sleep(1 * time.Second)
 
 	response := controlPlane.GetLastTriggerResponse()
@@ -110,6 +112,7 @@ func TestTriggerAgainstGoogle(t *testing.T) {
 }
 
 func TestTriggerInexistentAPI(t *testing.T) {
+	ctx := context.Background()
 	controlPlane, _ := setupTriggerWorker(t)
 
 	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
@@ -131,7 +134,7 @@ func TestTriggerInexistentAPI(t *testing.T) {
 	}
 
 	// make the control plane send a trigger request to the agent
-	controlPlane.SendTriggerRequest(triggerRequest)
+	controlPlane.SendTriggerRequest(ctx, triggerRequest)
 	time.Sleep(1 * time.Second)
 
 	response := controlPlane.GetLastTriggerResponse()

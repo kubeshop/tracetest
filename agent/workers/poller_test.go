@@ -52,7 +52,7 @@ func TestPollerWorker(t *testing.T) {
 		},
 	}
 
-	controlPlane.SendPollingRequest(&pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &pollingRequest)
 
 	time.Sleep(1 * time.Second)
 
@@ -146,7 +146,7 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 		},
 	}
 
-	controlPlane.SendPollingRequest(&pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &pollingRequest)
 
 	time.Sleep(1 * time.Second)
 
@@ -165,7 +165,7 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 		{Name: "span 2", ParentSpanId: span1ID[:], SpanId: span2ID[:], TraceId: traceID[:]},
 	})
 
-	controlPlane.SendPollingRequest(&pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &pollingRequest)
 
 	time.Sleep(1 * time.Second)
 
@@ -208,7 +208,7 @@ func TestPollerWithInvalidDataStore(t *testing.T) {
 		},
 	}
 
-	controlPlane.SendPollingRequest(&pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &pollingRequest)
 
 	time.Sleep(1 * time.Second)
 
