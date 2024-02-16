@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/davecgh/go-spew/spew"
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/runner"
 	"github.com/kubeshop/tracetest/agent/ui"
@@ -45,8 +44,6 @@ var startCmd = &cobra.Command{
 		if envID := config.ContextGetEnvironmentID(ctx); envID != "" {
 			flags.EnvironmentID = envID
 		}
-
-		spew.Dump(flags)
 
 		cfg, err := agentConfig.LoadConfig()
 		if err != nil {
