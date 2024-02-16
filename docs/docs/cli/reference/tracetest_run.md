@@ -8,7 +8,7 @@ run resources
 run resources
 
 ```
-tracetest run test|testsuite [flags]
+tracetest run testsuite|test [flags]
 ```
 
 ### Options
