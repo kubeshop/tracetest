@@ -13,10 +13,11 @@ import (
 )
 
 func TestShutdownFlow(t *testing.T) {
+	ctx := context.Background()
 	server := mocks.NewGrpcServer()
 	defer server.Stop()
 
-	client, err := client.Connect(context.Background(), server.Addr())
+	client, err := client.Connect(ctx, server.Addr())
 	require.NoError(t, err)
 
 	var called bool = false
@@ -27,12 +28,12 @@ func TestShutdownFlow(t *testing.T) {
 		return nil
 	})
 
-	err = client.Start(context.Background())
+	err = client.Start(ctx)
 	require.NoError(t, err)
 
 	time.Sleep(1 * time.Second)
 
-	server.TerminateConnection("shutdown requested by user")
+	server.TerminateConnection(ctx, "shutdown requested by user")
 
 	time.Sleep(1 * time.Second)
 	assert.True(t, called, "client.OnConnectionClosed should have been called")

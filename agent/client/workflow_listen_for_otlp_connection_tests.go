@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/server/telemetry"
 )
 
 func (c *Client) startOTLPConnectionTestListener(ctx context.Context) error {
@@ -36,8 +37,12 @@ func (c *Client) startOTLPConnectionTestListener(ctx context.Context) error {
 				continue
 			}
 
-			// TODO: Get ctx from request
-			err = c.otlpConnectionTestListener(context.Background(), &req)
+			ctx, err := telemetry.ExtractContextFromStream(stream)
+			if err != nil {
+				log.Println("could not extract context from stream %w", err)
+			}
+
+			err = c.otlpConnectionTestListener(ctx, &req)
 			if err != nil {
 				fmt.Println(err.Error())
 			}

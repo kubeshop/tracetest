@@ -14,6 +14,8 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	tracesdk "go.opentelemetry.io/otel/sdk/trace"
+	"go.opentelemetry.io/otel/trace"
 )
 
 func setupTriggerWorker(t *testing.T) (*mocks.GrpcServerMock, collector.TraceCache) {
@@ -62,22 +64,26 @@ func TestTrigger(t *testing.T) {
 		},
 	}
 
+	ctx := ContextWithTracingEnabled()
+
 	// make the control plane send a trigger request to the agent
-	controlPlane.SendTriggerRequest(triggerRequest)
+	controlPlane.SendTriggerRequest(ctx, triggerRequest)
 	time.Sleep(1 * time.Second)
 
 	response := controlPlane.GetLastTriggerResponse()
 
 	require.NotNil(t, response)
-	assert.Equal(t, "http", response.TriggerResult.Type)
-	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
-	assert.JSONEq(t, `{"hello": "world"}`, string(response.TriggerResult.Http.Body))
+	assert.Equal(t, "http", response.Data.TriggerResult.Type)
+	assert.Equal(t, int32(http.StatusOK), response.Data.TriggerResult.Http.StatusCode)
+	assert.JSONEq(t, `{"hello": "world"}`, string(response.Data.TriggerResult.Http.Body))
 
 	_, traceIdIsWatched := cache.Get(traceID)
 	assert.True(t, traceIdIsWatched)
+	assert.True(t, SameTraceID(ctx, response.Context))
 }
 
 func TestTriggerAgainstGoogle(t *testing.T) {
+	ctx := context.Background()
 	controlPlane, _ := setupTriggerWorker(t)
 
 	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
@@ -99,17 +105,18 @@ func TestTriggerAgainstGoogle(t *testing.T) {
 	}
 
 	// make the control plane send a trigger request to the agent
-	controlPlane.SendTriggerRequest(triggerRequest)
+	controlPlane.SendTriggerRequest(ctx, triggerRequest)
 	time.Sleep(1 * time.Second)
 
 	response := controlPlane.GetLastTriggerResponse()
 
 	require.NotNil(t, response)
-	assert.Equal(t, "http", response.TriggerResult.Type)
-	assert.Equal(t, int32(http.StatusOK), response.TriggerResult.Http.StatusCode)
+	assert.Equal(t, "http", response.Data.TriggerResult.Type)
+	assert.Equal(t, int32(http.StatusOK), response.Data.TriggerResult.Http.StatusCode)
 }
 
 func TestTriggerInexistentAPI(t *testing.T) {
+	ctx := context.Background()
 	controlPlane, _ := setupTriggerWorker(t)
 
 	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
@@ -131,14 +138,14 @@ func TestTriggerInexistentAPI(t *testing.T) {
 	}
 
 	// make the control plane send a trigger request to the agent
-	controlPlane.SendTriggerRequest(triggerRequest)
+	controlPlane.SendTriggerRequest(ctx, triggerRequest)
 	time.Sleep(1 * time.Second)
 
 	response := controlPlane.GetLastTriggerResponse()
 
 	require.NotNil(t, response)
-	assert.NotNil(t, response.TriggerResult.Error)
-	assert.Contains(t, response.TriggerResult.Error.Message, "connection refused")
+	assert.NotNil(t, response.Data.TriggerResult.Error)
+	assert.Contains(t, response.Data.TriggerResult.Error.Message, "connection refused")
 }
 
 func createHelloWorldApi() *httptest.Server {
@@ -146,4 +153,8 @@ func createHelloWorldApi() *httptest.Server {
 		w.Write([]byte(`{"hello": "world"}`))
 		w.WriteHeader(http.StatusOK)
 	}))
+}
+
+func getTracer() trace.Tracer {
+	return tracesdk.NewTracerProvider().Tracer("asd")
 }

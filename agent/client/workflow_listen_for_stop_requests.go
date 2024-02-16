@@ -9,6 +9,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
+// TODO: fix this and add test
 func (c *Client) startStopListener(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
 

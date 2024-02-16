@@ -20,7 +20,7 @@ import (
 )
 
 func TestPollerWorker(t *testing.T) {
-	ctx := context.Background()
+	ctx := ContextWithTracingEnabled()
 	controlPlane := mocks.NewGrpcServer()
 
 	client, err := client.Connect(ctx, controlPlane.Addr())
@@ -52,7 +52,7 @@ func TestPollerWorker(t *testing.T) {
 		},
 	}
 
-	controlPlane.SendPollingRequest(&pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &pollingRequest)
 
 	time.Sleep(1 * time.Second)
 
@@ -63,7 +63,7 @@ func TestPollerWorker(t *testing.T) {
 	// Very rudimentar sorting algorithm for only two items in the array
 	// first item is always the root span, second is it's child
 	var spans = make([]*proto.Span, 2)
-	for _, span := range pollingResponse.Spans {
+	for _, span := range pollingResponse.Data.Spans {
 		if span.ParentId == "" {
 			spans[0] = span
 		} else {
@@ -74,6 +74,8 @@ func TestPollerWorker(t *testing.T) {
 	assert.Len(t, spans, 2)
 	assert.Equal(t, "", spans[0].ParentId)
 	assert.Equal(t, spans[0].Id, spans[1].ParentId)
+
+	assert.True(t, SameTraceID(ctx, pollingResponse.Context))
 }
 
 func createTempoFakeApi() *httptest.Server {
@@ -146,7 +148,7 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 		},
 	}
 
-	controlPlane.SendPollingRequest(&pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &pollingRequest)
 
 	time.Sleep(1 * time.Second)
 
@@ -154,8 +156,8 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 	pollingResponse := controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
 
-	assert.False(t, pollingResponse.TraceFound)
-	assert.Len(t, pollingResponse.Spans, 0)
+	assert.False(t, pollingResponse.Data.TraceFound)
+	assert.Len(t, pollingResponse.Data.Spans, 0)
 
 	span1ID := id.NewRandGenerator().SpanID()
 	span2ID := id.NewRandGenerator().SpanID()
@@ -165,7 +167,7 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 		{Name: "span 2", ParentSpanId: span1ID[:], SpanId: span2ID[:], TraceId: traceID[:]},
 	})
 
-	controlPlane.SendPollingRequest(&pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &pollingRequest)
 
 	time.Sleep(1 * time.Second)
 
@@ -173,8 +175,8 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 	pollingResponse = controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
 
-	assert.True(t, pollingResponse.TraceFound)
-	assert.Len(t, pollingResponse.Spans, 2)
+	assert.True(t, pollingResponse.Data.TraceFound)
+	assert.Len(t, pollingResponse.Data.Spans, 2)
 }
 
 func TestPollerWithInvalidDataStore(t *testing.T) {
@@ -208,12 +210,12 @@ func TestPollerWithInvalidDataStore(t *testing.T) {
 		},
 	}
 
-	controlPlane.SendPollingRequest(&pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &pollingRequest)
 
 	time.Sleep(1 * time.Second)
 
 	pollingResponse := controlPlane.GetLastPollingResponse()
 	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
-	require.NotNil(t, pollingResponse.Error)
-	assert.Contains(t, pollingResponse.Error.Message, "connection refused")
+	require.NotNil(t, pollingResponse.Data.Error)
+	assert.Contains(t, pollingResponse.Data.Error.Message, "connection refused")
 }

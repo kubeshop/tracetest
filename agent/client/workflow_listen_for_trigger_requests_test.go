@@ -13,10 +13,11 @@ import (
 )
 
 func TestTriggerWorkflow(t *testing.T) {
+	ctx := context.Background()
 	server := mocks.NewGrpcServer()
 	defer server.Stop()
 
-	client, err := client.Connect(context.Background(), server.Addr())
+	client, err := client.Connect(ctx, server.Addr())
 	require.NoError(t, err)
 
 	var receivedTrigger *proto.TriggerRequest
@@ -25,7 +26,7 @@ func TestTriggerWorkflow(t *testing.T) {
 		return nil
 	})
 
-	err = client.Start(context.Background())
+	err = client.Start(ctx)
 	require.NoError(t, err)
 
 	triggerRequest := &proto.TriggerRequest{
@@ -43,7 +44,7 @@ func TestTriggerWorkflow(t *testing.T) {
 		},
 	}
 
-	server.SendTriggerRequest(triggerRequest)
+	server.SendTriggerRequest(ctx, triggerRequest)
 
 	// ensures there's enough time for networking between server and client
 	time.Sleep(1 * time.Second)
@@ -75,7 +76,7 @@ func TestTriggerWorkflow(t *testing.T) {
 			},
 		}
 
-		server.SendTriggerRequest(anotherTriggerRequest)
+		server.SendTriggerRequest(ctx, anotherTriggerRequest)
 
 		// ensures there's enough time for networking between server and client
 		time.Sleep(1 * time.Second)
