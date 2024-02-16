@@ -1,9 +1,11 @@
 ---
 id: cli-installation-reference
 title: CLI Installation Reference
-description: Tracetest adds versions to tests by giving the initial version "v1". When something changes in your test it's detected and the test increases the version by 1.
+description: This page contains a reference of all options for installing Tracetest CLI. Tracetest has a command line interface (CLI) which includes Tracetest Agent - Enables Tracetest to access your application under test and to ingest trace data from your OpenTelemetry Collector or tracing backend. Tracetest Core Install Wizard - Helps install the Tracetest Core Server into Docker or Kubernetes.
 keywords:
   - tracetest
+  - tracetest cli
+  - tracetest reference
   - trace-based testing
   - observability
   - distributed tracing
@@ -13,7 +15,12 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 This page contains a reference of all options for installing Tracetest CLI.
 
-Tracetest has a command line interface (CLI) which includes an **install wizard** that helps to install the Tracetest server into Docker or Kubernetes. The CLI can also be used to run tests, download or upload tests, and manage much of the capability of Tracetest.
+Tracetest has a command line interface (CLI) which includes:
+
+- [Tracetest Agent](/configuration/agent): Enables Tracetest to access your application under test and to ingest trace data from your OpenTelemetry Collector or tracing backend.
+- [Tracetest Core Install Wizard](/core/getting-started/installation): Helps install the Tracetest Core Server into Docker or Kubernetes.
+
+The CLI is used to run tests, download or upload tests, and manage Tracetest capability and resources.
 
 :::tip Want more info?
 Read more about the installation guide [here](/getting-started/installation).
