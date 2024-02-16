@@ -1,0 +1,44 @@
+type: Test
+spec:
+  id: pokeshop-serverless-demo-import-pokemon-queue
+  name: "Serverless - Import a Pokemon using API and MQ Worker"
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: ${var:POKESHOP_API_URL}/pokemon/import
+      body: |
+        {
+          "id": 6
+        }
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[tracetest.span.type="http" name="POST /pokemon/import" http.method="POST"]
+      name: POST /pokemon/import was called successfuly
+      assertions:
+        - attr:http.status_code  =  200
+        - attr:http.response.body | json_path '$.id' = "143"
+    - selector: span[tracetest.span.type="general" name="validate request"]
+      name: The request was validated correctly
+      assertions:
+        - attr:validation.is_valid = "true"
+    - selector: span[tracetest.span.type="messaging" name="queue.synchronizePokemon publish" messaging.system="rabbitmq" messaging.destination="queue.synchronizePokemon" messaging.operation="publish"]
+      name: A message was enqueued to the worker
+      assertions:
+        - attr:messaging.payload | json_path '$.id' = "143"
+    - selector: span[tracetest.span.type="messaging" name="queue.synchronizePokemon process" messaging.system="rabbitmq" messaging.destination="queue.synchronizePokemon" messaging.operation="process"]
+      name: A message was read by the worker
+      assertions:
+        - attr:messaging.payload | json_path '$.fields.routingKey' = "queue.synchronizePokemon"
+    - selector: span[tracetest.span.type="general" name="import pokemon"]
+      name: A "import pokemon" action was triggered
+      assertions:
+        - attr:tracetest.selected_spans.count >= 1
+  # TODO: sometimes this assertion fails due to Pokeshop cache
+  # - selector: span[tracetest.span.type="http" name="GET" http.method="GET"]
+  #   name: The PokeAPI was called with success
+  #   assertions:
+  #   - attr:http.status_code = 200
