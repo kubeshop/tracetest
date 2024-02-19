@@ -8,24 +8,24 @@ import Heading from '@theme/Heading';
 
 const ExamplesTutorialsOverview = [
   {
-    name: '👨‍💻 Tutorials',
-    url: '/examples-tutorials/tutorials',
-    description: (
-      <Translate >
-        Check out the following blog posts with Tracetest-related content.
-      </Translate>
-    ),
-    button: 'Learn more',
-  },
-  {
     name: '🍱 Recipes',
     url: '/examples-tutorials/recipes',
     description: (
       <Translate>
-        Short, self-contained, and runnable solutions to popular use cases.
+        Self-contained guides to popular use cases.
       </Translate>
     ),
     button: 'Start building',
+  },
+  {
+    name: '🛠️ Tools & Integrations',
+    url: '/tools-and-integrations/overview',
+    description: (
+      <Translate>
+        Tools and integrations examples with Tracetest.
+      </Translate>
+    ),
+    button: 'Integrate',
   },
   {
     name: '⚙️ CI/CD Automation',
@@ -38,14 +38,14 @@ const ExamplesTutorialsOverview = [
     button: 'Automate',
   },
   {
-    name: '🛠️ Tools & Integrations',
-    url: '/tools-and-integrations/overview',
+    name: '📽️ Videos & Recordings',
+    url: '/examples-tutorials/videos',
     description: (
       <Translate>
-        Check out tools and integrations with Tracetest.
+        Tracetest video guides and conference talks!
       </Translate>
     ),
-    button: 'Integrate',
+    button: 'Watch now',
   },
   {
     name: '🎙️ Webinars',
@@ -58,14 +58,14 @@ const ExamplesTutorialsOverview = [
     button: 'Watch now',
   },
   {
-    name: '📽️ Videos',
-    url: '/examples-tutorials/videos',
+    name: '👨‍💻 Blog Post Tutorials',
+    url: '/examples-tutorials/tutorials',
     description: (
-      <Translate>
-        Check out Tracetest video guides and conference talks!
+      <Translate >
+        Check out the following blog posts with Tracetest-related content.
       </Translate>
     ),
-    button: 'Watch now',
+    button: 'Learn more',
   },
 ];
 
