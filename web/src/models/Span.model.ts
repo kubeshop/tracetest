@@ -58,7 +58,11 @@ const defaultSpan: TRawSpan = {
 };
 
 const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = '', name = ''} = defaultSpan): Span => {
-  const mappedAttributeList: TSpanFlatAttribute[] = [{key: 'name', value: name}];
+  const kind = SpanKindList.find(spanKind => spanKind === attributes[Attributes.KIND]) || SpanKind.INTERNAL;
+  const mappedAttributeList: TSpanFlatAttribute[] = [
+    {key: 'name', value: name},
+    {key: 'kind', value: kind},
+  ];
   const attributeList = Object.entries(attributes)
     .map<TSpanFlatAttribute>(([key, value]) => ({
       value: String(value),
@@ -72,7 +76,6 @@ const Span = ({id = '', attributes = {}, startTime = 0, endTime = 0, parentId = 
     return {...map, [spanAttribute.name]: SpanAttribute(rawSpanAttribute)};
   }, {});
 
-  const kind = SpanKindList.find(spanKind => spanKind === attributes[Attributes.KIND]) || SpanKind.INTERNAL;
   const duration = attributes[Attributes.TRACETEST_SPAN_DURATION] || '0ns';
   const type =
     SemanticGroupNamesList.find(
