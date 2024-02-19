@@ -2,7 +2,6 @@ import {ClockCircleOutlined, SettingOutlined, ToolOutlined} from '@ant-design/ic
 import {Handle, Position} from 'react-flow-renderer';
 
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
-import {SpanKindToText} from 'constants/Span.constants';
 import Span from 'models/Span.model';
 import * as S from './BaseSpanNode.styled';
 
@@ -18,7 +17,7 @@ interface IProps {
 const BaseSpanNode = ({className, footer, id, isMatched, isSelected, span}: IProps) => {
   return (
     <S.Container className={className} data-cy={`trace-node-${span.type}`} $matched={isMatched} $selected={isSelected}>
-      <Handle id={id} position={Position.Top} style={{ top: 0, visibility: 'hidden' }} type="target" />
+      <Handle id={id} position={Position.Top} style={{top: 0, visibility: 'hidden'}} type="target" />
 
       <S.TopLine $type={span.type} />
 
@@ -33,7 +32,7 @@ const BaseSpanNode = ({className, footer, id, isMatched, isSelected, span}: IPro
         <S.Item>
           <SettingOutlined />
           <S.ItemText>
-            {span.service} {SpanKindToText[span.kind]}
+            {span.service} {span.kind}
           </S.ItemText>
         </S.Item>
         {Boolean(span.system) && (
@@ -50,7 +49,7 @@ const BaseSpanNode = ({className, footer, id, isMatched, isSelected, span}: IPro
 
       <S.Footer>{footer}</S.Footer>
 
-      <Handle id={id} position={Position.Bottom} style={{ bottom: 0, visibility: 'hidden' }} type="source" />
+      <Handle id={id} position={Position.Bottom} style={{bottom: 0, visibility: 'hidden'}} type="source" />
     </S.Container>
   );
 };

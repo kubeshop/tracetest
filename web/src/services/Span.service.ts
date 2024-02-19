@@ -1,7 +1,6 @@
 import {differenceBy, intersectionBy} from 'lodash';
 import {CompareOperator} from 'constants/Operator.constants';
 import {SELECTOR_DEFAULT_ATTRIBUTES, SemanticGroupNames} from 'constants/SemanticGroupNames.constants';
-import {SpanKind} from 'constants/Span.constants';
 import Span from 'models/Span.model';
 import {TSpanFlatAttribute} from 'types/Span.types';
 import {getObjectIncludesText} from 'utils/Common';
@@ -11,7 +10,7 @@ const itemSelectorKeys = SELECTOR_DEFAULT_ATTRIBUTES.flatMap(el => el.attributes
 
 const SpanService = () => ({
   getSpanInfo(span?: Span) {
-    const kind = span?.kind ?? SpanKind.INTERNAL;
+    const kind = span?.kind ?? '';
     const name = span?.name ?? '';
     const service = span?.service ?? '';
     const system = span?.system ?? '';

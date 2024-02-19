@@ -162,6 +162,9 @@ flowchart TD
 ### **Empty Selector**
 By providing an empty selector, all spans from the trace are selected. Note that an empty selector is an empty string. Providing `span` or `span[]` as a selector will result as a syntax error.
 
+### **Filter by span kind**
+If you have more than one span with similar attributes, but different span kinds, you can use `span[kind="expected-kind"] to differentiate them.
+
 ### **Filter by Attributes**
 The most basic way of filtering the spans to apply an assertion to is to use the span's attributes. A good starting example would be filtering all spans of type `http`:
 

@@ -3,7 +3,6 @@ import {SettingOutlined, ToolOutlined} from '@ant-design/icons';
 import {Typography} from 'antd';
 import * as SSpanNode from 'components/Visualization/components/DAG/BaseSpanNode/BaseSpanNode.styled';
 import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
-import {SpanKindToText} from 'constants/Span.constants';
 import SpanService from 'services/Span.service';
 import Span from 'models/Span.model';
 import * as S from './TestSpecDetail.styled';
@@ -23,7 +22,7 @@ const SpanHeader = ({onSelectSpan, span}: IProps) => {
         <S.HeaderTitle level={3}>{name}</S.HeaderTitle>
         <S.HeaderItem>
           <SettingOutlined />
-          <S.HeaderItemText>{`${service} ${SpanKindToText[kind]}`}</S.HeaderItemText>
+          <S.HeaderItemText>{`${service} ${kind}`}</S.HeaderItemText>
         </S.HeaderItem>
         {Boolean(system) && (
           <S.HeaderItem>

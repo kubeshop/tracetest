@@ -21,7 +21,8 @@ var (
 var pokeshopTrace = traces.Trace{
 	ID: gen.TraceID(),
 	RootSpan: traces.Span{
-		ID: postImportSpanID,
+		Kind: "http",
+		ID:   postImportSpanID,
 		Attributes: traces.NewAttributes(map[string]string{
 			"service.name":        "Pokeshop",
 			"tracetest.span.type": "http",
@@ -30,7 +31,8 @@ var pokeshopTrace = traces.Trace{
 		Name: "POST /import",
 		Children: []*traces.Span{
 			{
-				ID: insertPokemonDatabaseSpanID,
+				ID:   insertPokemonDatabaseSpanID,
+				Kind: "db",
 				Attributes: traces.NewAttributes(map[string]string{
 					"service.name":        "Pokeshop",
 					"tracetest.span.type": "db",
@@ -39,7 +41,8 @@ var pokeshopTrace = traces.Trace{
 				Name: "Insert pokemon into database",
 			},
 			{
-				ID: getPokemonFromExternalAPISpanID,
+				ID:   getPokemonFromExternalAPISpanID,
+				Kind: "general",
 				Attributes: traces.NewAttributes(map[string]string{
 					"service.name":        "Pokeshop-worker",
 					"tracetest.span.type": "http",
@@ -48,7 +51,8 @@ var pokeshopTrace = traces.Trace{
 				Name: "Get pokemon from external API",
 				Children: []*traces.Span{
 					{
-						ID: updatePokemonDatabaseSpanID,
+						Kind: "db",
+						ID:   updatePokemonDatabaseSpanID,
 						Attributes: traces.NewAttributes(map[string]string{
 							"service.name":        "Pokeshop-worker",
 							"tracetest.span.type": "db",
@@ -132,6 +136,11 @@ func TestSelector(t *testing.T) {
 			Name:            "SelectorShouldNotMatchParentWhenChildrenAreSpecified",
 			Expression:      `span[service.name = "Pokeshop-worker"] span[service.name = "Pokeshop-worker"]`,
 			ExpectedSpanIds: []trace.SpanID{updatePokemonDatabaseSpanID},
+		},
+		{
+			Name:            "SelectorShouldMatchSpanKind",
+			Expression:      `span[kind="db"]`,
+			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID, updatePokemonDatabaseSpanID},
 		},
 	}
 
