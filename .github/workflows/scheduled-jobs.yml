@@ -62,6 +62,60 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+  pokeshop-serverless-trace-based-tests:
+    name: Run trace based tests for Pokeshop Serverless
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure Tracetest CLI
+        uses: kubeshop/tracetest-github-action@v1
+        with:
+          token: ${{secrets.TRACETEST_SERVERLESS_POKESHOP_TOKEN}}
+
+      - name: Run synthetic monitoring tests
+        run: |
+          tracetest run testsuite --file ./testing/synthetic-monitoring/pokeshop-serverless/_testsuite.yaml --vars ./testing/synthetic-monitoring/pokeshop-serverless/_variableset.yaml
+
+      - name: Send message on Slack in case of failure
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          # check the block kit builder docs to understand how it works
+          # and how to modify it: https://api.slack.com/block-kit
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":warning: Synthetic Monitoring Alert - Serverless Pokeshop Demo :warning:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\nFailed"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
   otel-demo-trace-based-tests:
     name: Run trace based tests for Open Telemetry demo
     runs-on: ubuntu-latest

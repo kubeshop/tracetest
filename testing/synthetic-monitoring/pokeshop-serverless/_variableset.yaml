@@ -1,0 +1,7 @@
+type: VariableSet
+spec:
+  id: tracetesting-vars-serverless
+  name: tracetesting-vars-serverless
+  values:
+    - key: POKESHOP_API_URL
+      value: https://75yj353nn7.execute-api.us-east-1.amazonaws.com
