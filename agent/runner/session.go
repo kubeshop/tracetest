@@ -37,7 +37,7 @@ func (s *Session) WaitUntilDisconnected() {
 func StartSession(ctx context.Context, cfg config.Config, observer event.Observer, logger *zap.Logger) (*Session, error) {
 	observer = event.WrapObserver(observer)
 
-	tracer, err := telemetry.GetTracer(ctx, config.CollectorEndpoint, config.Name)
+	tracer, err := telemetry.GetTracer(ctx, cfg.CollectorEndpoint, cfg.Name)
 	if err != nil {
 		observer.Error(err)
 		return nil, err
