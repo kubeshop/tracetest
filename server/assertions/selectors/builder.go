@@ -112,6 +112,8 @@ func getOperatorFunction(operator string) (FilterFunction, error) {
 			var attrValue string
 			if attribute == "name" {
 				attrValue = span.Name
+			} else if attribute == "kind" {
+				attrValue = string(span.Kind)
 			} else {
 				attrValue = span.Attributes.Get(attribute)
 			}
