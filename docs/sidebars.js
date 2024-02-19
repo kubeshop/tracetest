@@ -114,11 +114,6 @@ const sidebars = {
       label: "Overview",
     },
     {
-      type: "doc",
-      id: "examples-tutorials/tutorials",
-      label: "Tutorials",
-    },
-    {
       type: "category",
       link: {
         type: "doc",
@@ -327,31 +322,6 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "CI/CD Automation",
-      link: {
-        type: "doc",
-        id: "ci-cd-automation/overview",
-      },
-      items: [
-        {
-          type: "doc",
-          id: "ci-cd-automation/github-actions-pipeline",
-          label: "GitHub Actions Pipeline",
-        },
-        {
-          type: "doc",
-          id: "ci-cd-automation/testkube-pipeline",
-          label: "Testkube Kubernetes-native Test Runner Pipeline",
-        },
-        {
-          type: "doc",
-          id: "ci-cd-automation/tekton-pipeline",
-          label: "Tekton Cloud-native Pipeline",
-        },
-      ],
-    },
-    {
-      type: "category",
       label: "Tools & Integrations",
       link: {
         type: "doc",
@@ -396,14 +366,44 @@ const sidebars = {
       ],
     },
     {
+      type: "category",
+      label: "CI/CD Automation",
+      link: {
+        type: "doc",
+        id: "ci-cd-automation/overview",
+      },
+      items: [
+        {
+          type: "doc",
+          id: "ci-cd-automation/github-actions-pipeline",
+          label: "GitHub Actions Pipeline",
+        },
+        {
+          type: "doc",
+          id: "ci-cd-automation/testkube-pipeline",
+          label: "Testkube Kubernetes-native Test Runner Pipeline",
+        },
+        {
+          type: "doc",
+          id: "ci-cd-automation/tekton-pipeline",
+          label: "Tekton Cloud-native Pipeline",
+        },
+      ],
+    },
+    {
+      type: "doc",
+      id: "examples-tutorials/videos",
+      label: "Videos & Recordings",
+    },
+    {
       type: "doc",
       id: "examples-tutorials/webinars",
       label: "Webinars",
     },
     {
       type: "doc",
-      id: "examples-tutorials/videos",
-      label: "Videos",
+      id: "examples-tutorials/tutorials",
+      label: "Blog Post Tutorials",
     },
   ],
 

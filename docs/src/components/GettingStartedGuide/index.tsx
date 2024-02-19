@@ -5,7 +5,7 @@ import Link from '@docusaurus/Link';
 import Translate from '@docusaurus/Translate';
 import Heading from '@theme/Heading';
 
-const GettingStartedGuides = [
+const TracetestGettingStartedGuides = [
   {
     name: 'Tracetest 🚀',
     url: '/getting-started/installation',
@@ -16,6 +16,9 @@ const GettingStartedGuides = [
     ),
     button: 'Start',
   },
+];
+
+const TracetestCoreGettingStartedGuides = [
   {
     name: 'Tracetest Core 🪨 ',
     url: '/core/getting-started/installation',
@@ -52,10 +55,20 @@ function GettingStartedGuideCard({name, url, description, button}: Props) {
   );
 }
 
-export function GettingStartedGuideCardsRow(): JSX.Element {
+export function TracetestGettingStartedGuideCardsRow(): JSX.Element {
   return (
     <div className="row">
-      {GettingStartedGuides.map((gettingStartedGuide) => (
+      {TracetestGettingStartedGuides.map((gettingStartedGuide) => (
+        <GettingStartedGuideCard key={gettingStartedGuide.name} {...gettingStartedGuide} />
+      ))}
+    </div>
+  );
+}
+
+export function TracetestCoreGettingStartedGuideCardsRow(): JSX.Element {
+  return (
+    <div className="row">
+      {TracetestCoreGettingStartedGuides.map((gettingStartedGuide) => (
         <GettingStartedGuideCard key={gettingStartedGuide.name} {...gettingStartedGuide} />
       ))}
     </div>
