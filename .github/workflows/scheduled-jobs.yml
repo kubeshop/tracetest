@@ -21,7 +21,7 @@ jobs:
         uses: kubeshop/tracetest-github-action@v1
         with:
           token: ${{secrets.TRACETEST_POKESHOP_TOKEN}}
-          version: v0.15.7-rc.1
+          version: v0.15.17-rc.1
 
       - name: Run synthetic monitoring tests
         run: |
@@ -76,7 +76,7 @@ jobs:
         uses: kubeshop/tracetest-github-action@v1
         with:
           token: ${{secrets.TRACETEST_POKESHOP_TOKEN}}
-          version: v0.15.7-rc.1
+          version: v0.15.17-rc.1
 
       - name: Run synthetic monitoring tests
         run: |
@@ -131,7 +131,7 @@ jobs:
         uses: kubeshop/tracetest-github-action@v1
         with:
           token: ${{secrets.TRACETEST_OTELDEMO_TOKEN}}
-          version: v0.15.7-rc.1
+          version: v0.15.17-rc.1
 
       - name: Run synthetic monitoring tests
         run: |
