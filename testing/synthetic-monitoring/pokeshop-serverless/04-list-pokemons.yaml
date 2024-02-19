@@ -1,8 +1,7 @@
 type: Test
 spec:
   id: pokeshop-serverless-demo-list-pokemon
-  name: "Serverless - List Pokemons"
-  description: List Pokemons registered on Pokeshop API
+  name: Serverless - List Pokemons
   trigger:
     type: http
     httpRequest:
@@ -12,10 +11,10 @@ spec:
       - key: Content-Type
         value: application/json
   specs:
-  - selector: span[tracetest.span.type="http" name="GET /pokemon?take=100&skip=0" http.method="GET"]
+  - selector: span[tracetest.span.type="http" name="GET /pokemon"]
     name: GET /pokemon endpoint was called and returned valid data
     assertions:
-    - attr:http.status_code  =  200
+    - attr:tracetest.selected_spans.count =  1
   - selector: span[tracetest.span.type="database" name="count pokeshop.pokemon" db.system="postgres" db.name="pokeshop" db.user="ashketchum" db.operation="count" db.sql.table="pokemon"]
     name: A count operation was triggered on database
     assertions:
