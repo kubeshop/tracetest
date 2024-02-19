@@ -19,6 +19,11 @@ import (
 const spanExporterTimeout = 1 * time.Minute
 
 func GetTracer(ctx context.Context, otelExporterEndpoint, serviceName string) (trace.Tracer, error) {
+	if otelExporterEndpoint == "" {
+		// fallback, return noop
+		return trace.NewNoopTracerProvider().Tracer("noop"), nil
+	}
+
 	realServiceName := fmt.Sprintf("tracetestAgent_%s", serviceName)
 
 	spanExporter, err := newSpanExporter(ctx, otelExporterEndpoint)
