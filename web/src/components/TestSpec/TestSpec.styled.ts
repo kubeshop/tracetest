@@ -57,7 +57,10 @@ export const Selector = styled.div`
 
 export const Title = styled(Typography.Text)`
   color: ${({theme}) => theme.color.text};
+  font-family: monospace;
   font-size: ${({theme}) => theme.size.md};
+  line-height: 1.4;
+  padding: 4px 0;
 `;
 
 export const WarningIcon = styled(InfoCircleFilled)`
