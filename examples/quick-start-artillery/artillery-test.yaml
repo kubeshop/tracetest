@@ -1,0 +1,31 @@
+config:
+  target: "http://localhost:11633"
+  phases:
+    - duration: 1
+      arrivalRate: 10
+  plugins:
+    publish-metrics:
+      - type: "open-telemetry"
+        serviceName: "tracetest"
+        metrics:
+          eorter: otlp-http
+          endpoint: "http://localhost:4318/v1/metrics"
+          attributes:
+            environment: "test"
+            tool: "Artillery"
+            type: "Load test"
+
+        traces:
+          eorter: otlp-http
+          endpoint: "http://localhost:4318/v1/traces"
+          attributes:
+            environment: "test"
+            tool: "Artillery"
+    tracetest:
+      apiToken: "<your api token>"
+      test: "tracetest-test.yaml"
+scenarios:
+  - name: "List available tests"
+    flow:
+      - get:
+          url: "/api/tests"

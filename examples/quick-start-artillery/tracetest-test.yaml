@@ -1,0 +1,13 @@
+type: Test
+spec:
+  id: kc_MdKoVR
+  name: artillery
+  description: artillery
+  trigger:
+    type: traceid
+    traceid:
+      id: ${var:TRACE_ID}
+  specs:
+  - selector: span[tracetest.span.type="general" name="first_byte"]
+    assertions:
+    - attr:tracetest.span.duration < 15ms
