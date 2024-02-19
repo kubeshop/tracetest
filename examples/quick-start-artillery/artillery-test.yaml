@@ -22,7 +22,7 @@ config:
             environment: "test"
             tool: "Artillery"
     tracetest:
-      apiToken: "tttoken_208335d9755b051b"
+      apiToken: "<api token>"
       testFile: "tracetest-test.yaml"
 scenarios:
   - name: "List available tests"
