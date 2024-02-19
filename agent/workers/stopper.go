@@ -7,6 +7,7 @@ import (
 
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
 
@@ -14,6 +15,7 @@ type StopperWorker struct {
 	logger         *zap.Logger
 	observer       event.Observer
 	cancelContexts *cancelCauseFuncMap
+	tracer         trace.Tracer
 }
 
 type StopperOption func(*StopperWorker)
@@ -27,6 +29,12 @@ func WithStopperCancelFuncList(cancelContexts *cancelCauseFuncMap) StopperOption
 func WithStopperObserver(observer event.Observer) StopperOption {
 	return func(tw *StopperWorker) {
 		tw.observer = observer
+	}
+}
+
+func WithStopperTracer(tracer trace.Tracer) StopperOption {
+	return func(tw *StopperWorker) {
+		tw.tracer = tracer
 	}
 }
 
@@ -48,6 +56,9 @@ func (w *StopperWorker) SetLogger(logger *zap.Logger) {
 }
 
 func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest) error {
+	ctx, span := w.tracer.Start(ctx, "StopRequest Worker operation")
+	defer span.End()
+
 	w.logger.Debug("Stop request received", zap.Any("stopRequest", stopRequest))
 	w.observer.StartStopRequest(stopRequest)
 
@@ -57,6 +68,8 @@ func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest
 		err := fmt.Errorf("cancel func for StopRequest not found")
 		w.logger.Error(err.Error(), zap.String("testID", stopRequest.TestID), zap.Int32("runID", stopRequest.RunID))
 		w.observer.EndStopRequest(stopRequest, err)
+		span.RecordError(err)
+
 		return err
 	}
 

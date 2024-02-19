@@ -26,6 +26,7 @@ type TriggerWorker struct {
 	observer               event.Observer
 	sensor                 sensors.Sensor
 	stoppableProcessRunner StoppableProcessRunner
+	tracer                 trace.Tracer
 }
 
 type TriggerOption func(*TriggerWorker)
@@ -60,31 +61,40 @@ func WithTriggerLogger(logger *zap.Logger) TriggerOption {
 	}
 }
 
+func WithTriggerTracer(tracer trace.Tracer) TriggerOption {
+	return func(tw *TriggerWorker) {
+		tw.tracer = tracer
+	}
+}
+
 func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWorker {
-	// TODO: use a real tracer
-	tracer := trace.NewNoopTracerProvider().Tracer("noop")
-
-	registry := agentTrigger.NewRegistry(tracer)
-	registry.Add(agentTrigger.HTTP())
-	registry.Add(agentTrigger.GRPC())
-	registry.Add(agentTrigger.TRACEID())
-	registry.Add(agentTrigger.KAFKA())
-
 	worker := &TriggerWorker{
 		client:   client,
-		registry: registry,
 		logger:   zap.NewNop(),
 		observer: event.NewNopObserver(),
+		tracer:   trace.NewNoopTracerProvider().Tracer("noop"),
 	}
 
 	for _, opt := range opts {
 		opt(worker)
 	}
 
+	registry := agentTrigger.NewRegistry(worker.tracer)
+	registry.Add(agentTrigger.HTTP())
+	registry.Add(agentTrigger.GRPC())
+	registry.Add(agentTrigger.TRACEID())
+	registry.Add(agentTrigger.KAFKA())
+
+	// Assign registry into worker
+	worker.registry = registry
+
 	return worker
 }
 
 func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
+	ctx, span := w.tracer.Start(ctx, "TriggerRequest Worker operation")
+	defer span.End()
+
 	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
 	w.observer.StartTriggerExecution(triggerRequest)
 
@@ -115,7 +125,10 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 			w.logger.Error("Could not report trigger error back to the server", zap.Error(sendErr))
 			w.observer.Error(sendErr)
 
-			err = fmt.Errorf("could not report trigger error back to the server: %w. Original error: %s", sendErr, err.Error())
+			formattedErr := fmt.Errorf("could not report trigger error back to the server: %w. Original error: %s", sendErr, err.Error())
+			span.RecordError(formattedErr)
+
+			return formattedErr
 		}
 	}
 

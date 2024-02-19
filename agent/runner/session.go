@@ -123,6 +123,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 	stopWorker := workers.NewStopperWorker(
 		workers.WithStopperObserver(observer),
 		workers.WithStopperCancelFuncList(processStopper.CancelMap()),
+		workers.WithStopperTracer(tracer),
 	)
 
 	triggerWorker := workers.NewTriggerWorker(
@@ -131,6 +132,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		workers.WithTriggerObserver(observer),
 		workers.WithTriggerStoppableProcessRunner(processStopper.RunStoppableProcess),
 		workers.WithTriggerLogger(logger),
+		workers.WithTriggerTracer(tracer),
 	)
 
 	pollingWorker := workers.NewPollerWorker(
@@ -139,18 +141,22 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		workers.WithPollerObserver(observer),
 		workers.WithPollerStoppableProcessRunner(processStopper.RunStoppableProcess),
 		workers.WithPollerLogger(logger),
+		workers.WithPollerTracer(tracer),
 	)
 
-	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(controlPlaneClient, observer)
-
-	dataStoreTestConnectionWorker.SetLogger(logger)
+	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(
+		controlPlaneClient,
+		workers.WithTestConnectionLogger(logger),
+		workers.WithTestConnectionObserver(observer),
+		workers.WithTestConnectionTracer(tracer),
+	)
 
 	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
 	controlPlaneClient.OnStopRequest(stopWorker.Stop)
 	controlPlaneClient.OnTriggerRequest(triggerWorker.Trigger)
 	controlPlaneClient.OnPollingRequest(pollingWorker.Poll)
 	controlPlaneClient.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error {
-		fmt.Printf("Server terminated the connection with the agent. Reason: %s\n", sr.Reason)
+		logger.Info(fmt.Sprintf("Server terminated the connection with the agent. Reason: %s\n", sr.Reason))
 		return controlPlaneClient.Close()
 	})
 

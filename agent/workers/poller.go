@@ -23,12 +23,12 @@ import (
 
 type PollerWorker struct {
 	client                 *client.Client
-	tracer                 trace.Tracer
 	sentSpanIDs            *gocache.Cache[string, bool]
 	inmemoryDatastore      tracedb.TraceDB
 	logger                 *zap.Logger
 	observer               event.Observer
 	stoppableProcessRunner StoppableProcessRunner
+	tracer                 trace.Tracer
 }
 
 type PollerOption func(*PollerWorker)
@@ -57,16 +57,19 @@ func WithPollerLogger(logger *zap.Logger) PollerOption {
 	}
 }
 
-func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker {
-	// TODO: use a real tracer
-	tracer := trace.NewNoopTracerProvider().Tracer("noop")
+func WithPollerTracer(tracer trace.Tracer) PollerOption {
+	return func(pw *PollerWorker) {
+		pw.tracer = tracer
+	}
+}
 
+func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker {
 	pollerWorker := &PollerWorker{
 		client:      client,
-		tracer:      tracer,
 		sentSpanIDs: gocache.New[string, bool](),
 		logger:      zap.NewNop(),
 		observer:    event.NewNopObserver(),
+		tracer:      trace.NewNoopTracerProvider().Tracer("noop"),
 	}
 
 	for _, opt := range opts {
@@ -77,6 +80,9 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 }
 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
+	ctx, span := w.tracer.Start(ctx, "PollingRequest Worker operation")
+	defer span.End()
+
 	w.logger.Debug("Received polling request", zap.Any("request", request))
 	w.observer.StartTracePoll(request)
 
@@ -112,7 +118,10 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 			w.logger.Error("Error sending polling error", zap.Error(sendErr))
 			w.observer.Error(sendErr)
 
-			return fmt.Errorf("could not report polling error back to the server: %w. Original error: %s", sendErr, err.Error())
+			formattedErr := fmt.Errorf("could not report polling error back to the server: %w. Original error: %s", sendErr, err.Error())
+			span.RecordError(formattedErr)
+
+			return formattedErr
 		}
 	}
 
