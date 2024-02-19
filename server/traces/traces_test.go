@@ -323,6 +323,11 @@ func TestJSONEncoding(t *testing.T) {
 	subSubSpan1 := createSpan("subSubSpan1")
 	subSpan2 := createSpan("subSpan2")
 
+	rootSpan.Kind = traces.SpanKindClient
+	subSpan1.Kind = traces.SpanKindConsumer
+	subSubSpan1.Kind = traces.SpanKindUnespecified
+	subSpan2.Kind = traces.SpanKindUnespecified
+
 	subSpan1.Parent = rootSpan
 	subSpan2.Parent = rootSpan
 	subSubSpan1.Parent = subSpan1
@@ -351,6 +356,7 @@ func TestJSONEncoding(t *testing.T) {
 		"RootSpan": {
 			"ID": "%s",
 			"Name":"root",
+			"Kind": "client",
 			"StartTime":"%d",
 			"EndTime":"%d",
 			"Attributes": {
@@ -360,6 +366,7 @@ func TestJSONEncoding(t *testing.T) {
 				{
 					"ID": "%s",
 					"Name":"subSpan1",
+					"Kind": "consumer",
 					"StartTime":"%d",
 					"EndTime":"%d",
 					"Attributes": {
@@ -369,6 +376,7 @@ func TestJSONEncoding(t *testing.T) {
 						{
 							"ID": "%s",
 							"StartTime":"%d",
+							"Kind": "unespecified",
 							"EndTime":"%d",
 							"Name":"subSubSpan1",
 							"Attributes": {
@@ -381,6 +389,7 @@ func TestJSONEncoding(t *testing.T) {
 				{
 					"ID": "%s",
 					"Name":"subSpan2",
+					"Kind": "unespecified",
 					"StartTime":"%d",
 					"EndTime":"%d",
 					"Attributes": {

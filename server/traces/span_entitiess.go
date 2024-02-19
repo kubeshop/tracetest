@@ -194,6 +194,7 @@ type SpanEvent struct {
 type encodedSpan struct {
 	ID         string
 	Name       string
+	Kind       string
 	StartTime  string
 	EndTime    string
 	Attributes Attributes
@@ -222,6 +223,7 @@ func encodeSpan(s Span) encodedSpan {
 	return encodedSpan{
 		ID:         s.ID.String(),
 		Name:       s.Name,
+		Kind:       string(s.Kind),
 		StartTime:  strconv.FormatInt(s.StartTime.UnixMilli(), 10),
 		EndTime:    strconv.FormatInt(s.EndTime.UnixMilli(), 10),
 		Attributes: s.Attributes,
@@ -273,6 +275,7 @@ func (s *Span) decodeSpan(aux encodedSpan) error {
 
 	s.ID = sid
 	s.Name = aux.Name
+	s.Kind = SpanKind(aux.Kind)
 	s.StartTime = startTime.UTC()
 	s.EndTime = endTime.UTC()
 	s.Attributes = aux.Attributes
