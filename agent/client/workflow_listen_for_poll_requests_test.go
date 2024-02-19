@@ -13,10 +13,11 @@ import (
 )
 
 func TestPollWorkflow(t *testing.T) {
+	ctx := context.Background()
 	server := mocks.NewGrpcServer()
 	defer server.Stop()
 
-	client, err := client.Connect(context.Background(), server.Addr())
+	client, err := client.Connect(ctx, server.Addr())
 	require.NoError(t, err)
 
 	var receivedPollingRequest *proto.PollingRequest
@@ -25,7 +26,7 @@ func TestPollWorkflow(t *testing.T) {
 		return nil
 	})
 
-	err = client.Start(context.Background())
+	err = client.Start(ctx)
 	require.NoError(t, err)
 
 	pollingRequest := &proto.PollingRequest{
@@ -44,7 +45,7 @@ func TestPollWorkflow(t *testing.T) {
 		},
 	}
 
-	server.SendPollingRequest(pollingRequest)
+	server.SendPollingRequest(ctx, pollingRequest)
 
 	// ensures there's enough time for networking between server and client
 	time.Sleep(1 * time.Second)
@@ -78,7 +79,7 @@ func TestPollWorkflow(t *testing.T) {
 			},
 		}
 
-		server.SendPollingRequest(anotherPollingRequest)
+		server.SendPollingRequest(ctx, anotherPollingRequest)
 
 		// ensures there's enough time for networking between server and client
 		time.Sleep(1 * time.Second)

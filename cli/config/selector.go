@@ -17,12 +17,12 @@ type Entry struct {
 func (c Configurator) organizationSelector(ctx context.Context, cfg Config, prev *Config) (string, error) {
 	resource, err := c.resources.Get("organization")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cannot create organizations client: %w", err)
 	}
 
 	elements, err := getElements(ctx, resource, cfg)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("cannot get organization: %w", err)
 	}
 
 	if len(elements) == 1 {

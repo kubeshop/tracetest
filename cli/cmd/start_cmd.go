@@ -29,7 +29,7 @@ var startCmd = &cobra.Command{
 		flags := agentConfig.Flags{
 			OrganizationID: saveParams.organizationID,
 			EnvironmentID:  saveParams.environmentID,
-			ServerURL:      saveParams.endpoint,
+			ServerURL:      overrideEndpoint,
 			AgentApiKey:    saveParams.agentApiKey,
 			Token:          saveParams.token,
 			Mode:           agentConfig.Mode(saveParams.mode),
@@ -43,6 +43,9 @@ var startCmd = &cobra.Command{
 		}
 		if envID := config.ContextGetEnvironmentID(ctx); envID != "" {
 			flags.EnvironmentID = envID
+		}
+		if serverURL := config.ContextGetServerURL(ctx); serverURL != "" {
+			flags.ServerURL = serverURL
 		}
 
 		cfg, err := agentConfig.LoadConfig()
@@ -65,7 +68,7 @@ func init() {
 	startCmd.Flags().StringVarP(&saveParams.environmentID, "environment", "", "", "environment id")
 	startCmd.Flags().StringVarP(&saveParams.agentApiKey, "api-key", "", defaultAPIKey, "agent api key")
 	startCmd.Flags().StringVarP(&saveParams.token, "token", "", defaultToken, "token authentication key")
-	startCmd.Flags().StringVarP(&saveParams.endpoint, "endpoint", "e", defaultEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
+	startCmd.Flags().StringVarP(&overrideEndpoint, "endpoint", "e", defaultEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
 	startCmd.Flags().StringVarP(&saveParams.mode, "mode", "m", "desktop", "set how the agent will start")
 	startCmd.Flags().StringVarP(&saveParams.logLevel, "log-level", "l", "debug", "set the agent log level")
 
@@ -78,7 +81,6 @@ func init() {
 type saveParameters struct {
 	organizationID string
 	environmentID  string
-	endpoint       string
 	agentApiKey    string
 	token          string
 	mode           string

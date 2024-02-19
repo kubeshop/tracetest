@@ -45,21 +45,21 @@ func TestSendTrace(t *testing.T) {
 
 	receivedPollingResponse := server.GetLastPollingResponse()
 
-	assert.Equal(t, pollingRequest.TestID, receivedPollingResponse.TestID)
-	assert.Equal(t, pollingRequest.RunID, receivedPollingResponse.RunID)
-	assert.Equal(t, pollingRequest.TraceID, receivedPollingResponse.TraceID)
+	assert.Equal(t, pollingRequest.TestID, receivedPollingResponse.Data.TestID)
+	assert.Equal(t, pollingRequest.RunID, receivedPollingResponse.Data.RunID)
+	assert.Equal(t, pollingRequest.TraceID, receivedPollingResponse.Data.TraceID)
 
-	require.Len(t, receivedPollingResponse.Spans, len(pollingRequest.Spans))
+	require.Len(t, receivedPollingResponse.Data.Spans, len(pollingRequest.Spans))
 	for i, span := range pollingRequest.Spans {
-		assert.Equal(t, span.Id, receivedPollingResponse.Spans[i].Id)
-		assert.Equal(t, span.Name, receivedPollingResponse.Spans[i].Name)
-		assert.Equal(t, span.Kind, receivedPollingResponse.Spans[i].Kind)
-		assert.Equal(t, span.ParentId, receivedPollingResponse.Spans[i].ParentId)
-		assert.Equal(t, span.StartTime, receivedPollingResponse.Spans[i].StartTime)
-		assert.Equal(t, span.EndTime, receivedPollingResponse.Spans[i].EndTime)
+		assert.Equal(t, span.Id, receivedPollingResponse.Data.Spans[i].Id)
+		assert.Equal(t, span.Name, receivedPollingResponse.Data.Spans[i].Name)
+		assert.Equal(t, span.Kind, receivedPollingResponse.Data.Spans[i].Kind)
+		assert.Equal(t, span.ParentId, receivedPollingResponse.Data.Spans[i].ParentId)
+		assert.Equal(t, span.StartTime, receivedPollingResponse.Data.Spans[i].StartTime)
+		assert.Equal(t, span.EndTime, receivedPollingResponse.Data.Spans[i].EndTime)
 		for j := range span.Attributes {
-			assert.Equal(t, span.Attributes[i].Key, receivedPollingResponse.Spans[i].Attributes[j].Key)
-			assert.Equal(t, span.Attributes[i].Value, receivedPollingResponse.Spans[i].Attributes[j].Value)
+			assert.Equal(t, span.Attributes[i].Key, receivedPollingResponse.Data.Spans[i].Attributes[j].Key)
+			assert.Equal(t, span.Attributes[i].Value, receivedPollingResponse.Data.Spans[i].Attributes[j].Value)
 		}
 	}
 }

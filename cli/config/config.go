@@ -146,9 +146,11 @@ func ParseServerURL(serverURL string) (scheme, endpoint, serverPath string, err 
 
 type orgIDKeyType struct{}
 type envIDKeyType struct{}
+type serverURLKeyType struct{}
 
 var orgIDKey = orgIDKeyType{}
 var envIDKey = envIDKeyType{}
+var serverURLKey = serverURLKeyType{}
 
 func ContextWithOrganizationID(ctx context.Context, orgID string) context.Context {
 	return context.WithValue(ctx, orgIDKey, orgID)
@@ -156,6 +158,10 @@ func ContextWithOrganizationID(ctx context.Context, orgID string) context.Contex
 
 func ContextWithEnvironmentID(ctx context.Context, envID string) context.Context {
 	return context.WithValue(ctx, envIDKey, envID)
+}
+
+func ContextWithServerURL(ctx context.Context, serverURL string) context.Context {
+	return context.WithValue(ctx, serverURLKey, serverURL)
 }
 
 func ContextGetOrganizationID(ctx context.Context) string {
@@ -168,6 +174,14 @@ func ContextGetOrganizationID(ctx context.Context) string {
 
 func ContextGetEnvironmentID(ctx context.Context) string {
 	v := ctx.Value(envIDKey)
+	if v == nil {
+		return ""
+	}
+	return v.(string)
+}
+
+func ContextGetServerURL(ctx context.Context) string {
+	v := ctx.Value(serverURLKey)
 	if v == nil {
 		return ""
 	}
@@ -195,6 +209,7 @@ func Save(ctx context.Context, config Config) (context.Context, error) {
 
 	ctx = ContextWithOrganizationID(ctx, config.OrganizationID)
 	ctx = ContextWithEnvironmentID(ctx, config.EnvironmentID)
+	ctx = ContextWithServerURL(ctx, config.UIEndpoint)
 
 	return ctx, nil
 }

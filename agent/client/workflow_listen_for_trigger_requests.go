@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/server/telemetry"
 )
 
 func (c *Client) startTriggerListener(ctx context.Context) error {
@@ -36,8 +37,12 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 				continue
 			}
 
-			// TODO: get context from request
-			err = c.triggerListener(context.Background(), &resp)
+			ctx, err := telemetry.ExtractContextFromStream(stream)
+			if err != nil {
+				log.Println("could not extract context from stream %w", err)
+			}
+
+			err = c.triggerListener(ctx, &resp)
 			if err != nil {
 				fmt.Println(err.Error())
 			}

@@ -24,23 +24,19 @@ This page showcases getting started with [Tracetest](https://app.tracetest.io/) 
 
 ## Install the Tracetest Agent
 
-[Tracetest Agent](../concepts/agent) runs as a standalone process. It runs either locally on your machine or as a container. Once started, Tracetest Agent exposes OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion. It executes tests in the environment where it is running and returns the response from triggered tests.
+[Tracetest Agent](/concepts/agent) runs as a standalone process. It runs either locally on your machine or as a container. Once started, Tracetest Agent exposes OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion. It executes tests in the environment where it is running and returns the response from triggered tests.
+
+[Sign in to Tracetest](https://app.tracetest.io/), and get your [Tracetest Agent API Key](/configuration/agent).
 
 <Tabs groupId="installation">
-  <TabItem value="cli" label="Tracetest CLI" default>
+<TabItem value="cli" label="Tracetest CLI" default>
 
 <CodeBlock
   language="text"
   title="Terminal"
 >
-tracetest start
+{`tracetest start --api-key <your_api_key>`}
 </CodeBlock>
-
-The Agent will start and open a browser. Sign in to Tracetest.
-
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1695990166/docs/screely-1695990151905_eb8yiw.png)
-
-Once signed in, return to the terminal.
 
 <CodeBlock
   language="text"
@@ -61,8 +57,8 @@ gRPC: `http://localhost:4317`
 
 HTTP: `http://localhost:4318/v1/traces`
 
-  </TabItem>
-  <TabItem value="docker" label="Docker" default>
+</TabItem>
+<TabItem value="docker" label="Docker" default>
 
 <CodeBlock
     language="text"
@@ -70,12 +66,6 @@ HTTP: `http://localhost:4318/v1/traces`
 >
 {`docker run \\\n-p 4317:4317 \\\n-p 4318:4318 \\\n-e TRACETEST_API_KEY="<your_api_key>" \\\nkubeshop/tracetest-agent`}
 </CodeBlock>
-
-The Agent will start and open a browser. Sign in to Tracetest.
-
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1695990166/docs/screely-1695990151905_eb8yiw.png)
-
-Once signed in, return to the terminal.
 
 <CodeBlock
   language="text"
@@ -110,8 +100,8 @@ You can reach services running on your local machine using:
 - MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
 :::
 
-  </TabItem>
-  <TabItem value="kubernetes" label="Kubernetes" default>
+</TabItem>
+<TabItem value="kubernetes" label="Kubernetes" default>
 
 <CodeBlock
     language="text"
@@ -119,12 +109,6 @@ You can reach services running on your local machine using:
 >
 {`curl https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/agent/deploy-agent.sh | bash -s -- default <your_api_key>`}
 </CodeBlock>
-
-The Agent will start and open a browser. Sign in to Tracetest.
-
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1695990166/docs/screely-1695990151905_eb8yiw.png)
-
-Once signed in, return to the terminal.
 
 <CodeBlock
   language="text"
@@ -159,7 +143,7 @@ You can reach services running on your local machine using:
 - MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
 :::
 
-  </TabItem>
+</TabItem>
 </Tabs>
 
 :::tip Don't have OpenTelemetry installed?
