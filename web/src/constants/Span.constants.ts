@@ -107,19 +107,3 @@ export const SelectorAttributesWhiteList = uniq([
     return sectionAttributes;
   }),
 ]);
-
-export enum SpanKind {
-  SERVER = 'SPAN_KIND_SERVER',
-  CLIENT = 'SPAN_KIND_CLIENT',
-  PRODUCER = 'SPAN_KIND_PRODUCER',
-  CONSUMER = 'SPAN_KIND_CONSUMER',
-  INTERNAL = 'SPAN_KIND_INTERNAL',
-}
-
-export const SpanKindToText = {
-  [SpanKind.SERVER]: 'server',
-  [SpanKind.CLIENT]: 'client',
-  [SpanKind.PRODUCER]: 'producer',
-  [SpanKind.CONSUMER]: 'consumer',
-  [SpanKind.INTERNAL]: 'internal',
-};
