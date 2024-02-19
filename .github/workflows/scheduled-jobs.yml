@@ -74,7 +74,7 @@ jobs:
       - name: Configure Tracetest CLI
         uses: kubeshop/tracetest-github-action@v1
         with:
-          token: ${{secrets.TRACETEST_POKESHOP_TOKEN}}
+          token: ${{secrets.TRACETEST_SERVERLESS_POKESHOP_TOKEN}}
 
       - name: Run synthetic monitoring tests
         run: |
@@ -93,7 +93,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": ":warning: Synthetic Monitoring Alert - Pokeshop Demo :warning:",
+                    "text": ":warning: Synthetic Monitoring Alert - Serverless Pokeshop Demo :warning:",
                     "emoji": true
                   }
                 },
