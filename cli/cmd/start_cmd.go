@@ -16,7 +16,7 @@ var (
 	defaultToken    = os.Getenv("TRACETEST_TOKEN")
 	defaultEndpoint = os.Getenv("TRACETEST_SERVER_URL")
 	defaultAPIKey   = os.Getenv("TRACETEST_API_KEY")
-	saveParams      = &saveParameters{}
+	startParams     = &startParameters{}
 )
 
 var startCmd = &cobra.Command{
@@ -27,13 +27,14 @@ var startCmd = &cobra.Command{
 	PreRun:  setupCommand(SkipConfigValidation(), SkipVersionMismatchCheck()),
 	Run: WithResultHandler((func(ctx context.Context, _ *cobra.Command, _ []string) (string, error) {
 		flags := agentConfig.Flags{
-			OrganizationID: saveParams.organizationID,
-			EnvironmentID:  saveParams.environmentID,
-			ServerURL:      overrideEndpoint,
-			AgentApiKey:    saveParams.agentApiKey,
-			Token:          saveParams.token,
-			Mode:           agentConfig.Mode(saveParams.mode),
-			LogLevel:       saveParams.logLevel,
+			OrganizationID:    startParams.organizationID,
+			EnvironmentID:     startParams.environmentID,
+			ServerURL:         overrideEndpoint,
+			AgentApiKey:       startParams.agentApiKey,
+			Token:             startParams.token,
+			Mode:              agentConfig.Mode(startParams.mode),
+			LogLevel:          startParams.logLevel,
+			CollectorEndpoint: startParams.collectorEndpoint,
 		}
 
 		// override organization and environment id from context.
@@ -57,6 +58,18 @@ var startCmd = &cobra.Command{
 			flags.AgentApiKey = cfg.APIKey
 		}
 
+		// if there is a config to the collector, it should preceed the flags
+		// otherwise, sync flags and config
+		if cfg.CollectorEndpoint != "" {
+			flags.CollectorEndpoint = cfg.CollectorEndpoint
+		} else {
+			cfg.CollectorEndpoint = flags.CollectorEndpoint
+		}
+
+		if cfg.Mode != "" {
+			flags.Mode = agentConfig.Mode(cfg.Mode)
+		}
+
 		err = agentRunner.Run(ctx, cliConfig, flags)
 		return "", err
 	})),
@@ -64,13 +77,14 @@ var startCmd = &cobra.Command{
 }
 
 func init() {
-	startCmd.Flags().StringVarP(&saveParams.organizationID, "organization", "", "", "organization id")
-	startCmd.Flags().StringVarP(&saveParams.environmentID, "environment", "", "", "environment id")
-	startCmd.Flags().StringVarP(&saveParams.agentApiKey, "api-key", "", defaultAPIKey, "agent api key")
-	startCmd.Flags().StringVarP(&saveParams.token, "token", "", defaultToken, "token authentication key")
+	startCmd.Flags().StringVarP(&startParams.organizationID, "organization", "", "", "organization id")
+	startCmd.Flags().StringVarP(&startParams.environmentID, "environment", "", "", "environment id")
+	startCmd.Flags().StringVarP(&startParams.agentApiKey, "api-key", "", defaultAPIKey, "agent api key")
+	startCmd.Flags().StringVarP(&startParams.token, "token", "", defaultToken, "token authentication key")
 	startCmd.Flags().StringVarP(&overrideEndpoint, "endpoint", "e", defaultEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
-	startCmd.Flags().StringVarP(&saveParams.mode, "mode", "m", "desktop", "set how the agent will start")
-	startCmd.Flags().StringVarP(&saveParams.logLevel, "log-level", "l", "debug", "set the agent log level")
+	startCmd.Flags().StringVarP(&startParams.mode, "mode", "m", "desktop", "set how the agent will start")
+	startCmd.Flags().StringVarP(&startParams.logLevel, "log-level", "l", "debug", "set the agent log level")
+	startCmd.Flags().StringVarP(&startParams.collectorEndpoint, "collector-endpoint", "", "", "address of the OTel Collector endpoint")
 
 	startCmd.Flags().MarkDeprecated("endpoint", "use --server-url instead")
 	startCmd.Flags().MarkShorthandDeprecated("e", "use --server-url instead")
@@ -78,11 +92,12 @@ func init() {
 	rootCmd.AddCommand(startCmd)
 }
 
-type saveParameters struct {
-	organizationID string
-	environmentID  string
-	agentApiKey    string
-	token          string
-	mode           string
-	logLevel       string
+type startParameters struct {
+	organizationID    string
+	environmentID     string
+	agentApiKey       string
+	token             string
+	mode              string
+	logLevel          string
+	collectorEndpoint string
 }

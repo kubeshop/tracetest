@@ -8,12 +8,13 @@ const (
 )
 
 type Flags struct {
-	ServerURL      string
-	OrganizationID string
-	EnvironmentID  string
-	CI             bool
-	AgentApiKey    string
-	Token          string
-	Mode           Mode
-	LogLevel       string
+	ServerURL         string
+	OrganizationID    string
+	EnvironmentID     string
+	CI                bool
+	AgentApiKey       string
+	Token             string
+	Mode              Mode
+	LogLevel          string
+	CollectorEndpoint string
 }

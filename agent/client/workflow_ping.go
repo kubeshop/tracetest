@@ -8,7 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/proto"
 )
 
-func (c *Client) startHearthBeat(ctx context.Context) error {
+func (c *Client) startHeartBeat(ctx context.Context) error {
 	client := proto.NewOrchestratorClient(c.conn)
 	ticker := time.NewTicker(c.config.PingPeriod)
 

@@ -16,28 +16,50 @@ import (
 
 type TestConnectionWorker struct {
 	client   *client.Client
-	tracer   trace.Tracer
 	logger   *zap.Logger
 	observer event.Observer
+	tracer   trace.Tracer
 }
 
-func NewTestConnectionWorker(client *client.Client, observer event.Observer) *TestConnectionWorker {
-	// TODO: use a real tracer
-	tracer := trace.NewNoopTracerProvider().Tracer("noop")
+type TestConnectionOption func(*TestConnectionWorker)
 
-	return &TestConnectionWorker{
-		client:   client,
-		tracer:   tracer,
-		logger:   zap.NewNop(),
-		observer: observer,
+func WithTestConnectionLogger(logger *zap.Logger) TestConnectionOption {
+	return func(w *TestConnectionWorker) {
+		w.logger = logger
 	}
 }
 
-func (w *TestConnectionWorker) SetLogger(logger *zap.Logger) {
-	w.logger = logger
+func WithTestConnectionObserver(observer event.Observer) TestConnectionOption {
+	return func(w *TestConnectionWorker) {
+		w.observer = observer
+	}
+}
+
+func WithTestConnectionTracer(tracer trace.Tracer) TestConnectionOption {
+	return func(w *TestConnectionWorker) {
+		w.tracer = tracer
+	}
+}
+
+func NewTestConnectionWorker(client *client.Client, opts ...TestConnectionOption) *TestConnectionWorker {
+	worker := &TestConnectionWorker{
+		client:   client,
+		tracer:   trace.NewNoopTracerProvider().Tracer("noop"),
+		logger:   zap.NewNop(),
+		observer: event.NewNopObserver(),
+	}
+
+	for _, opt := range opts {
+		opt(worker)
+	}
+
+	return worker
 }
 
 func (w *TestConnectionWorker) Test(ctx context.Context, request *proto.DataStoreConnectionTestRequest) error {
+	ctx, span := w.tracer.Start(ctx, "TestConnectionRequest Worker operation")
+	defer span.End()
+
 	w.logger.Debug("Received datastore connection test request")
 	w.observer.StartDataStoreConnection(request)
 
@@ -45,8 +67,10 @@ func (w *TestConnectionWorker) Test(ctx context.Context, request *proto.DataStor
 	if err != nil {
 		w.logger.Error("Invalid datastore", zap.Error(err))
 		w.observer.EndDataStoreConnection(request, err)
+		span.RecordError(err)
 		return err
 	}
+
 	w.logger.Debug("Converted datastore", zap.Any("datastore", datastoreConfig))
 
 	if datastoreConfig == nil {
@@ -54,6 +78,7 @@ func (w *TestConnectionWorker) Test(ctx context.Context, request *proto.DataStor
 
 		w.logger.Error("nil datastore", zap.Error(err))
 		w.observer.EndDataStoreConnection(request, err)
+		span.RecordError(err)
 		return err
 	}
 
@@ -63,6 +88,7 @@ func (w *TestConnectionWorker) Test(ctx context.Context, request *proto.DataStor
 		w.logger.Error("Invalid datastore", zap.Error(err))
 		log.Printf("Invalid datastore: %s", err.Error())
 		w.observer.EndDataStoreConnection(request, err)
+		span.RecordError(err)
 
 		return err
 	}
@@ -95,6 +121,7 @@ func (w *TestConnectionWorker) Test(ctx context.Context, request *proto.DataStor
 	if err != nil {
 		w.logger.Error("Could not send datastore connection test result", zap.Error(err))
 		w.observer.Error(err)
+		span.RecordError(err)
 	} else {
 		w.logger.Debug("Sent datastore connection test result")
 	}

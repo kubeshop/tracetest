@@ -11,9 +11,11 @@ import (
 )
 
 type Config struct {
-	APIKey    string `mapstructure:"api_key"`
-	Name      string `mapstructure:"agent_name"`
-	ServerURL string `mapstructure:"server_url"`
+	APIKey            string `mapstructure:"api_key"`
+	Name              string `mapstructure:"agent_name"`
+	ServerURL         string `mapstructure:"server_url"`
+	CollectorEndpoint string `mapstructure:"collector_endpoint"`
+	Mode              string `mapstructure:"mode"`
 
 	OTLPServer OtlpServer `mapstructure:"otlp_server"`
 }
@@ -45,6 +47,8 @@ func LoadConfig() (Config, error) {
 	vp.SetDefault("AGENT_NAME", getHostname())
 	vp.SetDefault("API_KEY", "")
 	vp.SetDefault("SERVER_URL", "https://app.tracetest.io")
+	vp.SetDefault("COLLECTOR_ENDPOINT", "")
+	vp.SetDefault("MODE", "")
 	vp.SetDefault("OTLP_SERVER.GRPC_PORT", 4317)
 	vp.SetDefault("OTLP_SERVER.HTTP_PORT", 4318)
 
