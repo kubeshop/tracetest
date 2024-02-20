@@ -17,7 +17,8 @@ interface IProps extends IPropsComponent {
 }
 
 const BaseSpanNode = ({index, node, span, style}: IProps) => {
-  const {collapsedSpans, getScale, matchedSpans, onSpanCollapse, onSpanClick, selectedSpan} = useTimeline();
+  const {collapsedSpans, getScale, matchedSpans, nameColumnWidth, onSpanCollapse, onSpanClick, selectedSpan} =
+    useTimeline();
   const {start: viewStart, end: viewEnd} = getScale(span.startTime, span.endTime);
   const hintSide = getHintSide(viewStart, viewEnd);
   const isSelected = selectedSpan === node.data.id;
@@ -31,6 +32,7 @@ const BaseSpanNode = ({index, node, span, style}: IProps) => {
         $isEven={index % 2 === 0}
         $isMatched={isMatched}
         $isSelected={isSelected}
+        style={{gridTemplateColumns: `${nameColumnWidth * 100}% 1fr`}}
       >
         <S.Col>
           <S.Header>
@@ -46,7 +48,6 @@ const BaseSpanNode = ({index, node, span, style}: IProps) => {
               <S.Title>{span.name}</S.Title>
             </S.NameContainer>
           </S.Header>
-          <S.Separator />
         </S.Col>
 
         <S.ColDuration>

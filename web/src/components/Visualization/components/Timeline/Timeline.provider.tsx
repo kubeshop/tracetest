@@ -13,6 +13,8 @@ interface IContext {
   collapsedSpans: string[];
   getScale: TScaleFunction;
   matchedSpans: string[];
+  nameColumnWidth: number;
+  onNameColumnWidthChange(width: number): void;
   onSpanClick(spanId: string): void;
   onSpanCollapse(spanId: string): void;
   onSpanNavigation(spanId: string): void;
@@ -26,6 +28,8 @@ export const Context = createContext<IContext>({
   collapsedSpans: [],
   getScale: () => ({start: 0, end: 0}),
   matchedSpans: [],
+  nameColumnWidth: 0,
+  onNameColumnWidthChange: noop,
   onSpanClick: noop,
   onSpanCollapse: noop,
   onSpanNavigation: noop,
@@ -59,6 +63,7 @@ const TimelineProvider = ({
   selectedSpan,
 }: IProps) => {
   const [collapsedSpans, setCollapsedSpans] = useState<string[]>([]);
+  const [nameColumnWidth, setNameColumnWidth] = useState(0.15);
 
   const nodes = useMemo(() => TimelineModel(spans, nodeType), [spans, nodeType]);
   const filteredNodes = useMemo(() => TimelineService.getFilteredNodes(nodes, collapsedSpans), [collapsedSpans, nodes]);
@@ -99,6 +104,8 @@ const TimelineProvider = ({
       collapsedSpans,
       getScale: getScale(),
       matchedSpans,
+      nameColumnWidth,
+      onNameColumnWidthChange: setNameColumnWidth,
       onSpanClick,
       onSpanCollapse,
       onSpanNavigation,
@@ -118,6 +125,7 @@ const TimelineProvider = ({
       onSpanCollapse,
       onSpanNavigation,
       selectedSpan,
+      nameColumnWidth,
     ]
   );
 
