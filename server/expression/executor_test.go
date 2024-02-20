@@ -164,6 +164,7 @@ func TestStringInterpolationExecution(t *testing.T) {
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"text": "this run took 25ms",
 					}),
@@ -188,6 +189,7 @@ func TestFilterExecution(t *testing.T) {
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
 					}),
@@ -408,6 +410,7 @@ func TestResolveStatementAttributeExecution(t *testing.T) {
 
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"my_attribute": "42",
 					}),
@@ -427,6 +430,7 @@ func TestResolveStatementStringInterpolationExecution(t *testing.T) {
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"text": "this run took 25ms",
 					}),
@@ -451,6 +455,7 @@ func TestResolveStatementFilterExecution(t *testing.T) {
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
 					}),
@@ -512,6 +517,7 @@ func TestFailureCases(t *testing.T) {
 
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"attr1": "1",
 						"attr2": "2",
