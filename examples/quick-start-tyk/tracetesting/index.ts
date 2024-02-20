@@ -76,10 +76,9 @@ const definition: TestResource = {
         assertions: ['attr:http.status_code = 200'],
       },
       {
-        selector:
-          'span[name="tracetest-serverless-dev-api"] span[tracetest.span.type="http" name="GET" http.method="GET"]',
+        selector: 'span[tracetest.span.type="http" name="GET" http.method="GET" net.peer.name = "pokeapi.co"]',
         name: 'The request matches the pokemon Id',
-        assertions: ['attr:http.url  =  "https://pokeapi.co/api/v2/pokemon/${var:POKEMON_ID}"'],
+        assertions: ['attr:http.url   =  "https://pokeapi.co/api/v2/pokemon/${var:POKEMON_ID}"'],
       },
     ],
   },

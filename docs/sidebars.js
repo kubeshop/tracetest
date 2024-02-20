@@ -282,6 +282,17 @@ const sidebars = {
         },
         {
           type: "category",
+          label: "Tyk",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/testing-distributed-services-with-tyk-opentelemetry-tracetest",
+              label: "Testing Distributed Services with Tyk, OpenTelemetry, and Tracetest",
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "Jaeger",
           items: [
             {
