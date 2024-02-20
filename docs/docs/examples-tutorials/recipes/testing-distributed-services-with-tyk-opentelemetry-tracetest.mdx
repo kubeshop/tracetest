@@ -38,14 +38,6 @@ The Node.js Services will fetch data from an external API, transform the data, a
 
 ## Prerequisites
 
-**Tracetest Account**:
-
-- Copy the `.env.template` file to `.env`.
-- Log into **the** [Tracetest app](https://app.tracetest.io/).
-- This example is configured to use the OpenTelemetry Collector. Ensure the environment you will be utilizing to run this example is also configured to use the OpenTelemetry Tracing Backend by clicking on Settings, Tracing Backend, OpenTelemetry, and Save.
-- Configure your environment to use [the agent](https://docs.tracetest.io/concepts/agent), then click the Settings link, and from the Agent tab select the "Run Agent Locally" option.
-- Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent api key](https://docs.tracetest.io/concepts/agent) details by editing your .env file. You can find these values in the Settings area for your environment.
-
 **Tyk Gateway Example:**
 
 Clone the [Tracetest GitHub Repo](https://github.com/kubeshop/tracetest) to your local machine, and open the quick start tyk quick start example app.
@@ -54,6 +46,14 @@ Clone the [Tracetest GitHub Repo](https://github.com/kubeshop/tracetest) to your
 git clone https://github.com/kubeshop/tracetest.git
 cd tracetest/examples/quick-start-tyk
 ```
+
+**Tracetest Account**:
+
+- Copy the `.env.template` file to `.env`.
+- Log into **the** [Tracetest app](https://app.tracetest.io/).
+- This example is configured to use the OpenTelemetry Collector. Ensure the environment you will be utilizing to run this example is also configured to use the OpenTelemetry Tracing Backend by clicking on Settings, Tracing Backend, OpenTelemetry, and Save.
+- Configure your environment to use [the agent](https://docs.tracetest.io/concepts/agent), then click the Settings link, and from the Agent tab select the "Run Agent Locally" option.
+- Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent api key](https://docs.tracetest.io/concepts/agent) details by editing your .env file. You can find these values in the Settings area for your environment.
 
 ## Project Structure
 
@@ -228,7 +228,7 @@ POKESHOP_DEMO_URL=http://tyk-gateway:8080
 
 The `tracetest/index.ts` file contains the script that will execute the trace-based tests against the tyk endpoint.
 
-### Steps executed by the script
+### Steps Executed by the Script
 1. Create a new key in the Tyk Gateway.
 2. Create a new test definition in Tracetest (using the async import service from the Pokeshop Demo).
 3. Run the test with the variables defined.
@@ -363,7 +363,7 @@ The output from the `tracetest/index.ts` script will show the test results with 
 
 ![Tracetest App Results](../img/tyk-results.png)
 
-### Running the example
+### Running the Example
 
 Spin up the deployment and test execution.
 
@@ -371,7 +371,7 @@ Spin up the deployment and test execution.
 docker-compose up
 ```
 
-This will trigger the docker compose setup and immediately run the [trace-based tests using the Tracetest Typescript integration](../../tools-and-integrations/typescript.mdx) as part of the `tracetest-client` service.
+This will trigger the Docker Compose setup and immediately run the [trace-based tests using the Tracetest Typescript integration](../../tools-and-integrations/typescript.mdx) as part of the `tracetest-client` service.
 
 ## Learn More
 
