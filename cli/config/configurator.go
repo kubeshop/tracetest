@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
@@ -161,14 +162,34 @@ func (e invalidServerErr) Render() {
 	e.ui.Error(msg)
 }
 
+func (c Configurator) populateConfigWithDevConfig(ctx context.Context, cfg *Config) {
+	cfg.AgentEndpoint = os.Getenv("TRACETEST_DEV_AGENT_ENDPOINT")
+	if cfg.AgentEndpoint == "" {
+		cfg.AgentEndpoint = "localhost:8091"
+	}
+
+	cfg.UIEndpoint = os.Getenv("TRACETEST_DEV_UI_ENDPOINT")
+	if cfg.UIEndpoint == "" {
+		cfg.UIEndpoint = "http://localhost:3000"
+	}
+
+	cfg.Scheme = os.Getenv("TRACETEST_DEV_SCHEME")
+	if cfg.Scheme == "" {
+		cfg.Scheme = "http"
+	}
+
+	cfg.Endpoint = os.Getenv("TRACETEST_DEV_ENDPOINT")
+	if cfg.Endpoint == "" {
+		cfg.Endpoint = "localhost:11633"
+	}
+
+	cfg.ServerPath = os.Getenv("TRACETEST_DEV_SERVER_PATH")
+}
+
 func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Config) (_ Config, _ error, isOSS bool) {
 	cliVersion := Version
 	if cliVersion == "dev" {
-		cfg.AgentEndpoint = "localhost:8091"
-		cfg.UIEndpoint = "http://localhost:3000"
-		cfg.Scheme = "http"
-		cfg.Endpoint = "localhost:11633"
-		cfg.ServerPath = ""
+		c.populateConfigWithDevConfig(ctx, &cfg)
 
 		c.ui.Success("Configured Tracetest CLI in development mode")
 
