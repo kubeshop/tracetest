@@ -1,0 +1,134 @@
+version: '3.3'
+services:
+  # Tracetest
+  tracetest-client:
+    build: ./tracetesting
+    environment:
+      TRACETEST_API_TOKEN: ${TRACETEST_API_TOKEN}
+      POKESHOP_DEMO_URL: ${POKESHOP_DEMO_URL}
+    depends_on:
+      api:
+        condition: service_healthy
+
+  tracetest-agent:
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
+      TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
+      TRACETEST_SERVER_URL: ${TRACETEST_SERVER_URL}
+    image: kubeshop/tracetest-agent:latest
+  
+  # Tyk Gateway
+  tyk-gateway:
+    image: tykio/tyk-gateway:v5.2.1
+    ports:
+      - 8080:8080
+    environment:
+        - TYK_GW_OPENTELEMETRY_ENABLED=true
+        - TYK_GW_OPENTELEMETRY_EXPORTER=grpc
+        - TYK_GW_OPENTELEMETRY_ENDPOINT=otel-collector:4317
+    volumes:
+      - ./deployments/tyk-gateway/apps:/opt/tyk-gateway/apps
+      - ./deployments/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
+    depends_on:
+      - tyk-redis
+
+  tyk-redis:
+    image: redis:6.0.4
+    volumes:
+      - tyk-redis-data:/data
+
+  # Demo services
+
+  # pokeshop demo services
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  cache:
+    image: redis:6
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  queue:
+    image: rabbitmq:3.12
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', 'localhost:16686']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  api:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: api
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', 'localhost:8081']
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  worker:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  # Collector
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    volumes:
+      - ./deployments/otel-collector/otel-collector.yml:/etc/otel-collector.yml
+    command: [ "--config=/etc/otel-collector.yml" ]
+
+volumes:
+  tyk-redis-data:
