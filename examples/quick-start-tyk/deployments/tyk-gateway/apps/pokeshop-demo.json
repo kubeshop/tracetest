@@ -1,0 +1,29 @@
+{
+  "name": "pokeshop",
+  "api_id": "1",
+  "org_id": "default",
+  "active": true,
+  "use_keyless": false,
+  "detailed_tracing": true,
+  "definition": {
+    "location": "header",
+    "key": "version"
+  },
+  "auth": {
+    "auth_header_name": "authorization"
+  },
+  "version_data": {
+    "not_versioned": true,
+    "versions": {
+      "Default": {
+        "name": "Default"
+      }
+    }
+  },
+  "proxy": {
+    "listen_path": "/pokeshop/",
+    "target_url": "http://api:8081/pokemon/",
+    "strip_listen_path": true,
+    "preserve_host_header": true
+  }
+}
