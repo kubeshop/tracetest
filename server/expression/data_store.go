@@ -45,7 +45,7 @@ func (ds AttributeDataStore) Get(name string) (string, error) {
 		// It's probably a nil span and we never got a matching selector,
 		// so instead of returning a resolution error, let's return a non-matching
 		// span error instead
-		return "", fmt.Errorf(`there are no matching spans to retrieve the attribute "%s" from`, name)
+		return "", fmt.Errorf(`there are no matching spans to retrieve the attribute "%s" from. To fix this error, create a selector matching at least one span.`, name)
 	}
 
 	value := ds.Span.Attributes.Get(name)

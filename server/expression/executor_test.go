@@ -141,7 +141,7 @@ func TestAttributeExecution(t *testing.T) {
 			Name:                 "should_return_error_when_no_matching_spans",
 			Query:                "attr:dapr-app-id = 42",
 			ShouldPass:           false,
-			ExpectedErrorMessage: `resolution error: there are no matching spans to retrieve the attribute "dapr-app-id" from`,
+			ExpectedErrorMessage: `resolution error: there are no matching spans to retrieve the attribute "dapr-app-id" from. To fix this error, create a selector matching at least one span.`,
 
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
