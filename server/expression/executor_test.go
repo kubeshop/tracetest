@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/server/expression"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/kubeshop/tracetest/server/variableset"
 	"github.com/stretchr/testify/assert"
@@ -103,6 +104,7 @@ func TestAttributeExecution(t *testing.T) {
 
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"my_attribute": "42",
 					}),
@@ -116,9 +118,36 @@ func TestAttributeExecution(t *testing.T) {
 
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"dapr-app-id": "42",
 					}),
+				},
+			},
+		},
+		{
+			Name:                 "should_return_error_when_attribute_doesnt_exist",
+			Query:                "attr:dapr-app-id = 43",
+			ShouldPass:           false,
+			ExpectedErrorMessage: `resolution error: attribute "dapr-app-id" not found`,
+
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
+				},
+			},
+		},
+		{
+			Name:                 "should_return_error_when_no_matching_spans",
+			Query:                "attr:dapr-app-id = 42",
+			ShouldPass:           false,
+			ExpectedErrorMessage: `resolution error: there are no matching spans to retrieve the attribute "dapr-app-id" from. To fix this error, create a selector matching at least one span.`,
+
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					// An span without an id is an invalid span
+					// this is the value received when we don't have any matching
+					// spans in the assertion.
 				},
 			},
 		},
@@ -135,6 +164,7 @@ func TestStringInterpolationExecution(t *testing.T) {
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"text": "this run took 25ms",
 					}),
@@ -159,6 +189,7 @@ func TestFilterExecution(t *testing.T) {
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
 					}),
@@ -345,6 +376,9 @@ func executeTestCases(t *testing.T, testCases []executorTestCase) {
 				assert.NoError(t, err, debugMessage)
 			} else {
 				assert.Error(t, err, debugMessage)
+				if testCase.ExpectedErrorMessage != "" {
+					assert.Equal(t, testCase.ExpectedErrorMessage, err.Error())
+				}
 			}
 		})
 	}
@@ -376,6 +410,7 @@ func TestResolveStatementAttributeExecution(t *testing.T) {
 
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"my_attribute": "42",
 					}),
@@ -395,6 +430,7 @@ func TestResolveStatementStringInterpolationExecution(t *testing.T) {
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"text": "this run took 25ms",
 					}),
@@ -419,6 +455,7 @@ func TestResolveStatementFilterExecution(t *testing.T) {
 			ShouldPass: true,
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"tracetest.response.body": `{"id": 8, "name": "john doe"}`,
 					}),
@@ -480,6 +517,7 @@ func TestFailureCases(t *testing.T) {
 
 			AttributeDataStore: expression.AttributeDataStore{
 				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
 					Attributes: traces.NewAttributes(map[string]string{
 						"attr1": "1",
 						"attr2": "2",
