@@ -59,10 +59,9 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 	c.flags = &flags
 	var serverURL string
 
-	// if token is passed, we cannot assume an interactive environment,
-	// so fallback to last used
-	if c.flags.Token != "" {
-		serverURL = lastUsedURL(prev)
+	if c.flags.AutomatedEnvironmentCanBeInferred() {
+		// avoid prompts on automated or non-interactive environments
+		serverURL = c.lastUsedURL(prev)
 	} else {
 		var err error
 		serverURL, err = c.getServerURL(prev)
@@ -103,7 +102,11 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 	return nil
 }
 
-func lastUsedURL(prev *Config) string {
+func (c Configurator) lastUsedURL(prev *Config) string {
+	if c.flags.ServerURL != "" {
+		return c.flags.ServerURL
+	}
+
 	possibleValues := []string{}
 	if prev != nil {
 		possibleValues = append(possibleValues, prev.UIEndpoint, prev.URL())
@@ -118,7 +121,7 @@ func (c Configurator) getServerURL(prev *Config) (string, error) {
 
 	// if flag was passed, don't show prompt
 	if c.flags.ServerURL == "" {
-		serverURL = c.ui.TextInput("What tracetest server do you want to use?", lastUsedURL(prev))
+		serverURL = c.ui.TextInput("What tracetest server do you want to use?", c.lastUsedURL(prev))
 	}
 
 	if err := validateServerURL(serverURL); err != nil {
@@ -187,8 +190,8 @@ func (c Configurator) populateConfigWithDevConfig(ctx context.Context, cfg *Conf
 }
 
 func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Config) (_ Config, _ error, isOSS bool) {
-	cliVersion := Version
-	if cliVersion == "dev" {
+	useDevVersion := os.Getenv("TRACETEST_AGENT_DEV_CONFIG") == "true"
+	if useDevVersion && Version == "dev" {
 		c.populateConfigWithDevConfig(ctx, &cfg)
 
 		c.ui.Success("Configured Tracetest CLI in development mode")
