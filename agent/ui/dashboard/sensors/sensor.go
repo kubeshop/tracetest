@@ -31,7 +31,7 @@ type sensor struct {
 	listeners map[string][]func(Event)
 	lastEvent map[string]Event
 
-	sync.Mutex
+	mutex sync.Mutex
 }
 
 func NewSensor() Sensor {
@@ -42,16 +42,15 @@ func NewSensor() Sensor {
 }
 
 func (r *sensor) Reset() {
-	r.Lock()
-	defer r.Unlock()
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 
 	r.listeners = make(map[string][]func(Event))
 	r.lastEvent = make(map[string]Event)
 }
 
 func (r *sensor) On(eventName string, cb func(Event)) {
-	r.Lock()
-	defer r.Unlock()
+	r.mutex.Lock()
 
 	var slice []func(Event)
 	if existingSlice, ok := r.listeners[eventName]; ok {
@@ -60,15 +59,16 @@ func (r *sensor) On(eventName string, cb func(Event)) {
 		slice = make([]func(Event), 0)
 	}
 	r.listeners[eventName] = append(slice, cb)
+	r.mutex.Unlock()
 
 	if event, ok := r.lastEvent[eventName]; ok {
-		cb(event)
+		go cb(event)
 	}
 }
 
 func (r *sensor) Emit(eventName string, event interface{}) {
-	r.Lock()
-	defer r.Unlock()
+	r.mutex.Lock()
+	r.mutex.Unlock()
 
 	listeners := r.listeners[eventName]
 	e := Event{
