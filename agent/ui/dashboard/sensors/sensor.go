@@ -62,7 +62,7 @@ func (r *sensor) On(eventName string, cb func(Event)) {
 	r.mutex.Unlock()
 
 	if event, ok := r.lastEvent[eventName]; ok {
-		go cb(event)
+		cb(event)
 	}
 }
 
