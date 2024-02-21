@@ -1,3 +1,4 @@
+import {INITIAL_NAME_COLUMN_WIDTH} from 'constants/Timeline.constants';
 import {NodeTypesEnum} from 'constants/Visualization.constants';
 import noop from 'lodash/noop';
 import without from 'lodash/without';
@@ -63,7 +64,7 @@ const TimelineProvider = ({
   selectedSpan,
 }: IProps) => {
   const [collapsedSpans, setCollapsedSpans] = useState<string[]>([]);
-  const [nameColumnWidth, setNameColumnWidth] = useState(0.15);
+  const [nameColumnWidth, setNameColumnWidth] = useState(INITIAL_NAME_COLUMN_WIDTH);
 
   const nodes = useMemo(() => TimelineModel(spans, nodeType), [spans, nodeType]);
   const filteredNodes = useMemo(() => TimelineService.getFilteredNodes(nodes, collapsedSpans), [collapsedSpans, nodes]);

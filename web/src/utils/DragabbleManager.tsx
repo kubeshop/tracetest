@@ -3,12 +3,6 @@ import type React from 'react';
 
 type TNil = null | undefined;
 
-enum EUpdateTypes {
-  DragEnd = 'DragEnd',
-  DragMove = 'DragMove',
-  DragStart = 'DragStart',
-}
-
 type TDraggableBounds = {
   clientXLeft: number;
   maxValue?: number;
@@ -18,47 +12,46 @@ type TDraggableBounds = {
 
 type TDraggableUpdate = {
   event: React.MouseEvent<HTMLDivElement | SVGSVGElement, MouseEvent> | MouseEvent;
-  type: EUpdateTypes;
+  resetBounds(): void;
   value: number;
   x: number;
-  resetBounds(): void;
 };
 
 type TDraggableManagerOptions = {
-  getBounds: () => TDraggableBounds;
-  onDragStart?: (update: TDraggableUpdate) => void;
-  onDragMove?: (update: TDraggableUpdate) => void;
+  onGetBounds: () => TDraggableBounds;
   onDragEnd?: (update: TDraggableUpdate) => void;
+  onDragMove?: (update: TDraggableUpdate) => void;
+  onDragStart?: (update: TDraggableUpdate) => void;
 };
 
 interface IDraggableManager {
   init(): (event: MouseEvent) => void;
-  resetBounds(): void;
   dispose(): void;
+  resetBounds(): void;
 }
 
 const LEFT_MOUSE_BUTTON = 0;
 
-function DraggableManager({getBounds, ...rest}: TDraggableManagerOptions): IDraggableManager {
-  let _bounds: TDraggableBounds | TNil;
-  let _isDragging: boolean;
-  let _onDragStart: ((update: TDraggableUpdate) => void) | TNil;
-  let _onDragMove: ((update: TDraggableUpdate) => void) | TNil;
-  let _onDragEnd: ((update: TDraggableUpdate) => void) | TNil;
+function DraggableManager({onGetBounds, ...rest}: TDraggableManagerOptions): IDraggableManager {
+  let bounds: TDraggableBounds | TNil;
+  let isDragging: boolean;
+  let onDragStart: ((update: TDraggableUpdate) => void) | TNil;
+  let onDragMove: ((update: TDraggableUpdate) => void) | TNil;
+  let onDragEnd: ((update: TDraggableUpdate) => void) | TNil;
 
-  const _resetBounds = () => {
-    _bounds = undefined;
+  const resetBounds = () => {
+    bounds = undefined;
   };
 
-  const _getBounds = () => {
-    if (!_bounds) {
-      _bounds = getBounds();
+  const getBounds = () => {
+    if (!bounds) {
+      bounds = onGetBounds();
     }
-    return _bounds;
+    return bounds;
   };
 
-  const _getPosition = (clientX: number) => {
-    const {clientXLeft, maxValue, minValue, width} = _getBounds();
+  const getPosition = (clientX: number) => {
+    const {clientXLeft, maxValue, minValue, width} = getBounds();
     let x = clientX - clientXLeft;
     let value = x / width;
     if (minValue != null && value < minValue) {
@@ -71,52 +64,48 @@ function DraggableManager({getBounds, ...rest}: TDraggableManagerOptions): IDrag
     return {value, x};
   };
 
-  const _stopDragging = () => {
-    window.removeEventListener('mousemove', _handleDragEvent);
-    window.removeEventListener('mouseup', _handleDragEvent);
+  const stopDragging = () => {
+    window.removeEventListener('mousemove', handleEvent);
+    window.removeEventListener('mouseup', handleEvent);
     const style = _get(document, 'body.style');
     if (style) {
       style.removeProperty('userSelect');
     }
-    _isDragging = false;
+    isDragging = false;
   };
 
-  const _handleDragEvent = (event: MouseEvent | React.MouseEvent<HTMLDivElement | SVGSVGElement, MouseEvent>) => {
+  const handleEvent = (event: MouseEvent | React.MouseEvent<HTMLDivElement | SVGSVGElement, MouseEvent>) => {
     const {button, clientX, type: eventType} = event;
-    let type: EUpdateTypes | null = null;
     let handler: ((update: TDraggableUpdate) => void) | TNil;
 
     if (eventType === 'mousedown') {
-      if (_isDragging || button !== LEFT_MOUSE_BUTTON) {
+      if (isDragging || button !== LEFT_MOUSE_BUTTON) {
         return;
       }
 
-      window.addEventListener('mousemove', _handleDragEvent);
-      window.addEventListener('mouseup', _handleDragEvent);
+      window.addEventListener('mousemove', handleEvent);
+      window.addEventListener('mouseup', handleEvent);
 
       const style = _get(document, 'body.style');
       if (style) {
         style.userSelect = 'none';
       }
-      _isDragging = true;
+      isDragging = true;
 
-      type = EUpdateTypes.DragStart;
-      handler = _onDragStart;
+      handler = onDragStart;
     } else if (eventType === 'mousemove') {
-      if (!_isDragging) {
+      if (!isDragging) {
         return;
       }
 
-      type = EUpdateTypes.DragMove;
-      handler = _onDragMove;
+      handler = onDragMove;
     } else if (eventType === 'mouseup') {
-      if (!_isDragging) {
+      if (!isDragging) {
         return;
       }
 
-      _stopDragging();
-      type = EUpdateTypes.DragEnd;
-      handler = _onDragEnd;
+      stopDragging();
+      handler = onDragEnd;
     } else {
       throw new Error(`invalid event type: ${eventType}`);
     }
@@ -125,41 +114,40 @@ function DraggableManager({getBounds, ...rest}: TDraggableManagerOptions): IDrag
       return;
     }
 
-    const {value, x} = _getPosition(clientX);
+    const {value, x} = getPosition(clientX);
 
     handler({
       event,
-      type,
       value,
       x,
-      resetBounds: _resetBounds,
+      resetBounds,
     });
   };
 
   return {
     init() {
-      _isDragging = false;
-      _bounds = undefined;
+      isDragging = false;
+      bounds = undefined;
       window.addEventListener('resize', this.resetBounds);
-      _onDragStart = rest.onDragStart;
-      _onDragMove = rest.onDragMove;
-      _onDragEnd = rest.onDragEnd;
+      onDragStart = rest.onDragStart;
+      onDragMove = rest.onDragMove;
+      onDragEnd = rest.onDragEnd;
 
-      return _handleDragEvent;
+      return handleEvent;
     },
-
-    resetBounds: _resetBounds,
 
     dispose() {
-      if (_isDragging) {
-        _stopDragging();
+      if (isDragging) {
+        stopDragging();
       }
       window.removeEventListener('resize', this.resetBounds);
-      _bounds = undefined;
-      _onDragStart = undefined;
-      _onDragMove = undefined;
-      _onDragEnd = undefined;
+      bounds = undefined;
+      onDragStart = undefined;
+      onDragMove = undefined;
+      onDragEnd = undefined;
     },
+
+    resetBounds,
   };
 }
 

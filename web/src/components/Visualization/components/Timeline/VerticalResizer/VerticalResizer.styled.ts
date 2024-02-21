@@ -30,7 +30,8 @@ export const VerticalResizerDragger = styled.div`
     border-left: 2px solid ${({theme}) => theme.color.border};
   }
 
-  &.dragging {
+  &.right-dragging,
+  &.left-dragging {
     background: rgba(136, 0, 136, 0.05);
     width: unset;
 
@@ -38,5 +39,15 @@ export const VerticalResizerDragger = styled.div`
       left: -2000px;
       right: -2000px;
     }
+  }
+
+  &.left-dragging {
+    border-left: 2px solid ${({theme}) => theme.color.primaryLight};
+    border-right: 1px solid ${({theme}) => theme.color.border};
+  }
+
+  &.right-dragging {
+    border-left: 1px solid ${({theme}) => theme.color.border};
+    border-right: 2px solid ${({theme}) => theme.color.primaryLight};
   }
 `;

@@ -1,3 +1,4 @@
+import {toPercent} from 'utils/Common';
 import Ticks from './Ticks/Ticks';
 import * as S from './Timeline.styled';
 import VerticalResizer from './VerticalResizer/VerticalResizer';
@@ -11,7 +12,7 @@ interface IProps {
 }
 
 const Header = ({duration, nameColumnWidth, onNameColumnWidthChange}: IProps) => (
-  <S.HeaderRow style={{gridTemplateColumns: `${nameColumnWidth * 100}% 1fr`}}>
+  <S.HeaderRow style={{gridTemplateColumns: `${toPercent(nameColumnWidth)} 1fr`}}>
     <S.Col>
       <S.HeaderContent>
         <S.HeaderTitle level={3}>Span</S.HeaderTitle>

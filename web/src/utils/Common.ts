@@ -96,3 +96,7 @@ export const withLowPriority =
         resolve(fn(...args));
       }, 0);
     });
+
+export const toPercent = (value: number) => {
+  return `${value * 100}%`;
+};

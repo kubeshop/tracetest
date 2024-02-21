@@ -1,9 +1,8 @@
+import {MAX_NAME_COLUMN_WIDTH, MIN_NAME_COLUMN_WIDTH} from 'constants/Timeline.constants';
 import {useEffect, useRef, useState} from 'react';
+import {toPercent} from 'utils/Common';
 import DraggableManager from 'utils/DragabbleManager';
 import * as S from './VerticalResizer.styled';
-
-const MIN_NAME_COLUMN_WIDTH = 0.15;
-const MAX_NAME_COLUMN_WIDTH = 0.65;
 
 interface IProps {
   nameColumnWidth: number;
@@ -12,12 +11,12 @@ interface IProps {
 
 const VerticalResizer = ({nameColumnWidth, onNameColumnWidthChange}: IProps) => {
   const rootRef = useRef<HTMLDivElement>(null);
-  const resizerRef = useRef<HTMLDivElement>(null);
+  const draggerRef = useRef<HTMLDivElement>(null);
   const [dragPosition, setDragPosition] = useState<number | null>(null);
 
   useEffect(() => {
     const draggableManager = DraggableManager({
-      getBounds: () => {
+      onGetBounds: () => {
         if (!rootRef.current) {
           return {clientXLeft: 0, width: 0, maxValue: 0, minValue: 0};
         }
@@ -41,32 +40,32 @@ const VerticalResizer = ({nameColumnWidth, onNameColumnWidthChange}: IProps) => 
     });
 
     const handleMouseDown = draggableManager.init();
-    resizerRef.current?.addEventListener('mousedown', handleMouseDown);
+    draggerRef.current?.addEventListener('mousedown', handleMouseDown);
 
     return () => {
       draggableManager.dispose();
-      resizerRef.current?.removeEventListener('mousedown', handleMouseDown);
+      draggerRef.current?.removeEventListener('mousedown', handleMouseDown);
     };
   }, [onNameColumnWidthChange]);
 
-  let isDraggingCls = '';
+  let draggerClass = '';
   let draggerStyle;
 
   if (dragPosition !== null) {
-    isDraggingCls = 'dragging';
+    draggerClass = `${dragPosition > nameColumnWidth ? 'right' : 'left'}-dragging`;
     // Draw a highlight from the current dragged position to the original position
-    const draggerLeft = `${Math.min(nameColumnWidth, dragPosition) * 100}%`;
-    // subtract 1px for draggerRight to deal with the right border being off
+    const draggerLeft = toPercent(Math.min(nameColumnWidth, dragPosition));
+    // Subtract 1px for draggerRight to deal with the right border being off
     // by 1px when dragging left
-    const draggerRight = `calc(${(1 - Math.max(nameColumnWidth, dragPosition)) * 100}% - 1px)`;
+    const draggerRight = `calc(${toPercent(1 - Math.max(nameColumnWidth, dragPosition))} - 1px)`;
     draggerStyle = {left: draggerLeft, right: draggerRight};
   } else {
-    draggerStyle = {left: `${nameColumnWidth * 100}%`};
+    draggerStyle = {left: toPercent(nameColumnWidth)};
   }
 
   return (
     <S.VerticalResizer ref={rootRef}>
-      <S.VerticalResizerDragger className={isDraggingCls} style={draggerStyle} ref={resizerRef} />
+      <S.VerticalResizerDragger className={draggerClass} style={draggerStyle} ref={draggerRef} />
     </S.VerticalResizer>
   );
 };
