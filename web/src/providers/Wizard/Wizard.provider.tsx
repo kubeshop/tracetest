@@ -93,7 +93,6 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
   );
 
   useEffect(() => {
-    console.log('useEffect:');
     const activeStepIndex = steps.findIndex(step => step.state === 'pending');
     if (activeStepIndex !== -1) {
       setActiveStep(activeStepIndex);
