@@ -82,7 +82,9 @@ func (q Queue[T]) Enqueue(ctx context.Context, item T) {
 
 	workerCtx := context.Background()
 	if propagator := otel.GetTextMapPropagator(); propagator != nil {
-		var carrier propagation.HeaderCarrier
+		carrier := make(propagation.HeaderCarrier)
+		propagator.Inject(ctx, carrier)
+
 		workerCtx = propagator.Extract(workerCtx, carrier)
 	}
 
