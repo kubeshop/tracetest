@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/ui"
 
 	"github.com/kubeshop/tracetest/cli/config"
+	"github.com/kubeshop/tracetest/cli/pkg/oauth"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 
 	"go.uber.org/zap"
@@ -38,7 +39,7 @@ func NewRunner(configurator config.Configurator, resources *resourcemanager.Regi
 	}
 }
 
-func (s *Runner) Run(ctx context.Context, cfg config.Config, flags agentConfig.Flags) error {
+func (s *Runner) Run(ctx context.Context, cfg config.Config, flags agentConfig.Flags, verbose bool) error {
 	s.ui.Banner(config.Version)
 	s.ui.Println(`Tracetest start launches a lightweight agent. It enables you to run tests and collect traces with Tracetest.
 Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.`)
@@ -56,6 +57,10 @@ Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces 
 	if enableLogging(flags.LogLevel) {
 		var err error
 		atom := zap.NewAtomicLevel()
+		if verbose {
+			atom.SetLevel(zapcore.DebugLevel)
+		}
+
 		logger, err = zap.NewDevelopment()
 		if err != nil {
 			return fmt.Errorf("could not create logger: %w", err)
@@ -73,6 +78,10 @@ Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces 
 	}
 
 	s.logger = logger
+	s.configurator = s.configurator.WithLogger(logger)
+	oauth.SetLogger(logger)
+
+	s.logger.Debug("Starting agent with flags", zap.Any("flags", flags))
 
 	return s.configurator.Start(ctx, &cfg, flags)
 }
@@ -105,22 +114,30 @@ func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 
 func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoint string) error {
 	cfg, err := agentConfig.LoadConfig()
+	s.logger.Debug("Loaded agent config", zap.Any("config", cfg))
 	if err != nil {
+		s.logger.Error("Could not load agent config", zap.Error(err))
 		return err
 	}
 
 	if endpoint != "" {
+		s.logger.Debug("Overriding agent endpoint", zap.String("endpoint", endpoint))
 		cfg.ServerURL = endpoint
 	}
+	s.logger.Debug("Agent endpoint", zap.String("endpoint", cfg.ServerURL))
 
 	if agentApiKey != "" {
+		s.logger.Debug("Overriding agent api key", zap.String("apiKey", agentApiKey))
 		cfg.APIKey = agentApiKey
 	}
+	s.logger.Debug("Agent api key", zap.String("apiKey", cfg.APIKey))
 
 	if s.mode == agentConfig.Mode_Desktop {
+		s.logger.Debug("Starting agent in desktop mode")
 		return s.RunDesktopStrategy(ctx, cfg, uiEndpoint)
 	}
 
+	s.logger.Debug("Starting agent in verbose mode")
 	return s.RunVerboseStrategy(ctx, cfg)
 }
 

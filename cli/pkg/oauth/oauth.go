@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/kubeshop/tracetest/cli/ui"
+	"go.uber.org/zap"
 )
 
 type OnAuthSuccess func(token string, jwt string)
@@ -72,32 +73,46 @@ type JWTResponse struct {
 	Jwt string `json:"jwt"`
 }
 
+var logger = zap.NewNop()
+
+func SetLogger(l *zap.Logger) {
+	logger = l
+}
+
 func ExchangeToken(endpoint string, token string) (string, error) {
+	logger.Debug("Exchanging token", zap.String("endpoint", endpoint), zap.String("token", token))
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/tokens/%s/exchange", endpoint, token), nil)
 	if err != nil {
+		logger.Debug("Failed to create request", zap.Error(err))
 		return "", fmt.Errorf("failed to create request: %w", err)
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
+		logger.Debug("Failed to exchange token", zap.Error(err))
 		return "", fmt.Errorf("failed to exchange token: %w", err)
 	}
 
 	if res.StatusCode != http.StatusCreated {
+		logger.Debug("Failed to exchange token", zap.String("status", res.Status))
 		return "", fmt.Errorf("failed to exchange token: %s", res.Status)
 	}
 
 	defer res.Body.Close()
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
+		logger.Debug("Failed to read response body", zap.Error(err))
 		return "", fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	var jwtResponse JWTResponse
 	err = json.Unmarshal(body, &jwtResponse)
 	if err != nil {
+		logger.Debug("Failed to unmarshal response body", zap.Error(err))
 		return "", fmt.Errorf("failed to unmarshal response body: %w", err)
 	}
+
+	logger.Debug("Token exchanged")
 
 	return jwtResponse.Jwt, nil
 }

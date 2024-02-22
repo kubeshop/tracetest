@@ -13,11 +13,13 @@ import (
 	"github.com/kubeshop/tracetest/cli/pkg/oauth"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
+	"go.uber.org/zap"
 )
 
 type onFinishFn func(context.Context, Config)
 
 type Configurator struct {
+	logger         *zap.Logger
 	resources      *resourcemanager.Registry
 	ui             cliUI.UI
 	onFinish       onFinishFn
@@ -30,6 +32,7 @@ func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 	ui := cliUI.DefaultUI
 
 	return Configurator{
+		logger:    zap.NewNop(),
 		resources: resources,
 		ui:        ui,
 		onFinish: func(_ context.Context, _ Config) {
@@ -41,6 +44,11 @@ func NewConfigurator(resources *resourcemanager.Registry) Configurator {
 		},
 		flags: &agentConfig.Flags{},
 	}
+}
+
+func (c Configurator) WithLogger(logger *zap.Logger) Configurator {
+	c.logger = logger
+	return c
 }
 
 func (c Configurator) WithOnFinish(onFinish onFinishFn) Configurator {
@@ -59,34 +67,44 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 	c.flags = &flags
 	var serverURL string
 
+	c.logger.Debug("Starting configurator", zap.Any("flags", flags), zap.Any("prev", prev), zap.String("serverURL", serverURL))
+
 	if c.flags.AutomatedEnvironmentCanBeInferred() {
+		c.logger.Debug("Automated environment detected, skipping prompts")
 		// avoid prompts on automated or non-interactive environments
 		serverURL = c.lastUsedURL(prev)
 	} else {
+		c.logger.Debug("Interactive environment detected, prompting for server URL")
 		var err error
 		serverURL, err = c.getServerURL(prev)
 		if err != nil {
+			c.logger.Error("Invalid server URL", zap.Error(err))
 			return err
 		}
 	}
 	c.finalServerURL = serverURL
+	c.logger.Debug("Final server URL", zap.String("serverURL", serverURL))
 
 	cfg, err := c.createConfig(serverURL)
 	if err != nil {
+		c.logger.Error("Could not create config", zap.Error(err))
 		return err
 	}
 
 	cfg, err, isOSS := c.populateConfigWithVersionInfo(ctx, cfg)
 	if err != nil {
+		c.logger.Error("Could not populate config with version info", zap.Error(err))
 		return err
 	}
 
 	if isOSS {
+		c.logger.Debug("OSS server detected, skipping OAuth")
 		// we don't need anything else for OSS
 		return nil
 	}
 
 	if c.flags.CI {
+		c.logger.Debug("CI environment detected, skipping OAuth")
 		_, err = Save(ctx, cfg)
 		if err != nil {
 			return err
@@ -96,8 +114,11 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 
 	_, err = c.handleOAuth(ctx, cfg, prev)
 	if err != nil {
+		c.logger.Error("Could not handle OAuth", zap.Error(err))
 		return err
 	}
+
+	c.logger.Debug("Successfully configured OAuth")
 
 	return nil
 }
@@ -229,30 +250,38 @@ func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Con
 
 func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config) (Config, error) {
 	if prev != nil && cfg.UIEndpoint == prev.UIEndpoint {
+		c.logger.Debug("Using previous UI endpoint", zap.String("uiEndpoint", cfg.UIEndpoint))
 		if prev != nil && prev.Jwt != "" {
+			c.logger.Debug("Using previous JWT")
 			cfg.Jwt = prev.Jwt
 			cfg.Token = prev.Token
 		}
 	}
 
 	if c.flags.Token != "" {
+		c.logger.Debug("Using token from flag")
 		var err error
 		cfg, err = c.exchangeToken(cfg, c.flags.Token)
 		if err != nil {
+			c.logger.Error("Could not exchange token", zap.Error(err))
 			return Config{}, err
 		}
 	}
 
 	if c.flags.AgentApiKey != "" {
+		c.logger.Debug("Using agent API key from flag")
 		cfg.AgentApiKey = c.flags.AgentApiKey
 		c.showOrganizationSelector(ctx, prev, cfg)
 		return cfg, nil
 	}
 
 	if cfg.Jwt != "" {
+		c.logger.Debug("Using JWT from config")
 		c.showOrganizationSelector(ctx, prev, cfg)
 		return cfg, nil
 	}
+
+	c.logger.Debug("No JWT found, executing user login")
 
 	return c.ExecuteUserLogin(ctx, cfg, prev)
 }
@@ -270,8 +299,10 @@ func (c Configurator) ExecuteUserLogin(ctx context.Context, cfg Config, prev *Co
 }
 
 func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
+	c.logger.Debug("Exchanging token", zap.String("token", token))
 	jwt, err := oauth.ExchangeToken(cfg.OAuthEndpoint(), token)
 	if err != nil {
+		c.logger.Error("Could not exchange token", zap.Error(err))
 		return Config{}, err
 	}
 
@@ -280,6 +311,7 @@ func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
 
 	claims, err := GetTokenClaims(jwt)
 	if err != nil {
+		c.logger.Error("Could not get token claims", zap.Error(err))
 		return Config{}, err
 	}
 
@@ -287,9 +319,11 @@ func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
 	environmentId := claims["environment_id"].(string)
 
 	if organizationId != "" {
+		c.logger.Debug("Using organization ID from token", zap.String("organizationID", organizationId))
 		c.flags.OrganizationID = organizationId
 	}
 	if environmentId != "" {
+		c.logger.Debug("Using environment ID from token", zap.String("environmentID", environmentId))
 		c.flags.EnvironmentID = environmentId
 	}
 
@@ -308,6 +342,7 @@ func getFirstNonEmptyString(values []string) string {
 
 func (c Configurator) onOAuthSuccess(ctx context.Context, cfg Config, prev *Config) func(token, jwt string) {
 	return func(token, jwt string) {
+		c.logger.Debug("OAuth success")
 		cfg.Jwt = jwt
 		cfg.Token = token
 
@@ -320,10 +355,13 @@ func (c Configurator) onOAuthFailure(err error) {
 }
 
 func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config, cfg Config) {
+	c.logger.Debug("Showing organization selector", zap.String("organizationID", cfg.OrganizationID), zap.String("environmentID", cfg.EnvironmentID))
 	cfg.OrganizationID = c.flags.OrganizationID
 	if cfg.OrganizationID == "" && c.flags.AgentApiKey == "" {
+		c.logger.Debug("Organization ID not found, prompting for organization")
 		orgID, err := c.organizationSelector(ctx, cfg, prev)
 		if err != nil {
+			c.logger.Error("Could not select organization", zap.Error(err))
 			c.errorHandlerFn(ctx, err)
 			return
 		}
@@ -333,6 +371,7 @@ func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config
 
 	cfg.EnvironmentID = c.flags.EnvironmentID
 	if cfg.EnvironmentID == "" && c.flags.AgentApiKey == "" {
+		c.logger.Debug("Environment ID not found, prompting for environment")
 		envID, err := c.environmentSelector(ctx, cfg, prev)
 		if err != nil {
 			c.errorHandlerFn(ctx, err)
@@ -344,6 +383,7 @@ func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config
 
 	ctx, err := Save(ctx, cfg)
 	if err != nil {
+		c.logger.Error("Could not save configuration", zap.Error(err))
 		c.errorHandlerFn(ctx, err)
 		return
 	}
