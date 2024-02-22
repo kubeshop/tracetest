@@ -36,10 +36,12 @@ func (s *Session) WaitUntilDisconnected() {
 
 // Start the agent session with given configuration
 func StartSession(ctx context.Context, cfg config.Config, observer event.Observer, logger *zap.Logger) (*Session, error) {
+	logger.Debug("Starting agent session")
 	observer = event.WrapObserver(observer)
 
 	tracer, err := telemetry.GetTracer(ctx, cfg.CollectorEndpoint, cfg.Name)
 	if err != nil {
+		logger.Error("Failed to create tracer", zap.Error(err))
 		observer.Error(err)
 		return nil, err
 	}
