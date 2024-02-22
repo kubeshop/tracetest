@@ -13,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test/trigger"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"go.uber.org/zap"
@@ -27,6 +28,7 @@ type TriggerWorker struct {
 	sensor                 sensors.Sensor
 	stoppableProcessRunner StoppableProcessRunner
 	tracer                 trace.Tracer
+	meter                  metric.Meter
 }
 
 type TriggerOption func(*TriggerWorker)
@@ -67,6 +69,12 @@ func WithTriggerTracer(tracer trace.Tracer) TriggerOption {
 	}
 }
 
+func WithTriggerMeter(meter metric.Meter) TriggerOption {
+	return func(tw *TriggerWorker) {
+		tw.meter = meter
+	}
+}
+
 func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWorker {
 	worker := &TriggerWorker{
 		client:   client,
@@ -94,6 +102,11 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
 	ctx, span := w.tracer.Start(ctx, "TriggerRequest Worker operation")
 	defer span.End()
+
+	runCounter, _ := w.meter.Int64Counter("tracetest.agent.triggerworker.runs")
+	runCounter.Add(ctx, 1)
+
+	errorCounter, _ := w.meter.Int64Counter("tracetest.agent.triggerworker.errors")
 
 	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
 	w.observer.StartTriggerExecution(triggerRequest)
@@ -127,9 +140,13 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 			formattedErr := fmt.Errorf("could not report trigger error back to the server: %w. Original error: %s", sendErr, err.Error())
 			span.RecordError(formattedErr)
+			errorCounter.Add(ctx, 1)
 
 			return formattedErr
 		}
+
+		span.RecordError(err)
+		errorCounter.Add(ctx, 1)
 	}
 
 	w.observer.EndTriggerExecution(triggerRequest, err)

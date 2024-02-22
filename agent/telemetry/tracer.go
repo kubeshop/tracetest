@@ -8,9 +8,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
-	"go.opentelemetry.io/otel/sdk/resource"
 	sdkTrace "go.opentelemetry.io/otel/sdk/trace"
-	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -24,7 +22,7 @@ func GetTracer(ctx context.Context, otelExporterEndpoint, serviceName string) (t
 		return trace.NewNoopTracerProvider().Tracer("noop"), nil
 	}
 
-	realServiceName := fmt.Sprintf("tracetestAgent_%s", serviceName)
+	realServiceName := getAgentServiceName(serviceName)
 
 	spanExporter, err := newSpanExporter(ctx, otelExporterEndpoint)
 	if err != nil {
@@ -57,22 +55,14 @@ func newSpanExporter(ctx context.Context, otelExporterEndpoint string) (sdkTrace
 }
 
 func newTraceProvider(ctx context.Context, spanExporter sdkTrace.SpanExporter, serviceName string) (*sdkTrace.TracerProvider, error) {
-	defaultResource := resource.Default()
-
-	mergedResource, err := resource.Merge(
-		defaultResource,
-		resource.NewWithAttributes(
-			defaultResource.SchemaURL(),
-			semconv.ServiceNameKey.String(serviceName),
-		),
-	)
+	resource, err := getResource(serviceName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create otel resource: %w", err)
 	}
 
 	tp := sdkTrace.NewTracerProvider(
 		sdkTrace.WithBatcher(spanExporter),
-		sdkTrace.WithResource(mergedResource),
+		sdkTrace.WithResource(resource),
 	)
 
 	otel.SetTracerProvider(tp)
