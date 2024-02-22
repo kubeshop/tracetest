@@ -18,3 +18,7 @@ type Flags struct {
 	LogLevel          string
 	CollectorEndpoint string
 }
+
+func (f Flags) AutomatedEnvironmentCanBeInferred() bool {
+	return f.CI || f.AgentApiKey != "" || f.Token != ""
+}

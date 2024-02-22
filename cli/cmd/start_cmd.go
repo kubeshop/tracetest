@@ -70,7 +70,7 @@ var startCmd = &cobra.Command{
 			flags.Mode = agentConfig.Mode(cfg.Mode)
 		}
 
-		err = agentRunner.Run(ctx, cliConfig, flags)
+		err = agentRunner.Run(ctx, cliConfig, flags, verbose)
 		return "", err
 	})),
 	PostRun: teardownCommand,

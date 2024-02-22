@@ -56,8 +56,10 @@ type Client struct {
 }
 
 func (c *Client) Start(ctx context.Context) error {
+	c.logger.Debug("Starting controlPlane client")
 	err := c.startup(ctx)
 	if err != nil {
+		c.logger.Error("Failed to start controlPlane client", zap.Error(err))
 		return err
 	}
 
@@ -65,6 +67,7 @@ func (c *Client) Start(ctx context.Context) error {
 	ctx, cancel := context.WithCancel(ctx)
 	go func() {
 		<-c.done
+		c.logger.Debug("Stopping controlPlane client")
 		// We cannot `defer cancel()` in this case because the start listener functions
 		// start one goroutine each and don't block the execution of this function.
 		// Thus, if we cancel the context, all those goroutines will fail.
@@ -73,38 +76,47 @@ func (c *Client) Start(ctx context.Context) error {
 
 	err = c.startStopListener(ctx)
 	if err != nil {
+		c.logger.Error("Failed to start stop listener", zap.Error(err))
 		return err
 	}
 
 	err = c.startTriggerListener(ctx)
 	if err != nil {
+		c.logger.Error("Failed to start trigger listener", zap.Error(err))
 		return err
 	}
 
 	err = c.startPollerListener(ctx)
 	if err != nil {
+		c.logger.Error("Failed to start poller listener", zap.Error(err))
 		return err
 	}
 
 	err = c.startShutdownListener(ctx)
 	if err != nil {
+		c.logger.Error("Failed to start shutdown listener", zap.Error(err))
 		return err
 	}
 
 	err = c.startDataStoreConnectionTestListener(ctx)
 	if err != nil {
+		c.logger.Error("Failed to start data store connection test listener", zap.Error(err))
 		return err
 	}
 
 	err = c.startOTLPConnectionTestListener(ctx)
 	if err != nil {
+		c.logger.Error("Failed to start OTLP connection test listener", zap.Error(err))
 		return err
 	}
 
 	err = c.startHeartBeat(ctx)
 	if err != nil {
+		c.logger.Error("Failed to start heart beat", zap.Error(err))
 		return err
 	}
+
+	c.logger.Debug("ControlPlane client started")
 
 	return nil
 }

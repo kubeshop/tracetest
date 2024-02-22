@@ -14,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/kubeshop/tracetest/agent/workers/poller"
 
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
@@ -35,16 +36,24 @@ func (s *Session) WaitUntilDisconnected() {
 
 // Start the agent session with given configuration
 func StartSession(ctx context.Context, cfg config.Config, observer event.Observer, logger *zap.Logger) (*Session, error) {
+	logger.Debug("Starting agent session")
 	observer = event.WrapObserver(observer)
 
 	tracer, err := telemetry.GetTracer(ctx, cfg.CollectorEndpoint, cfg.Name)
+	if err != nil {
+		logger.Error("Failed to create tracer", zap.Error(err))
+		observer.Error(err)
+		return nil, err
+	}
+
+	meter, err := telemetry.GetMeter(ctx, cfg.CollectorEndpoint, cfg.Name)
 	if err != nil {
 		observer.Error(err)
 		return nil, err
 	}
 
 	traceCache := collector.NewTraceCache()
-	controlPlaneClient, err := newControlPlaneClient(ctx, cfg, traceCache, observer, logger, tracer)
+	controlPlaneClient, err := newControlPlaneClient(ctx, cfg, traceCache, observer, logger, tracer, meter)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +116,7 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 	return collector, nil
 }
 
-func newControlPlaneClient(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger, tracer trace.Tracer) (*client.Client, error) {
+func newControlPlaneClient(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger, tracer trace.Tracer, meter metric.Meter) (*client.Client, error) {
 	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
@@ -123,7 +132,9 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 	stopWorker := workers.NewStopperWorker(
 		workers.WithStopperObserver(observer),
 		workers.WithStopperCancelFuncList(processStopper.CancelMap()),
+		workers.WithStopperLogger(logger),
 		workers.WithStopperTracer(tracer),
+		workers.WithStopperMeter(meter),
 	)
 
 	triggerWorker := workers.NewTriggerWorker(
@@ -133,6 +144,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		workers.WithTriggerStoppableProcessRunner(processStopper.RunStoppableProcess),
 		workers.WithTriggerLogger(logger),
 		workers.WithTriggerTracer(tracer),
+		workers.WithTriggerMeter(meter),
 	)
 
 	pollingWorker := workers.NewPollerWorker(
@@ -142,6 +154,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		workers.WithPollerStoppableProcessRunner(processStopper.RunStoppableProcess),
 		workers.WithPollerLogger(logger),
 		workers.WithPollerTracer(tracer),
+		workers.WithPollerMeter(meter),
 	)
 
 	dataStoreTestConnectionWorker := workers.NewTestConnectionWorker(
@@ -149,6 +162,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		workers.WithTestConnectionLogger(logger),
 		workers.WithTestConnectionObserver(observer),
 		workers.WithTestConnectionTracer(tracer),
+		workers.WithTestConnectionMeter(meter),
 	)
 
 	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
