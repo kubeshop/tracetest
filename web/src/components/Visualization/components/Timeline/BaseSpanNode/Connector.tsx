@@ -47,7 +47,16 @@ const Connector = ({hasParent, id, isCollapsed, nodeDepth, onCollapse, totalChil
       )}
 
       {new Array(nodeDepth).fill(0).map((_, index) => {
-        return <S.LineBase x1={index * BaseLeftPaddingV2 + 12} x2={index * BaseLeftPaddingV2 + 12} y1="0" y2="32" />;
+        return (
+          <S.LineBase
+            // eslint-disable-next-line react/no-array-index-key
+            key={index * BaseLeftPaddingV2}
+            x1={index * BaseLeftPaddingV2 + 12}
+            x2={index * BaseLeftPaddingV2 + 12}
+            y1="0"
+            y2="32"
+          />
+        );
       })}
     </S.Connector>
   );
