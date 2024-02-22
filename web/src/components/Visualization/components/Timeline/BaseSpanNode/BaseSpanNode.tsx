@@ -3,6 +3,7 @@ import Connector from './Connector';
 import {IPropsComponent} from '../SpanNodeFactory';
 import {useTimeline} from '../Timeline.provider';
 import * as S from '../Timeline.styled';
+import {useVerticalResizer} from '../VerticalResizer.provider';
 
 function toPercent(value: number) {
   return `${(value * 100).toFixed(1)}%`;
@@ -17,8 +18,8 @@ interface IProps extends IPropsComponent {
 }
 
 const BaseSpanNode = ({index, node, span, style}: IProps) => {
-  const {collapsedSpans, getScale, matchedSpans, nameColumnWidth, onSpanCollapse, onSpanClick, selectedSpan} =
-    useTimeline();
+  const {collapsedSpans, getScale, matchedSpans, onSpanCollapse, onSpanClick, selectedSpan} = useTimeline();
+  const {columnWidth} = useVerticalResizer();
   const {start: viewStart, end: viewEnd} = getScale(span.startTime, span.endTime);
   const hintSide = getHintSide(viewStart, viewEnd);
   const isSelected = selectedSpan === node.data.id;
@@ -32,7 +33,7 @@ const BaseSpanNode = ({index, node, span, style}: IProps) => {
         $isEven={index % 2 === 0}
         $isMatched={isMatched}
         $isSelected={isSelected}
-        style={{gridTemplateColumns: `${nameColumnWidth * 100}% 1fr`}}
+        style={{gridTemplateColumns: `${columnWidth * 100}% 1fr`}}
       >
         <S.Col>
           <S.Header>

@@ -11,15 +11,11 @@ interface IProps {
 }
 
 const ListWrapper = ({listRef}: IProps) => {
-  const {nameColumnWidth, onNameColumnWidthChange, spans, viewEnd, viewStart} = useTimeline();
+  const {spans, viewEnd, viewStart} = useTimeline();
 
   return (
     <S.Container>
-      <Header
-        duration={viewEnd - viewStart}
-        nameColumnWidth={nameColumnWidth}
-        onNameColumnWidthChange={onNameColumnWidthChange}
-      />
+      <Header duration={viewEnd - viewStart} />
       <List
         height={window.innerHeight - HEADER_HEIGHT}
         itemCount={spans.length}

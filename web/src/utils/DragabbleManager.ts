@@ -25,8 +25,8 @@ type TDraggableManagerOptions = {
 };
 
 interface IDraggableManager {
-  init(): (event: MouseEvent) => void;
-  dispose(): void;
+  initEventHandler(): (event: MouseEvent) => void;
+  cleanup(): void;
   resetBounds(): void;
 }
 
@@ -125,7 +125,7 @@ function DraggableManager({onGetBounds, ...rest}: TDraggableManagerOptions): IDr
   };
 
   return {
-    init() {
+    initEventHandler() {
       isDragging = false;
       bounds = undefined;
       window.addEventListener('resize', this.resetBounds);
@@ -136,7 +136,7 @@ function DraggableManager({onGetBounds, ...rest}: TDraggableManagerOptions): IDr
       return handleEvent;
     },
 
-    dispose() {
+    cleanup() {
       if (isDragging) {
         stopDragging();
       }
