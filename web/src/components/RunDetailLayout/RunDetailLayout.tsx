@@ -34,7 +34,7 @@ const renderTab = (title: string, testId: string, runId: number, mode: string) =
 );
 
 const RunDetailLayout = ({test: {id, name, trigger, skipTraceCollection}, test}: IProps) => {
-  const {mode = RunDetailModes.TRIGGER} = useParams();
+  const {mode = RunDetailModes.TEST} = useParams();
   const {isError, run, runEvents} = useTestRun();
   useDocumentTitle(`${name} - ${run.state}`);
   const runOriginPath = useAppSelector(UserSelectors.selectRunOriginPath);
