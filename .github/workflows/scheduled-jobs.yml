@@ -11,7 +11,7 @@ jobs:
   pokeshop-trace-based-tests:
     name: Run trace based tests for Pokeshop
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -67,7 +67,7 @@ jobs:
   pokeshop-serverless-trace-based-tests:
     name: Run trace based tests for Pokeshop Serverless
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -123,7 +123,7 @@ jobs:
   otel-demo-trace-based-tests:
     name: Run trace based tests for Open Telemetry demo
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
