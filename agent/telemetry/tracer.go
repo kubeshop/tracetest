@@ -16,10 +16,14 @@ import (
 
 const spanExporterTimeout = 1 * time.Minute
 
+func GetNoopTracer() trace.Tracer {
+	return trace.NewNoopTracerProvider().Tracer("noop")
+}
+
 func GetTracer(ctx context.Context, otelExporterEndpoint, serviceName string) (trace.Tracer, error) {
 	if otelExporterEndpoint == "" {
 		// fallback, return noop
-		return trace.NewNoopTracerProvider().Tracer("noop"), nil
+		return GetNoopTracer(), nil
 	}
 
 	realServiceName := getAgentServiceName(serviceName)

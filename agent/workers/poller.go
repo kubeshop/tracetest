@@ -12,6 +12,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/tracedb"
@@ -77,7 +78,8 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 		sentSpanIDs: gocache.New[string, bool](),
 		logger:      zap.NewNop(),
 		observer:    event.NewNopObserver(),
-		tracer:      trace.NewNoopTracerProvider().Tracer("noop"),
+		tracer:      telemetry.GetNoopTracer(),
+		meter:       telemetry.GetNoopMeter(),
 	}
 
 	for _, opt := range opts {

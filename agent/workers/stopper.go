@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/agent/telemetry"
+
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"go.opentelemetry.io/otel/metric"
@@ -56,7 +58,8 @@ func NewStopperWorker(opts ...StopperOption) *StopperWorker {
 	worker := &StopperWorker{
 		logger:   zap.NewNop(),
 		observer: event.NewNopObserver(),
-		tracer:   trace.NewNoopTracerProvider().Tracer("noop"),
+		tracer:   telemetry.GetNoopTracer(),
+		meter:    telemetry.GetNoopMeter(),
 	}
 
 	for _, opt := range opts {

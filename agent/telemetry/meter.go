@@ -16,10 +16,14 @@ const (
 	metricExporterTimeout = 5 * time.Second
 )
 
+func GetNoopMeter() metric.Meter {
+	return noop.NewMeterProvider().Meter("noop")
+}
+
 func GetMeter(ctx context.Context, otelExporterEndpoint, serviceName string) (metric.Meter, error) {
 	if otelExporterEndpoint == "" {
 		// fallback, return noop
-		return noop.NewMeterProvider().Meter("noop"), nil
+		return GetNoopMeter(), nil
 	}
 
 	realServiceName := getAgentServiceName(serviceName)
