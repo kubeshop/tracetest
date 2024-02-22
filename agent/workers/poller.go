@@ -12,11 +12,13 @@ import (
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
@@ -29,6 +31,7 @@ type PollerWorker struct {
 	observer               event.Observer
 	stoppableProcessRunner StoppableProcessRunner
 	tracer                 trace.Tracer
+	meter                  metric.Meter
 }
 
 type PollerOption func(*PollerWorker)
@@ -63,13 +66,20 @@ func WithPollerTracer(tracer trace.Tracer) PollerOption {
 	}
 }
 
+func WithPollerMeter(meter metric.Meter) PollerOption {
+	return func(pw *PollerWorker) {
+		pw.meter = meter
+	}
+}
+
 func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker {
 	pollerWorker := &PollerWorker{
 		client:      client,
 		sentSpanIDs: gocache.New[string, bool](),
 		logger:      zap.NewNop(),
 		observer:    event.NewNopObserver(),
-		tracer:      trace.NewNoopTracerProvider().Tracer("noop"),
+		tracer:      telemetry.GetNoopTracer(),
+		meter:       telemetry.GetNoopMeter(),
 	}
 
 	for _, opt := range opts {
@@ -82,6 +92,11 @@ func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker 
 func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) error {
 	ctx, span := w.tracer.Start(ctx, "PollingRequest Worker operation")
 	defer span.End()
+
+	runCounter, _ := w.meter.Int64Counter("tracetest.agent.pollerworker.runs")
+	runCounter.Add(ctx, 1)
+
+	errorCounter, _ := w.meter.Int64Counter("tracetest.agent.pollerworker.errors")
 
 	w.logger.Debug("Received polling request", zap.Any("request", request))
 	w.observer.StartTracePoll(request)
@@ -120,9 +135,13 @@ func (w *PollerWorker) Poll(ctx context.Context, request *proto.PollingRequest) 
 
 			formattedErr := fmt.Errorf("could not report polling error back to the server: %w. Original error: %s", sendErr, err.Error())
 			span.RecordError(formattedErr)
+			errorCounter.Add(ctx, 1)
 
 			return formattedErr
 		}
+
+		span.RecordError(err)
+		errorCounter.Add(ctx, 1)
 	}
 
 	w.observer.EndTracePoll(request, nil)

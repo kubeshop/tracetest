@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/agent/telemetry"
+
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
@@ -16,6 +19,7 @@ type StopperWorker struct {
 	observer       event.Observer
 	cancelContexts *cancelCauseFuncMap
 	tracer         trace.Tracer
+	meter          metric.Meter
 }
 
 type StopperOption func(*StopperWorker)
@@ -38,10 +42,24 @@ func WithStopperTracer(tracer trace.Tracer) StopperOption {
 	}
 }
 
+func WithStopperMeter(meter metric.Meter) StopperOption {
+	return func(tw *StopperWorker) {
+		tw.meter = meter
+	}
+}
+
+func WithStopperLogger(logger *zap.Logger) StopperOption {
+	return func(tw *StopperWorker) {
+		tw.logger = logger
+	}
+}
+
 func NewStopperWorker(opts ...StopperOption) *StopperWorker {
 	worker := &StopperWorker{
 		logger:   zap.NewNop(),
 		observer: event.NewNopObserver(),
+		tracer:   telemetry.GetNoopTracer(),
+		meter:    telemetry.GetNoopMeter(),
 	}
 
 	for _, opt := range opts {
@@ -51,13 +69,14 @@ func NewStopperWorker(opts ...StopperOption) *StopperWorker {
 	return worker
 }
 
-func (w *StopperWorker) SetLogger(logger *zap.Logger) {
-	w.logger = logger
-}
-
 func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest) error {
 	ctx, span := w.tracer.Start(ctx, "StopRequest Worker operation")
 	defer span.End()
+
+	runCounter, _ := w.meter.Int64Counter("tracetest.agent.stopworker.runs")
+	runCounter.Add(ctx, 1)
+
+	errorCounter, _ := w.meter.Int64Counter("tracetest.agent.stopworker.errors")
 
 	w.logger.Debug("Stop request received", zap.Any("stopRequest", stopRequest))
 	w.observer.StartStopRequest(stopRequest)
@@ -69,6 +88,8 @@ func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest
 		w.logger.Error(err.Error(), zap.String("testID", stopRequest.TestID), zap.Int32("runID", stopRequest.RunID))
 		w.observer.EndStopRequest(stopRequest, err)
 		span.RecordError(err)
+
+		errorCounter.Add(ctx, 1)
 
 		return err
 	}

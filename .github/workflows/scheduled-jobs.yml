@@ -11,18 +11,20 @@ jobs:
   pokeshop-trace-based-tests:
     name: Run trace based tests for Pokeshop
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Configure Tracetest CLI
+        timeout-minutes: 5
         uses: kubeshop/tracetest-github-action@v1
         with:
           token: ${{secrets.TRACETEST_POKESHOP_TOKEN}}
 
       - name: Run synthetic monitoring tests
+        timeout-minutes: 10
         run: |
           tracetest run testsuite --file ./testing/synthetic-monitoring/pokeshop/_testsuite.yaml --vars ./testing/synthetic-monitoring/pokeshop/_variableset.yaml
 
@@ -65,18 +67,20 @@ jobs:
   pokeshop-serverless-trace-based-tests:
     name: Run trace based tests for Pokeshop Serverless
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Configure Tracetest CLI
+        timeout-minutes: 5
         uses: kubeshop/tracetest-github-action@v1
         with:
           token: ${{secrets.TRACETEST_SERVERLESS_POKESHOP_TOKEN}}
 
       - name: Run synthetic monitoring tests
+        timeout-minutes: 10
         run: |
           tracetest run testsuite --file ./testing/synthetic-monitoring/pokeshop-serverless/_testsuite.yaml --vars ./testing/synthetic-monitoring/pokeshop-serverless/_variableset.yaml
 
@@ -119,18 +123,20 @@ jobs:
   otel-demo-trace-based-tests:
     name: Run trace based tests for Open Telemetry demo
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Configure Tracetest CLI
+        timeout-minutes: 5
         uses: kubeshop/tracetest-github-action@v1
         with:
           token: ${{secrets.TRACETEST_OTELDEMO_TOKEN}}
 
       - name: Run synthetic monitoring tests
+        timeout-minutes: 10
         run: |
           tracetest run testsuite --file ./testing/synthetic-monitoring/otel-demo/_testsuite.yaml --vars ./testing/synthetic-monitoring/otel-demo/_variableset.yaml
 

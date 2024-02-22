@@ -70,7 +70,7 @@ func getOtelMetricsCollectorExporter(ctx context.Context, exporterConfig *config
 		otlpmetricgrpc.WithInsecure(),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("could not create trace exporter: %w", err)
+		return nil, fmt.Errorf("could not create metric exporter: %w", err)
 	}
 
 	return exporter, nil
