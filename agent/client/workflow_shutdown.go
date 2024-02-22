@@ -38,7 +38,7 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 
 			reconnected, err := c.handleDisconnectionError(err)
 			if reconnected {
-				logger.Debug("reconnected to shutdown stream")
+				logger.Warn("reconnected to shutdown stream")
 				return
 			}
 

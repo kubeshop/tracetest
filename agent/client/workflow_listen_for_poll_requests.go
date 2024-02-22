@@ -36,7 +36,7 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 
 			reconnected, err := c.handleDisconnectionError(err)
 			if reconnected {
-				logger.Debug("reconnected to poller stream")
+				logger.Warn("reconnected to poller stream")
 				return
 			}
 

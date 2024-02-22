@@ -37,7 +37,7 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 
 			reconnected, err := c.handleDisconnectionError(err)
 			if reconnected {
-				logger.Debug("reconnected to data store connection stream")
+				logger.Warn("reconnected to data store connection stream")
 				return
 			}
 

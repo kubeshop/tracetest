@@ -37,7 +37,7 @@ func (c *Client) startOTLPConnectionTestListener(ctx context.Context) error {
 
 			reconnected, err := c.handleDisconnectionError(err)
 			if reconnected {
-				logger.Debug("reconnected to otlp connection stream")
+				logger.Warn("reconnected to otlp connection stream")
 				return
 			}
 
