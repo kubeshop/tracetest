@@ -24,6 +24,7 @@ import * as S from './RunDetailTest.styled';
 import Visualization from './Visualization';
 import {FillPanel} from '../ResizablePanels';
 import SkipTraceCollectionInfo from '../SkipTraceCollectionInfo';
+import SpanResultDetail from '../SpanResultDetail';
 
 const TABS = {
   SPECS: 'specs',
@@ -39,8 +40,17 @@ interface IProps {
 const TestPanel = ({run, testId, runEvents}: IProps) => {
   const [query, updateQuery] = useSearchParams();
   const {selectedSpan, onSetFocusedSpan} = useSpan();
-  const {remove, revert, selectedTestSpec, setSelectedSpec, setSelectorSuggestions, setPrevSelector, specs} =
-    useTestSpecs();
+  const {
+    remove,
+    revert,
+    selectedTestSpec,
+    selectedSpanResult,
+    setSelectedSpanResult,
+    setSelectedSpec,
+    setSelectorSuggestions,
+    setPrevSelector,
+    specs,
+  } = useTestSpecs();
   const {isOpen: isTestSpecFormOpen, formProps, onSubmit, open, close, isValid, onIsValid} = useTestSpecForm();
   const {
     isEditing,
@@ -218,6 +228,12 @@ const TestPanel = ({run, testId, runEvents}: IProps) => {
             onRevert={handleRevert}
             selectedSpan={selectedSpan?.id}
             testSpec={selectedTestSpec}
+          />
+
+          <SpanResultDetail
+            isOpen={!!selectedSpanResult}
+            spanResult={selectedSpanResult}
+            onClose={() => setSelectedSpanResult()}
           />
         </S.SectionRight>
       </S.Container>

@@ -43,6 +43,10 @@ const AssertionService = () => ({
     return countBy(passedResults);
   },
 
+  getTotalPassedSpanChecks(checks: ICheckResult[]) {
+    return checks.filter(({result: {passed}}) => passed).length;
+  },
+
   isValidError(error: string) {
     return TestSpecErrors.some(testSpecError => error.includes(testSpecError));
   },

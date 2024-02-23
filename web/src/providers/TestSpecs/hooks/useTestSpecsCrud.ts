@@ -22,8 +22,9 @@ import {
   setIsInitialized,
   setSelectorSuggestions as setSelectorSuggestionsAction,
   setPrevSelector as setPrevSelectorAction,
+  setSelectedSpanResult as setSelectedSpanResultAction,
 } from 'redux/slices/TestSpecs.slice';
-import {ISuggestion} from 'types/TestSpecs.types';
+import {ISpanResult, ISuggestion} from 'types/TestSpecs.types';
 
 interface IProps {
   runId: number;
@@ -52,6 +53,13 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
       );
     },
     [assertionResults?.resultList, dispatch]
+  );
+
+  const setSelectedSpanResult = useCallback(
+    (spanResult: ISpanResult) => {
+      dispatch(setSelectedSpanResultAction(spanResult));
+    },
+    [dispatch]
   );
 
   const revert = useCallback(
@@ -164,6 +172,7 @@ const useTestSpecsCrud = ({runId, testId, test, isDraftMode, assertionResults}: 
     setSelectedSpec,
     setSelectorSuggestions,
     setPrevSelector,
+    setSelectedSpanResult,
   };
 };
 

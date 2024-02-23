@@ -5,7 +5,7 @@ import {ICheckResult} from 'types/Assertion.types';
 import {TCompareOperatorSymbol} from 'types/Operator.types';
 import {SupportedEditors} from 'constants/Editor.constants';
 import {Editor} from 'components/Inputs';
-import * as S from './TestSpecDetail.styled';
+import * as S from './SpanResultDetail.styled';
 
 interface IProps {
   check: ICheckResult;
@@ -15,14 +15,14 @@ interface IProps {
 }
 
 const Assertion = ({check, testId, runId, selector}: IProps) => (
-  <S.CheckItemContainer>
+  <S.CheckItemContainer $isSuccessful={check.result.passed}>
     <S.GridContainer>
       {check.result.error && AssertionService.isValidError(check.result.error) ? (
         <>
           <S.Row $justify="center">
-            <S.IconWarning />
+            <S.IconError />
           </S.Row>
-          <AttributeValue strong type="warning" value={check.result.error} />
+          <AttributeValue strong type="danger" value={check.result.error} />
         </>
       ) : (
         <>

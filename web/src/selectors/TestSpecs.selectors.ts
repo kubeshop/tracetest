@@ -42,6 +42,7 @@ const TestSpecsSelectors = () => ({
   selectAssertionBySelector: createSelector(stateSelector, selectorSelector, ({assertionResults}, selector) =>
     assertionResults?.resultList.find(def => def.selector === selector)
   ),
+  selectSelectedSpanResult: createSelector(stateSelector, ({selectedSpanResult}) => selectedSpanResult),
   selectAssertionByPositionIndex: createSelector(
     stateSelector,
     positionIndexSelector,

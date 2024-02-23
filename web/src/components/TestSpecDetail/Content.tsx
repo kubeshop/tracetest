@@ -1,5 +1,5 @@
-import {useCallback, useEffect, useMemo, useRef} from 'react';
-import {VariableSizeList as List} from 'react-window';
+import {useEffect, useMemo, useRef} from 'react';
+import {FixedSizeList as List} from 'react-window';
 import AutoSizer, {Size} from 'react-virtualized-auto-sizer';
 
 import {useAppSelector} from 'redux/hooks';
@@ -8,7 +8,7 @@ import AssertionService from 'services/Assertion.service';
 import TraceSelectors from 'selectors/Trace.selectors';
 import {TAssertionResultEntry} from 'models/AssertionResults.model';
 import Header from './Header';
-import ResultCard from './ResultCard';
+import SpanResult from './SpanResult';
 import Search from './Search';
 import * as S from './TestSpecDetail.styled';
 
@@ -54,15 +54,6 @@ const Content = ({
     }
   }, [results, selectedSpan]);
 
-  const getItemSize = useCallback(
-    index => {
-      const [, checkResults = []] = results[index];
-
-      return checkResults.length * 72.59 + 40 + 16;
-    },
-    [results]
-  );
-
   return (
     <>
       <div>
@@ -98,10 +89,10 @@ const Content = ({
               height={height}
               itemCount={results.length}
               itemData={results}
-              itemSize={getItemSize}
+              itemSize={80}
               width={width}
             >
-              {ResultCard}
+              {SpanResult}
             </List>
           )}
         </AutoSizer>

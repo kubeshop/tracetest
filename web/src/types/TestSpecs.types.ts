@@ -3,10 +3,16 @@ import {CaseReducer, PayloadAction} from '@reduxjs/toolkit';
 import {TChange} from 'redux/actions/TestSpecs.actions';
 import TestSpecs, {TTestSpecEntry} from 'models/TestSpecs.model';
 import AssertionResults, {TAssertionResultEntry} from 'models/AssertionResults.model';
+import {ICheckResult} from './Assertion.types';
 
 export interface ISuggestion {
   query: string;
   title: string;
+}
+
+export interface ISpanResult {
+  spanId: string;
+  checkResults: ICheckResult[];
 }
 
 export interface ITestSpecsState {
@@ -20,6 +26,7 @@ export interface ITestSpecsState {
   isDraftMode: boolean;
   selectorSuggestions: ISuggestion[];
   prevSelector: string;
+  selectedSpanResult?: ISpanResult;
 }
 
 export type TTestSpecsSliceActions = {
@@ -32,6 +39,7 @@ export type TTestSpecsSliceActions = {
   resetSpecs: CaseReducer<ITestSpecsState>;
   setAssertionResults: CaseReducer<ITestSpecsState, PayloadAction<AssertionResults>>;
   setSelectedSpec: CaseReducer<ITestSpecsState, PayloadAction<TAssertionResultEntry | undefined>>;
+  setSelectedSpanResult: CaseReducer<ITestSpecsState, PayloadAction<ISpanResult | undefined>>;
   setIsInitialized: CaseReducer<ITestSpecsState, PayloadAction<{isInitialized: boolean}>>;
   setSelectorSuggestions: CaseReducer<ITestSpecsState, PayloadAction<ISuggestion[]>>;
   setPrevSelector: CaseReducer<ITestSpecsState, PayloadAction<{prevSelector: string}>>;
