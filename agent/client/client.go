@@ -208,7 +208,7 @@ func (c *Client) reconnect() error {
 	// connection is not working. We need to reconnect
 	err := retry.Do(func() error {
 		return c.connect(context.Background())
-	}, retry.Attempts(ReconnectRetryAttempts), retry.Delay(ReconnectRetryAttemptDelay))
+	}, retry.Attempts(ReconnectRetryAttempts), retry.Delay(ReconnectRetryAttemptDelay), retry.DelayType(retry.BackOffDelay))
 
 	if err != nil {
 		return fmt.Errorf("could not reconnect to server: %w", err)
