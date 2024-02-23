@@ -9,10 +9,6 @@ export const Container = styled.div`
   padding: 4px 0;
 `;
 
-export const ProgressContainer = styled.div`
-  width: 300px;
-`;
-
 export const Title = styled(Typography.Title)`
   && {
     margin-bottom: 8px;

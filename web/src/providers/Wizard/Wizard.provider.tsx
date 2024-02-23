@@ -1,6 +1,6 @@
 import {noop} from 'lodash';
 import Wizard, {TWizardStepId, isStepEnabled} from 'models/Wizard.model';
-import {createContext, useCallback, useContext, useMemo, useState} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import Tracetest from 'redux/apis/Tracetest';
 import WizardAnalytics from 'services/Analytics/Wizard.service';
 import {IWizardState, IWizardStep, TWizardMap} from 'types/Wizard.types';
@@ -91,6 +91,13 @@ const WizardProvider = ({children, stepsMap}: IProps) => {
     },
     [steps]
   );
+
+  useEffect(() => {
+    const activeStepIndex = steps.findIndex(step => step.state === 'pending');
+    if (activeStepIndex !== -1) {
+      setActiveStep(activeStepIndex);
+    }
+  }, [steps]);
 
   const value = useMemo<IContext>(
     () => ({
