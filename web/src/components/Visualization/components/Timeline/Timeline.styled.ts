@@ -10,9 +10,7 @@ export const Container = styled.div`
 export const Row = styled.div<{$isEven: boolean; $isMatched: boolean; $isSelected: boolean}>`
   background-color: ${({theme, $isEven}) => ($isEven ? theme.color.background : theme.color.white)};
   display: grid;
-  grid-template-columns: 300px 1fr;
   grid-template-rows: 32px;
-  padding: 0px 16px;
 
   :hover {
     background-color: ${({theme}) => theme.color.backgroundInteractive};
@@ -37,11 +35,14 @@ export const Row = styled.div<{$isEven: boolean; $isMatched: boolean; $isSelecte
 
 export const Col = styled.div`
   display: grid;
-  grid-template-columns: 1fr 8px;
+  grid-template-columns: 1fr;
+  padding-left: 16px;
 `;
 
 export const ColDuration = styled.div`
   overflow: hidden;
+  margin-left: 15px;
+  padding-right: 16px;
   position: relative;
 `;
 
@@ -56,14 +57,6 @@ export const Header = styled.div`
 export const NameContainer = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
-`;
-
-export const Separator = styled.div`
-  border-left: 1px solid rgb(222, 227, 236);
-  cursor: ew-resize;
-  height: 32px;
-  padding: 0px 3px;
-  width: 1px;
 `;
 
 export const Title = styled(Typography.Text)`
@@ -131,9 +124,8 @@ export const RectBaseTransparent = styled(RectBase)`
 export const HeaderRow = styled.div`
   background-color: ${({theme}) => theme.color.white};
   display: grid;
-  grid-template-columns: 300px 1fr;
   grid-template-rows: 32px;
-  padding: 0px 16px;
+  position: relative;
 `;
 
 export const HeaderContent = styled.div`

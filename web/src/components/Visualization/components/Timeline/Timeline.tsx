@@ -2,9 +2,10 @@ import {NodeTypesEnum} from 'constants/Visualization.constants';
 import Span from 'models/Span.model';
 import {useRef} from 'react';
 import {FixedSizeList as List} from 'react-window';
+import ListWrapper from './ListWrapper';
 import NavigationWrapper from './NavigationWrapper';
 import TimelineProvider from './Timeline.provider';
-import ListWrapper from './ListWrapper';
+import VerticalResizerProvider from './VerticalResizer.provider';
 
 export interface IProps {
   nodeType: NodeTypesEnum;
@@ -28,8 +29,10 @@ const Timeline = ({nodeType, spans, onClick, onNavigate, matchedSpans, selectedS
       nodeType={nodeType}
       spans={spans}
     >
-      <NavigationWrapper />
-      <ListWrapper listRef={listRef} />
+      <VerticalResizerProvider>
+        <NavigationWrapper />
+        <ListWrapper listRef={listRef} />
+      </VerticalResizerProvider>
     </TimelineProvider>
   );
 };

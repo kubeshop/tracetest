@@ -2,6 +2,7 @@ import {Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
 export const Ticks = styled.div`
+  padding-right: 16px;
   pointer-events: none;
   position: relative;
 `;

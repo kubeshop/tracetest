@@ -102,9 +102,9 @@ const TestRunService = () => ({
   getHeaderInfo({createdAt, testVersion, metadata: {source = ''}, trace}: TestRun, triggerType: string) {
     const createdTimeAgo = Date.getTimeAgo(createdAt ?? '');
 
-    return `v${testVersion} • ${triggerType} • Ran ${createdTimeAgo} • ${
-      !!trace?.spans.length && `${trace.spans.length} ${singularOrPlural('span', trace?.spans.length)}`
-    } ${source && `• Run via ${source.toUpperCase()}`}`;
+    return `v${testVersion} • ${triggerType} • Ran ${createdTimeAgo} • ${`${
+      trace?.spans?.length ?? 0
+    } ${singularOrPlural('span', trace?.spans.length)}`} ${source && `• Run via ${source.toUpperCase()}`}`;
   },
 });
 
