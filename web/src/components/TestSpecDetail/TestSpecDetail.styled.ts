@@ -115,12 +115,14 @@ export const SpanHeaderContainer = styled.div`
   gap: 8px;
 `;
 
-export const Wrapper = styled.div`
-  align-items: center;
+export const Wrapper = styled.div<{$isSelected: boolean; $type: SemanticGroupNames}>`
   cursor: pointer;
-  justify-content: space-between;
-  display: flex;
   padding: 8px 12px;
+
+  border: ${({$isSelected, theme}) =>
+    $isSelected ? `1px solid ${theme.color.interactive}` : `1px solid ${theme.color.borderLight}`};
+
+  border-top: ${({$type}) => `4px solid ${SemanticGroupNamesToColor[$type]}`};
 `;
 
 export const ClearSearchIcon = styled(CloseCircleFilled)`

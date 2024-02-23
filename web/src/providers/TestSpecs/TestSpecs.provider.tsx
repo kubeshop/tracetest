@@ -6,7 +6,7 @@ import {useTestRun} from 'providers/TestRun/TestRun.provider';
 import TestSpecsSelectors from 'selectors/TestSpecs.selectors';
 import AssertionResults, {TAssertionResultEntry} from 'models/AssertionResults.model';
 import {TTestSpecEntry} from 'models/TestSpecs.model';
-import {ISuggestion} from 'types/TestSpecs.types';
+import {ISpanResult, ISuggestion} from 'types/TestSpecs.types';
 import useTestSpecsCrud from './hooks/useTestSpecsCrud';
 import {useTest} from '../Test/Test.provider';
 
@@ -20,12 +20,14 @@ interface IContext {
   dryRun(definitionList: TTestSpecEntry[]): void;
   updateIsInitialized(isInitialized: boolean): void;
   selectedTestSpec?: TAssertionResultEntry;
+  selectedSpanResult?: ISpanResult;
   assertionResults?: AssertionResults;
   specs: TTestSpecEntry[];
   isLoading: boolean;
   isError: boolean;
   isDraftMode: boolean;
   setSelectedSpec(selector?: string): void;
+  setSelectedSpanResult(spanResult?: ISpanResult): void;
   setSelectorSuggestions(selectorSuggestions: ISuggestion[]): void;
   setPrevSelector(selector: string): void;
 }
@@ -46,6 +48,7 @@ export const Context = createContext<IContext>({
   updateIsInitialized: noop,
   setSelectorSuggestions: noop,
   setPrevSelector: noop,
+  setSelectedSpanResult: noop,
 });
 
 interface IProps {
@@ -68,6 +71,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
 
   const selectedSpec = useAppSelector(TestSpecsSelectors.selectSelectedSpec);
   const selectedTestSpec = useAppSelector(state => TestSpecsSelectors.selectAssertionBySelector(state, selectedSpec!));
+  const selectedSpanResult = useAppSelector(TestSpecsSelectors.selectSelectedSpanResult);
 
   const {
     add,
@@ -83,6 +87,7 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
     setSelectedSpec,
     setSelectorSuggestions,
     setPrevSelector,
+    setSelectedSpanResult,
   } = useTestSpecsCrud({
     assertionResults,
     test,
@@ -124,6 +129,8 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
       updateIsInitialized,
       setSelectorSuggestions,
       setPrevSelector,
+      selectedSpanResult,
+      setSelectedSpanResult,
     }),
     [
       add,
@@ -142,6 +149,8 @@ const TestSpecsProvider = ({children, testId, runId}: IProps) => {
       updateIsInitialized,
       setSelectorSuggestions,
       setPrevSelector,
+      selectedSpanResult,
+      setSelectedSpanResult,
     ]
   );
 

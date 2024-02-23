@@ -12,6 +12,7 @@ export const initialState: ITestSpecsState = {
   isLoading: false,
   isInitialized: false,
   selectedSpec: undefined,
+  selectedSpanResult: undefined,
   isDraftMode: false,
   selectorSuggestions: [],
   prevSelector: '',
@@ -90,6 +91,10 @@ const testSpecsSlice = createSlice<ITestSpecsState, TTestSpecsSliceActions, 'tes
       if (assertionResult) state.selectedSpec = assertionResult.selector;
       else state.selectedSpec = undefined;
     },
+    setSelectedSpanResult(state, {payload: spanResult}) {
+      if (spanResult) state.selectedSpanResult = spanResult;
+      else state.selectedSpanResult = undefined;
+    },
     setSelectorSuggestions(state, {payload: selectorSuggestions}) {
       state.selectorSuggestions = selectorSuggestions;
     },
@@ -139,5 +144,6 @@ export const {
   setIsInitialized,
   setSelectorSuggestions,
   setPrevSelector,
+  setSelectedSpanResult,
 } = testSpecsSlice.actions;
 export default testSpecsSlice.reducer;
