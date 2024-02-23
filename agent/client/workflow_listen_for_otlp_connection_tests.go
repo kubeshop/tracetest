@@ -32,7 +32,7 @@ func (c *Client) startOTLPConnectionTestListener(ctx context.Context) error {
 			}
 			if isEndOfFileError(err) || isCancelledError(err) {
 				logger.Debug("otlp connection stream closed")
-				return
+				continue
 			}
 
 			reconnected, err := c.handleDisconnectionError(err)

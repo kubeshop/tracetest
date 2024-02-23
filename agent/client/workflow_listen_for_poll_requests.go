@@ -31,7 +31,7 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 			}
 			if isEndOfFileError(err) || isCancelledError(err) {
 				logger.Debug("poller stream closed")
-				return
+				continue
 			}
 
 			reconnected, err := c.handleDisconnectionError(err)

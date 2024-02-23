@@ -24,7 +24,7 @@ func (c *Client) startHeartBeat(ctx context.Context) error {
 			}
 			if isEndOfFileError(err) || isCancelledError(err) {
 				log.Println("ping stream closed")
-				return
+				continue
 			}
 
 			reconnected, err := c.handleDisconnectionError(err)

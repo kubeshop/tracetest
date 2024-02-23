@@ -32,7 +32,7 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 			}
 			if isEndOfFileError(err) || isCancelledError(err) {
 				logger.Debug("stop stream closed")
-				return
+				continue
 			}
 
 			reconnected, err := c.handleDisconnectionError(err)

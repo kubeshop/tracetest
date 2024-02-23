@@ -33,7 +33,7 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 
 			if isEndOfFileError(err) || isCancelledError(err) {
 				logger.Debug("shutdown stream closed")
-				return
+				continue
 			}
 
 			reconnected, err := c.handleDisconnectionError(err)

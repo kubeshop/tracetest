@@ -32,7 +32,7 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 			}
 			if isEndOfFileError(err) || isCancelledError(err) {
 				logger.Debug("data store connection stream closed")
-				return
+				continue
 			}
 
 			reconnected, err := c.handleDisconnectionError(err)
