@@ -83,3 +83,11 @@ func (v Value) String() string {
 
 	return v.Value().Value
 }
+
+func (v Value) UnescappedString() string {
+	output := v.String()
+	output = strings.ReplaceAll(output, `\'`, `'`)
+	output = strings.ReplaceAll(output, `\"`, `"`)
+
+	return output
+}

@@ -341,7 +341,7 @@ func (e Executor) executeFilter(input value.Value, filter *Filter) (value.Value,
 			return value.Nil, err
 		}
 
-		args = append(args, resolvedArg.Value().Value)
+		args = append(args, resolvedArg.UnescappedString())
 	}
 
 	newValue, err := executeFilter(input, filter.Name, args)

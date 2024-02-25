@@ -40,6 +40,11 @@ func TestJSONPath(t *testing.T) {
 			Query:          `$.array[*]..['id', 'name']`,
 			ExpectedOutput: `[38, "Tracetest", 39, "Kusk"]`,
 		},
+		{
+			JSON:           `{"results":[{"count(*)":{"result":3}}]}`,
+			Query:          `$.results[0]['count(*)'].result`,
+			ExpectedOutput: `3`,
+		},
 	}
 
 	for _, testCase := range testCases {
