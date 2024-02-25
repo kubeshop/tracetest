@@ -182,6 +182,13 @@ func TestStringInterpolationExecution(t *testing.T) {
 }
 
 func TestFilterExecution(t *testing.T) {
+	jsonResponseSpan := traces.Span{
+		ID:         id.NewRandGenerator().SpanID(),
+		Attributes: traces.NewAttributes(),
+	}
+
+	jsonResponseSpan.Attributes.Set("tracetest.response.body", `{"results":[{"count(*)":{"result":3}}]}`)
+
 	testCases := []executorTestCase{
 		{
 			Name:       "should_extract_id_from_json",
@@ -215,6 +222,14 @@ func TestFilterExecution(t *testing.T) {
 			Name:       "should_get_last_item_from_list",
 			Query:      `'{ "array": [1, 2, 5] }' | json_path '$.array[*]' | get_index 'last' = 5`,
 			ShouldPass: true,
+		},
+		{
+			Name:       "should_unescape_filter_arg",
+			Query:      `attr:tracetest.response.body | json_path '$.results[0][\'count(*)\'].result' = 3`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: jsonResponseSpan,
+			},
 		},
 	}
 
