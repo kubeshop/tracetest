@@ -108,10 +108,12 @@ func (a Attributes) Get(key string) string {
 	return v
 }
 
-func (a Attributes) Set(key, value string) {
+func (a Attributes) Set(key, value string) Attributes {
 	a.lock()
 	defer a.unlock()
 	a.values[key] = value
+
+	return a
 }
 
 func (a Attributes) Delete(key string) {
