@@ -391,19 +391,13 @@ func TestJSONExecution(t *testing.T) {
 			ShouldPass: true,
 		},
 		{
-			Name:       "should_identify_json_input_from_attribute",
-			Query:      `attr:tracetest.response.body contains '{"name": "john"}'`,
-			ShouldPass: true,
-			AttributeDataStore: expression.AttributeDataStore{
-				Span: traces.Span{
-					ID:         id.NewRandGenerator().SpanID(),
-					Attributes: traces.NewAttributes().Set("tracetest.response.body", `{"name": "john", "age": 32, "email": "john@company.com"}`),
-				},
-			},
-		},
-		{
 			Name:       "should_be_able_to_compare_with_subset",
 			Query:      `'{"name": "john", "age": 32, "email": "john@company.com"}' contains '{"email": "john@company.com", "name": "john"}'`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_be_able_to_compare_with_subset_ignoring_order",
+			Query:      `'{"name": "john", "age": 32, "email": "john@company.com"}' contains '{"email": "john@company.com", "name": "john", "age": 32}'`,
 			ShouldPass: true,
 		},
 		{
@@ -425,6 +419,22 @@ func TestJSONExecution(t *testing.T) {
 			Name:       "should_fail_when_array_doesnt_match_size_and_order",
 			Query:      `'{"numbers": [0,1,2,3,4]}' contains '{"numbers": [0,1]}'`,
 			ShouldPass: false,
+		},
+		{
+			Name:       "should_fail_when_array_contains_same_elements_but_different_types",
+			Query:      `'{"numbers": [0,1,2,3,4]}' contains '{"numbers": [0,1,"2","3",4]}'`,
+			ShouldPass: false,
+		},
+		{
+			Name:       "should_identify_json_input_from_attribute",
+			Query:      `attr:tracetest.response.body contains '{"name": "john"}'`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					ID:         id.NewRandGenerator().SpanID(),
+					Attributes: traces.NewAttributes().Set("tracetest.response.body", `{"name": "john", "age": 32, "email": "john@company.com"}`),
+				},
+			},
 		},
 	}
 
