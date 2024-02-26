@@ -426,6 +426,11 @@ func TestJSONExecution(t *testing.T) {
 			ShouldPass: false,
 		},
 		{
+			Name:       "should_be_able_to_compare_deep_objects_with_arrays_in_subset",
+			Query:      `'{"name": "john", "age": 32, "email": "john@company.com", "company": {"name": "Company", "address": "1234 Agora Street", "telephones": ["01", "02", "03"]}}' contains '{"email": "john@company.com", "name": "john", "company": {"name": "Company", "telephones": ["01", "02", "03"]}}'`,
+			ShouldPass: true,
+		},
+		{
 			Name:       "should_identify_json_input_from_attribute",
 			Query:      `attr:tracetest.response.body contains '{"name": "john"}'`,
 			ShouldPass: true,
