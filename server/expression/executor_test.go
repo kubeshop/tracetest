@@ -373,6 +373,74 @@ func TestArrayExecution(t *testing.T) {
 			Query:      `[31,35,39] contains 42`,
 			ShouldPass: false,
 		},
+		{
+			Name:       "should_identify_array_instead_of_json",
+			Query:      `["{}", "{}", "{}"] | type = "array"`,
+			ShouldPass: true,
+		},
+	}
+
+	executeTestCases(t, testCases)
+}
+
+func TestJSONExecution(t *testing.T) {
+	testCases := []executorTestCase{
+		{
+			Name:       "should_identify_json_input",
+			Query:      `'{"name": "john", "age": 32, "email": "john@company.com"}' | type = "json"`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_be_able_to_compare_with_subset",
+			Query:      `'{"name": "john", "age": 32, "email": "john@company.com"}' contains '{"email": "john@company.com", "name": "john"}'`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_be_able_to_compare_with_subset_ignoring_order",
+			Query:      `'{"name": "john", "age": 32, "email": "john@company.com"}' contains '{"email": "john@company.com", "name": "john", "age": 32}'`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_be_able_to_compare_deep_objects_in_subset",
+			Query:      `'{"name": "john", "age": 32, "email": "john@company.com", "company": {"name": "Company", "address": "1234 Agora Street"}}' contains '{"email": "john@company.com", "name": "john", "company": {"name": "Company"}}'`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_be_able_to_compare_array_of_json_objects",
+			Query:      `'[{"name": "john", "age": 32}, {"name": "Maria", "age": 63}]' contains '[{"age": 63}, {"age": 32}]'`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_match_complete_arrays",
+			Query:      `'{"numbers": [0,1,2,3,4]}' contains '{"numbers": [0,1,2,3,4]}'`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_fail_when_array_doesnt_match_size_and_order",
+			Query:      `'{"numbers": [0,1,2,3,4]}' contains '{"numbers": [0,1]}'`,
+			ShouldPass: false,
+		},
+		{
+			Name:       "should_fail_when_array_contains_same_elements_but_different_types",
+			Query:      `'{"numbers": [0,1,2,3,4]}' contains '{"numbers": [0,1,"2","3",4]}'`,
+			ShouldPass: false,
+		},
+		{
+			Name:       "should_be_able_to_compare_deep_objects_with_arrays_in_subset",
+			Query:      `'{"name": "john", "age": 32, "email": "john@company.com", "company": {"name": "Company", "address": "1234 Agora Street", "telephones": ["01", "02", "03"]}}' contains '{"email": "john@company.com", "name": "john", "company": {"name": "Company", "telephones": ["01", "02", "03"]}}'`,
+			ShouldPass: true,
+		},
+		{
+			Name:       "should_identify_json_input_from_attribute",
+			Query:      `attr:tracetest.response.body contains '{"name": "john"}'`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					ID:         id.NewRandGenerator().SpanID(),
+					Attributes: traces.NewAttributes().Set("tracetest.response.body", `{"name": "john", "age": 32, "email": "john@company.com"}`),
+				},
+			},
+		},
 	}
 
 	executeTestCases(t, testCases)

@@ -8,8 +8,9 @@ type Comparator interface {
 }
 
 var (
-	ErrNoMatch  = fmt.Errorf("no match")
-	ErrNotFound = fmt.Errorf("not found")
+	ErrNoMatch   = fmt.Errorf("no match")
+	ErrNotFound  = fmt.Errorf("not found")
+	ErrWrongType = fmt.Errorf("wrong type")
 )
 
 type Registry interface {
