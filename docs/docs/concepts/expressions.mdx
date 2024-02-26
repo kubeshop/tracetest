@@ -21,6 +21,7 @@ Tracetest allows you to add expressions when writing your tests. They are a nice
 * Arithmetic operations
 * String interpolation
 * Filters
+* JSON comparison
 
 ### Reference Span Attributes
 
@@ -138,4 +139,27 @@ attr:myapp.operations | get_index 2 | type = "string"
 ```css
 # check if attribute is either a number of a string
 ["number", "string"] contains attr:my_attribute | type
+```
+
+### JSON Comparison
+
+When working with APIs, it's very common for developers to want to check if the response contains some data while ignoring all the noise a response can have. For this, you can use the `contains` comparator in JSON objects. It works just like [Jest's toMatchObject](https://jestjs.io/pt-BR/docs/expect#tomatchobjectobject).
+
+The order of the attributes doesn't matter and the left side of the expression can contain more attributes than the right side.
+
+Some examples:
+
+```css
+# If user is 32 years old, it passes
+'{"name": "john", "age": 32}' contains '{"age": 32}'
+```
+
+```css
+# If any of the users is called "maria", it passes
+'[{"name": "john", "age": 32}, {"name": "maria", "age": 63}]' contains '{"name": "maria"}'
+```
+
+```css
+# In this case, both ages must be part of the JSON array
+'[{"name": "john", "age": 32}, {"name": "maria", "age": 63}]' contains '[{"age": 63}, {"age": 32}]'
 ```
