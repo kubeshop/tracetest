@@ -1,33 +1,30 @@
 type: Test
 spec:
-  id: yWoVaiuVR
+  id: 7uEPjAoIg
   name: Your API call with error
-  description: Test call that will fail on purpose, showing the error propagation problem in the Payment System
   trigger:
     type: http
     httpRequest:
-      url: http://your-api:10013/executePaymentOrder
       method: POST
+      url: http://your-api:10013/executePaymentOrder
+      body: |
+        {
+          "walletId": 4,
+          "yearsAsACustomer": 0
+        }
       headers:
       - key: Content-Type
         value: application/json
-      body: |-
-        {
-            "walletId": 4,
-            "yearsAsACustomer": 0
-        }
   specs:
-  - name: Your-API is OK
-    selector: span[name="POST /executePaymentOrder" http.target="/executePaymentOrder" http.method="POST"]
+  - selector: span[name="POST /executePaymentOrder" http.target="/executePaymentOrder" http.method="POST"]
+    name: Your-API is OK
     assertions:
     - attr:http.status_code = 200
-  - name: Payment-Executor is OK
-    selector: span[tracetest.span.type="http" name="POST" http.target="/payment/execute" http.method="POST"]
+  - selector: span[tracetest.span.type="http" name="POST" http.target="/payment/execute" http.method="POST"]
+    name: Payment-Executor is OK
     assertions:
     - attr:http.status_code = 200
-  - name: Risk-Analysis API calculation is returning OK
-    selector: span[name="/computeRisk" http.target="/computeRisk" http.method="POST"]
+  - selector: span[name="/computeRisk" http.target="/computeRisk" http.method="POST"]
+    name: Risk-Analysis API calculation is returning OK
     assertions:
     - attr:http.status_code = 200
-
-
