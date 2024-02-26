@@ -3,3 +3,7 @@ deployments/reservation/node_modules/*
 .DS_Store
 node_modules
 .env
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

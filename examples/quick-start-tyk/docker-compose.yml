@@ -1,14 +1,22 @@
 version: '3.3'
 services:
-  # Tracetest
-  tracetest-client:
-    build: ./tracetesting
+  # Tracetest x Playwright
+  tracetest-e2e:
+    build: .
+    command: npm test
     environment:
-      TRACETEST_API_TOKEN: ${TRACETEST_API_TOKEN}
-      POKESHOP_DEMO_URL: ${POKESHOP_DEMO_URL}
+      - POKESHOP_DEMO_URL=${POKESHOP_DEMO_URL}
+      - TRACETEST_API_TOKEN=${TRACETEST_API_TOKEN}
+      - TYK_AUTH_KEY=${TYK_AUTH_KEY}
     depends_on:
+      tracetest-agent:
+        condition: service_started
       api:
         condition: service_healthy
+      worker:
+        condition: service_started
+      tyk-gateway:
+        condition: service_started
 
   tracetest-agent:
     environment:
@@ -16,28 +24,27 @@ services:
       TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
       TRACETEST_SERVER_URL: ${TRACETEST_SERVER_URL}
     image: kubeshop/tracetest-agent:latest
-  
+
   # Tyk Gateway
   tyk-gateway:
     image: tykio/tyk-gateway:v5.2.1
     ports:
       - 8080:8080
     environment:
-        - TYK_GW_OPENTELEMETRY_ENABLED=true
-        - TYK_GW_OPENTELEMETRY_EXPORTER=grpc
-        - TYK_GW_OPENTELEMETRY_ENDPOINT=otel-collector:4317
+      - TYK_GW_OPENTELEMETRY_ENABLED=true
+      - TYK_GW_OPENTELEMETRY_EXPORTER=grpc
+      - TYK_GW_OPENTELEMETRY_ENDPOINT=otel-collector:4317
     volumes:
       - ./deployments/tyk-gateway/apps:/opt/tyk-gateway/apps
       - ./deployments/tyk-gateway/tyk.conf:/opt/tyk-gateway/tyk.conf
     depends_on:
       - tyk-redis
+      - otel-collector
 
   tyk-redis:
     image: redis:6.0.4
     volumes:
       - tyk-redis-data:/data
-
-  # Demo services
 
   # pokeshop demo services
   postgres:
@@ -79,12 +86,15 @@ services:
       RABBITMQ_HOST: queue
       POKE_API_BASE_URL: https://pokeapi.co/api/v2
       COLLECTOR_ENDPOINT: http://otel-collector:4317
+      HTTP_COLLECTOR_ENDPOINT: http://otel-collector:4318/v1/traces
       NPM_RUN_COMMAND: api
     healthcheck:
       test: ['CMD', 'wget', '--spider', 'localhost:8081']
       interval: 1s
       timeout: 3s
       retries: 60
+    ports:
+      - 8081:8081
     depends_on:
       postgres:
         condition: service_healthy
@@ -92,6 +102,8 @@ services:
         condition: service_healthy
       queue:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
 
   worker:
     image: kubeshop/demo-pokemon-api:latest
@@ -117,7 +129,9 @@ services:
     image: otel/opentelemetry-collector-contrib:latest
     volumes:
       - ./deployments/otel-collector/otel-collector.yml:/etc/otel-collector.yml
-    command: [ "--config=/etc/otel-collector.yml" ]
+    command: ['--config=/etc/otel-collector.yml']
+    ports:
+      - 4318:4318
 
 volumes:
   tyk-redis-data:

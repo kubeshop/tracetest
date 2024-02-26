@@ -101,29 +101,32 @@ You can find the Tyk Gateway apps and configuration in the `deployments/tyk-gate
   "auth": { "auth_header_name": "authorization" },
   "version_data": { "not_versioned": true, "versions": { "Default": { "name": "Default" } } },
   "proxy":
-    {
-      "listen_path": "/pokeshop/",
-      "target_url": "http://api:8081/pokemon/",
-      "strip_listen_path": true,
-      "preserve_host_header": true,
-    },
+    { "listen_path": "/", "target_url": "http://api:8081/", "strip_listen_path": true, "preserve_host_header": true },
 }
 ```
 
 ### 2. Tracetest
 
-The tracetest setup is composed by the `tracetest-client` and the `tracetest-agent` services under the `docker-compose.yml` file.
+The tracetest setup is composed by the `tracetest-e2e` and the `tracetest-agent` services under the `docker-compose.yml` file.
 
 ```yaml title=docker-compose.yml
-# Tracetest
-tracetest-client:
-  build: ./tracetesting
+# Tracetest x Playwright
+tracetest-e2e:
+  build: .
+  command: npm test
   environment:
-    TRACETEST_API_TOKEN: ${TRACETEST_API_TOKEN}
-    POKESHOP_DEMO_URL: ${POKESHOP_DEMO_URL}
+    - POKESHOP_DEMO_URL=${POKESHOP_DEMO_URL}
+    - TRACETEST_API_TOKEN=${TRACETEST_API_TOKEN}
+    - TYK_AUTH_KEY=${TYK_AUTH_KEY}
   depends_on:
+    tracetest-agent:
+      condition: service_started
     api:
       condition: service_healthy
+    worker:
+      condition: service_started
+    tyk-gateway:
+      condition: service_started
 
 tracetest-agent:
   environment:
@@ -222,141 +225,134 @@ Copy the `.env.template` and create a `.env` file in the same directory. Add tok
 TRACETEST_API_TOKEN=<my_token_with_engineer_access>
 TRACETEST_AGENT_API_KEY=<my_agent_api_key>
 POKESHOP_DEMO_URL=http://tyk-gateway:8080
+TYK_AUTH_KEY=28d220fd77974a4facfb07dc1e49c2aa
+
 ```
 
-## The Tracetest Script
+## The Tracetest End To End Script
 
-The `tracetest/index.ts` file contains the script that will execute the trace-based tests against the tyk endpoint.
+The `playwright/home.spec.ts` file contains the script that will execute the trace-based tests against the Pokeshop App proxied by a tyk endpoint.
 
 ### Steps Executed by the Script
+
 1. Create a new key in the Tyk Gateway.
 2. Create a new test definition in Tracetest (using the async import service from the Pokeshop Demo).
-3. Run the test with the variables defined.
+3. Run the Playwright Test.
+4. Report back the results.
 
-```typescript title=tracetesting/tracetest.ts
-import Tracetest from "@tracetest/client";
-import fetch from "node-fetch";
-import { TestResource } from "@tracetest/client/dist/modules/openapi-client";
-import { config } from "dotenv";
+```typescript title=playwright/home.spec.ts
+import { test, expect } from "@playwright/test";
+import { getKey } from "./auth";
+import Tracetest, { Types } from "@tracetest/playwright";
 
-config();
+const { TRACETEST_API_TOKEN = "" } = process.env;
 
-const { TRACETEST_API_TOKEN = "", POKESHOP_DEMO_URL = "" } = process.env;
+let tracetest: Types.TracetestPlaywright | undefined = undefined;
 
-const params = {
-  headers: {
-    "Content-Type": "application/json",
-    "x-tyk-authorization": "28d220fd77974a4facfb07dc1e49c2aa",
-    "Response-Type": "application/json",
-  },
-};
+test.describe.configure({ mode: "serial" });
 
-const setup = async () => {
-  const alias = "website";
+const definition = `
+type: Test
+spec:
+  id: UGxheXdyaWdodDogaW1wb3J0cyBhIHBva2Vtb24=
+  name: "Playwright: imports a pokemon"
+  trigger:
+    type: playwright
+  specs:
+    - selector: span[tracetest.span.type="http"] span[tracetest.span.type="http"]
+      name: "All HTTP Spans: Status  code is 200"
+      assertions:
+      - attr:http.status_code   =   200
+    - selector: span[tracetest.span.type="database"]
+      name: "All Database Spans: Processing time is less than 100ms"
+      assertions:
+      - attr:tracetest.span.duration < 2s
+  outputs:
+    - name: MY_OUTPUT
+      selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+      value: attr:name
+`;
 
-  const data = {
-    alias,
-    expires: -1,
-    access_rights: {
-      1: {
-        api_id: "1",
-        api_name: "pokeshop",
-        versions: ["Default"],
-      },
+test.beforeAll(async () => {
+  tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN });
+
+  await tracetest.setOptions({
+    "Playwright: imports a pokemon": {
+      definition,
     },
-  };
+  });
+});
 
-  const res = await fetch("http://tyk-gateway:8080/tyk/keys/create", {
-    ...params,
-    method: "POST",
-    body: JSON.stringify(data),
+test.beforeEach(async ({ page, context }, { title }) => {
+  // sets the auth headers for the page requests
+  const key = await getKey();
+  await context.setExtraHTTPHeaders({
+    Authorization: `Bearer ${key}`,
   });
 
-  const { key } = (await res.json()) as { key: string };
+  await page.goto("/");
+  await tracetest?.capture(title, page);
+});
 
-  return key;
-};
+// optional step to break the playwright script in case a Tracetest test fails
+test.afterAll(async ({}, testInfo) => {
+  testInfo.setTimeout(80000);
+  await tracetest?.summary();
+});
 
-const definition: TestResource = {
-  type: "Test",
-  spec: {
-    id: "ZV1G3v2IR",
-    name: "Import Pokemon",
-    trigger: {
-      type: "http",
-      httpRequest: {
-        method: "POST",
-        url: "${var:ENDPOINT}/pokeshop/import",
-        body: '{"id": ${var:POKEMON_ID}}',
-        headers: [
-          {
-            key: "Content-Type",
-            value: "application/json",
-          },
-          {
-            key: "Authorization",
-            value: "${var:AUTHORIZATION}",
-          },
-        ],
-      },
-    },
-    specs: [
-      {
-        selector: 'span[tracetest.span.type="database"]',
-        name: "All Database Spans: Processing time is less than 100ms",
-        assertions: ["attr:tracetest.span.duration < 100ms"],
-      },
-      {
-        selector: 'span[tracetest.span.type="http"]',
-        name: "All HTTP Spans: Status  code is 200",
-        assertions: ["attr:http.status_code = 200"],
-      },
-      {
-        selector: 'span[tracetest.span.type="http" name="GET" http.method="GET" net.peer.name = "pokeapi.co"]',
-        name: "The request matches the pokemon Id",
-        assertions: ['attr:http.url   =  "https://pokeapi.co/api/v2/pokemon/${var:POKEMON_ID}"'],
-      },
-    ],
-  },
-};
+test("Playwright: imports a pokemon", async ({ page }) => {
+  expect(await page.getByText("Pokeshop")).toBeTruthy();
 
-const main = async () => {
-  const tracetest = await Tracetest(TRACETEST_API_TOKEN);
+  await page.click("text=Import");
 
-  const key = await setup();
-
-  const test = await tracetest.newTest(definition);
-  await tracetest.runTest(test, {
-    variables: [
-      {
-        key: "ENDPOINT",
-        value: POKESHOP_DEMO_URL.trim(),
-      },
-      {
-        key: "POKEMON_ID",
-        value: `${Math.floor(Math.random() * 100) + 1}`,
-      },
-      {
-        key: "AUTHORIZATION",
-        value: key,
-      },
-    ],
-  });
-  console.log(await tracetest.getSummary());
-};
-
-main();
+  await page.getByLabel("ID").fill(Math.floor(Math.random() * 101).toString());
+  await page.getByRole("button", { name: "OK", exact: true }).click();
+});
 ```
 
-The output from the `tracetest/index.ts` script will show the test results with links to the Tracetest App.
+The output from the Playwright tests will show the test results with links to the Tracetest App.
 
 ```bash title=Terminal
-2024-02-20 13:11:06 
-2024-02-20 13:11:06 Successful: 1
-2024-02-20 13:11:06 Failed: 0
-2024-02-20 13:11:06 
-2024-02-20 13:11:06 [✔️ Import Pokemon] #11 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/ZV1G3v2IR/run/11
-2024-02-20 13:11:06 
+WARN[0000] The "TRACETEST_SERVER_URL" variable is not set. Defaulting to a blank string.
+[+] Running 2/2
+ ✔ worker Pulled                                                                                                                      1.1s
+ ✔ api Pulled                                                                                                                         1.1s
+[+] Creating 9/0
+ ✔ Container quick-start-tyk-tyk-redis-1        Running                                                                               0.0s
+ ✔ Container quick-start-tyk-otel-collector-1   Running                                                                               0.0s
+ ✔ Container quick-start-tyk-cache-1            Running                                                                               0.0s
+ ✔ Container quick-start-tyk-queue-1            Running                                                                               0.0s
+ ✔ Container quick-start-tyk-tracetest-agent-1  Running                                                                               0.0s
+ ✔ Container quick-start-tyk-postgres-1         Running                                                                               0.0s
+ ✔ Container quick-start-tyk-tyk-gateway-1      Running                                                                               0.0s
+ ✔ Container quick-start-tyk-worker-1           Running                                                                               0.0s
+ ✔ Container quick-start-tyk-api-1              Running                                                                               0.0s
+[+] Running 3/3
+ ✔ Container quick-start-tyk-postgres-1  Healthy                                                                                      0.5s
+ ✔ Container quick-start-tyk-cache-1     Healthy                                                                                      0.5s
+ ✔ Container quick-start-tyk-queue-1     Healthy                                                                                      0.5s
+[+] Running 2/2
+ ✔ worker Pulled                                                                                                                      1.2s
+ ✔ api Pulled                                                                                                                         1.1s
+
+> quick-start-tyk@1.0.0 test
+> playwright test
+
+
+Running 1 test using 1 worker
+[chromium] › home.spec.ts:59:5 › Playwright: imports a pokemon
+
+Successful: 1
+Failed: 0
+
+[✔️ Playwright: imports a pokemon] #20 - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/UGxheXdyaWdodDogaW1wb3J0cyBhIHBva2Vtb24=/run/20
+
+  1 passed (14.1s)
+
+To open last HTML report run:
+
+  npx playwright show-report
+
 ```
 
 ### Tracetest App Results
@@ -368,10 +364,10 @@ The output from the `tracetest/index.ts` script will show the test results with 
 Spin up the deployment and test execution.
 
 ```bash title=Terminal
-docker-compose up
+docker-compose run tracetest-e2e
 ```
 
-This will trigger the Docker Compose setup and immediately run the [trace-based tests using the Tracetest Typescript integration](../../tools-and-integrations/typescript.mdx) as part of the `tracetest-client` service.
+This will trigger the Docker Compose setup and immediately run the [trace-based tests using the Tracetest Playwright integration](../../tools-and-integrations/playwright.mdx) as part of the `tracetest-e2e` service.
 
 ## Learn More
 

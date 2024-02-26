@@ -21,8 +21,8 @@
     }
   },
   "proxy": {
-    "listen_path": "/pokeshop/",
-    "target_url": "http://api:8081/pokemon/",
+    "listen_path": "/",
+    "target_url": "http://api:8081/",
     "strip_listen_path": true,
     "preserve_host_header": true
   }
