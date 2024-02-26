@@ -6,16 +6,16 @@ spec:
   trigger:
     type: http
     httpRequest:
-      url: http://your-api:10013/executePaymentOrder
       method: POST
+      url: http://your-api:10013/executePaymentOrder
+      body: |
+        {
+          "walletId": 4,
+          "yearsAsACustomer": 1
+        }
       headers:
       - key: Content-Type
         value: application/json
-      body: |-
-        {
-            "walletId": 4,
-            "yearsAsACustomer": 1
-        }
   specs:
   - name: Your-API is OK
     selector: span[name="POST /executePaymentOrder" http.target="/executePaymentOrder" http.method="POST"]
