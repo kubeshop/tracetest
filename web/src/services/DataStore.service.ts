@@ -33,6 +33,7 @@ interface IDataStoreService {
   getInitialValues(config: DataStore, configuredDataStore?: SupportedDataStores): TDraftDataStore;
   validateDraft(config: TDraftDataStore): Promise<boolean>;
   getIsOtlpBased(draft: TDraftDataStore): boolean;
+  getPublicInfo(config: DataStore): Record<string, string>;
   _getDataStore(type?: SupportedDataStores): TDataStoreService;
 }
 
@@ -40,6 +41,7 @@ const DataStoreService = (): IDataStoreService => ({
   _getDataStore(type = SupportedDataStores.JAEGER) {
     return dataStoreServiceMap[type] || OtelCollectorService;
   },
+
   async getRequest(draft, defaultDataStore) {
     const dataStoreType = draft.dataStoreType || SupportedDataStores.JAEGER;
     const dataStoreService = this._getDataStore(dataStoreType);
@@ -77,6 +79,13 @@ const DataStoreService = (): IDataStoreService => ({
     const dataStore = this._getDataStore(draft.dataStoreType);
 
     return dataStore.getIsOtlpBased(draft);
+  },
+
+  getPublicInfo(config) {
+    const type = (config.type || SupportedDataStores.JAEGER) as SupportedDataStores;
+    const dataStore = this._getDataStore(type);
+
+    return {...dataStore.getPublicInfo(config)};
   },
 });
 

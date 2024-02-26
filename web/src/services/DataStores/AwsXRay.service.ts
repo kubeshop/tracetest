@@ -40,6 +40,14 @@ const AwsXRayService = (): TDataStoreService => ({
   getIsOtlpBased() {
     return false;
   },
+  getPublicInfo({awsxray = {}}) {
+    const {region = '', useDefaultAuth = false} = awsxray;
+
+    return {
+      Region: region,
+      'Use Default Auth': useDefaultAuth ? 'Yes' : 'No',
+    };
+  },
 });
 
 export default AwsXRayService();
