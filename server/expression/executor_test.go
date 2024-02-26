@@ -391,6 +391,17 @@ func TestJSONExecution(t *testing.T) {
 			ShouldPass: true,
 		},
 		{
+			Name:       "should_identify_json_input_from_attribute",
+			Query:      `attr:tracetest.response.body contains '{"name": "john"}'`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					ID:         id.NewRandGenerator().SpanID(),
+					Attributes: traces.NewAttributes().Set("tracetest.response.body", `{"name": "john", "age": 32, "email": "john@company.com"}`),
+				},
+			},
+		},
+		{
 			Name:       "should_be_able_to_compare_with_subset",
 			Query:      `'{"name": "john", "age": 32, "email": "john@company.com"}' contains '{"email": "john@company.com", "name": "john"}'`,
 			ShouldPass: true,
