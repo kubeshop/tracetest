@@ -1,6 +1,9 @@
 package types
 
-import "regexp"
+import (
+	"encoding/json"
+	"regexp"
+)
 
 type Type uint
 
@@ -12,11 +15,13 @@ const (
 	TypeDuration
 	TypeVariable
 	TypeArray
+	TypeJson
 )
 
 var typeNames = map[Type]string{
 	TypeNil:       "nil",
 	TypeString:    "string",
+	TypeJson:      "json",
 	TypeNumber:    "number",
 	TypeAttribute: "attribute",
 	TypeDuration:  "duration",
@@ -37,7 +42,16 @@ func GetType(value string) Type {
 		return TypeDuration
 	}
 
+	if err := json.Unmarshal([]byte(value), &map[string]any{}); err == nil {
+		return TypeJson
+	}
+
 	if arrayRegex.Match([]byte(value)) {
+		var jsonArray = []map[string]any{}
+		if err := json.Unmarshal([]byte(value), &jsonArray); err == nil {
+			return TypeJson
+		}
+
 		return TypeArray
 	}
 

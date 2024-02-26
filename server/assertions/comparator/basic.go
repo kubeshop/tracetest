@@ -1,6 +1,7 @@
 package comparator
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -18,6 +19,7 @@ var (
 		NotContains,
 		StartsWith,
 		EndsWith,
+		JsonContains,
 	}
 )
 
@@ -227,4 +229,102 @@ func (c endsWith) Compare(expected, actual string) error {
 
 func (c endsWith) String() string {
 	return "endsWith"
+}
+
+// JsonContains
+var JsonContains Comparator = jsonContains{}
+
+type jsonContains struct{}
+
+func (c jsonContains) Compare(right, left string) error {
+	supersetMap, err := c.parseJson(left)
+	if err != nil {
+		return fmt.Errorf("left side is not a JSON object")
+	}
+
+	subsetMap, err := c.parseJson(right)
+	if err != nil {
+		return fmt.Errorf("left side is not a JSON object")
+	}
+
+	return c.compare(supersetMap, subsetMap)
+}
+
+func (c jsonContains) parseJson(input string) ([]map[string]any, error) {
+	if strings.HasPrefix(input, "[") && strings.HasSuffix(input, "]") {
+		output := []map[string]any{}
+		err := json.Unmarshal([]byte(input), &output)
+		if err != nil {
+			return []map[string]any{}, fmt.Errorf("invalid JSON array")
+		}
+
+		return output, nil
+	}
+
+	object := map[string]any{}
+	err := json.Unmarshal([]byte(input), &object)
+	if err != nil {
+		return []map[string]any{}, fmt.Errorf("invalid JSON object")
+	}
+
+	return []map[string]any{object}, nil
+}
+
+func (c jsonContains) compare(left, right []map[string]any) error {
+	for i, expected := range right {
+		err := c.anyMatches(left, expected)
+		if err != nil {
+			return fmt.Errorf("left side array doesn't match item %d of right side: %w", i, ErrNoMatch)
+		}
+	}
+
+	return nil
+}
+
+func (c jsonContains) anyMatches(array []map[string]any, expected map[string]any) error {
+	for _, left := range array {
+		err := c.compareObjects(left, expected)
+		if err == nil {
+			return nil
+		}
+	}
+
+	return ErrNoMatch
+}
+
+func (c jsonContains) compareObjects(left, right map[string]any) error {
+	for key, value := range right {
+		leftValue, ok := left[key]
+		if !ok {
+			return fmt.Errorf(`field "%s" not found on left side: %w`, key, ErrNoMatch)
+		}
+
+		if leftValueMap, ok := leftValue.(map[string]any); ok {
+			rightValueMap, ok := value.(map[string]any)
+			if !ok {
+				return fmt.Errorf(`field: "%s": %w`, key, ErrWrongType)
+			}
+
+			err := c.compareObjects(leftValueMap, rightValueMap)
+			if err != nil {
+				return fmt.Errorf(`field "%s": %w`, key, err)
+			}
+
+			return nil
+		}
+
+		// This minimizes the change of a panic due to comparing two []interface{} types
+		leftValueString, _ := json.Marshal(leftValue)
+		rightValueString, _ := json.Marshal(value)
+
+		if string(leftValueString) != string(rightValueString) {
+			return fmt.Errorf(`field "%s": %w`, key, ErrNoMatch)
+		}
+	}
+
+	return nil
+}
+
+func (c jsonContains) String() string {
+	return "json-contains"
 }
