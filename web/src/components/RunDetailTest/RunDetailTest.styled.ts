@@ -19,8 +19,8 @@ export const SectionLeft = styled(Section)<{$isTimeline: boolean}>`
   ${({$isTimeline}) =>
     $isTimeline &&
     css`
-      max-size: calc(100% - 695px);
-      overflow: scroll;
+      overflow: hidden;
+      overflow-x: auto;
     `}
 `;
 

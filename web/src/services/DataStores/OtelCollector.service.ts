@@ -23,6 +23,9 @@ const OtelCollectorService = (): TDataStoreService => ({
   getIsOtlpBased() {
     return true;
   },
+  getPublicInfo() {
+    return {};
+  },
 });
 
 export default OtelCollectorService();

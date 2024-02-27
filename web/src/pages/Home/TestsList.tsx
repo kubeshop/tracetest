@@ -64,7 +64,7 @@ const Tests = () => {
 
   const handleOnEdit = useCallback(
     (id: string, lastRunId: number) => {
-      navigate(`/test/${id}/run/${lastRunId}`);
+      navigate(`/test/${id}/run/${lastRunId}/trigger`);
     },
     [navigate]
   );

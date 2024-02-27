@@ -12,11 +12,7 @@ interface IProps {
   span: Span;
 }
 
-const Detail = ({
-  assertionsFailed,
-  assertionsPassed,
-  span: {duration, name, id, service, kind, system, type},
-}: IProps) => {
+const Detail = ({assertionsFailed, assertionsPassed, span: {duration, name, service, kind, system, type}}: IProps) => {
   return (
     <>
       <S.DetailsWrapper>
