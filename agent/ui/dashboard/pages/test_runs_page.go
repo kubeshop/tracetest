@@ -39,18 +39,12 @@ func NewTestRunPage(renderScheduler components.RenderScheduler, sensor sensors.S
 	})
 
 	p.Grid.
-		// We gonna use 4 lines (it could be 2, but there's a limitation in tview that only allow
-		// lines of height 30 or less. So I had to convert the previous line of height 90 to 3 lines of height 30)
-		SetRows(10, 20, 30, 30).
-		// 3 rows, two columns of size 30 and the middle column fills the rest of the screen.
+		// Check the docs here: https://pkg.go.dev/github.com/rivo/tview#Grid
+		SetRows(-2, -10, -1).
 		SetColumns(30, 0, 30).
-
-		// TestRunList starts at (1,0) and fills 2 rows and 3 columns
-		AddItem(p.testRunList, 1, 0, 2, 3, 0, 0, true).
-		// Header starts at (row,column) (0,0) and fills 1 row and 3 columns
 		AddItem(p.header, 0, 0, 1, 3, 0, 0, false).
-		// Command panel starts at last row and just uses one row.
-		AddItem(p.commandsPanel, 3, 0, 1, 3, 0, 0, false)
+		AddItem(p.testRunList, 1, 0, 1, 3, 0, 0, true).
+		AddItem(p.commandsPanel, 2, 0, 1, 3, 0, 0, false)
 
 	sensor.On(events.NewTestRun, func(e sensors.Event) {
 		var testRun models.TestRun
