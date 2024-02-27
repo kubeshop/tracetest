@@ -61,7 +61,7 @@ const RunActionsMenu = ({resultId, testId, testSuiteId, testSuiteRunId, isRunVie
               data-cy="test-edit-button"
               onClick={({domEvent}) => {
                 domEvent.stopPropagation();
-                navigate(`/test/${testId}/run/${resultId}`);
+                navigate(`/test/${testId}/run/${resultId}/trigger`);
               }}
               key="edit"
               disabled={!getIsAllowed(Operation.Edit)}
