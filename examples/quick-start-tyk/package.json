@@ -1,0 +1,19 @@
+{
+  "name": "quick-start-tyk",
+  "version": "1.0.0",
+  "description": "## Quick Start",
+  "main": "index.js",
+  "scripts": {
+    "pw:open": "playwright test --ui",
+    "test": "playwright test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.41.2",
+    "@tracetest/playwright": "^0.0.30",
+    "@types/node": "^20.11.20",
+    "dotenv": "^16.4.5"
+  }
+}
