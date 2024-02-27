@@ -121,6 +121,7 @@ export type TDataStoreService = {
     configuredDataStore?: SupportedDataStores
   ): TDraftDataStore;
   getIsOtlpBased(draft: TDraftDataStore): boolean;
+  getPublicInfo(config: DataStore): Record<string, string>;
 };
 
 export interface IDataStorePluginProps {}

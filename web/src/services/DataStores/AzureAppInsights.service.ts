@@ -63,6 +63,19 @@ const AzureAppInsightsService = (): TDataStoreService => ({
   getIsOtlpBased({dataStore: {azureappinsights: {connectionType = ConnectionTypes.Direct} = {}} = {}}) {
     return connectionType === ConnectionTypes.Collector;
   },
+  getPublicInfo({azureappinsights = {}}) {
+    const {
+      resourceArmId = '',
+      connectionType = ConnectionTypes.Direct,
+      useAzureActiveDirectoryAuth = true,
+    } = azureappinsights;
+
+    return {
+      'Resource Arm Id': resourceArmId,
+      'Connection Type': connectionType,
+      'Use Azure Active Directory Auth': useAzureActiveDirectoryAuth ? 'Yes' : 'No',
+    };
+  },
 });
 
 export default AzureAppInsightsService();

@@ -82,6 +82,13 @@ const HttpClientService = () => ({
       fileKey: keyFile ? new File([keyFile], 'fileKey') : undefined,
     };
   },
+  getPublicInfo(values: TRawHttpClientSettings) {
+    const {url = ''} = values;
+
+    return {
+      URL: url,
+    };
+  },
 });
 
 export default HttpClientService();

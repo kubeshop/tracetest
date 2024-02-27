@@ -27,6 +27,13 @@ const SignalFxService = (): TDataStoreService => ({
   getIsOtlpBased() {
     return false;
   },
+  getPublicInfo({signalfx = {}}) {
+    const {realm = ''} = signalfx;
+
+    return {
+      Realm: realm,
+    };
+  },
 });
 
 export default SignalFxService();
