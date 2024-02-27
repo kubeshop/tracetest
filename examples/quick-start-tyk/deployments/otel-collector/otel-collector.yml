@@ -12,6 +12,10 @@ processors:
   batch:
 
 exporters:
+  jaeger:
+    endpoint: jaeger:14250
+    tls:
+      insecure: true
   otlp:
     endpoint: tracetest-agent:4317
     tls:
@@ -20,6 +24,10 @@ exporters:
 service:
   pipelines:
     traces:
+      receivers: [otlp]
+      processors: []
+      exporters: [jaeger]
+    traces/1:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp]
