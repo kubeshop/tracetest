@@ -4,7 +4,7 @@ This repo shows how to integrate tracetest tests with artillery.io tests
 
 
 ```
-export TRACETEST_API_KEY=ttagent_15b4c38ec00bb0e7
+export TRACETEST_API_KEY=
 ```
 
 ## Steps
