@@ -16,8 +16,9 @@ const maxTestRuns = 25
 type TestRunPage struct {
 	*tview.Grid
 
-	header      *components.Header
-	testRunList *components.TestRunList
+	header        *components.Header
+	testRunList   *components.TestRunList
+	commandsPanel *components.CommandsPanel
 
 	renderScheduler components.RenderScheduler
 	testRuns        []models.TestRun
@@ -32,6 +33,10 @@ func NewTestRunPage(renderScheduler components.RenderScheduler, sensor sensors.S
 
 	p.header = components.NewHeader(renderScheduler, sensor)
 	p.testRunList = components.NewTestRunList(renderScheduler, sensor)
+	p.commandsPanel = components.NewCommandsPanel([]components.Command{
+		{Name: "Show details", Shortcut: "Enter"},
+		{Name: "Exit", Shortcut: "Esc"},
+	})
 
 	p.Grid.
 		// We gonna use 4 lines (it could be 2, but there's a limitation in tview that only allow
@@ -43,7 +48,8 @@ func NewTestRunPage(renderScheduler components.RenderScheduler, sensor sensors.S
 		// Header starts at (row,column) (0,0) and fills 1 row and 3 columns
 		AddItem(p.header, 0, 0, 1, 3, 0, 0, false).
 		// TestRunList starts at (1,0) and fills 2 rows and 3 columns
-		AddItem(p.testRunList, 1, 0, 2, 3, 0, 0, true)
+		AddItem(p.testRunList, 1, 0, 2, 3, 0, 0, true).
+		AddItem(p.commandsPanel, 3, 0, 1, 3, 0, 0, false)
 
 	sensor.On(events.NewTestRun, func(e sensors.Event) {
 		var testRun models.TestRun
