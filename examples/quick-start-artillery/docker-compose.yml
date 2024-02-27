@@ -18,7 +18,7 @@ services:
         depends_on:
             postgres:
                 condition: service_healthy
-            otel-collector:
+            tracetest-agent:
                 condition: service_started
         healthcheck:
             test: ["CMD", "wget", "--spider", "localhost:11633"]
@@ -41,6 +41,16 @@ services:
         ports:
             - 5432:5432
 
+    tracetest-agent:
+        environment:
+            TRACETEST_DEV: ${TRACETEST_DEV}
+            TRACETEST_API_KEY: ${TRACETEST_API_KEY}
+        image: kubeshop/tracetest-agent:latest
+        # ports:
+        #     - 4317:4317
+        #     - 4318:4318
+
+
     otel-collector:
         image: otel/opentelemetry-collector:0.54.0
         command:
@@ -50,6 +60,7 @@ services:
             - ./collector.config.yaml:/otel-local-config.yaml
         depends_on:
             - jaeger
+            - tracetest-agent
         ports:
             - 4317:4317
             - 4318:4318

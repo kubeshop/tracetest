@@ -3,6 +3,10 @@
 This repo shows how to integrate tracetest tests with artillery.io tests
 
 
+```
+export TRACETEST_API_KEY=ttagent_15b4c38ec00bb0e7
+```
+
 ## Steps
 
 1. Get your tracetest cloud api key and replace it on `atillery-test.yaml`
