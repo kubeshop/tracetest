@@ -1,11 +1,13 @@
-import {Button} from 'antd';
 import styled, {createGlobalStyle, css} from 'styled-components';
-import {withPulseAnimation} from '../PulseButton';
 
 export const GlobalStyle = createGlobalStyle`
-  .spaces-resize-handle {
+  .spaces-space {
     border-left: 1px solid ${({theme}) => theme.color.borderLight};
-    z-index: 10;
+  }
+
+  .spaces-resize-handle.resize-right:before,
+  .spaces-resize-handle.resize-left:before {
+    cursor: col-resize;    
   }
 
   .splitter {
@@ -17,26 +19,11 @@ export const GlobalStyle = createGlobalStyle`
   }
 `;
 
-export const ButtonContainer = styled.div`
-  position: absolute;
-  right: -15px;
-  top: 48px;
-  z-index: 100;
-`;
-
-export const SplitterButton = styled(Button)<{$isPulsing: boolean}>`
-  && {
-    border: 3px solid ${({theme}) => theme.color.primaryLight};
-    background-clip: padding-box;
-    > span {
-      font-size: ${({theme}) => theme.size.md};
-    }
+export const SplitterContainer = styled.div`
+  :hover {
+    background: ${({theme}) => theme.color.primaryLight};
   }
-
-  ${({theme, $isPulsing}) => $isPulsing && withPulseAnimation(theme)}
 `;
-
-export const SplitterContainer = styled.div``;
 
 export const PanelContainer = styled.div<{$isOpen: boolean}>`
   background-color: ${({theme}) => theme.color.white};
@@ -51,11 +38,31 @@ export const PanelContainer = styled.div<{$isOpen: boolean}>`
   }
 
   ${({$isOpen}) =>
-    $isOpen &&
+    ($isOpen &&
+      css`
+        > div {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      `) ||
     css`
-      > div {
-        opacity: 1;
-        pointer-events: auto;
+      :hover {
+        background: ${({theme}) => theme.color.primaryLight};
       }
+      cursor: pointer;
     `}
+`;
+
+export const Controls = styled.div<{$isOpen: boolean}>`
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: ${({theme}) => theme.color.primary};
+  color: ${({theme}) => theme.color.white};
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-size: ${({theme}) => theme.size.lg};
 `;

@@ -1,37 +1,31 @@
 import * as Spaces from 'react-spaces';
-import Splitter from '../ResizablePanels/Splitter';
-import useResizablePanel, {TPanel, TSize} from '../ResizablePanels/hooks/useResizablePanel';
+import useResizablePanel, {TPanel} from '../ResizablePanels/hooks/useResizablePanel';
+import PanelContainer from './PanelContainer';
+import * as S from './ResizablePanels.styled';
 
 interface IProps {
   panel: TPanel;
   order?: number;
-  children(size: TSize): React.ReactNode;
-  tooltip?: string;
+  children: React.ReactNode;
 }
 
-const RightPanel = ({panel, order = 1, children, tooltip}: IProps) => {
-  const {size, toggle, onStopResize} = useResizablePanel({panel});
+const RightPanel = ({panel, order = 1, children}: IProps) => {
+  const {size, onChange, onStopResize} = useResizablePanel({panel});
 
   return (
     <Spaces.RightResizable
+      allowOverflow
       onResizeEnd={newSize => onStopResize(newSize)}
-      minimumSize={size.minSize}
-      maximumSize={size.maxSize}
+      minimumSize={size.minSize()}
+      maximumSize={size.maxSize()}
       size={size.size}
       key={size.name}
       order={order}
-      handleRender={props => (
-        <Splitter
-          {...props}
-          name={size.name}
-          isOpen={!size.isOpen}
-          onClick={() => toggle()}
-          tooltip={!size.isOpen ? tooltip : ''}
-          tooltipPlacement="left"
-        />
-      )}
+      handleRender={props => <S.SplitterContainer {...props} />}
     >
-      {children(size)}
+      <PanelContainer size={size} onChange={onChange}>
+        {children}
+      </PanelContainer>
     </Spaces.RightResizable>
   );
 };

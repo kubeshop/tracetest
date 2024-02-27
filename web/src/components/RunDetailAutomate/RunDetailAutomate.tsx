@@ -16,6 +16,7 @@ import TestRun from 'models/TestRun.model';
 import {useVariableSet} from 'providers/VariableSet';
 import {ResourceType} from 'types/Resource.type';
 import * as S from './RunDetailAutomate.styled';
+import ResizablePanels, {FillPanel, RightPanel} from '../ResizablePanels';
 
 function getMethods(triggerType: TriggerTypes) {
   switch (triggerType) {
@@ -77,35 +78,37 @@ const RunDetailAutomate = ({test, run}: IProps) => {
 
   return (
     <S.Container>
-      <S.SectionLeft>
-        <RunDetailAutomateDefinition
-          definition={definition}
-          resourceType={ResourceType.Test}
-          fileName={fileName}
-          onFileNameChange={setFileName}
-        />
-      </S.SectionLeft>
-      <S.SectionRight>
-        <RunDetailAutomateMethods
-          resourceType={ResourceType.Test}
-          methods={getMethods(test.trigger.type).map(({id, label, component: Component}) => ({
-            id,
-            label,
-            children: (
-              <Component
-                docsUrl={CLI_RUNNING_TESTS_URL}
-                fileName={fileName}
-                id={test.id}
-                resourceType={ResourceType.Test}
-                run={run}
-                test={test}
-                definition={definition}
-                variableSetId={variableSetId}
-              />
-            ),
-          }))}
-        />
-      </S.SectionRight>
+      <ResizablePanels>
+        <FillPanel>
+          <RunDetailAutomateDefinition
+            definition={definition}
+            resourceType={ResourceType.Test}
+            fileName={fileName}
+            onFileNameChange={setFileName}
+          />
+        </FillPanel>
+        <RightPanel panel={{name: 'Techniques', openSize: () => window.innerWidth / 2, isDefaultOpen: true}}>
+          <RunDetailAutomateMethods
+            resourceType={ResourceType.Test}
+            methods={getMethods(test.trigger.type).map(({id, label, component: Component}) => ({
+              id,
+              label,
+              children: (
+                <Component
+                  docsUrl={CLI_RUNNING_TESTS_URL}
+                  fileName={fileName}
+                  id={test.id}
+                  resourceType={ResourceType.Test}
+                  run={run}
+                  test={test}
+                  definition={definition}
+                  variableSetId={variableSetId}
+                />
+              ),
+            }))}
+          />
+        </RightPanel>
+      </ResizablePanels>
     </S.Container>
   );
 };

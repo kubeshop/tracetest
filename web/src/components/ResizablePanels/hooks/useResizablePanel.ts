@@ -1,10 +1,12 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 export type TPanel = {
   name: string;
   isDefaultOpen?: boolean;
-  minSize?: number;
-  maxSize?: number;
+  minSize?(): number;
+  maxSize?(): number;
+  openSize?(): number;
+  closeSize?(): number;
 };
 
 interface IProps {
@@ -14,50 +16,89 @@ interface IProps {
 export type TSize = Exclude<TPanel, 'component'> & {
   size: number;
   isOpen: boolean;
-  minSize: number;
-  maxSize: number;
+  isFullScreen: boolean;
+  minSize(): number;
+  maxSize(): number;
+  openSize(): number;
+  fullScreen(): number;
+  closeSize(): number;
 };
 
-const useResizablePanel = ({panel}: IProps) => {
+const defaultMaxSize = () => window.innerWidth;
+const defaultCloseSize = () => 25;
+const defaultMinSize = () => 350;
+const defaultOpenSize = () => window.innerWidth / 3;
+
+const useResizablePanel = ({
+  panel: {
+    minSize = defaultMinSize,
+    maxSize = defaultMaxSize,
+    closeSize = defaultCloseSize,
+    openSize = defaultOpenSize,
+    ...panel
+  },
+}: IProps) => {
   const [size, setSize] = useState<TSize>({
     ...panel,
-    size: (panel.isDefaultOpen && panel.maxSize) || panel.minSize || 0,
+    size: (panel.isDefaultOpen && openSize()) || minSize() || 0,
     isOpen: panel.isDefaultOpen || false,
-    minSize: panel.minSize || 0,
-    maxSize: panel.maxSize || 0,
+    minSize,
+    maxSize,
+    openSize,
+    closeSize,
+    isFullScreen: false,
+    fullScreen: () => window.innerWidth,
   });
 
-  const toggle = useCallback(() => {
-    if (size.size <= size.minSize) {
-      const currentSize = size.maxSize;
+  const onWindowResize = useCallback(() => {
+    if (size.isOpen) {
       setSize({
         ...size,
-        size: currentSize,
-        isOpen: currentSize > size.minSize,
+        size: size.isFullScreen ? size.fullScreen() : size.openSize(),
       });
-      return;
+    } else {
+      setSize({
+        ...size,
+        size: size.closeSize(),
+      });
     }
-    setSize({
-      ...size,
-      size: size.minSize || 0,
-      isOpen: false,
-    });
   }, [size]);
+
+  useEffect(() => {
+    window.addEventListener('resize', onWindowResize);
+
+    return () => {
+      window.removeEventListener('resize', onWindowResize);
+    };
+  }, [onWindowResize]);
 
   const onStopResize = useCallback(
     newSize => {
       const currentSize = Number(newSize);
+      const isOpen = currentSize > size.minSize();
 
       setSize({
         ...size,
-        size: currentSize,
-        isOpen: currentSize > size.minSize,
+        size: isOpen ? currentSize : size.closeSize(),
+        isOpen,
       });
     },
     [size]
   );
 
-  return {toggle, onStopResize, size};
+  const onChange = useCallback(
+    (width: number) => {
+      setSize({
+        ...size,
+        size: width,
+        isOpen: width > size.minSize(),
+        isFullScreen: width === size.fullScreen(),
+      });
+    },
+    [size]
+  );
+
+  return {onStopResize, size, onChange};
 };
 
 export default useResizablePanel;

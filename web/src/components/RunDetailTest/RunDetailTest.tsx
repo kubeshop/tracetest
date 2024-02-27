@@ -5,6 +5,7 @@ import SetupAlert from '../SetupAlert/SetupAlert';
 import ResizablePanels from '../ResizablePanels/ResizablePanels';
 import SpanDetailsPanel from './SpanDetailsPanel';
 import TestPanel from './TestPanel';
+import SpecsPanel from './SpecsPanel';
 
 interface IProps {
   run: TestRun;
@@ -19,6 +20,7 @@ const RunDetailTest = ({run, runEvents, testId}: IProps) => {
       <ResizablePanels>
         <SpanDetailsPanel />
         <TestPanel run={run} runEvents={runEvents} testId={testId} />
+        <SpecsPanel run={run} />
       </ResizablePanels>
     </S.Container>
   );
