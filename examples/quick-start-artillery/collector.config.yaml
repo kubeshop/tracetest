@@ -28,4 +28,5 @@ service:
     traces:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
-      exporters: [otlp/jaeger,otlp/ttagent]
+      # exporters: [otlp/jaeger,otlp/ttagent]
+      exporters: [otlp/jaeger]
