@@ -75,6 +75,11 @@
       "destination": "/ci-cd-automation/tekton-pipeline",
       "source": "/examples-tutorials/recipes/running-tracetest-with-tekton",
       "statusCode": 301
+    },
+    {
+      "destination": "/cli/creating-tests",
+      "source": "/cli/test-definition-file/",
+      "statusCode": 301
     }
   ]
 }
