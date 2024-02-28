@@ -100,3 +100,25 @@ export const withLowPriority =
 export const toPercent = (value: number) => {
   return `${value * 100}%`;
 };
+
+export const abbreviateNumber = (num: number): string => {
+  const symbols = ['', 'k', 'M', 'G', 'T', 'P', 'E'];
+
+  // tier to determine suffix
+  // eslint-disable-next-line no-bitwise
+  const tier = (Math.log10(num) / 3) | 0;
+
+  // if zero not need a suffix
+  if (tier === 0) return num.toString();
+
+  // get suffix
+  const suffix = symbols[tier];
+  if (!suffix) return num.toString();
+
+  // get scale
+  const scale = 10 ** (tier * 3);
+  const scaled = num / scale;
+  const rounded = scaled.toFixed(1);
+
+  return rounded + suffix;
+};

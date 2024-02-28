@@ -1,4 +1,10 @@
-import {CheckCircleFilled, InfoCircleFilled, LoadingOutlined, MinusCircleFilled} from '@ant-design/icons';
+import {
+  CheckCircleFilled,
+  ExclamationCircleFilled,
+  InfoCircleFilled,
+  LoadingOutlined,
+  MinusCircleFilled,
+} from '@ant-design/icons';
 import {Typography} from 'antd';
 import styled from 'styled-components';
 
@@ -12,6 +18,10 @@ export const IconFail = styled(MinusCircleFilled)`
 
 export const IconInfo = styled(InfoCircleFilled)`
   color: ${({theme}) => theme.color.textLight};
+`;
+
+export const IconWarning = styled(ExclamationCircleFilled)`
+  color: ${({theme}) => theme.color.warningYellow};
 `;
 
 export const SequenceText = styled.div`

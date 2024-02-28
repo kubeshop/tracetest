@@ -6,6 +6,7 @@ import TracetestAPI from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
 import Test from 'models/Test.model';
 import TestRun from 'models/TestRun.model';
+import Box from './Box';
 import * as S from './ResourceCard.styled';
 import ResourceCardActions from './ResourceCardActions';
 import ResourceCardRuns from './ResourceCardRuns';
@@ -37,9 +38,9 @@ const TestCard = ({onEdit, onDelete, onDuplicate, onRun, onViewAll, test}: IProp
     <S.Container $type={ResourceType.Test}>
       <S.TestContainer onClick={onClick}>
         {isCollapsed ? <RightOutlined data-cy={`collapse-test-${test.id}`} /> : <DownOutlined />}
-        <S.Box $type={ResourceType.Test}>
-          <S.BoxTitle level={2}>{test.summary.runs}</S.BoxTitle>
-        </S.Box>
+
+        <Box num={test.summary.runs} type={ResourceType.Test} />
+
         <S.TitleContainer>
           <S.Title level={3}>{test.name}</S.Title>
           <S.Text>
