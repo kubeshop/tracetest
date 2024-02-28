@@ -102,6 +102,13 @@ const GrpcClientService = () => ({
       fileKey: keyFile ? new File([keyFile], 'fileKey') : undefined,
     };
   },
+  getPublicInfo(values: TRawGRPCClientSettings) {
+    const {endpoint = ''} = values;
+
+    return {
+      Endpoint: endpoint,
+    };
+  },
 });
 
 export default GrpcClientService();

@@ -26,7 +26,7 @@ const AllowButton = ({operation, ButtonComponent, ...props}: IProps) => {
             <S.Warning color="yellow" /> Limited Access
           </Typography.Title>
           <Typography.Paragraph>
-            Your current role group (<b>{capitalize(role)}</b>) has limited access to this environment. please contact
+            Your current role group (<b>{capitalize(role)}</b>) has limited access to this environment. Please contact
             the environment administrator for assistance.
           </Typography.Paragraph>
         </>
