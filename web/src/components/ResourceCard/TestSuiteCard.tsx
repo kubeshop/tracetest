@@ -7,6 +7,7 @@ import TracetestAPI from 'redux/apis/Tracetest';
 import {ResourceType} from 'types/Resource.type';
 import TestSuite from 'models/TestSuite.model';
 import TestSuiteRun from 'models/TestSuiteRun.model';
+import Box from './Box';
 import * as S from './ResourceCard.styled';
 import ResourceCardActions from './ResourceCardActions';
 import ResourceCardRuns from './ResourceCardRuns';
@@ -46,9 +47,9 @@ const TestSuiteCard = ({
     <S.Container $type={ResourceType.TestSuite}>
       <S.TestContainer onClick={onClick}>
         {isCollapsed ? <RightOutlined data-cy={`collapse-testsuite-${testSuiteId}`} /> : <DownOutlined />}
-        <S.Box $type={ResourceType.TestSuite}>
-          <S.BoxTitle level={2}>{summary.runs}</S.BoxTitle>
-        </S.Box>
+
+        <Box num={summary.runs} type={ResourceType.TestSuite} />
+
         <S.TitleContainer>
           <S.Title level={3}>{name}</S.Title>
           <S.Text>{description}</S.Text>

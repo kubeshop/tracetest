@@ -54,7 +54,7 @@ function getMethods(triggerType: TriggerTypes) {
         },
         {
           id: 'typescript',
-          label: 'Typescript',
+          label: 'TypeScript',
           component: Typescript,
         },
       ];
