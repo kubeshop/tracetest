@@ -1,4 +1,5 @@
-const { POKESHOP_DEMO_URL = '',  TYK_AUTH_KEY = '' } = process.env;
+import fetch from 'node-fetch';
+const { POKESHOP_DEMO_URL = '', TYK_AUTH_KEY = '' } = process.env;
 
 export const getKey = async () => {
   const params = {

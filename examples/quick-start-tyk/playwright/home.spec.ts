@@ -6,38 +6,9 @@ const { TRACETEST_API_TOKEN = '' } = process.env;
 
 let tracetest: Types.TracetestPlaywright | undefined = undefined;
 
-test.describe.configure({ mode: 'serial' });
-
-const definition = `
-type: Test
-spec:
-  id: UGxheXdyaWdodDogaW1wb3J0cyBhIHBva2Vtb24=
-  name: "Playwright: imports a pokemon"
-  trigger:
-    type: playwright
-  specs:
-    - selector: span[tracetest.span.type="http"] span[tracetest.span.type="http"]
-      name: "All HTTP Spans: Status  code is 200"
-      assertions:
-      - attr:http.status_code   =   200
-    - selector: span[tracetest.span.type="database"]
-      name: "All Database Spans: Processing time is less than 100ms"
-      assertions:
-      - attr:tracetest.span.duration < 2s
-  outputs:
-    - name: MY_OUTPUT
-      selector: span[tracetest.span.type="general" name="Tracetest trigger"]
-      value: attr:name
-`;
-
 test.beforeAll(async () => {
+  // 1: Create a new Tracetest instance
   tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN });
-
-  await tracetest.setOptions({
-    'Playwright: imports a pokemon': {
-      definition,
-    },
-  });
 });
 
 test.beforeEach(async ({ page, context }, { title }) => {
@@ -47,12 +18,12 @@ test.beforeEach(async ({ page, context }, { title }) => {
   });
 
   await page.goto('/');
+  // 2: Capture the initial page
   await tracetest?.capture(title, page);
 });
 
-// optional step to break the playwright script in case a Tracetest test fails
 test.afterAll(async ({}, testInfo) => {
-  testInfo.setTimeout(80000);
+  // 3: Summary of the test (optional, but recommended)
   await tracetest?.summary();
 });
 

@@ -14,6 +14,10 @@
     "@playwright/test": "^1.41.2",
     "@tracetest/playwright": "^0.0.30",
     "@types/node": "^20.11.20",
+    "@types/node-fetch": "^2.6.11",
     "dotenv": "^16.4.5"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
   }
 }
