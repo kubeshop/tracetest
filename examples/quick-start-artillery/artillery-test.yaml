@@ -21,9 +21,9 @@ config:
           attributes:
             environment: "test"
             tool: "Artillery"
-    # tracetest:
-    #   apiToken: ""
-    #   testFile: "tracetest-test.yaml"
+    tracetest:
+      apiToken: "tttoken_dfa1e954d47d1857"
+      testFile: "tracetest-test.yaml"
 scenarios:
   - name: "List available tests"
     flow:
