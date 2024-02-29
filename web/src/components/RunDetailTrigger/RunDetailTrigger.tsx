@@ -19,6 +19,7 @@ import {TDraftTest} from 'types/Test.types';
 import * as S from './RunDetailTrigger.styled';
 import {useShortcutWithDefault} from '../TestPlugins/hooks/useShortcut';
 import ResizablePanels, {FillPanel, RightPanel} from '../ResizablePanels';
+import {StepsID} from '../GuidedTour/testRunSteps';
 
 export const FORM_ID = 'create-test';
 
@@ -75,9 +76,9 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
         />
 
         <S.Body>
-          <ResizablePanels saveId='run-detail-trigger'>
+          <ResizablePanels saveId="run-detail-trigger">
             <FillPanel>
-              <S.Section>
+              <S.Section data-tour={StepsID.Trigger}>
                 <FormFactory type={test.trigger.type} />
               </S.Section>
             </FillPanel>
@@ -88,7 +89,7 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
                 isDefaultOpen: true,
               }}
             >
-              <S.Section>
+              <S.Section data-tour={StepsID.Response}>
                 {shouldDisplayError ? (
                   <RunEvents events={runEvents} stage={TestRunStage.Trigger} state={state} />
                 ) : (

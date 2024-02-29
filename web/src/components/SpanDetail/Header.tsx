@@ -5,6 +5,7 @@ import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import Span from 'models/Span.model';
 import SpanService from 'services/Span.service';
 import * as S from './SpanDetail.styled';
+import { StepsID } from '../GuidedTour/testRunSteps';
 
 interface IProps {
   span?: Span;
@@ -22,7 +23,7 @@ const Header = ({span}: IProps) => {
   }
 
   return (
-    <S.Header>
+    <S.Header data-tour={StepsID.SpanDetails}>
       <S.Column>
         <Space>
           <SSpanNode.BadgeType $hasMargin count={SemanticGroupNamesToText[type]} $type={type} />
