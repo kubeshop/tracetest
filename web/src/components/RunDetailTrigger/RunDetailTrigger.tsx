@@ -82,7 +82,12 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
               </S.Section>
             </FillPanel>
 
-            <RightPanel panel={{name: 'RESPONSE', openSize: () => window.innerWidth / 2, isDefaultOpen: true}}>
+            <RightPanel
+              panel={{
+                openSize: () => (window.innerWidth / 2 / window.innerWidth) * 100,
+                isDefaultOpen: true,
+              }}
+            >
               <S.Section>
                 {shouldDisplayError ? (
                   <RunEvents events={runEvents} stage={TestRunStage.Trigger} state={state} />

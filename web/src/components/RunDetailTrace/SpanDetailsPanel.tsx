@@ -14,10 +14,8 @@ interface IProps {
 }
 
 const panel = {
-  name: 'SPAN_DETAILS',
   isDefaultOpen: true,
-  order: 2,
-  openSize: () => window.innerWidth / 4,
+  openSize: () => (window.innerWidth / 4 / window.innerWidth) * 100,
 };
 
 const SpanDetailsPanel = ({run, testId}: IProps) => {

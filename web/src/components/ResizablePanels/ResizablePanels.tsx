@@ -1,13 +1,14 @@
-import * as Spaces from 'react-spaces';
+// import * as Spaces from 'react-spaces';
+import {PanelGroup} from 'react-resizable-panels';
 import * as S from './ResizablePanels.styled';
 
 const ResizablePanels: React.FC = ({children}) => {
   return (
     <>
       <S.GlobalStyle />
-      <Spaces.Fixed height="100%" width="100vw">
+      <PanelGroup direction="horizontal">
         {children}
-      </Spaces.Fixed>
+      </PanelGroup>
     </>
   );
 };

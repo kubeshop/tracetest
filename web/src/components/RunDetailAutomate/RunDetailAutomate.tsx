@@ -87,7 +87,12 @@ const RunDetailAutomate = ({test, run}: IProps) => {
             onFileNameChange={setFileName}
           />
         </FillPanel>
-        <RightPanel panel={{name: 'Techniques', openSize: () => window.innerWidth / 2, isDefaultOpen: true}}>
+        <RightPanel
+          panel={{
+            openSize: () => (window.innerWidth / 2 / window.innerWidth) * 100,
+            isDefaultOpen: true,
+          }}
+        >
           <RunDetailAutomateMethods
             resourceType={ResourceType.Test}
             methods={getMethods(test.trigger.type).map(({id, label, component: Component}) => ({

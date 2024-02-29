@@ -8,7 +8,6 @@ interface IProps {
 }
 
 const panel = {
-  name: 'ANALYZER',
   isDefaultOpen: true,
 };
 

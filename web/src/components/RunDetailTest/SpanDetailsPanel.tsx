@@ -4,9 +4,8 @@ import useAttributePanelTooltip from 'hooks/useAttributePanelTooltip';
 import {LeftPanel} from '../ResizablePanels';
 
 const panel = {
-  name: 'SPAN_DETAILS',
   isDefaultOpen: true,
-  openSize: () => window.innerWidth / 4,
+  openSize: () => (window.innerWidth / 4 / window.innerWidth) * 100,
 };
 
 const SpanDetailsPanel = () => {

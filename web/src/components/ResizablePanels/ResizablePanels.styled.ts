@@ -52,17 +52,3 @@ export const PanelContainer = styled.div<{$isOpen: boolean}>`
       cursor: pointer;
     `}
 `;
-
-export const Controls = styled.div<{$isOpen: boolean}>`
-  display: flex;
-  justify-content: end;
-  align-items: center;
-  gap: 8px;
-  padding: 8px;
-  background-color: ${({theme}) => theme.color.primary};
-  color: ${({theme}) => theme.color.white};
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  font-size: ${({theme}) => theme.size.lg};
-`;
