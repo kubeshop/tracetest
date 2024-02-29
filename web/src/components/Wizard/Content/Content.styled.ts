@@ -2,7 +2,7 @@ import {Typography} from 'antd';
 import styled, {css} from 'styled-components';
 
 export const Container = styled.div`
-  margin: 8px 0;
+  margin: 8px 0 0;
 
   .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab,
   .ant-tabs-card > div > .ant-tabs-nav .ant-tabs-tab {
