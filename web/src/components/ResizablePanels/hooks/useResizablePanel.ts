@@ -23,7 +23,7 @@ export type TSize = {
 };
 
 const defaultMaxSize = () => 100;
-const defaultCloseSize = () => 5;
+const defaultCloseSize = () => 2;
 const defaultMinSize = () => 15;
 const defaultOpenSize = () => (window.innerWidth / 3 / window.innerWidth) * 100;
 
@@ -64,11 +64,7 @@ const useResizablePanel = ({
       const isOpen = width > size.minSize();
       setSize(prev => ({...prev, isOpen}));
 
-      if (isOpen) {
-        ref.current?.resize(size.openSize());
-      } else {
-        ref.current?.resize(size.closeSize());
-      }
+      ref.current?.resize(width);
     },
     [size]
   );

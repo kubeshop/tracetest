@@ -17,7 +17,7 @@ const RunDetailTest = ({run, runEvents, testId}: IProps) => {
   return (
     <S.Container>
       <SetupAlert />
-      <ResizablePanels>
+      <ResizablePanels saveId='run-detail-test'>
         <SpanDetailsPanel />
         <TestPanel run={run} runEvents={runEvents} testId={testId} />
         <SpecsPanel run={run} />

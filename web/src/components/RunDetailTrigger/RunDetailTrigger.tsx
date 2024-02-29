@@ -75,7 +75,7 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
         />
 
         <S.Body>
-          <ResizablePanels>
+          <ResizablePanels saveId='run-detail-trigger'>
             <FillPanel>
               <S.Section>
                 <FormFactory type={test.trigger.type} />

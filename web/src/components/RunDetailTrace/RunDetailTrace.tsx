@@ -28,7 +28,7 @@ const RunDetailTrace = ({run, runEvents, testId, skipTraceCollection}: IProps) =
   return (
     <S.Container $isTimeline={false}>
       <SetupAlert />
-      <ResizablePanels>
+      <ResizablePanels saveId='run-detail-trace'>
         <SpanDetailsPanel run={run} testId={testId} />
         <TracePanel run={run} runEvents={runEvents} testId={testId} skipTraceCollection={skipTraceCollection} />
         <AnalyzerPanel run={run} />

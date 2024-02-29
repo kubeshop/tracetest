@@ -1,4 +1,3 @@
-import {PanelResizeHandle} from 'react-resizable-panels';
 import {TPanel} from '../ResizablePanels/hooks/useResizablePanel';
 import Panel from './Panel';
 
@@ -9,12 +8,7 @@ interface IProps {
 }
 
 const LeftPanel = (props: IProps) => {
-  return (
-    <>
-      <Panel {...props} />
-      <PanelResizeHandle />
-    </>
-  );
+  return <Panel {...props} />;
 };
 
 export default LeftPanel;

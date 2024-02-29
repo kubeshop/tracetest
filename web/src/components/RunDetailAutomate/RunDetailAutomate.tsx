@@ -78,7 +78,7 @@ const RunDetailAutomate = ({test, run}: IProps) => {
 
   return (
     <S.Container>
-      <ResizablePanels>
+      <ResizablePanels saveId='run-detail-automate'>
         <FillPanel>
           <RunDetailAutomateDefinition
             definition={definition}
