@@ -204,7 +204,7 @@ GEM
       opentelemetry-api (~> 1.0)
     puma (6.4.2)
       nio4r (~> 2.0)
-    rack (2.2.6.4)
+    rack (2.2.8.1)
     rack-protection (3.0.5)
       rack
     ruby2_keywords (0.0.5)
