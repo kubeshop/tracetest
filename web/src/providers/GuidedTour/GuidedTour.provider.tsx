@@ -66,6 +66,7 @@ const GuidedTourProvider = ({children}: IProps) => {
   return (
     <Context.Provider value={value}>
       <Joyride
+        styles={{options: {zIndex: 1060}}}
         callback={guidedTourState.callback}
         continuous
         disableOverlay

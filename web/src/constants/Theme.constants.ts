@@ -11,6 +11,7 @@ export const theme: DefaultTheme = {
     interactive: '#2D62FF',
     primary: '#61175E',
     primaryLight: '#61175e33',
+    primaryHover: '#61175EB3',
     success: '#52C41A',
     text: '#031849',
     textHighlight: '#61175e29',

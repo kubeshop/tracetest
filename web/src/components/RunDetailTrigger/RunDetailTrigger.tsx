@@ -1,6 +1,5 @@
 import {Form, Input} from 'antd';
 import Header from 'components/CreateTest/Header';
-import {StepsID} from 'components/GuidedTour/testRunSteps';
 import RunDetailTriggerResponseFactory from 'components/RunDetailTriggerResponse/RunDetailTriggerResponseFactory';
 import RunEvents from 'components/RunEvents';
 import FormFactory from 'components/TestPlugins/FormFactory';
@@ -19,6 +18,8 @@ import TestService from 'services/Test.service';
 import {TDraftTest} from 'types/Test.types';
 import * as S from './RunDetailTrigger.styled';
 import {useShortcutWithDefault} from '../TestPlugins/hooks/useShortcut';
+import ResizablePanels, {FillPanel, RightPanel} from '../ResizablePanels';
+import {StepsID} from '../GuidedTour/testRunSteps';
 
 export const FORM_ID = 'create-test';
 
@@ -75,24 +76,35 @@ const RunDetailTrigger = ({test, run: {id, state, triggerResult, triggerTime}, r
         />
 
         <S.Body>
-          <S.SectionLeft data-tour={StepsID.Trigger}>
-            <FormFactory type={test.trigger.type} />
-          </S.SectionLeft>
+          <ResizablePanels saveId="run-detail-trigger">
+            <FillPanel>
+              <S.Section data-tour={StepsID.Trigger}>
+                <FormFactory type={test.trigger.type} />
+              </S.Section>
+            </FillPanel>
 
-          <S.SectionRight>
-            {shouldDisplayError ? (
-              <RunEvents events={runEvents} stage={TestRunStage.Trigger} state={state} />
-            ) : (
-              <RunDetailTriggerResponseFactory
-                runId={id}
-                state={state}
-                testId={test.id}
-                triggerResult={triggerResult}
-                triggerTime={triggerTime}
-                type={triggerResult?.type ?? TriggerTypes.http}
-              />
-            )}
-          </S.SectionRight>
+            <RightPanel
+              panel={{
+                openSize: () => (window.innerWidth / 2 / window.innerWidth) * 100,
+                isDefaultOpen: true,
+              }}
+            >
+              <S.Section data-tour={StepsID.Response}>
+                {shouldDisplayError ? (
+                  <RunEvents events={runEvents} stage={TestRunStage.Trigger} state={state} />
+                ) : (
+                  <RunDetailTriggerResponseFactory
+                    runId={id}
+                    state={state}
+                    testId={test.id}
+                    triggerResult={triggerResult}
+                    triggerTime={triggerTime}
+                    type={triggerResult?.type ?? TriggerTypes.http}
+                  />
+                )}
+              </S.Section>
+            </RightPanel>
+          </ResizablePanels>
         </S.Body>
       </Form>
     </S.Container>
