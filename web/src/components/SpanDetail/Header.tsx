@@ -5,7 +5,7 @@ import {SemanticGroupNamesToText} from 'constants/SemanticGroupNames.constants';
 import Span from 'models/Span.model';
 import SpanService from 'services/Span.service';
 import * as S from './SpanDetail.styled';
-import { StepsID } from '../GuidedTour/testRunSteps';
+import {StepsID} from '../GuidedTour/testRunSteps';
 
 interface IProps {
   span?: Span;
@@ -16,7 +16,7 @@ const Header = ({span}: IProps) => {
 
   if (!span) {
     return (
-      <S.Header>
+      <S.Header data-tour={StepsID.SpanDetails}>
         <S.HeaderTitle level={3}>Span Attributes</S.HeaderTitle>
       </S.Header>
     );
