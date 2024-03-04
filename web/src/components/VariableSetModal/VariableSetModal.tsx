@@ -6,6 +6,7 @@ import VariableSet from 'models/VariableSet.model';
 import VariableSetService from 'services/VariableSet.service';
 import * as S from './VariableSetModal.styled';
 import VariableSetModalFooter from './VariableSetModalFooter';
+import Tip from './Tip';
 
 interface IProps {
   variableSet?: VariableSet;
@@ -52,7 +53,7 @@ const VariableSetModal = ({variableSet, isOpen, onClose, onSubmit, isLoading}: I
         />
       }
       onCancel={onClose}
-      title={<S.Title>{isEditing ? 'Edit variable set' : 'Create a new variable set'}</S.Title>}
+      title={<S.Title level={2}>{isEditing ? 'Edit variable set' : 'Create a new variable set'}</S.Title>}
       visible={isOpen}
     >
       <VariableSetForm
@@ -61,6 +62,8 @@ const VariableSetModal = ({variableSet, isOpen, onClose, onSubmit, isLoading}: I
         onSubmit={handleOnSubmit}
         onValidate={handleOnValidate}
       />
+
+      <Tip />
     </S.Modal>
   );
 };

@@ -58,7 +58,6 @@ const ImportModal = ({isOpen, onClose}: IProps) => {
       onCancel={onClose}
       title={<S.Title level={2}>Import a test</S.Title>}
       visible={isOpen}
-      centered
     >
       <Form<TDraftTest>
         form={form}
