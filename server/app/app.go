@@ -142,7 +142,7 @@ func (app *App) initAnalytics(configFromDB config.Config) error {
 var instanceID = id.GenerateID().String()
 
 func (app *App) Start(opts ...appOption) error {
-	// instanceID is a temprary ID for this instance of the server
+	// instanceID is a temporary ID for this instance of the server
 	// it is regenerated on every start intentionally
 	for _, opt := range opts {
 		opt(app)
