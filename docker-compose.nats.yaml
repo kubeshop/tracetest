@@ -1,6 +1,24 @@
-version: "3.2"
+version: "3.8"
 services:
+  traefik:
+    image: traefik:v2.4
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+    ports:
+      - "11633:80"  # Changed this line
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   tracetest:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tracetest.rule=Host(`localhost`)"
+      - "traefik.http.services.tracetest.loadbalancer.server.port=11633"
+    deploy:
+      replicas: 3
     restart: unless-stopped
     image: kubeshop/tracetest:${TAG:-latest}
     extra_hosts:
@@ -14,8 +32,8 @@ services:
       - type: bind
         source: ./local-config/tracetest.provision.yaml
         target: /app/provisioning.yaml
-    ports:
-      - 11633:11633
+    expose:
+      - 11633
     command: --provisioning-file /app/provisioning.yaml
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
