@@ -12,7 +12,7 @@ const (
 	BlockProfileFractionRate = 5
 )
 
-func StartProfiler(applicationName, telemetryServer string, samplingPercentage int) {
+func StartProfiler(applicationName, applicationEnvironment, telemetryServer string, samplingPercentage int) {
 	samplingRate := 100 / samplingPercentage
 
 	runtime.SetMutexProfileFraction(samplingRate)
@@ -25,11 +25,13 @@ func StartProfiler(applicationName, telemetryServer string, samplingPercentage i
 		ServerAddress: telemetryServer,
 
 		// you can disable logging by setting this to nil
-		Logger: pyroscope.StandardLogger,
+		// Logger: pyroscope.StandardLogger,
+		Logger: nil,
 
 		// you can provide static tags via a map:
 		Tags: map[string]string{
-			"hostname": os.Getenv("HOSTNAME"),
+			"hostname":    os.Getenv("HOSTNAME"),
+			"environment": applicationEnvironment,
 		},
 
 		ProfileTypes: []pyroscope.ProfileType{
