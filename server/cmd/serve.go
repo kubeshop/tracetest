@@ -8,6 +8,7 @@ import (
 
 	"github.com/kubeshop/tracetest/server/app"
 	"github.com/kubeshop/tracetest/server/config"
+	"github.com/kubeshop/tracetest/server/telemetry"
 	"github.com/spf13/cobra"
 )
 
@@ -35,6 +36,11 @@ var serveCmd = &cobra.Command{
 			appInstance.Stop()
 			os.Exit(1)
 		}()
+
+		profilerConfig := cfg.ApplicationProfiler()
+		if profilerConfig.Enabled {
+			telemetry.StartProfiler(profilerConfig.Name, profilerConfig.Endpoint, profilerConfig.SamplingRate)
+		}
 
 		wg.Add(1)
 		err := appInstance.Start(app.WithProvisioningFile(provisioningFile))

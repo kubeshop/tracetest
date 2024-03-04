@@ -17,7 +17,8 @@ type (
 	}
 
 	telemetry struct {
-		Exporters map[string]TelemetryExporterOption `yaml:",omitempty" mapstructure:"exporters"`
+		ApplicationProfiler ApplicationProfiler                `yaml:",omitempty" mapstructure:"profiler"`
+		Exporters           map[string]TelemetryExporterOption `yaml:",omitempty" mapstructure:"exporters"`
 	}
 
 	TelemetryExporterOption struct {
@@ -35,7 +36,21 @@ type (
 	OTELCollectorConfig struct {
 		Endpoint string `yaml:",omitempty" mapstructure:"endpoint"`
 	}
+
+	ApplicationProfiler struct {
+		Name         string `yaml:",omitempty" mapstructure:"name"`
+		Enabled      bool   `yaml:",omitempty" mapstructure:"enabled"`
+		Endpoint     string `yaml:",omitempty" mapstructure:"endpoint"`
+		SamplingRate int    `yaml:",omitempty" mapstructure:"samplingRate"`
+	}
 )
+
+func (c *AppConfig) ApplicationProfiler() *ApplicationProfiler {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return &c.config.Telemetry.ApplicationProfiler
+}
 
 func (c *AppConfig) Exporter() (*TelemetryExporterOption, error) {
 	c.mu.Lock()
