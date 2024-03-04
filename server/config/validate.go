@@ -37,7 +37,6 @@ func (c *AppConfig) Validate() error {
 			err,
 			fmt.Errorf("invalid config value for '%s': %s", opt.key, optErr.Error()),
 		)
-
 	}
 
 	return err

@@ -42,6 +42,7 @@ type (
 		Enabled      bool   `yaml:",omitempty" mapstructure:"enabled"`
 		Endpoint     string `yaml:",omitempty" mapstructure:"endpoint"`
 		SamplingRate int    `yaml:",omitempty" mapstructure:"samplingRate"`
+		Environment  string `yaml:",omitempty" mapstructure:"environment"`
 	}
 )
 

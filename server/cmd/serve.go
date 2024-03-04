@@ -39,7 +39,7 @@ var serveCmd = &cobra.Command{
 
 		profilerConfig := cfg.ApplicationProfiler()
 		if profilerConfig.Enabled {
-			telemetry.StartProfiler(profilerConfig.Name, profilerConfig.Endpoint, profilerConfig.SamplingRate)
+			telemetry.StartProfiler(profilerConfig.Name, profilerConfig.Environment, profilerConfig.Endpoint, profilerConfig.SamplingRate)
 		}
 
 		wg.Add(1)
