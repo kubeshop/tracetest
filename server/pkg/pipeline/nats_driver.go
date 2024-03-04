@@ -49,7 +49,7 @@ func (d *NatsDriver[T]) Enqueue(ctx context.Context, msg T) {
 
 // SetListener implements QueueDriver.
 func (d *NatsDriver[T]) SetListener(listener Listener[T]) {
-	subscription, err := d.conn.Subscribe(d.topic, func(msg *nats.Msg) {
+	subscription, err := d.conn.QueueSubscribe(d.topic, "queue_worker", func(msg *nats.Msg) {
 		var target T
 		err := json.Unmarshal(msg.Data, &target)
 		if err != nil {

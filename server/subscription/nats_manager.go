@@ -12,7 +12,7 @@ type natsManager struct {
 }
 
 func (m *natsManager) Subscribe(resourceID string, subscriber Subscriber) Subscription {
-	subscription, err := m.conn.Subscribe(resourceID, func(msg *nats.Msg) {
+	subscription, err := m.conn.QueueSubscribe(resourceID, "subscriptions", func(msg *nats.Msg) {
 		decoded, err := DecodeMessage(msg.Data)
 		if err != nil {
 			log.Printf("cannot unmarshall incoming nats message: %s", err.Error())
