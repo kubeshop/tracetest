@@ -1,6 +1,7 @@
 package telemetry
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
@@ -12,7 +13,10 @@ const (
 	BlockProfileFractionRate = 5
 )
 
-func StartProfiler(applicationName, applicationEnvironment, telemetryServer string, samplingPercentage int) {
+func StartProfiler(applicationName, applicationEnvironment, telemetryServerAddress string, samplingPercentage int) {
+	fmt.Printf("Starting profiler for environment [%s] with sampling [%d]. Telemetry server address: %s\n",
+		applicationEnvironment, samplingPercentage, telemetryServerAddress)
+
 	samplingRate := 100 / samplingPercentage
 
 	runtime.SetMutexProfileFraction(samplingRate)
@@ -22,7 +26,7 @@ func StartProfiler(applicationName, applicationEnvironment, telemetryServer stri
 		ApplicationName: applicationName,
 
 		// replace this with the address of pyroscope server
-		ServerAddress: telemetryServer,
+		ServerAddress: telemetryServerAddress,
 
 		// you can disable logging by setting this to nil
 		// Logger: pyroscope.StandardLogger,
