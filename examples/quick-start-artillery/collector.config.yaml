@@ -14,10 +14,6 @@ processors:
     sampling_percentage: 100
 
 exporters:
-  otlp/jaeger:
-    endpoint: jaeger:4317
-    tls:
-      insecure: true
   otlp/ttagent:
     endpoint: tracetest-agent:4317
     tls:
@@ -28,5 +24,4 @@ service:
     traces:
       receivers: [otlp]
       processors: [probabilistic_sampler, batch]
-      # exporters: [otlp/jaeger,otlp/ttagent]
-      exporters: [otlp/jaeger]
+      exporters: [otlp/ttagent]
