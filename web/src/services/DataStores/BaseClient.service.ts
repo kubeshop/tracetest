@@ -76,6 +76,21 @@ const BaseClientService = (): TDataStoreService => ({
   getIsOtlpBased() {
     return false;
   },
+  getPublicInfo(
+    defaultDataStore = {name: '', type: SupportedDataStores.JAEGER},
+    dataStoreType = SupportedDataStores.TEMPO
+  ) {
+    const {type = 'grpc', grpc = {}, http = {}} = defaultDataStore[dataStoreType] as TRawBaseClientSettings;
+
+    switch (type) {
+      case SupportedClientTypes.GRPC:
+        return GrpcClientService.getPublicInfo(grpc as TRawGRPCClientSettings);
+      case SupportedClientTypes.HTTP:
+        return HttpClientService.getPublicInfo(http as TRawHttpClientSettings);
+      default:
+        return GrpcClientService.getPublicInfo(grpc as TRawGRPCClientSettings);
+    }
+  },
 });
 
 export default BaseClientService();

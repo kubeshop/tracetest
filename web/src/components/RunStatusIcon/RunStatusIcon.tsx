@@ -18,21 +18,23 @@ const Icon = ({state, requiredGatesResult: {passed}}: IProps) => {
     return <S.IconInfo />;
   }
 
-  if (isRunStateFailed(state) || !passed) {
+  if (isRunStateFailed(state)) {
+    return <S.IconWarning />;
+  }
+
+  if (!passed) {
     return <S.IconFail />;
   }
 
   return <S.IconSuccess />;
 };
 
-const RunStatusIcon = (props: IProps) => {
-  return (
-    <Tooltip title={() => <RunTooltipTitle {...props} />}>
-      <S.IconWrapper>
-        <Icon {...props} />
-      </S.IconWrapper>
-    </Tooltip>
-  );
-};
+const RunStatusIcon = (props: IProps) => (
+  <Tooltip title={() => <RunTooltipTitle {...props} />}>
+    <S.IconWrapper>
+      <Icon {...props} />
+    </S.IconWrapper>
+  </Tooltip>
+);
 
 export default RunStatusIcon;

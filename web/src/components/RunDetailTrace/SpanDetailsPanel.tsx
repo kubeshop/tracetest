@@ -6,7 +6,7 @@ import {useDashboard} from 'providers/Dashboard/Dashboard.provider';
 import SpanSelectors from 'selectors/Span.selectors';
 import TraceSelectors from 'selectors/Trace.selectors';
 import useAttributePanelTooltip from 'hooks/useAttributePanelTooltip';
-import {LeftPanel, PanelContainer} from '../ResizablePanels';
+import {LeftPanel} from '../ResizablePanels';
 
 interface IProps {
   run: TestRun;
@@ -14,10 +14,8 @@ interface IProps {
 }
 
 const panel = {
-  name: 'SPAN_DETAILS',
-  minSize: 25,
-  maxSize: 320,
   isDefaultOpen: true,
+  openSize: () => (window.innerWidth / 4 / window.innerWidth) * 100,
 };
 
 const SpanDetailsPanel = ({run, testId}: IProps) => {
@@ -25,25 +23,21 @@ const SpanDetailsPanel = ({run, testId}: IProps) => {
   const selectedSpan = useAppSelector(TraceSelectors.selectSelectedSpan);
   const {navigate} = useDashboard();
   const span = useAppSelector(state => SpanSelectors.selectSpanById(state, selectedSpan, testId, run.id));
-  const {onClose, tooltip, isVisible} = useAttributePanelTooltip();
+  const {onClose} = useAttributePanelTooltip();
 
   const handleOnCreateSpec = useCallback(() => {
     navigate(`/test/${testId}/run/${run.id}/test`);
   }, [navigate, run.id, testId]);
 
   return (
-    <LeftPanel panel={panel} tooltip={tooltip} onOpen={onClose} isToolTipVisible={isVisible}>
-      {size => (
-        <PanelContainer $isOpen={size.isOpen}>
-          <SpanDetail
-            onCreateTestSpec={handleOnCreateSpec}
-            searchText={searchText}
-            span={span}
-            AttributeRowComponent={TraceAttributeRow}
-            SubHeaderComponent={TraceSubHeader}
-          />
-        </PanelContainer>
-      )}
+    <LeftPanel panel={panel} onOpen={onClose}>
+      <SpanDetail
+        onCreateTestSpec={handleOnCreateSpec}
+        searchText={searchText}
+        span={span}
+        AttributeRowComponent={TraceAttributeRow}
+        SubHeaderComponent={TraceSubHeader}
+      />
     </LeftPanel>
   );
 };

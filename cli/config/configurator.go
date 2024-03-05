@@ -158,10 +158,14 @@ func (c Configurator) createConfig(serverURL string) (Config, error) {
 		return Config{}, err
 	}
 
-	if strings.Contains(serverURL, DefaultCloudDomain) {
-		path = DefaultCloudPath
-	} else if !strings.HasSuffix(path, "/api") {
-		path = strings.TrimSuffix(path, "/") + "/api"
+	if os.Getenv("TRACETEST_DEV_FORCE_URL") != "true" {
+		if strings.Contains(serverURL, DefaultCloudDomain) {
+			path = DefaultCloudPath
+		} else if !strings.HasSuffix(path, "/api") {
+			path = strings.TrimSuffix(path, "/") + "/api"
+		}
+	} else {
+		c.ui.Warning("Server path overwritten by TRACETEST_DEV_FORCE_URL")
 	}
 
 	return Config{

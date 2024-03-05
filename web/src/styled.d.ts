@@ -21,6 +21,7 @@ declare module 'styled-components' {
       interactive: string;
       primary: string;
       primaryLight: string;
+      primaryHover: string;
       success: string;
       text: string;
       textHighlight: string;

@@ -1,63 +1,75 @@
-import {useCallback, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
+import {ImperativePanelHandle} from 'react-resizable-panels';
 
 export type TPanel = {
-  name: string;
   isDefaultOpen?: boolean;
-  minSize?: number;
-  maxSize?: number;
+  minSize?(): number;
+  maxSize?(): number;
+  openSize?(): number;
+  closeSize?(): number;
 };
 
 interface IProps {
   panel: TPanel;
 }
 
-export type TSize = Exclude<TPanel, 'component'> & {
-  size: number;
+export type TSize = {
   isOpen: boolean;
-  minSize: number;
-  maxSize: number;
+  isDefaultOpen: boolean;
+  minSize(): number;
+  maxSize(): number;
+  openSize(): number;
+  closeSize(): number;
 };
 
-const useResizablePanel = ({panel}: IProps) => {
-  const [size, setSize] = useState<TSize>({
-    ...panel,
-    size: (panel.isDefaultOpen && panel.maxSize) || panel.minSize || 0,
-    isOpen: panel.isDefaultOpen || false,
-    minSize: panel.minSize || 0,
-    maxSize: panel.maxSize || 0,
-  });
+const defaultMaxSize = () => 100;
+const defaultCloseSize = () => 2;
+const defaultMinSize = () => 15;
+const defaultOpenSize = () => (window.innerWidth / 3 / window.innerWidth) * 100;
 
-  const toggle = useCallback(() => {
-    if (size.size <= size.minSize) {
-      const currentSize = size.maxSize;
-      setSize({
-        ...size,
-        size: currentSize,
-        isOpen: currentSize > size.minSize,
-      });
-      return;
-    }
-    setSize({
-      ...size,
-      size: size.minSize || 0,
-      isOpen: false,
-    });
-  }, [size]);
+const useResizablePanel = ({
+  panel: {
+    minSize = defaultMinSize,
+    maxSize = defaultMaxSize,
+    closeSize = defaultCloseSize,
+    openSize = defaultOpenSize,
+    ...panel
+  },
+}: IProps) => {
+  const ref = useRef<ImperativePanelHandle>(null);
+
+  const [size, setSize] = useState<TSize>({
+    isOpen: !!panel.isDefaultOpen,
+    isDefaultOpen: !!panel.isDefaultOpen,
+    minSize,
+    maxSize,
+    openSize,
+    closeSize,
+  });
 
   const onStopResize = useCallback(
     newSize => {
-      const currentSize = Number(newSize);
+      const isOpen = Number(newSize) > size.minSize();
+      setSize(prev => ({...prev, isOpen}));
 
-      setSize({
-        ...size,
-        size: currentSize,
-        isOpen: currentSize > size.minSize,
-      });
+      if (!isOpen) {
+        ref.current?.resize(size.closeSize());
+      }
     },
     [size]
   );
 
-  return {toggle, onStopResize, size};
+  const onChange = useCallback(
+    (width: number) => {
+      const isOpen = width > size.minSize();
+      setSize(prev => ({...prev, isOpen}));
+
+      ref.current?.resize(width);
+    },
+    [size]
+  );
+
+  return {onStopResize, size, onChange, ref};
 };
 
 export default useResizablePanel;

@@ -1,5 +1,5 @@
-import * as Spaces from 'react-spaces';
+import { Panel } from 'react-resizable-panels';
 
-const FillPanel: React.FC = ({children}) => <Spaces.Fill style={{overflow: 'scroll'}}>{children}</Spaces.Fill>;
+const FillPanel: React.FC = ({children}) => <Panel>{children}</Panel>;
 
 export default FillPanel;

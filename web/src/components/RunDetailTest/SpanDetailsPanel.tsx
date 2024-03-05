@@ -1,33 +1,20 @@
-import {StepsID} from 'components/GuidedTour/testRunSteps';
 import SpanDetail, {TestAttributeRow, TestSubHeader} from 'components/SpanDetail';
 import {useSpan} from 'providers/Span/Span.provider';
 import useAttributePanelTooltip from 'hooks/useAttributePanelTooltip';
-import {LeftPanel, PanelContainer} from '../ResizablePanels';
+import {LeftPanel} from '../ResizablePanels';
 
 const panel = {
-  name: 'SPAN_DETAILS',
-  minSize: 25,
-  maxSize: 320,
   isDefaultOpen: true,
+  openSize: () => (window.innerWidth / 4 / window.innerWidth) * 100,
 };
 
 const SpanDetailsPanel = () => {
   const {selectedSpan} = useSpan();
-  const {tooltip, isVisible, onClose} = useAttributePanelTooltip();
+  const {onClose} = useAttributePanelTooltip();
 
   return (
-    <LeftPanel
-      panel={panel}
-      tooltip={tooltip}
-      isToolTipVisible={isVisible}
-      onOpen={onClose}
-      dataTour={StepsID.SpanDetails}
-    >
-      {size => (
-        <PanelContainer $isOpen={size.isOpen}>
-          <SpanDetail span={selectedSpan} AttributeRowComponent={TestAttributeRow} SubHeaderComponent={TestSubHeader} />
-        </PanelContainer>
-      )}
+    <LeftPanel panel={panel} onOpen={onClose}>
+      <SpanDetail span={selectedSpan} AttributeRowComponent={TestAttributeRow} SubHeaderComponent={TestSubHeader} />
     </LeftPanel>
   );
 };

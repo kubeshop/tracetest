@@ -32,6 +32,13 @@ const SumoLogicService = (): TDataStoreService => ({
   getIsOtlpBased() {
     return false;
   },
+  getPublicInfo({sumologic = {}}) {
+    const {url = ''} = sumologic;
+
+    return {
+      URL: url,
+    };
+  },
 });
 
 export default SumoLogicService();

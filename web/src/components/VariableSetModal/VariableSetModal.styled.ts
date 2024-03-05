@@ -17,7 +17,10 @@ export const Modal = styled(AntModal)`
 
 export const Title = styled(Typography.Title)`
   && {
-    font-size: ${({theme}) => theme.size.lg};
     margin: 0;
   }
+`;
+
+export const TipContainer = styled.div`
+  margin-top: 24px;
 `;

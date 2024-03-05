@@ -1,42 +1,41 @@
 import {Button} from 'antd';
 import styled, {createGlobalStyle, css} from 'styled-components';
-import {withPulseAnimation} from '../PulseButton';
 
 export const GlobalStyle = createGlobalStyle`
-  .spaces-resize-handle {
-    border-left: 1px solid ${({theme}) => theme.color.borderLight};
-    z-index: 10;
-  }
-
-  .splitter {
-    .ant-tooltip-arrow-content:before,
-    .ant-tooltip-inner {
-      background: ${({theme}) => theme.color.primary};
-      color: ${({theme}) => theme.color.white};
+  .panel-handle:has(button:hover) {
+    * {
+      cursor: pointer !important;
     }
   }
 `;
 
-export const ButtonContainer = styled.div`
-  position: absolute;
-  right: -15px;
-  top: 48px;
-  z-index: 100;
-`;
+export const ButtonContainer = styled.div<{$placement: 'left' | 'right'}>`
+  position: relative;
+  width: 4px;
+  height: 100%;
+  background: ${({theme}) => theme.color.white};
 
-export const SplitterButton = styled(Button)<{$isPulsing: boolean}>`
-  && {
-    border: 3px solid ${({theme}) => theme.color.primaryLight};
-    background-clip: padding-box;
-    > span {
-      font-size: ${({theme}) => theme.size.md};
-    }
+  :hover {
+    background: ${({theme}) => theme.color.primaryHover};
   }
 
-  ${({theme, $isPulsing}) => $isPulsing && withPulseAnimation(theme)}
-`;
+  ${({$placement}) =>
+    ($placement === 'left' &&
+      css`
+        border-left: 1px solid ${({theme}) => theme.color.borderLight};
 
-export const SplitterContainer = styled.div``;
+        :hover {
+          border-left: 1px solid ${({theme}) => theme.color.primaryHover};
+        }
+      `) ||
+    css`
+      border-right: 1px solid ${({theme}) => theme.color.borderLight};
+
+      :hover {
+        border-right: 1px solid ${({theme}) => theme.color.primaryHover};
+      }
+    `}
+`;
 
 export const PanelContainer = styled.div<{$isOpen: boolean}>`
   background-color: ${({theme}) => theme.color.white};
@@ -51,11 +50,36 @@ export const PanelContainer = styled.div<{$isOpen: boolean}>`
   }
 
   ${({$isOpen}) =>
-    $isOpen &&
+    ($isOpen &&
+      css`
+        > div {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      `) ||
     css`
-      > div {
-        opacity: 1;
-        pointer-events: auto;
+      :hover {
+        background: ${({theme}) => theme.color.primaryHover};
       }
+      cursor: pointer;
     `}
+`;
+
+export const ToggleButton = styled(Button).attrs({
+  shape: 'circle',
+  type: 'primary',
+  onMouseDown: (e: React.MouseEvent) => e.stopPropagation(),
+})`
+  && {
+    position: absolute;
+    top: 60px;
+    left: -14px;
+    z-index: 1030;
+
+    border: 3px solid ${({theme}) => theme.color.primaryLight};
+    background-clip: padding-box;
+    > span {
+      font-size: ${({theme}) => theme.size.md};
+    }
+  }
 `;

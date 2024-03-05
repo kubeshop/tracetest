@@ -5,6 +5,7 @@ export const Container = styled.div`
   display: flex;
   height: 100%;
   width: 100%;
+  position: relative;
 `;
 
 export const Section = styled.div`
@@ -19,8 +20,8 @@ export const SectionLeft = styled(Section)<{$isTimeline: boolean}>`
   ${({$isTimeline}) =>
     $isTimeline &&
     css`
-      max-size: calc(100% - 695px);
-      overflow: scroll;
+      overflow: hidden;
+      overflow-x: auto;
     `}
 `;
 

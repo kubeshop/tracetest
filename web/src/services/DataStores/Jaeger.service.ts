@@ -41,6 +41,9 @@ const JaegerService = (): TDataStoreService => ({
   getIsOtlpBased() {
     return false;
   },
+  getPublicInfo({jaeger = {}}) {
+    return GrpcClientService.getPublicInfo(jaeger);
+  },
 });
 
 export default JaegerService();
