@@ -1,0 +1,23 @@
+config:
+  target: my_target
+  tracetest:
+    token: tttoken_dfa1e954d47d1857
+  phases:
+    - duration: 2
+      arrivalRate: 5
+  engines:
+    tracetest: {}
+scenarios:
+  - name: tracetest_engine_test
+    engine: tracetest
+    flow:
+      - test:
+          id: artillery-engine-import-pokemon
+          runInfo:
+            variables:
+              - key: ENDPOINT
+                value: http://api:8081
+              - key: POKEMON_ID
+                value: "6"
+      - summary:
+          format: "pretty"
