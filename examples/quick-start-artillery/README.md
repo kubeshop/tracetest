@@ -1,21 +1,5 @@
-# Tracetest Cloud + Artillery.io
+# Tracetest + Artillery
 
-This repo shows how to integrate tracetest tests with artillery.io tests
+> [Read the detailed recipe for setting up Tracetest + Artillery in our documentation.](https://docs.tracetest.io/tools-and-integrations/artillery)
 
-
-```
-export TRACETEST_API_KEY=
-```
-
-## Steps
-
-1. Get your tracetest cloud api key and replace it on `atillery-test.yaml`
-2. Install the `artillery-plugin-tracetest` // TODO: fix this
-3. Run the project by using docker-compose: `docker-compose up -d` (Linux) or `docker compose up -d` (Mac)
-4. Start the agent:
-  > Since we need to use the otel collector from the docker compose, you need to run the agent
-  > with changed otlp ports
-  ```
-  TRACETEST_OTLP_SERVER_GRPC_PORT=9999 TRACETEST_OTLP_SERVER_HTTP_PORT=9998 tracetest start
-  ```
-5. Run the tests `artillery run atillery-test.yaml`
+This is a quick start showing how you can create programs to run trace-based tests from your Artillery setup utilizing the tracetest engine and plugin. The example shows how to define the Tracetest tests, execute them, and wait for results to be ready. [Read the Typescript Quick Start Docs](https://docs.tracetest.io/tools-and-integrations/artillery) to see how to run this example.
