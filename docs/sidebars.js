@@ -361,6 +361,16 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "tools-and-integrations/artillery-plugin",
+          label: "Artillery Plugin",
+        },
+        {
+          type: "doc",
+          id: "tools-and-integrations/artillery-engine",
+          label: "Artillery Engine",
+        },
+        {
+          type: "doc",
           id: "tools-and-integrations/k6",
           label: "k6 & Tracetest",
         },

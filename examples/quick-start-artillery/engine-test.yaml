@@ -1,10 +1,10 @@
 config:
   target: my_target
   tracetest:
-    token: tttoken_dfa1e954d47d1857
+    token: <YOUR_TRACETES_ENV_TOKEN>
   phases:
-    - duration: 2
-      arrivalRate: 5
+    - duration: 1
+      arrivalRate: 1
   engines:
     tracetest: {}
 scenarios:

@@ -1,0 +1,17 @@
+{
+  "name": "quick-start-artillery",
+  "version": "1.0.0",
+  "description": "> [Read the detailed recipe for setting up Tracetest + Artillery in our documentation.](https://docs.tracetest.io/tools-and-integrations/artillery)",
+  "main": "index.js",
+  "scripts": {
+    "test:plugin": "artillery run --dotenv .env --variables '{\"tracetest_token\": \"${TRACETEST_API_TOKEN}\"}' plugin-test.yaml",
+    "test:engine": "artillery run engine-test.yaml --dotenv .env --variables '{\"tracetest_token\": \"$(TRACETEST_API_TOKEN)\"}'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "artillery": "^2.0.7",
+    "artillery-engine-tracetest": "^0.0.32",
+    "artillery-plugin-tracetest": "^0.0.32"
+  }
+}

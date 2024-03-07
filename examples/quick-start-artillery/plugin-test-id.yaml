@@ -22,7 +22,7 @@ config:
             environment: "test"
             tool: "Artillery"
     tracetest:
-      token: tttoken_dfa1e954d47d1857
+      token: <YOUR_TRACETES_ENV_TOKEN>
       id: artillery-plugin-import-pokemon
 scenarios:
   - name: "Import Pokemon"
