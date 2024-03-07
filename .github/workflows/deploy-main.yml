@@ -15,39 +15,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # backend-arch-graph:
-  #   name: Generate backend architecture graph
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 0
-  #     - name: Setup go
-  #       uses: actions/setup-go@v3
-  #       with:
-  #         go-version-file: 'go.mod'
-  #         cache: true
-  #         cache-dependency-path: go.mod
-  #     - name: install graph tool
-  #       run: |
-  #         mkdir /tmp/go-arch
-  #         cd /tmp/go-arch
-  #         curl -SLO https://github.com/mathnogueira/golang-arch-viewer/archive/refs/heads/master.zip
-  #         unzip master.zip
-  #         cd golang-arch-viewer-master
-  #         make
-  #         mv dist/go-arch /tmp/go-arch/go-arch
-  #     - name: generate graph
-  #       run: |
-  #         cd server
-  #         mkdir -p ../dist/
-  #         /tmp/go-arch/go-arch -o ../dist/architecture.png
-  #     - name: Upload assets
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: architecture-graph
-  #         path: dist/architecture.png
-
   build-web:
     name: build web
     runs-on: ubuntu-latest
@@ -181,10 +148,6 @@ jobs:
         with:
           name: tracetest-web
           path: web/build/
-      # - uses: actions/download-artifact@v3
-      #   with:
-      #     name: architecture-graph
-      #     path: dist/architecture.png
 
       - uses: goreleaser/goreleaser-action@v4
         if: steps.cache.outputs.cache-hit != 'true'
@@ -198,49 +161,3 @@ jobs:
           ANALYTICS_FE_KEY: ${{ secrets.ANALYTICS_FE_KEY }}
           ANALYTICS_BE_KEY: ${{ secrets.ANALYTICS_BE_KEY }}
           TRACETEST_DEFAULT_CLOUD_ENDPOINT: ${{ secrets.TRACETEST_DEFAULT_CLOUD_ENDPOINT }}
-
-  deploy-beta:
-    if: github.event_name == 'push'
-    needs: release
-    name: Deploy Beta
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - shell: bash
-      run: |
-        echo "TAG=sha-$(git rev-parse --short=8 $GITHUB_SHA)" >> $GITHUB_ENV
-
-    - uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
-      with:
-        service_account_key: ${{ secrets.GKE_SA_KEY }}
-        project_id: ${{ secrets.GKE_PROJECT }}
-
-    - run: |-
-        gcloud --quiet auth configure-docker
-
-    - uses: google-github-actions/get-gke-credentials@fb08709ba27618c31c09e014e1d8364b02e5042e
-      with:
-        cluster_name: ${{ secrets.GKE_CLUSTER }}
-        location: ${{ secrets.GKE_ZONE }}
-        credentials: ${{ secrets.GKE_SA_KEY }}
-
-    - name: Deploy
-      run: |
-        TAG=${{env.TAG}} \
-        NAME=tracetest-beta \
-        CONFIG_FILE=./k8s/tracetest.beta.yaml \
-        EXPOSE_HOST=beta.tracetest.io \
-        CERT_NAME=tracetest-beta \
-        BACKEND_CONFIG=tracetest-beta \
-        ./k8s/deploy.sh
-
-    - name: Trigger Infra Update
-      uses: peter-evans/repository-dispatch@v1
-      with:
-        token: ${{ secrets.INFRA_REPO_PAT }}
-        repository: ${{ secrets.INFRA_REPO }}
-        event-type: update-tags
-        client-payload: '{"repo_name": "tracetest", "new_tag": "${{ env.TAG }}"}'
