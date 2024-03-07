@@ -1,0 +1,17 @@
+{
+  "name": "quick-start-artillery",
+  "version": "1.0.0",
+  "description": "> [Read the detailed recipe for setting up Tracetest + Artillery in our documentation.](https://docs.tracetest.io/tools-and-integrations/artillery)",
+  "main": "index.js",
+  "scripts": {
+    "test": "artillery run artillery-playwright.yaml"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@playwright/test": "^1.42.1",
+    "@tracetest/playwright": "^0.0.32",
+    "artillery": "^2.0.7",
+    "playwright": "^1.42.1"
+  }
+}
