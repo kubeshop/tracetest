@@ -4,9 +4,7 @@ name: pokeshop
 services:
   tracetest-agent:
     environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
       TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
-      TRACETEST_SERVER_URL: ${TRACETEST_SERVER_URL}
     image: kubeshop/tracetest-agent:latest
     networks:
       default: null
