@@ -1,0 +1,33 @@
+config:
+  target: "http://localhost:8081"
+  phases:
+    - duration: 2
+      arrivalRate: 5
+  plugins:
+    publish-metrics:
+      - type: "open-telemetry"
+        serviceName: "artillery"
+        metrics:
+          reporter: otlp-http
+          endpoint: "http://localhost:4318/v1/metrics"
+          attributes:
+            environment: "test"
+            tool: "Artillery"
+            type: "Load test"
+
+        traces:
+          reporter: otlp-http
+          endpoint: "http://localhost:4318/v1/traces"
+          attributes:
+            environment: "test"
+            tool: "Artillery"
+    tracetest:
+      token: <YOUR_TRACETES_ENV_TOKEN>
+      id: artillery-plugin-import-pokemon
+scenarios:
+  - name: "Import Pokemon"
+    flow:
+      - post:
+          url: "/pokemon/import"
+          json:
+            id: 6

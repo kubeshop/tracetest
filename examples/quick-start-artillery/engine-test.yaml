@@ -1,0 +1,23 @@
+config:
+  target: my_target
+  tracetest:
+    token: <YOUR_TRACETES_ENV_TOKEN>
+  phases:
+    - duration: 1
+      arrivalRate: 1
+  engines:
+    tracetest: {}
+scenarios:
+  - name: tracetest_engine_test
+    engine: tracetest
+    flow:
+      - test:
+          definition: import-pokemon.yaml
+          runInfo:
+            variables:
+              - key: ENDPOINT
+                value: http://api:8081
+              - key: POKEMON_ID
+                value: "6"
+      - summary:
+          format: "pretty"
