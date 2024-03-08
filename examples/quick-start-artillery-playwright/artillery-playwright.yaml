@@ -1,0 +1,8 @@
+config:
+  target: http://localhost:8081
+  engines:
+    playwright: {}
+  processor: home.spec.ts
+scenarios:
+  - engine: playwright
+    testFunction: importPokemon
