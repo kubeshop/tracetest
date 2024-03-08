@@ -155,6 +155,28 @@ const sidebars = {
         },
         {
           type: "category",
+          label: "Performance Testing",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-playwright-performance-tests-with-artillery-and-tracetest",
+              label: "Performance Testing with Distributed Tracing using Artillery, Playwright and Tracetest",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "API Gateways",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/testing-distributed-services-with-tyk-opentelemetry-tracetest",
+              label: "Testing Distributed Services with Tyk, OpenTelemetry, and Tracetest",
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "OpenTelemetry",
           items: [
             {
@@ -277,17 +299,6 @@ const sidebars = {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-tempo",
               label: "Node.js and Grafana Tempo",
-            },
-          ],
-        },
-        {
-          type: "category",
-          label: "Tyk",
-          items: [
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/testing-distributed-services-with-tyk-opentelemetry-tracetest",
-              label: "Testing Distributed Services with Tyk, OpenTelemetry, and Tracetest",
             },
           ],
         },

@@ -1,5 +1,5 @@
 {
-  "name": "quick-start-artillery",
+  "name": "quick-start-artillery-playwright",
   "version": "1.0.0",
   "description": "> [Read the detailed recipe for setting up Tracetest + Artillery in our documentation.](https://docs.tracetest.io/tools-and-integrations/artillery)",
   "main": "index.js",
