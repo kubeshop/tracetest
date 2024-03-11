@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/clientsdk/openapi"
+	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 )
 
 type testSuiteFormatter interface {

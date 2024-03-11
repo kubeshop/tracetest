@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/clientsdk/openapi"
 	"github.com/pterm/pterm"
 	"golang.org/x/exp/slices"
 )

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
+	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 )
 
 type Entry struct {

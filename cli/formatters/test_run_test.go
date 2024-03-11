@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/clientsdk/openapi"
 	"github.com/stretchr/testify/assert"
 )
 

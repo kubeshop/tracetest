@@ -11,8 +11,8 @@ import (
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/pkg/oauth"
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	cliUI "github.com/kubeshop/tracetest/cli/ui"
+	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 	"go.uber.org/zap"
 )
 

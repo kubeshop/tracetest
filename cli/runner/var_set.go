@@ -3,8 +3,8 @@ package runner
 import (
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/ui"
+	"github.com/kubeshop/tracetest/clientsdk/openapi"
 )
 
 func askForMissingVars(missingVars []varSet) []varSet {

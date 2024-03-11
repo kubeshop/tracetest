@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/runner"
+	"github.com/kubeshop/tracetest/clientsdk/openapi"
 	"github.com/spf13/cobra"
 )
 

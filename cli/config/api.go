@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
-	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/clientsdk/openapi"
 )
 
 type ListArgs struct {

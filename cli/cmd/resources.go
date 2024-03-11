@@ -11,9 +11,9 @@ import (
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/preprocessor"
 	"github.com/kubeshop/tracetest/cli/runner"
+	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 )
 
 var resourceParams = &resourceParameters{}

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/clientsdk/openapi"
 	"github.com/pterm/pterm"
 )
 
