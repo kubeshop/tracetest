@@ -10,9 +10,9 @@ import (
 	"github.com/Jeffail/gabs/v2"
 	"github.com/kubeshop/tracetest/cli/analytics"
 	"github.com/kubeshop/tracetest/cli/formatters"
-	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/preprocessor"
 	"github.com/kubeshop/tracetest/cli/runner"
+	"github.com/kubeshop/tracetest/clientsdk/fileutil"
 	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 )
 

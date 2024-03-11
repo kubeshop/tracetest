@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 
-	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 )
 
 func triggerListener(_ context.Context, _ *proto.TriggerRequest) error {

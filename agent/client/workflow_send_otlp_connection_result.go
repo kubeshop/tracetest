@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 )
 
 func (c *Client) SendOTLPConnectionResult(ctx context.Context, response *proto.OTLPConnectionTestResponse) error {

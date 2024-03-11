@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
+	"github.com/kubeshop/tracetest/clientsdk/fileutil"
 	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 	"github.com/spf13/cobra"
 )

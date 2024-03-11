@@ -12,7 +12,7 @@ import (
 	"time"
 
 	retry "github.com/avast/retry-go"
-	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 

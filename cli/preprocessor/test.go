@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
-	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
+	"github.com/kubeshop/tracetest/clientsdk/fileutil"
 	"github.com/kubeshop/tracetest/clientsdk/openapi"
 	"go.uber.org/zap"
 )

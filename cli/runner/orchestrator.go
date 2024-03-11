@@ -12,8 +12,8 @@ import (
 
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/variable"
+	"github.com/kubeshop/tracetest/clientsdk/fileutil"
 	"github.com/kubeshop/tracetest/clientsdk/openapi"
 	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 	"go.uber.org/zap"

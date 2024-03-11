@@ -9,7 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/event"
-	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/metric"

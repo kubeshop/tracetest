@@ -8,7 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/telemetry"
 
 	"github.com/kubeshop/tracetest/agent/event"
-	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"

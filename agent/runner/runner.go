@@ -13,7 +13,7 @@ import (
 
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/oauth"
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

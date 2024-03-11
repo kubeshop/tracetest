@@ -9,10 +9,10 @@ import (
 	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/event"
-	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/telemetry"
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/kubeshop/tracetest/agent/workers/poller"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"

@@ -54,10 +54,9 @@ build-go: dist/tracetest dist/tracetest-server ## build all go code
 build-web: web/build ## build web
 build-docker: goreleaser-version web/build .goreleaser.dev.yaml dist/tracetest-docker-$(TAG).tar dist/tracetest-agent-docker-$(TAG).tar ## build and tag docker image as defined in .goreleaser.dev.yaml
 
-.PHONY: generate generate-server generate-cli generate-web
-generate: generate-server generate-cli generate-web ## generate code entities from openapi definitions for all parts of the code
+.PHONY: generate generate-server generate-client-sdk generate-web
+generate: generate-server generate-client-sdk generate-web ## generate code entities from openapi definitions for all parts of the code
 generate-server: server/openapi ## generate code entities from openapi definitions for server
-generate-cli: cli/openapi ## generate code entities from openapi definitions for cli
 generate-web: web/src/types/Generated.types.ts ## generate code entities from openapi definitions for web
 
 OPENAPI_SRC_FILES := $(shell find api -type f)
@@ -68,7 +67,7 @@ OPENAPI_TARGET_DIR=openapi/
 web/src/types/Generated.types.ts: $(OPENAPI_SRC_FILES)
 	cd web; npm run types:generate
 
-cli/openapi: $(OPENAPI_SRC_FILES)
+generate-client-sdk: $(OPENAPI_SRC_FILES) ## generate code entities from openapi definitions for client
 	$(eval BASE := ./cli)
 	mkdir -p $(BASE)/tmp
 	rm -rf $(BASE)/$(OPENAPI_TARGET_DIR)

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 	"github.com/kubeshop/tracetest/server/telemetry"
 	"go.uber.org/zap"
 )

@@ -1,7 +1,7 @@
 package event
 
 import (
-	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 

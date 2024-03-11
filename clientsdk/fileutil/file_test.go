@@ -3,7 +3,7 @@ package fileutil_test
 import (
 	"testing"
 
-	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
+	"github.com/kubeshop/tracetest/clientsdk/fileutil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

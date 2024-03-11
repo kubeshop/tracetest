@@ -9,8 +9,8 @@ import (
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/event"
-	"github.com/kubeshop/tracetest/agent/proto"
 	consoleUI "github.com/kubeshop/tracetest/agent/ui"
+	"github.com/kubeshop/tracetest/clientsdk/agent/proto"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
