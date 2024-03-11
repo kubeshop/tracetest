@@ -9,7 +9,7 @@ import (
 	"net/http/httputil"
 
 	"github.com/Jeffail/gabs/v2"
-	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
+	"github.com/kubeshop/tracetest/clientsdk/fileutil"
 	"go.uber.org/zap"
 )
 

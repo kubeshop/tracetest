@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/cli/config"
-	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/clientsdk/resourcemanager"
 )
 
 type environment struct {
