@@ -48,6 +48,20 @@ const ResponseData = {
       statusCode: 200,
     };
   },
+  [TriggerTypes.artillery](response: object) {
+    return {
+      body: get(response, 'id', ''),
+      headers: [],
+      statusCode: 200,
+    };
+  },
+  [TriggerTypes.k6](response: object) {
+    return {
+      body: get(response, 'id', ''),
+      headers: [],
+      statusCode: 200,
+    };
+  },
   [TriggerTypes.kafka](response: object) {
     const kafkaResult = {
       offset: get(response, 'offset', ''),

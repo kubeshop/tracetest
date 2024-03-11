@@ -68,6 +68,26 @@ const Playwright: IPlugin = {
   requestType: TriggerTypes.traceid,
 };
 
+const Artillery: IPlugin = {
+  name: SupportedPlugins.Artillery,
+  title: 'Artillery',
+  description: 'Define your test via Artillery',
+  isActive: true,
+  demoList: [],
+  type: TriggerTypes.artillery,
+  requestType: TriggerTypes.traceid,
+};
+
+const K6: IPlugin = {
+  name: SupportedPlugins.K6,
+  title: 'K6',
+  description: 'Define your test via K6',
+  isActive: true,
+  demoList: [],
+  type: TriggerTypes.k6,
+  requestType: TriggerTypes.traceid,
+};
+
 export const Plugins = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: GRPC,
@@ -75,6 +95,8 @@ export const Plugins = {
   [SupportedPlugins.TraceID]: TraceID,
   [SupportedPlugins.Cypress]: Cypress,
   [SupportedPlugins.Playwright]: Playwright,
+  [SupportedPlugins.Artillery]: Artillery,
+  [SupportedPlugins.K6]: K6,
 } as const;
 
 export const TriggerTypeToPlugin = {
@@ -84,6 +106,8 @@ export const TriggerTypeToPlugin = {
   [TriggerTypes.traceid]: Plugins.TraceID,
   [TriggerTypes.cypress]: Plugins.Cypress,
   [TriggerTypes.playwright]: Plugins.Playwright,
+  [TriggerTypes.artillery]: Plugins.Artillery,
+  [TriggerTypes.k6]: Plugins.K6,
 } as const;
 
 export const CreateTriggerTypeToPlugin = {

@@ -10,6 +10,8 @@ const FormFactoryMap = {
   [TriggerTypes.traceid]: () => null,
   [TriggerTypes.cypress]: () => null,
   [TriggerTypes.playwright]: () => null,
+  [TriggerTypes.artillery]: () => null,
+  [TriggerTypes.k6]: () => null,
 };
 
 interface IProps {

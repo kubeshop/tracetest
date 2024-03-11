@@ -76,4 +76,6 @@ export enum SupportedPlugins {
   TraceID = 'TraceID',
   Cypress = 'Cypress',
   Playwright = 'Playwright',
+  Artillery = 'Artillery',
+  K6 = 'K6',
 }

@@ -19,6 +19,8 @@ const ComponentMap: Record<TriggerTypes, (props: IPropsComponent) => React.React
   [TriggerTypes.traceid]: RunDetailTriggerData,
   [TriggerTypes.cypress]: RunDetailTriggerData,
   [TriggerTypes.playwright]: RunDetailTriggerData,
+  [TriggerTypes.artillery]: RunDetailTriggerData,
+  [TriggerTypes.k6]: RunDetailTriggerData,
 };
 
 interface IProps extends IPropsComponent {

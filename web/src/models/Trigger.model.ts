@@ -48,6 +48,18 @@ const EntryData = {
       method: 'Playwright',
     };
   },
+  [TriggerTypes.artillery](request: TRequest) {
+    return {
+      entryPoint: get(request, 'id', ''),
+      method: 'Artillery',
+    };
+  },
+  [TriggerTypes.k6](request: TRequest) {
+    return {
+      entryPoint: get(request, 'id', ''),
+      method: 'K6',
+    };
+  },
   [TriggerTypes.kafka](request: TRequest) {
     let entryPoint = '';
 
@@ -77,7 +89,15 @@ const Trigger = ({
     request = HttpRequest(httpRequest);
   } else if (type === TriggerTypes.grpc) {
     request = GrpcRequest(grpc);
-  } else if ([TriggerTypes.traceid, TriggerTypes.cypress, TriggerTypes.playwright].includes(type)) {
+  } else if (
+    [
+      TriggerTypes.traceid,
+      TriggerTypes.cypress,
+      TriggerTypes.playwright,
+      TriggerTypes.artillery,
+      TriggerTypes.k6,
+    ].includes(type)
+  ) {
     request = TraceIDRequest(traceid);
   } else if (type === TriggerTypes.kafka) {
     request = KafkaRequest(kafka);

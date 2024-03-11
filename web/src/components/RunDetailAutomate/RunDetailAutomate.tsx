@@ -8,6 +8,9 @@ import DeepLink from 'components/RunDetailAutomateMethods/methods/DeepLink';
 import Playwright from 'components/RunDetailAutomateMethods/methods/Playwright';
 import Typescript from 'components/RunDetailAutomateMethods/methods/Typescript';
 import GithubActions from 'components/RunDetailAutomateMethods/methods/GithubActions';
+import K6 from 'components/RunDetailAutomateMethods/methods/K6';
+import Artillery from 'components/RunDetailAutomateMethods/methods/Artillery';
+import ArtilleryEngine from 'components/RunDetailAutomateMethods/methods/ArtilleryEngine';
 import {CLI_RUNNING_TESTS_URL} from 'constants/Common.constants';
 import useDefinitionFile from 'hooks/useDefinitionFile';
 import {TriggerTypes} from 'constants/Test.constants';
@@ -36,6 +39,22 @@ function getMethods(triggerType: TriggerTypes) {
           component: Playwright,
         },
       ];
+    case TriggerTypes.artillery:
+      return [
+        {
+          id: 'artillery',
+          label: 'Artillery',
+          component: Artillery,
+        },
+      ];
+    case TriggerTypes.k6:
+      return [
+        {
+          id: 'k6',
+          label: 'K6',
+          component: K6,
+        },
+      ];
     default:
       return [
         {
@@ -58,6 +77,11 @@ function getMethods(triggerType: TriggerTypes) {
           label: 'TypeScript',
           component: Typescript,
         },
+        {
+          id: 'artillery-engine',
+          label: 'Artillery',
+          component: ArtilleryEngine,
+        },
       ];
   }
 }
@@ -78,7 +102,7 @@ const RunDetailAutomate = ({test, run}: IProps) => {
 
   return (
     <S.Container>
-      <ResizablePanels saveId='run-detail-automate'>
+      <ResizablePanels saveId="run-detail-automate">
         <FillPanel>
           <RunDetailAutomateDefinition
             definition={definition}

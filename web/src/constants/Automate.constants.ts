@@ -51,3 +51,42 @@ test('${testName}', () => {
   // ...playwright commands
 });`;
 }
+
+export function ArtilleryCodeSnippet(testId: string) {
+  return `config:
+  target: "target"
+  phases:
+    ...phases
+  plugins:
+    ...plugins
+    tracetest:
+      token: <TRACETEST_API_TOKEN>
+      id: ${testId}
+  scenarios:
+    ...scenarios
+  `;
+}
+
+export function ArtilleryEngineCodeSnippet(testId: string) {
+  return `config:
+  target: "tracetest-engine"
+  tracetest:
+    token: <TRACETEST_API_TOKEN>
+  phases:
+    ...phases
+  engines:
+    tracetest: {}
+  scenarios:
+    - name: tracetest_engine_test
+      engine: tracetest
+      flow:
+        - test:
+            id: ${testId}
+        - summary:
+            format: "pretty"
+  `;
+}
+
+export function K6CodeSnippet() {
+  return `XK6_TRACETEST_API_TOKEN=<TRACETEST_API_TOKEN> ./k6 run ./<your-script> -o xk6-tracetest`;
+}

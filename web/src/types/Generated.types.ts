@@ -2180,7 +2180,9 @@ export interface external {
             | "traceid"
             | "kafka"
             | "cypress"
-            | "playwright";
+            | "playwright"
+            | "artillery"
+            | "k6";
           httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
           traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
@@ -2194,7 +2196,9 @@ export interface external {
             | "traceid"
             | "kafka"
             | "cypress"
-            | "playwright";
+            | "playwright"
+            | "artillery"
+            | "k6";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];

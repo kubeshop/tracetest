@@ -14,7 +14,17 @@ const Playwright = ({test}: IProps) => (
     <S.TitleContainer>
       <S.Title>Playwright Integration</S.Title>
     </S.TitleContainer>
-    <Typography.Paragraph>The code snippet below enables you to run this test via a Playwright run.</Typography.Paragraph>
+    <Typography.Paragraph>
+      The code snippet below enables you to run this test via a Playwright run.
+    </Typography.Paragraph>
+    <FramedCodeBlock
+      title="Install:"
+      language="bash"
+      value="npm i @tracetest/playwright"
+      minHeight="50px"
+      maxHeight="50px"
+    />
+    <br />
     <FramedCodeBlock title="Playwright code snippet:" language="javascript" value={PlaywrightCodeSnippet(test.name)} />
   </S.Container>
 );
