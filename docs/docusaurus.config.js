@@ -118,8 +118,10 @@ const config = {
         id: 'announcement',
         // content:
         //   '<a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/live/2MSDy3XHjtE?si=VlK7cxJOsgKi5QTE&t=1132">Tracetest is the official testing harness for the OpenTelemetry Demo! 🚀</a>',
+        // content:
+        //   '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/pricing">Tracetest Open Beta is Live. Try it! Give us feedback! 🙌</a>',
         content:
-          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/pricing">Tracetest Open Beta is Live. Try it! Give us feedback! 🙌</a>',
+          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/tracetest-is-going-to-kubecon-cloudnativecon-europe-in-paris">Tracetest is going to KubeCon + CloudNativeCon Europe in Paris 🇫🇷</a>',
         isCloseable: false,
       },  
       navbar: {
