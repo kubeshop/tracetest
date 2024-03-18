@@ -59,9 +59,30 @@ The [`@tracetest/playwright`](https://www.npmjs.com/package/@tracetest/playwrigh
 - Create an [environment token](/concepts/environment-tokens).
 - Have access to the environment's [agent API key](/configuration/agent).
 
-**Pokeshop Demo:** Clone the official [Tracetest Pokeshop Demo App Repo](https://github.com/kubeshop/pokeshop) to your local machine.
+**Docker**:
 
-**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+- Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+## Run This Quckstart Example
+
+Clone the official [Tracetest Pokeshop Demo App Repo](https://github.com/kubeshop/pokeshop) to your local machine.
+
+```bash
+git clone https://github.com/kubeshop/pokeshop.git
+cd pokeshop
+```
+
+Follow these instructions to run the Cypress example:
+
+1. Copy the `.env.template` file to `.env`.
+2. Log into the [Tracetest app](https://app.tracetest.io/).
+3. This example is configured to use the OpenTelemetry Collector. Ensure the environment you will be utilizing to run this example is also configured to use the OpenTelemetry Tracing Backend by clicking on Settings, Tracing Backend, OpenTelemetry, Save.
+4. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
+5. Run `docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d`.
+6. Run `npm i` in the root folder to install the dependencies.
+7. Run `npm run pw:run` or `npm run pw:open`.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
 ## Project Structure
 
@@ -251,7 +272,19 @@ test("Playwright: deletes a pokemon", async ({ page }) => {
 
 ### Setting the Environment Variables
 
-Copy the `.env.template` file to `.env` and add the Tracetest API token and agent tokens to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
+Copy the `.env.template` content into a new `.env` file.
+
+```bash title=Terminal
+cp .env.template .env
+```
+
+Add the [Tracetest API Token](/concepts/environment-tokens) and [Tracetest Agent API Key](/configuration/agent) to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
+
+```bash title=.env
+TRACETEST_API_TOKEN=<YOUR_API_TOKEN>
+TRACETEST_AGENT_API_KEY=<YOUR_AGENT_API_KEY>
+POKESHOP_DEMO_URL=http://localhost:8081
+```
 
 ### Starting the Pokeshop Demo App
 

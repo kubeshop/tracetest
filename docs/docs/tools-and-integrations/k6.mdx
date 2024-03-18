@@ -80,25 +80,65 @@ This is a simple quick start guide on how to run the Tracetest k6 extension to r
 - Create an [environment token](/concepts/environment-tokens).
 - Have access to the environment's [agent API key](/configuration/agent).
 
-**Tracetest CLI**:
+**Docker**:
 
-- [Download the CLI](/getting-started/installation#install-the-tracetest-cli).
-- Configure the CLI to connect to your Tracetest environment with the environment token you created in the step above.
+- Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
-    ```bash
-      tracetest configure -t <tttoken_1234567890>
-    ```
+## Run This Quckstart Example
 
-**xk6:** To start using the Tracetest k6 binary you need to have the xk6 builder installed on your machine. You can [follow the instructions defined in this page](https://github.com/grafana/xk6/) to do that.
+Clone the official [Tracetest Pokeshop Demo App Repo](https://github.com/kubeshop/pokeshop) to your local machine.
 
-**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+```bash
+git clone https://github.com/kubeshop/pokeshop.git
+cd pokeshop
+```
+
+Follow these instructions to run the Cypress example:
+
+1. Copy the `.env.template` file to `.env`.
+2. Log into the [Tracetest app](https://app.tracetest.io/).
+3. This example is configured to use Jaeger. Ensure the environment you will be utilizing to run this example is also configured to use the Jaeger Tracing Backend by clicking on Settings, Tracing Backend, Jaeger, updating the URL to `jaeger:16685`, Test Connection and Save.
+4. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
+5. Run `docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d`.
+6. Run `npm i` in the root folder to install the dependencies.
+7. Install k6 Tracetest extension for your OS. This will create a `k6` binary.
+8. Run `XK6_TRACETEST_API_TOKEN=<your-environment-token> ./k6 run ./test/k6/import-pokemon.js -o xk6-tracetest`.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
+
+## Project Structure
+
+The project is built with Docker Compose.
+
+### Pokeshop Demo App
+
+The [Pokeshop Demo App](/live-examples/pokeshop/overview) is a complete example of a distributed application using different backend and front-end services, implementation code is written in Typescript.
+
+The `docker-compose.yml` file in the root directory is for the Pokeshop Demo app and the OpenTelemetry setup.
+And the `docker-compose.e2e.yml` includes the [Tracetest Agent](/concepts/agent).
+
+Finally, the k6 load tests can be found in `test/k6/import-pokemon.js`.
 
 ## Installing the k6 Tracetest Extension
 
-Installing the k6 Tracetest extension is as easy as running the following command:
+[Installing the k6 Tracetest extension](https://github.com/grafana/xk6) is as easy as running the following command:
 
-```bash
-xk6 build v0.42.0 --with github.com/kubeshop/xk6-tracetest
+```title=Linux
+docker run --rm -it -u "$(id -u):$(id -g)" -v "${PWD}:/xk6" \
+  grafana/xk6 build v0.43.1 \
+  --with github.com/kubeshop/xk6-tracetest
+```
+
+```title=MacOS
+docker run --rm -it -e GOOS=darwin -u "$(id -u):$(id -g)" -v "${PWD}:/xk6" \
+  grafana/xk6 build v0.43.1 \
+  --with github.com/kubeshop/xk6-tracetest
+```
+
+```title=Windows
+docker run --rm -it -e GOOS=windows -u "$(id -u):$(id -g)" -v "${PWD}:/xk6" `
+  grafana/xk6 build v0.43.1 --output k6.exe `
+  --with github.com/kubeshop/xk6-tracetest
 ```
 
 This will generate the `k6-tracetest` binary in the current directory.
@@ -109,23 +149,9 @@ The instructions can be also found in the main [k6 docs](https://k6.io/docs/exte
 
 Once you have installed the k6 Tracetest binary, you can use the base k6 functionality to run load tests against instrumented services and Tracetest to run checks against the resulting telemetry data.
 
-## Project Structure
-
-The project is built with Docker Compose.
-
-### Pokeshop Demo App
-
-The [Pokeshop Demo App](/live-examples/pokeshop/overview) is a complete example of a distributed application using different backend and front-end services, implementation code is written in Typescript.
-
-The `docker-compose-yaml` file in the root directory is for the Pokeshop Demo app, the OpenTelemetry setup and the [Tracetest Agent](/concepts/agent).
-
-### Docker Compose Network
-
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. For example, `jaeger:14250` in the `collector.config.yaml` file will map to the `jaeger` service, where port `14250` is the port where the Jaeger all-in-one instance accepts telemetry data.
-
 ## Creating Your Tracetest Test Definition
 
-The `tests/test.yaml` file contains the test definition that will be used to run the tests. It uses the trace id trigger which is required for the k6 integrations as well as adding assertions using test-based TDD patterns.
+The `test/k6/import-pokemon.yaml` file contains the test definition that will be used to run the tests. It uses the trace id trigger which is required for the k6 integrations as well as adding assertions using test-based TDD patterns.
 
 ```yaml
 type: Test
@@ -156,12 +182,13 @@ spec:
 Create the test using the following command:
 
 ```bash
-tracetest apply test -f ./tests/test.yaml
+tracetest configure -t <TRACETEST_API_TOKEN>
+tracetest apply test -f ./test/k6/import-pokemon.yaml
 ```
 
 ## Creating Your k6 Script
 
-The `import-pokemon.js` file contains the k6 script that will be used to run the performance tests. It is a simple script that will trigger a `POST` request to the `/pokemon/import` Pokeshop Demo app endpoint.
+The `test/k6/import-pokemon.js` file contains the k6 script that will be used to run the performance tests. It is a simple script that will trigger a `POST` request to the `/pokemon/import` Pokeshop Demo app endpoint.
 
 ```javascript
 import { Http, Tracetest } from "k6/x/tracetest";
@@ -222,48 +249,28 @@ export function teardown() {
 }
 ```
 
-## Tracetest Agent Connects to Tracetest
+### Setting the Environment Variables
 
-The `docker-compose.yaml` file includes the [Tracetest Agent](/concepts/agent) image, which is going to fetch traces from the Jaeger all-in-one instance and send them to Tracetest.
+Copy the `.env.template` content into a new `.env` file.
 
-```yaml
-version: "3"
-
-services:
-  tracetest-agent:
-    image: kubeshop/tracetest-agent:latest
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-      TRACETEST_API_KEY: ${TRACETEST_API_KEY}
+```bash title=Terminal
+cp .env.template .env
 ```
 
-Do not forget to set the `TRACETEST_API_KEY` environment variable in the `.env` file to your Tracetest Agent. The API key available on the `Settings > Agent` page of your environment as you can see [here](/configuration/agent).
+Add the [Tracetest API Token](/concepts/environment-tokens) and [Tracetest Agent API Key](/configuration/agent) to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
 
-Configure Tracetest Agent to connect to the Jaeger instance running in Docker.
-
-```yaml title=tracetest-datastore.yaml
----
-type: DataStore
-spec:
-  id: current
-  name: jaeger
-  type: jaeger
-  jaeger:
-    endpoint: jaeger:16685
-    tls:
-      insecure: true
+```bash title=.env
+TRACETEST_API_TOKEN=<YOUR_API_TOKEN> # your environment token
+TRACETEST_AGENT_API_KEY=<YOUR_AGENT_API_KEY>
+POKESHOP_DEMO_URL=http://localhost:8081
 ```
+
+### Starting the Pokeshop Demo App
+
+To start the Pokeshop Demo App, run the following command from the root directory:
 
 ```bash
-tracetest apply datastore -f ./tracetest-datastore.yaml
-```
-
-## Run the Pokeshop Demo App and the Tracetest Agent
-
-To start the full setup, run the following command:
-
-```bash
-docker-compose up -d
+docker compose -f docker-compose.yml -f docker-compose.e2e.yml up
 ```
 
 This will start the Pokeshop Demo HTTP API on `http://localhost:8081/`.
@@ -273,7 +280,7 @@ This will start the Pokeshop Demo HTTP API on `http://localhost:8081/`.
 Having the full setup ready, the final step is to run the k6 script. To do that, run the following command:
 
 ```bash
-XK6_TRACETEST_API_TOKEN=<your-environment-token> ./k6 run ./import-pokemon.js -o xk6-tracetest
+XK6_TRACETEST_API_TOKEN=<your-environment-token> ./k6 run ./test/k6/import-pokemon.js -o xk6-tracetest
 context menu
 
 

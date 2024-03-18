@@ -363,7 +363,7 @@ const sidebars = {
         {
           type: "doc",
           id: "tools-and-integrations/typescript",
-          label: "Typescript",
+          label: "TypeScript",
         },
         {
           type: "doc",
