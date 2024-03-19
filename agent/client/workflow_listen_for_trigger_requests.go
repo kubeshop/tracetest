@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
-	"github.com/kubeshop/tracetest/server/telemetry"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 	"go.uber.org/zap"
 )
 

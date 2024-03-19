@@ -10,7 +10,7 @@ import (
 	"github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
-	"github.com/kubeshop/tracetest/server/telemetry"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
