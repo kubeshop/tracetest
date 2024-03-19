@@ -16,6 +16,10 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+
 :::note
 [Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-k6)
 :::
@@ -101,8 +105,8 @@ Follow these instructions to run the Cypress example:
 4. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
 5. Run `docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d`.
 6. Run `npm i` in the root folder to install the dependencies.
-7. Install k6 Tracetest extension for your OS. This will create a `k6` binary.
-8. Run `XK6_TRACETEST_API_TOKEN=<your-environment-token> ./k6 run ./test/k6/import-pokemon.js -o xk6-tracetest`.
+7. [Install k6 Tracetest extension](https://github.com/grafana/xk6) for your OS. This will create a `k6` binary.
+8. Run `XK6_TRACETEST_API_TOKEN=<TRACETEST_API_TOKEN> ./k6 run ./test/k6/import-pokemon.js -o xk6-tracetest`.
 
 Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
@@ -123,23 +127,37 @@ Finally, the k6 load tests can be found in `test/k6/import-pokemon.js`.
 
 [Installing the k6 Tracetest extension](https://github.com/grafana/xk6) is as easy as running the following command:
 
-```title=Linux
+<Tabs groupId="k6">
+  <TabItem value="Linux" label="Linux" default>
+
+```bash title="Terminal"
 docker run --rm -it -u "$(id -u):$(id -g)" -v "${PWD}:/xk6" \
   grafana/xk6 build v0.43.1 \
   --with github.com/kubeshop/xk6-tracetest
 ```
 
-```title=MacOS
+  </TabItem>
+
+  <TabItem value="MacOS" label="MacOS" default>
+
+```bash title="Terminal"
 docker run --rm -it -e GOOS=darwin -u "$(id -u):$(id -g)" -v "${PWD}:/xk6" \
   grafana/xk6 build v0.43.1 \
   --with github.com/kubeshop/xk6-tracetest
 ```
 
-```title=Windows
+  </TabItem>
+
+  <TabItem value="Windows" label="Windows" default>
+
+```bash title="Terminal"
 docker run --rm -it -e GOOS=windows -u "$(id -u):$(id -g)" -v "${PWD}:/xk6" `
   grafana/xk6 build v0.43.1 --output k6.exe `
   --with github.com/kubeshop/xk6-tracetest
 ```
+
+  </TabItem>
+</Tabs>
 
 This will generate the `k6-tracetest` binary in the current directory.
 
@@ -280,7 +298,7 @@ This will start the Pokeshop Demo HTTP API on `http://localhost:8081/`.
 Having the full setup ready, the final step is to run the k6 script. To do that, run the following command:
 
 ```bash
-XK6_TRACETEST_API_TOKEN=<your-environment-token> ./k6 run ./test/k6/import-pokemon.js -o xk6-tracetest
+XK6_TRACETEST_API_TOKEN=<TRACETEST_API_TOKEN> ./k6 run ./test/k6/import-pokemon.js -o xk6-tracetest
 context menu
 
 
