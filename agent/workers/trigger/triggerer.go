@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/agent/pkg/id"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 )

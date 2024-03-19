@@ -13,7 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/models"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
-	"github.com/kubeshop/tracetest/server/version"
+	"github.com/kubeshop/tracetest/agent/version"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"go.uber.org/zap"
 )

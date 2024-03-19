@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/kubeshop/tracetest/agent/collector"
-	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/agent/pkg/id"
 	"github.com/kubeshop/tracetest/server/tracedb"
 	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"

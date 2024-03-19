@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/kubeshop/tracetest/agent/pkg/id"
 	triggerer "github.com/kubeshop/tracetest/agent/workers/trigger"
-	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/trace"

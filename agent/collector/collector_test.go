@@ -9,7 +9,7 @@ import (
 
 	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/collector/mocks"
-	"github.com/kubeshop/tracetest/server/pkg/id"
+	"github.com/kubeshop/tracetest/agent/pkg/id"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.opentelemetry.io/otel/trace"

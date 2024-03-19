@@ -4,7 +4,12 @@ import (
 	"fmt"
 	"os"
 
+<<<<<<< Updated upstream
 	"github.com/kubeshop/tracetest/server/version"
+=======
+	"github.com/kubeshop/tracetest/agent/version"
+	"go.opentelemetry.io/otel/propagation"
+>>>>>>> Stashed changes
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
 )

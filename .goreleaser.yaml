@@ -28,6 +28,8 @@ builds:
     ldflags:
     - -X github.com/kubeshop/tracetest/server/version.Version={{ .Env.VERSION }}
     - -X github.com/kubeshop/tracetest/server/version.Env={{ .Env.TRACETEST_ENV }}
+    - -X github.com/kubeshop/tracetest/agent/version.Version={{ .Env.VERSION }}
+    - -X github.com/kubeshop/tracetest/agent/version.Env={{ .Env.TRACETEST_ENV }}
     - -X github.com/kubeshop/tracetest/server/analytics.SecretKey={{ .Env.ANALYTICS_BE_KEY }}
     - -X github.com/kubeshop/tracetest/server/analytics.FrontendKey={{ .Env.ANALYTICS_FE_KEY }}
     env:
