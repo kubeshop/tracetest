@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/event"
+	"github.com/kubeshop/tracetest/agent/otlp"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
-	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opencensus.io/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"

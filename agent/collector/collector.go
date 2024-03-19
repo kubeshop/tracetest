@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/event"
+	"github.com/kubeshop/tracetest/agent/otlp"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
-	"github.com/kubeshop/tracetest/server/otlp"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )

@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubeshop/tracetest/agent/otlp"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/model/events"
@@ -22,17 +23,6 @@ import (
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
-
-type RequestType string
-
-var (
-	RequestTypeHTTP RequestType = "HTTP"
-	RequestTypeGRPC RequestType = "gRPC"
-)
-
-type Ingester interface {
-	Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error)
-}
 
 type runGetter interface {
 	GetRunByTraceID(context.Context, trace.TraceID) (test.Run, error)
@@ -104,7 +94,7 @@ func (i *ingester) startTesterListener() {
 	}))
 }
 
-func (i *ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType RequestType) (*pb.ExportTraceServiceResponse, error) {
+func (i *ingester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
 	i.increaseSpanCount(countSpans(request.ResourceSpans))
 
 	ds, err := i.dsRepo.Current(ctx)
@@ -159,7 +149,7 @@ func countSpans(resourceSpans []*v1.ResourceSpans) int {
 	return count
 }
 
-func (i *ingester) processTrace(ctx context.Context, modelTrace traces.Trace, ix int, requestType RequestType) error {
+func (i *ingester) processTrace(ctx context.Context, modelTrace traces.Trace, ix int, requestType otlp.RequestType) error {
 	ctx, span := i.tracer.Start(ctx, "process otlp trace")
 	span.SetAttributes(
 		attribute.String("tracetest.ingestor.trace_id", modelTrace.ID.String()),
@@ -244,7 +234,7 @@ func (i *ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Tr
 	return run, nil
 }
 
-func (i *ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType RequestType) error {
+func (i *ingester) notify(ctx context.Context, run test.Run, trace traces.Trace, requestType otlp.RequestType) error {
 	evt := events.TraceOtlpServerReceivedSpans(
 		run.TestID,
 		run.ID,

@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jackc/pgx/v5/pgxpool"
+	agentOtlp "github.com/kubeshop/tracetest/agent/otlp"
 	"github.com/kubeshop/tracetest/server/analytics"
 	"github.com/kubeshop/tracetest/server/assertions/comparator"
 	"github.com/kubeshop/tracetest/server/config"
@@ -404,8 +405,8 @@ func registerOtlpServer(
 	tracer trace.Tracer,
 ) {
 	ingester := otlp.NewIngester(tracesRepo, runRepository, eventEmitter, dsRepo, subManager, tracer)
-	grpcOtlpServer := otlp.NewGrpcServer(":4317", ingester, tracer)
-	httpOtlpServer := otlp.NewHttpServer(":4318", ingester)
+	grpcOtlpServer := agentOtlp.NewGrpcServer(":4317", ingester, tracer)
+	httpOtlpServer := agentOtlp.NewHttpServer(":4318", ingester)
 	go grpcOtlpServer.Start()
 	go httpOtlpServer.Start()
 
