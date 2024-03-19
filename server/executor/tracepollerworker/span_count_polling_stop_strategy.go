@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/kubeshop/tracetest/agent/tracedb"
 	"github.com/kubeshop/tracetest/server/executor"
-	"github.com/kubeshop/tracetest/server/tracedb"
 )
 
 type SpanCountPollingStopStrategy struct{}

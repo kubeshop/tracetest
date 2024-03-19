@@ -2,8 +2,6 @@ package trigger
 
 import (
 	"context"
-
-	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
 func TRACEID() Triggerer {
@@ -12,17 +10,31 @@ func TRACEID() Triggerer {
 
 type traceidTriggerer struct{}
 
-func (t *traceidTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts *Options) (Response, error) {
+func (t *traceidTriggerer) Trigger(ctx context.Context, triggerConfig Trigger, opts *Options) (Response, error) {
 	response := Response{
-		Result: trigger.TriggerResult{
+		Result: TriggerResult{
 			Type:    t.Type(),
-			TraceID: &trigger.TraceIDResponse{ID: triggerConfig.TraceID.ID},
+			TraceID: &TraceIDResponse{ID: triggerConfig.TraceID.ID},
 		},
 	}
 
 	return response, nil
 }
 
-func (t *traceidTriggerer) Type() trigger.TriggerType {
-	return trigger.TriggerTypeTraceID
+func (t *traceidTriggerer) Type() TriggerType {
+	return TriggerTypeTraceID
+}
+
+const TriggerTypeTraceID TriggerType = "traceid"
+const TriggerTypeCypress TriggerType = "cypress"
+const TriggerTypePlaywright TriggerType = "playwright"
+
+var traceIDBasedTriggers = []TriggerType{TriggerTypeTraceID, TriggerTypeCypress, TriggerTypePlaywright}
+
+type TraceIDRequest struct {
+	ID string `json:"id,omitempty" expr_enabled:"true"`
+}
+
+type TraceIDResponse struct {
+	ID string
 }

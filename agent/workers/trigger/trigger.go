@@ -2,13 +2,20 @@ package trigger
 
 import (
 	"errors"
-
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
-type (
-	TriggerType string
+type TriggerType string
 
+func (t TriggerType) IsTraceIDBased() bool {
+	return slices.Contains(traceIDBasedTriggers, t)
+}
+
+func (t TriggerType) IsFrontendE2EBased() bool {
+	return t == TriggerTypeCypress || t == TriggerTypePlaywright
+}
+
+type (
 	Trigger struct {
 		Type    TriggerType     `json:"type"`
 		HTTP    *HTTPRequest    `json:"httpRequest,omitempty"`
@@ -40,12 +47,4 @@ func (e *TriggerError) ToError() error {
 	}
 
 	return errors.New(e.ErrorMessage)
-}
-
-func (t TriggerType) IsTraceIDBased() bool {
-	return slices.Contains(traceIDBasedTriggers, t)
-}
-
-func (t TriggerType) IsFrontendE2EBased() bool {
-	return t == TriggerTypeCypress || t == TriggerTypePlaywright
 }

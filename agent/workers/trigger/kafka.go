@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/server/pkg/kafka"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/propagation"
 )
 
@@ -15,9 +14,9 @@ func KAFKA() Triggerer {
 
 type kafkaTriggerer struct{}
 
-func (te *kafkaTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts *Options) (Response, error) {
+func (te *kafkaTriggerer) Trigger(ctx context.Context, triggerConfig Trigger, opts *Options) (Response, error) {
 	response := Response{
-		Result: trigger.TriggerResult{
+		Result: TriggerResult{
 			Type: te.Type(),
 		},
 	}
@@ -39,7 +38,7 @@ func (te *kafkaTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Tri
 		return response, fmt.Errorf("error when sending message to kafka producer: %w", err)
 	}
 
-	response.Result.Kafka = &trigger.KafkaResponse{
+	response.Result.Kafka = &KafkaResponse{
 		Partition: result.Partition,
 		Offset:    result.Offset,
 	}
@@ -52,11 +51,11 @@ func (te *kafkaTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Tri
 	return response, nil
 }
 
-func (t *kafkaTriggerer) Type() trigger.TriggerType {
-	return trigger.TriggerTypeKafka
+func (t *kafkaTriggerer) Type() TriggerType {
+	return TriggerTypeKafka
 }
 
-func (t *kafkaTriggerer) getConfig(request *trigger.KafkaRequest) kafka.Config {
+func (t *kafkaTriggerer) getConfig(request *KafkaRequest) kafka.Config {
 	config := kafka.Config{
 		BrokerURLs:      request.BrokerURLs,
 		Topic:           request.Topic,
@@ -73,4 +72,46 @@ func (t *kafkaTriggerer) getConfig(request *trigger.KafkaRequest) kafka.Config {
 	}
 
 	return config
+}
+
+const TriggerTypeKafka TriggerType = "kafka"
+
+type KafkaRequest struct {
+	BrokerURLs      []string             `json:"brokerUrls"`
+	Topic           string               `expr_enabled:"true" json:"topic"`
+	Headers         []KafkaMessageHeader `json:"headers"`
+	Authentication  *KafkaAuthenticator  `json:"authetication,omitempty"`
+	MessageKey      string               `expr_enabled:"true" json:"messageKey"`
+	MessageValue    string               `expr_enabled:"true" json:"messageValue"`
+	SSLVerification bool                 `json:"sslVerification,omitempty"`
+}
+
+func (r KafkaRequest) GetHeaderAsMap() map[string]string {
+	headerAsMap := make(map[string]string, len(r.Headers))
+
+	for _, item := range r.Headers {
+		headerAsMap[item.Key] = item.Value
+	}
+
+	return headerAsMap
+}
+
+type KafkaMessageHeader struct {
+	Key   string `expr_enabled:"true" json:"key,omitempty"`
+	Value string `expr_enabled:"true" json:"value,omitempty"`
+}
+
+type KafkaAuthenticator struct {
+	Type  string                   `json:"type,omitempty" expr_enabled:"true"`
+	Plain *KafkaPlainAuthenticator `json:"plain,omitempty"`
+}
+
+type KafkaPlainAuthenticator struct {
+	Username string `json:"username,omitempty" expr_enabled:"true"`
+	Password string `json:"password,omitempty" expr_enabled:"true"`
+}
+
+type KafkaResponse struct {
+	Partition string
+	Offset    string
 }

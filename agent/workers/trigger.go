@@ -11,10 +11,10 @@ import (
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
+	"github.com/kubeshop/tracetest/agent/workers/trigger"
 	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -208,7 +208,7 @@ func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 func convertProtoToTrigger(pt *proto.Trigger) trigger.Trigger {
 	return trigger.Trigger{
-		Type:    trigger.TriggerType(pt.Type),
+		Type:    agentTrigger.TriggerType(pt.Type),
 		HTTP:    convertProtoHttpTriggerToHttpTrigger(pt.Http),
 		GRPC:    convertProtoGrpcTriggerToGrpcTrigger(pt.Grpc),
 		TraceID: convertProtoTraceIDTriggerToTraceIDTrigger(pt.TraceID),

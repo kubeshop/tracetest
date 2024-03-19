@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/kafka"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 
 	"go.opentelemetry.io/otel/propagation"
 )

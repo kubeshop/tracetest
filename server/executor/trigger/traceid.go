@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
 const TRACEID_EXPRESSION = "${env:TRACE_ID}"
