@@ -18,7 +18,7 @@ func (t TriggerType) IsFrontendE2EBased() bool {
 type (
 	Trigger struct {
 		Type    TriggerType     `json:"type"`
-		HTTP    *HTTPRequest    `json:"httpRequest,omitempty"`
+		HTTP    *HTTPRequest    `json:"http,omitempty"`
 		GRPC    *GRPCRequest    `json:"grpc,omitempty"`
 		TraceID *TraceIDRequest `json:"traceid,omitempty"`
 		Kafka   *KafkaRequest   `json:"kafka,omitempty"`
