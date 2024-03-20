@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/kubeshop/tracetest/agent/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/stretchr/testify/assert"
 )
 

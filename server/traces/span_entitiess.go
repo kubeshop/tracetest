@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/timing"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 )
 

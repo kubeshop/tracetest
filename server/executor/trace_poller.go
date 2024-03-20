@@ -7,13 +7,13 @@ import (
 	"log"
 	"time"
 
+	"github.com/kubeshop/tracetest/agent/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/executor/pollingprofile"
 	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model/events"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/subscription"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 

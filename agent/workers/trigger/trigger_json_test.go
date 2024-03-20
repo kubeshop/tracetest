@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/kubeshop/tracetest/server/test/trigger"
+	"github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

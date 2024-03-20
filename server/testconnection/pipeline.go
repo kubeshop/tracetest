@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/kubeshop/tracetest/agent/tracedb"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/http/middleware"
 	"github.com/kubeshop/tracetest/server/model"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
-	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/metric"
 )
 

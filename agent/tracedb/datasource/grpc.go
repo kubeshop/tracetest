@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/agent/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/model"
-	"github.com/kubeshop/tracetest/server/tracedb/connection"
 	"github.com/kubeshop/tracetest/server/traces"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/collector/component"

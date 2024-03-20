@@ -7,7 +7,6 @@ import (
 	"sync"
 
 	"github.com/kubeshop/tracetest/server/pkg/id"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -18,13 +17,13 @@ type Options struct {
 }
 
 type Triggerer interface {
-	Trigger(context.Context, trigger.Trigger, *Options) (Response, error)
-	Type() trigger.TriggerType
+	Trigger(context.Context, Trigger, *Options) (Response, error)
+	Type() TriggerType
 }
 
 type Response struct {
 	SpanAttributes map[string]string
-	Result         trigger.TriggerResult
+	Result         TriggerResult
 	TraceID        trace.TraceID
 	SpanID         trace.SpanID
 }
@@ -32,14 +31,14 @@ type Response struct {
 func NewRegistry(tracer trace.Tracer) *Registry {
 	return &Registry{
 		tracer: tracer,
-		reg:    map[trigger.TriggerType]Triggerer{},
+		reg:    map[TriggerType]Triggerer{},
 	}
 }
 
 type Registry struct {
 	sync.Mutex
 	tracer trace.Tracer
-	reg    map[trigger.TriggerType]Triggerer
+	reg    map[TriggerType]Triggerer
 }
 
 func (r *Registry) Add(t Triggerer) {
@@ -51,12 +50,12 @@ func (r *Registry) Add(t Triggerer) {
 
 var ErrTriggererTypeNotRegistered = errors.New("triggerer type not found")
 
-func (r *Registry) Get(triggererType trigger.TriggerType) (Triggerer, error) {
+func (r *Registry) Get(triggererType TriggerType) (Triggerer, error) {
 	r.Lock()
 	defer r.Unlock()
 
 	if triggererType.IsTraceIDBased() {
-		triggererType = trigger.TriggerTypeTraceID
+		triggererType = TriggerTypeTraceID
 	}
 
 	t, found := r.reg[triggererType]

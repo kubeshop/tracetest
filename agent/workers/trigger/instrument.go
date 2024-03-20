@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/contrib/propagators/aws/xray"
 	"go.opentelemetry.io/contrib/propagators/b3"
 	"go.opentelemetry.io/contrib/propagators/jaeger"
@@ -26,11 +25,11 @@ type instrumentedTriggerer struct {
 	triggerer Triggerer
 }
 
-func (t *instrumentedTriggerer) Type() trigger.TriggerType {
-	return trigger.TriggerType("instrumented")
+func (t *instrumentedTriggerer) Type() TriggerType {
+	return TriggerType("instrumented")
 }
 
-func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts *Options) (Response, error) {
+func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig Trigger, opts *Options) (Response, error) {
 	_, span := t.tracer.Start(ctx, "Trigger test")
 	defer span.End()
 
@@ -62,14 +61,14 @@ func (t *instrumentedTriggerer) Trigger(ctx context.Context, triggerConfig trigg
 	resp.TraceID = tid
 
 	attrs := []attribute.KeyValue{
-		attribute.String("tracetest.run.trigger.trace_id", tid.String()),
-		attribute.String("tracetest.run.trigger.test_id", string(opts.TestID)),
-		attribute.String("tracetest.run.trigger.type", string(t.triggerer.Type())),
+		attribute.String("tracetest.run.trace_id", tid.String()),
+		attribute.String("tracetest.run.test_id", string(opts.TestID)),
+		attribute.String("tracetest.run.type", string(t.triggerer.Type())),
 	}
 
 	if err != nil {
 		span.RecordError(err)
-		attrs = append(attrs, attribute.String("tracetest.run.trigger.error", err.Error()))
+		attrs = append(attrs, attribute.String("tracetest.run.error", err.Error()))
 	}
 
 	for k, v := range resp.SpanAttributes {

@@ -1,10 +1,10 @@
 package app
 
 import (
+	"github.com/kubeshop/tracetest/agent/tracedb"
 	"github.com/kubeshop/tracetest/server/config"
 	"github.com/kubeshop/tracetest/server/pkg/pipeline"
 	"github.com/kubeshop/tracetest/server/testconnection"
-	"github.com/kubeshop/tracetest/server/tracedb"
 	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/trace"
 )

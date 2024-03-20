@@ -1,8 +1,8 @@
 package mappings
 
 import (
+	"github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/openapi"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 )
 
 // out

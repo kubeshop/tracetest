@@ -12,7 +12,6 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/jhump/protoreflect/desc"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -21,20 +20,82 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const TriggerTypeGRPC TriggerType = "grpc"
+
+type GRPCHeader struct {
+	Key   string `expr_enabled:"true" json:"key"`
+	Value string `expr_enabled:"true" json:"value"`
+}
+
+type GRPCRequest struct {
+	ProtobufFile string             `json:"protobufFile,omitempty" expr_enabled:"true"`
+	Address      string             `json:"address,omitempty" expr_enabled:"true"`
+	Service      string             `json:"service,omitempty" expr_enabled:"true"`
+	Method       string             `json:"method,omitempty" expr_enabled:"true"`
+	Request      string             `json:"request,omitempty" expr_enabled:"true"`
+	Metadata     []GRPCHeader       `json:"metadata,omitempty"`
+	Auth         *HTTPAuthenticator `json:"auth,omitempty"`
+}
+
+func (a GRPCRequest) Headers() []string {
+	h := []string{}
+
+	for _, md := range a.Metadata {
+		// ignore invalid values
+		if md.Key == "" {
+			continue
+		}
+
+		h = append(h, md.Key+": "+md.Value)
+	}
+
+	return h
+}
+
+func (a GRPCRequest) MD() *metadata.MD {
+	md := metadata.MD{}
+
+	for _, header := range a.Metadata {
+		// ignore invalid values
+		if header.Key == "" {
+			continue
+		}
+
+		md[header.Key] = []string{header.Value}
+	}
+
+	return &md
+}
+
+func (a GRPCRequest) Authenticate() {
+	if a.Auth == nil {
+		return
+	}
+
+	a.Auth.AuthenticateGRPC()
+}
+
+type GRPCResponse struct {
+	Status     string
+	StatusCode int
+	Metadata   []GRPCHeader
+	Body       string
+}
+
 func GRPC() Triggerer {
 	return &grpcTriggerer{}
 }
 
 type grpcTriggerer struct{}
 
-func (te *grpcTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trigger, opts *Options) (Response, error) {
+func (te *grpcTriggerer) Trigger(ctx context.Context, triggerConfig Trigger, opts *Options) (Response, error) {
 	response := Response{
-		Result: trigger.TriggerResult{
+		Result: TriggerResult{
 			Type: te.Type(),
 		},
 	}
 
-	if triggerConfig.Type != trigger.TriggerTypeGRPC {
+	if triggerConfig.Type != TriggerTypeGRPC {
 		return response, fmt.Errorf(`trigger type "%s" not supported by GRPC triggerer`, triggerConfig.Type)
 	}
 
@@ -84,7 +145,7 @@ func (te *grpcTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trig
 		return response, err
 	}
 
-	response.Result.GRPC = &trigger.GRPCResponse{
+	response.Result.GRPC = &GRPCResponse{
 		Metadata:   mapHeaders(h.respMD),
 		StatusCode: int(h.respCode),
 		Status:     h.respCode.String(),
@@ -99,8 +160,8 @@ func (te *grpcTriggerer) Trigger(ctx context.Context, triggerConfig trigger.Trig
 	return response, nil
 }
 
-func (t *grpcTriggerer) Type() trigger.TriggerType {
-	return trigger.TriggerTypeGRPC
+func (t *grpcTriggerer) Type() TriggerType {
+	return TriggerTypeGRPC
 }
 
 func mdToHeaders(md *metadata.MD) []string {
@@ -137,11 +198,11 @@ func protoDescription(content string) (grpcurl.DescriptorSource, error) {
 
 }
 
-func mapHeaders(md metadata.MD) []trigger.GRPCHeader {
-	var mappedHeaders []trigger.GRPCHeader
+func mapHeaders(md metadata.MD) []GRPCHeader {
+	var mappedHeaders []GRPCHeader
 	for key, headers := range md {
 		for _, val := range headers {
-			val := trigger.GRPCHeader{
+			val := GRPCHeader{
 				Key:   key,
 				Value: val,
 			}

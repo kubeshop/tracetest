@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/kubeshop/tracetest/server/test"
-	"github.com/kubeshop/tracetest/server/test/trigger"
 	"github.com/kubeshop/tracetest/server/testmock"
 	"github.com/kubeshop/tracetest/server/testsuite"
 	"github.com/stretchr/testify/assert"
