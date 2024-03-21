@@ -1,0 +1,26 @@
+type: Test
+spec:
+  id: artillery-plugin-import-pokemon
+  name: "Artillery Plugin: Import a Pokemon"
+  trigger:
+    type: artillery
+  specs:
+    - selector: span[tracetest.span.type="general" name = "validate request"] span[tracetest.span.type="http"]
+      name: "All HTTP Spans: Status  code is 200"
+      assertions:
+        - attr:http.status_code = 200
+    - selector: span[tracetest.span.type="http" name="GET" http.method="GET"]
+      assertions:
+        - attr:http.route = "/api/v2/pokemon/${var:POKEMON_ID}"
+    - selector: span[tracetest.span.type="database"]
+      name: "All Database Spans: Processing time is less than 1s"
+      assertions:
+        - attr:tracetest.span.duration < 1s
+    - selector: span[tracetest.span.type="http" name="post" http.method="POST"]
+      name: Response time should be fast
+      assertions:
+        - attr:response.time.ms < 100
+  outputs:
+    - name: DATABASE_POKEMON_ID
+      selector: span[tracetest.span.type="database" name="create postgres.pokemon" db.system="postgres" db.name="postgres" db.user="postgres" db.operation="create" db.sql.table="pokemon"]
+      value: attr:db.result | json_path '$.id'
