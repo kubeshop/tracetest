@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/kubeshop/tracetest/server/pkg/kafka"
+	"github.com/kubeshop/tracetest/agent/workers/trigger/kafka"
 	"go.opentelemetry.io/otel/propagation"
 )
 

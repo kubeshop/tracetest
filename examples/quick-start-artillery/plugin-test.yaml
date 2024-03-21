@@ -23,7 +23,7 @@ config:
             tool: "Artillery"
     tracetest:
       token: <YOUR_TRACETES_ENV_TOKEN>
-      definition: import-pokemon-trace-id.yaml
+      definition: import-pokemon-plugin.yaml
       runInfo:
         variables:
           - key: POKEMON_ID
