@@ -11,8 +11,8 @@ func (t TriggerType) IsTraceIDBased() bool {
 	return slices.Contains(traceIDBasedTriggers, t)
 }
 
-func (t TriggerType) IsFrontendE2EBased() bool {
-	return t == TriggerTypeCypress || t == TriggerTypePlaywright
+func (t TriggerType) IsIntegration() bool {
+	return slices.Contains(traceIDBasedIntegrationsTriggers, t)
 }
 
 type (
