@@ -60,7 +60,7 @@ var testRunCmd = &cobra.Command{
 	PreRun:     setupCommand(),
 	Run: func(_ *cobra.Command, _ []string) {
 		// map old flags to new ones
-		runParams.DefinitionFile = runTestFileDefinition
+		runParams.DefinitionFiles = []string{runTestFileDefinition}
 		runParams.VarsID = runTestEnvID
 		runParams.SkipResultWait = !runTestWaitForResult
 		runParams.JUnitOuptutFile = runTestJUnit

@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
@@ -71,21 +72,21 @@ func (p listParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errors := make([]error, 0)
 
 	if p.Take < 0 {
-		errors = append(errors, paramError{
+		errors = append(errors, cmdutil.ParamError{
 			Parameter: "take",
 			Message:   "take parameter must be greater than 0",
 		})
 	}
 
 	if p.Skip < 0 {
-		errors = append(errors, paramError{
+		errors = append(errors, cmdutil.ParamError{
 			Parameter: "skip",
 			Message:   "skip parameter must be greater than 0",
 		})
 	}
 
 	if p.SortDirection != "" && p.SortDirection != "asc" && p.SortDirection != "desc" {
-		errors = append(errors, paramError{
+		errors = append(errors, cmdutil.ParamError{
 			Parameter: "sortDirection",
 			Message:   "sortDirection parameter must be either asc or desc",
 		})

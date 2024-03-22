@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
@@ -59,7 +60,7 @@ func (p exportParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errors := p.resourceIDParameters.Validate(cmd, args)
 
 	if p.OutputFile == "" {
-		errors = append(errors, paramError{
+		errors = append(errors, cmdutil.ParamError{
 			Parameter: "file",
 			Message:   "output file must be provided",
 		})
