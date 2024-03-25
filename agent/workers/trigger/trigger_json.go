@@ -21,7 +21,7 @@ func (v3 triggerJSONV3) valid() bool {
 		(v3.HTTP != nil ||
 			v3.GRPC != nil ||
 			v3.TraceID != nil ||
-			v3.Kafka != nil)) || (v3.Type == TriggerTypeCypress || v3.Type == TriggerTypePlaywright)
+			v3.Kafka != nil)) || (v3.Type == TriggerTypeCypress || v3.Type == TriggerTypePlaywright || v3.Type == TriggerTypeArtillery || v3.Type == TriggerTypeK6)
 }
 
 type triggerJSONV2 struct {

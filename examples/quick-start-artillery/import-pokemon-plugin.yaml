@@ -3,9 +3,7 @@ spec:
   id: artillery-plugin-import-pokemon
   name: "Artillery Plugin: Import a Pokemon"
   trigger:
-    type: traceid
-    traceid:
-      id: ${var:TRACE_ID}
+    type: artillery
   specs:
     - selector: span[tracetest.span.type="general" name = "validate request"] span[tracetest.span.type="http"]
       name: "All HTTP Spans: Status  code is 200"
