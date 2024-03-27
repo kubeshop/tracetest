@@ -21,6 +21,7 @@ var _ MappedNullable = &RunInformation{}
 type RunInformation struct {
 	Metadata      map[string]string  `json:"metadata,omitempty"`
 	VariableSetId *string            `json:"variableSetId,omitempty"`
+	RunGroupId    *string            `json:"runGroupId,omitempty"`
 	Variables     []VariableSetValue `json:"variables,omitempty"`
 	RequiredGates []SupportedGates   `json:"requiredGates,omitempty"`
 }
@@ -107,6 +108,38 @@ func (o *RunInformation) SetVariableSetId(v string) {
 	o.VariableSetId = &v
 }
 
+// GetRunGroupId returns the RunGroupId field value if set, zero value otherwise.
+func (o *RunInformation) GetRunGroupId() string {
+	if o == nil || isNil(o.RunGroupId) {
+		var ret string
+		return ret
+	}
+	return *o.RunGroupId
+}
+
+// GetRunGroupIdOk returns a tuple with the RunGroupId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *RunInformation) GetRunGroupIdOk() (*string, bool) {
+	if o == nil || isNil(o.RunGroupId) {
+		return nil, false
+	}
+	return o.RunGroupId, true
+}
+
+// HasRunGroupId returns a boolean if a field has been set.
+func (o *RunInformation) HasRunGroupId() bool {
+	if o != nil && !isNil(o.RunGroupId) {
+		return true
+	}
+
+	return false
+}
+
+// SetRunGroupId gets a reference to the given string and assigns it to the RunGroupId field.
+func (o *RunInformation) SetRunGroupId(v string) {
+	o.RunGroupId = &v
+}
+
 // GetVariables returns the Variables field value if set, zero value otherwise.
 func (o *RunInformation) GetVariables() []VariableSetValue {
 	if o == nil || isNil(o.Variables) {
@@ -187,6 +220,9 @@ func (o RunInformation) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.VariableSetId) {
 		toSerialize["variableSetId"] = o.VariableSetId
+	}
+	if !isNil(o.RunGroupId) {
+		toSerialize["runGroupId"] = o.RunGroupId
 	}
 	if !isNil(o.Variables) {
 		toSerialize["variables"] = o.Variables

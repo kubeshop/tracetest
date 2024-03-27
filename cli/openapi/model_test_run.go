@@ -24,7 +24,8 @@ type TestRun struct {
 	TraceId *string `json:"traceId,omitempty"`
 	SpanId  *string `json:"spanId,omitempty"`
 	// Test version used when running this test run
-	TestVersion *int32 `json:"testVersion,omitempty"`
+	TestVersion *int32  `json:"testVersion,omitempty"`
+	RunGroupId  *string `json:"runGroupId,omitempty"`
 	// Current execution state
 	State *string `json:"state,omitempty"`
 	// Details of the cause for the last `FAILED` state
@@ -194,6 +195,38 @@ func (o *TestRun) HasTestVersion() bool {
 // SetTestVersion gets a reference to the given int32 and assigns it to the TestVersion field.
 func (o *TestRun) SetTestVersion(v int32) {
 	o.TestVersion = &v
+}
+
+// GetRunGroupId returns the RunGroupId field value if set, zero value otherwise.
+func (o *TestRun) GetRunGroupId() string {
+	if o == nil || isNil(o.RunGroupId) {
+		var ret string
+		return ret
+	}
+	return *o.RunGroupId
+}
+
+// GetRunGroupIdOk returns a tuple with the RunGroupId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestRun) GetRunGroupIdOk() (*string, bool) {
+	if o == nil || isNil(o.RunGroupId) {
+		return nil, false
+	}
+	return o.RunGroupId, true
+}
+
+// HasRunGroupId returns a boolean if a field has been set.
+func (o *TestRun) HasRunGroupId() bool {
+	if o != nil && !isNil(o.RunGroupId) {
+		return true
+	}
+
+	return false
+}
+
+// SetRunGroupId gets a reference to the given string and assigns it to the RunGroupId field.
+func (o *TestRun) SetRunGroupId(v string) {
+	o.RunGroupId = &v
 }
 
 // GetState returns the State field value if set, zero value otherwise.
@@ -851,6 +884,9 @@ func (o TestRun) ToMap() (map[string]interface{}, error) {
 	// skip: spanId is readOnly
 	if !isNil(o.TestVersion) {
 		toSerialize["testVersion"] = o.TestVersion
+	}
+	if !isNil(o.RunGroupId) {
+		toSerialize["runGroupId"] = o.RunGroupId
 	}
 	if !isNil(o.State) {
 		toSerialize["state"] = o.State
