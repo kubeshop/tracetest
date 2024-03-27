@@ -1,6 +1,6 @@
 ---
-id: creating-tests
-title: Creating Tests - HTTP
+id: creating-tests-traceid
+title: Creating Tests - TraceID
 description: Tracetest enables creating tests visually in the Tracetest Web UI.
 hide_table_of_contents: false
 keywords:
@@ -24,7 +24,7 @@ The "Create New Test" dialog appears.
 Choose the kind of trigger to initiate the trace:
 
 - HTTP Request - Create a basic HTTP request.
-- GRPC Request - Test and debug your GRPC request.
+- gRPC Request - Test and debug your GRPC request.
 - Kafka - Test consumers with Kafka messages.
 - TraceID - Define your test via a TraceID.
 
@@ -39,29 +39,23 @@ Then, click one of the options to continue:
 
 ![Choose Trigger](../img/choose-trigger-0.16.png)
 
-In this example, an HTTP Request has been chosen.
+In this example, a TraceID Request has been chosen.
 
-![Choose Example](../img/choose-example-0.14.png)
+![Choose Example](../img/choose-example-traceid-0.16.png)
 
-Input the **Name** and **Trigger** details or select one of the example provided in the drop down:
+Select an existing variable set or create a new one in the drop down:
 
-![Choose Example Pokemon](../img/choose-example-pokemon-0.14.png)
+![Choose Variable Set](../img/choose-variable-set-0.16.png)
 
-The **Pokemon - Import** example has been chosen.
+![Create Variable Set](../img/create-new-variable-set-0.16.png)
 
-![Choose Example Pokemon](../img/choose-example-pokemon-import-0.14.png)
+Enter the variable name and click **Run**:
 
-Add any additional information and click **Run**:
-
-![Create Test](../img/provide-addl-information-0.14.png)
+![Create Test](../img/enter-variable-name-0.16.png)
 
 The test will start:
 
-![Awaiting Trace](../img/awaiting-trace-0.14.png)
-
-When the test is finished, you will get the following results:
-
-![Finished Trace](../img/finished-trace-0.14.png)
+![Awaiting Trace](../img/awaiting-trace-traceid-0.16.png)
 
 Please visit the [Test Results](../web-ui/test-results.mdx) document for an explanation of viewing the results of a test.
 
