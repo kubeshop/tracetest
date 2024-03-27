@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/ui"
@@ -116,7 +117,7 @@ func handleErrorMessage(err error) string {
 	return fmt.Sprintf("user is not authenticated on %s", cliConfig.Endpoint)
 }
 
-func WithParamsHandler(validators ...Validator) MiddlewareWrapper {
+func WithParamsHandler(validators ...cmdutil.Validator) MiddlewareWrapper {
 	return func(runFn RunFn) RunFn {
 		return func(ctx context.Context, cmd *cobra.Command, args []string) (string, error) {
 			errors := make([]error, 0)
@@ -139,11 +140,7 @@ func WithParamsHandler(validators ...Validator) MiddlewareWrapper {
 	}
 }
 
-type Validator interface {
-	Validate(cmd *cobra.Command, args []string) []error
-}
-
-func WithResourceMiddleware(runFn RunFn, params ...Validator) CobraRunFn {
+func WithResourceMiddleware(runFn RunFn, params ...cmdutil.Validator) CobraRunFn {
 	params = append(params, resourceParams)
 	return WithResultHandler(WithParamsHandler(params...)(runFn))
 }
@@ -166,7 +163,7 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 
 	if len(args) == 0 || args[0] == "" {
 		return []error{
-			paramError{
+			cmdutil.ParamError{
 				Parameter: "resource",
 				Message:   fmt.Sprintf("resource name must be provided. Available resources: %s", resourceList()),
 			},
@@ -180,7 +177,7 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 		suggestion := resources.Suggest(p.ResourceName)
 		if suggestion != "" {
 			return []error{
-				paramError{
+				cmdutil.ParamError{
 					Parameter: "resource",
 					Message:   fmt.Sprintf("resource \"%s\" not found. Did you mean this?\n\t%s", p.ResourceName, suggestion),
 				},
@@ -188,7 +185,7 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 		}
 
 		return []error{
-			paramError{
+			cmdutil.ParamError{
 				Parameter: "resource",
 				Message:   fmt.Sprintf("resource must be %s", resourceList()),
 			},
@@ -196,13 +193,4 @@ func (p *resourceParameters) Validate(cmd *cobra.Command, args []string) []error
 	}
 
 	return nil
-}
-
-type paramError struct {
-	Parameter string
-	Message   string
-}
-
-func (pe paramError) Error() string {
-	return fmt.Sprintf(`[%s] %s`, pe.Parameter, pe.Message)
 }

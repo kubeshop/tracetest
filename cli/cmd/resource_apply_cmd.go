@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
@@ -61,7 +62,7 @@ func (p applyParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errors := make([]error, 0)
 
 	if p.DefinitionFile == "" {
-		errors = append(errors, paramError{
+		errors = append(errors, cmdutil.ParamError{
 			Parameter: "file",
 			Message:   "Definition file must be provided",
 		})

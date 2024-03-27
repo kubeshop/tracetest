@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/spf13/cobra"
 )
@@ -58,7 +59,7 @@ func (p resourceIDParameters) Validate(cmd *cobra.Command, args []string) []erro
 	errors := make([]error, 0)
 
 	if p.ResourceID == "" {
-		errors = append(errors, paramError{
+		errors = append(errors, cmdutil.ParamError{
 			Parameter: "id",
 			Message:   "resource id must be provided",
 		})

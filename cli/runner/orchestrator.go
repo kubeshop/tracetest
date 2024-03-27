@@ -127,38 +127,24 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		zap.Strings("requiredGates", opts.RequiredGates),
 	)
 
-	varsID, err := o.resolveVarsID(ctx, opts.VarsID)
+	variableSetFetcher := GetVariableSetFetcher(o.logger, o.variableSets)
+
+	varsID, err := variableSetFetcher.Fetch(ctx, opts.VarsID)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
 	}
-	o.logger.Debug("env resolved", zap.String("ID", varsID))
+
+	resourceFetcher := GetResourceFetcher(o.logger, r)
 
 	var resource any
+
 	if opts.DefinitionFile != "" {
-		f, err := fileutil.Read(opts.DefinitionFile)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot read definition file %s: %w", opts.DefinitionFile, err)
-		}
-		df := f
-		o.logger.Debug("Definition file read", zap.String("absolutePath", df.AbsPath()))
-
-		df, err = o.injectLocalEnvVars(ctx, df)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot inject local env vars: %w", err)
-		}
-
-		resource, err = r.Apply(ctx, df)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot apply definition file: %w", err)
-		}
-		o.logger.Debug("Definition file applied", zap.String("updated", string(df.Contents())))
+		resource, err = resourceFetcher.FetchWithDefinitionFile(ctx, opts.DefinitionFile)
 	} else {
-		o.logger.Debug("Definition file not provided, fetching resource by ID", zap.String("ID", opts.ID))
-		resource, err = r.GetByID(ctx, opts.ID)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot get resource by ID: %w", err)
-		}
-		o.logger.Debug("Resource fetched by ID", zap.String("ID", opts.ID), zap.Any("resource", resource))
+		resource, err = resourceFetcher.FetchWithID(ctx, opts.ID)
+	}
+	if err != nil {
+		return ExitCodeGeneralError, err
 	}
 
 	var result RunResult
