@@ -13,22 +13,20 @@ import (
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/cli/openapi"
-	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
-	"github.com/kubeshop/tracetest/cli/variable"
+	"github.com/kubeshop/tracetest/cli/runner"
 	"go.uber.org/zap"
-	"gopkg.in/yaml.v2"
 )
 
 // RunOptions defines options for running a resource
-// ID and DefinitionFile are mutually exclusive and the only required options
+// IDs and DefinitionFiles are mutually exclusive and the only required options
 type RunOptions struct {
 	// ID of the resource to run
-	ID string
+	IDs []string
 
 	// path to the file with resource definition
 	// the file will be applied before running
-	DefinitionFile string
+	DefinitionFiles []string
 
 	// varsID or path to the file with environment definition
 	VarsID string
@@ -45,48 +43,7 @@ type RunOptions struct {
 	RequiredGates []string
 }
 
-// RunResult holds the result of the run
-// Resources
-type RunResult struct {
-	// The resource being run. If has been preprocessed, this needs to be the updated version
-	Resource any
-
-	// The result of the run. It can be anything the resource needs for validating and formatting the result
-	Run any
-
-	// If true, it means that the current run is ready to be presented to the user
-	Finished bool
-
-	// Whether the run has passed or not. Used to determine exit code
-	Passed bool
-}
-
-// Runner defines interface for running a resource
-type Runner interface {
-	// Name of the runner. must match the resource name it handles
-	Name() string
-
-	// Apply the given file and return a resource. The resource can be of any type.
-	// It will then be used by Run method
-	Apply(context.Context, fileutil.File) (resource any, _ error)
-
-	// GetByID gets the resource by ID. This method is used to get the resource when running from id
-	GetByID(_ context.Context, id string) (resource any, _ error)
-
-	// StartRun starts running the resource and return the result. This method should not wait for the test to finish
-	StartRun(_ context.Context, resource any, _ openapi.RunInformation) (RunResult, error)
-
-	// UpdateResult is regularly called by the orchestrator to check the status of the run
-	UpdateResult(context.Context, RunResult) (RunResult, error)
-
-	// JUnitResult returns the result of the run in JUnit format
-	JUnitResult(context.Context, RunResult) (string, error)
-
-	// Format the result of the run into a string
-	FormatResult(_ RunResult, format string) string
-}
-
-func Orchestrator(
+func MultiFileOrchestrator(
 	logger *zap.Logger,
 	openapiClient *openapi.APIClient,
 	variableSets resourcemanager.Client,
@@ -116,35 +73,49 @@ const (
 	ExitCodeTestNotPassed = 2
 )
 
-func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
+func (o orchestrator) Run(ctx context.Context, r runner.Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
 	o.logger.Debug(
-		"Running test from definition",
-		zap.String("definitionFile", opts.DefinitionFile),
-		zap.String("ID", opts.ID),
+		"Running tests from definition",
+		zap.Strings("definitionFiles", opts.DefinitionFiles),
+		zap.Strings("IDs", opts.IDs),
 		zap.String("varSetID", opts.VarsID),
 		zap.Bool("skipResultsWait", opts.SkipResultWait),
 		zap.String("junitOutputFile", opts.JUnitOuptutFile),
 		zap.Strings("requiredGates", opts.RequiredGates),
 	)
 
-	variableSetFetcher := GetVariableSetFetcher(o.logger, o.variableSets)
+	variableSetFetcher := runner.GetVariableSetFetcher(o.logger, o.variableSets)
 
 	varsID, err := variableSetFetcher.Fetch(ctx, opts.VarsID)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
 	}
+	o.logger.Debug("env resolved", zap.String("ID", varsID))
 
-	resourceFetcher := GetResourceFetcher(o.logger, r)
+	var resources []any
+	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
 
-	var resource any
+	resourceFetcher := runner.GetResourceFetcher(o.logger, r)
 
-	if opts.DefinitionFile != "" {
-		resource, err = resourceFetcher.FetchWithDefinitionFile(ctx, opts.DefinitionFile)
+	if hasDefinitionFilesDefined {
+		resources = make([]any, 0, len(opts.DefinitionFiles))
+
+		for _, definitionFile := range opts.DefinitionFiles {
+			resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
+			if err != nil {
+				return ExitCodeGeneralError, err
+			}
+			resources = append(resources, resource)
+		}
+
 	} else {
-		resource, err = resourceFetcher.FetchWithID(ctx, opts.ID)
-	}
-	if err != nil {
-		return ExitCodeGeneralError, err
+		for _, id := range opts.IDs {
+			resource, err := resourceFetcher.FetchWithID(ctx, id)
+			if err != nil {
+				return ExitCodeGeneralError, err
+			}
+			resources = append(resources, resource)
+		}
 	}
 
 	var result RunResult
@@ -199,67 +170,9 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 	return exitCode, nil
 }
 
-func (o orchestrator) resolveVarsID(ctx context.Context, varsID string) (string, error) {
-	if varsID == "" {
-		return "", nil // user have not defined variables, skipping it
-	}
-
-	if !fileutil.IsFilePath(varsID) {
-		o.logger.Debug("varsID is not a file path", zap.String("vars", varsID))
-
-		// validate that env exists
-		_, err := o.variableSets.Get(ctx, varsID, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
-		if errors.Is(err, resourcemanager.ErrNotFound) {
-			return "", fmt.Errorf("variable set '%s' not found", varsID)
-		}
-		if err != nil {
-			return "", fmt.Errorf("cannot get variable set '%s': %w", varsID, err)
-		}
-
-		o.logger.Debug("envID is valid")
-
-		return varsID, nil
-	}
-
-	f, err := fileutil.Read(varsID)
-	if err != nil {
-		return "", fmt.Errorf("cannot read environment set file %s: %w", varsID, err)
-	}
-
-	o.logger.Debug("envID is a file path", zap.String("filePath", varsID), zap.Any("file", f))
-	updatedEnv, err := o.variableSets.Apply(ctx, f, yamlFormat)
-	if err != nil {
-		return "", fmt.Errorf("could not read environment set file: %w", err)
-	}
-
-	var vars openapi.VariableSetResource
-	err = yaml.Unmarshal([]byte(updatedEnv), &vars)
-	if err != nil {
-		o.logger.Error("error parsing json", zap.String("content", updatedEnv), zap.Error(err))
-		return "", fmt.Errorf("could not unmarshal variable set json: %w", err)
-	}
-
-	return vars.Spec.GetId(), nil
-}
-
-func (o orchestrator) injectLocalEnvVars(ctx context.Context, df fileutil.File) (fileutil.File, error) {
-	variableInjector := variable.NewInjector(variable.WithVariableProvider(
-		variable.EnvironmentVariableProvider{},
-	))
-
-	injected, err := variableInjector.ReplaceInString(string(df.Contents()))
-	if err != nil {
-		return df, fmt.Errorf("cannot inject local variable set: %w", err)
-	}
-
-	df = fileutil.New(df.AbsPath(), []byte(injected))
-
-	return df, nil
-}
-
-func (o orchestrator) waitForResult(ctx context.Context, r Runner, result RunResult) (RunResult, error) {
+func (o orchestrator) waitForResult(ctx context.Context, r runner.Runner, result runner.RunResult) (runner.RunResult, error) {
 	var (
-		updatedResult RunResult
+		updatedResult runner.RunResult
 		lastError     error
 		wg            sync.WaitGroup
 	)
@@ -289,7 +202,7 @@ func (o orchestrator) waitForResult(ctx context.Context, r Runner, result RunRes
 	wg.Wait()
 
 	if lastError != nil {
-		return RunResult{}, lastError
+		return runner.RunResult{}, lastError
 	}
 
 	return updatedResult, nil
@@ -297,7 +210,7 @@ func (o orchestrator) waitForResult(ctx context.Context, r Runner, result RunRes
 
 var ErrJUnitNotSupported = errors.New("junit report is not supported for this resource type")
 
-func (a orchestrator) writeJUnitReport(ctx context.Context, r Runner, result RunResult, outputFile string) error {
+func (a orchestrator) writeJUnitReport(ctx context.Context, r runner.Runner, result runner.RunResult, outputFile string) error {
 	if outputFile == "" {
 		a.logger.Debug("no junit output file specified")
 		return nil
