@@ -5,6 +5,7 @@ services:
   tracetest-agent:
     environment:
       TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
+
     image: kubeshop/tracetest-agent:latest
     networks:
       default: null

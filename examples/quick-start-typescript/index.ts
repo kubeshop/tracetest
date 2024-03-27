@@ -27,20 +27,13 @@ const main = async () => {
     { key: 'BASE_URL', value: baseUrl },
   ];
 
-  const importedPokemonList: string[] = [];
-
   const importPokemons = async (startId: number) => {
     const test = await tracetest.newTest(importDefinition);
     // imports all pokemons
     await Promise.all(
       new Array(5).fill(0).map(async (_, index) => {
         console.log(`ℹ Importing pokemon ${startId + index + 1}`);
-        const run = await tracetest.runTest(test, { variables: getVariables(`${startId + index + 1}`) });
-        const updatedRun = await run.wait();
-        const pokemonId = updatedRun.outputs?.find((output) => output.name === 'DATABASE_POKEMON_ID')?.value || '';
-
-        console.log(`ℹ Adding pokemon ${pokemonId} to the list`);
-        importedPokemonList.push(pokemonId);
+        await tracetest.runTest(test, { variables: getVariables(`${startId + index + 1}`) });
       })
     );
   };
@@ -52,13 +45,19 @@ const main = async () => {
       importedPokemonList.map(async (pokemonId) => {
         console.log(`ℹ Deleting pokemon ${pokemonId}`);
         const run = await tracetest.runTest(test, { variables: getVariables(pokemonId) });
-        run.wait();
       })
     );
   };
 
   await importPokemons(pokemonId);
   console.log(await tracetest.getSummary());
+
+  const importedPokemonList = tracetest.runs.map((run) => {
+    const pokemonId = run.outputs?.find((output) => output.name === 'DATABASE_POKEMON_ID')?.value || '';
+
+    console.log(`ℹ Adding pokemon ${pokemonId} to the list`);
+    return pokemonId;
+  });
 
   await deletePokemons();
   console.log(await tracetest.getSummary());
