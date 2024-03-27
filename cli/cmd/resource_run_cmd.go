@@ -77,9 +77,18 @@ func runSingleFile(ctx context.Context) (string, error) {
 		runParams.VarsID = runParams.EnvID
 	}
 
+	var id, definitionFile string
+	if len(runParams.IDs) > 0 {
+		id = runParams.IDs[0]
+	}
+
+	if len(runParams.DefinitionFiles) > 0 {
+		definitionFile = runParams.DefinitionFiles[0]
+	}
+
 	runParams := runner.RunOptions{
-		ID:              runParams.IDs[0],
-		DefinitionFile:  runParams.DefinitionFiles[0],
+		ID:              id,
+		DefinitionFile:  definitionFile,
 		VarsID:          runParams.VarsID,
 		SkipResultWait:  runParams.SkipResultWait,
 		JUnitOuptutFile: runParams.JUnitOuptutFile,
