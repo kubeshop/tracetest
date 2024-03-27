@@ -8,7 +8,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
-	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/runner"
 	"github.com/spf13/cobra"
 
@@ -117,12 +116,7 @@ func getResourceType(runParams *cmdutil.RunParameters, resourceParams *resourceP
 	}
 
 	if filePath != "" {
-		f, err := fileutil.Read(filePath)
-		if err != nil {
-			return "", fmt.Errorf("cannot read file %s: %w", filePath, err)
-		}
-
-		return strings.ToLower(f.Type()), nil
+		return cmdutil.GetResourceTypeFromFile(filePath)
 	}
 
 	return "", fmt.Errorf("resourceName is empty and no definition file provided")
