@@ -9,6 +9,7 @@ import (
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/kubeshop/tracetest/cli/analytics"
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
@@ -39,20 +40,7 @@ var (
 	httpClient = &resourcemanager.HTTPClient{}
 
 	variableSetPreprocessor = preprocessor.VariableSet(cliLogger)
-	variableSetClient       = resourcemanager.NewClient(
-		httpClient, cliLogger,
-		"variableset", "variablesets",
-		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-			Cells: []resourcemanager.TableCellConfig{
-				{Header: "ID", Path: "spec.id"},
-				{Header: "NAME", Path: "spec.name"},
-				{Header: "DESCRIPTION", Path: "spec.description"},
-			},
-		}),
-		resourcemanager.WithResourceType("VariableSet"),
-		resourcemanager.WithApplyPreProcessor(variableSetPreprocessor.Preprocess),
-		resourcemanager.WithDeprecatedAlias("Environment"),
-	)
+	variableSetClient       = cmdutil.GetVariableSetClient(variableSetPreprocessor)
 
 	testPreprocessor = preprocessor.Test(cliLogger)
 	testClient       = resourcemanager.NewClient(
