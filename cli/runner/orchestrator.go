@@ -43,6 +43,11 @@ type RunOptions struct {
 
 	// Overrides the default required gates for the resource
 	RequiredGates []string
+
+	// ResourceType defines what is the type of resource that is being run. It's value
+	// is filled automatically when the user define the type of resource that will be run
+	// when they enter: tracetest run <resource-name> --id <id>
+	ResourceType string
 }
 
 // RunResult holds the result of the run
@@ -90,19 +95,22 @@ func Orchestrator(
 	logger *zap.Logger,
 	openapiClient *openapi.APIClient,
 	variableSets resourcemanager.Client,
+	runnerRegistry Registry,
 ) orchestrator {
 	return orchestrator{
-		logger:        logger,
-		openapiClient: openapiClient,
-		variableSets:  variableSets,
+		logger:         logger,
+		openapiClient:  openapiClient,
+		variableSets:   variableSets,
+		runnerRegistry: runnerRegistry,
 	}
 }
 
 type orchestrator struct {
 	logger *zap.Logger
 
-	openapiClient *openapi.APIClient
-	variableSets  resourcemanager.Client
+	openapiClient  *openapi.APIClient
+	variableSets   resourcemanager.Client
+	runnerRegistry Registry
 }
 
 var (
@@ -116,7 +124,7 @@ const (
 	ExitCodeTestNotPassed = 2
 )
 
-func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
+func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat string) (exitCode int, _ error) {
 	o.logger.Debug(
 		"Running test from definition",
 		zap.String("definitionFile", opts.DefinitionFile),
@@ -134,17 +142,27 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
 	}
 
-	resourceFetcher := GetResourceFetcher(o.logger, r)
+	resourceFetcher := GetResourceFetcher(o.logger, o.runnerRegistry)
 
 	var resource any
 
 	if opts.DefinitionFile != "" {
 		resource, err = resourceFetcher.FetchWithDefinitionFile(ctx, opts.DefinitionFile)
 	} else {
-		resource, err = resourceFetcher.FetchWithID(ctx, opts.ID)
+		resource, err = resourceFetcher.FetchWithID(ctx, opts.ID, opts.ResourceType)
 	}
 	if err != nil {
 		return ExitCodeGeneralError, err
+	}
+
+	resourceType, err := resourcemanager.GetResourceType(resource)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot extract type from resource: %w", err)
+	}
+
+	runner, err := o.runnerRegistry.Get(resourceType)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot find runner for resource type %s: %w", resourceType, err)
 	}
 
 	var result RunResult
@@ -160,7 +178,7 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 			RequiredGates: getRequiredGates(opts.RequiredGates),
 		}
 
-		result, err = r.StartRun(ctx, resource, runInfo)
+		result, err = runner.StartRun(ctx, resource, runInfo)
 		if err == nil {
 			break
 		}
@@ -175,18 +193,18 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 	}
 
 	if opts.SkipResultWait {
-		fmt.Println(r.FormatResult(result, outputFormat))
+		fmt.Println(runner.FormatResult(result, outputFormat))
 		return ExitCodeSuccess, nil
 	}
 
-	result, err = o.waitForResult(ctx, r, result)
+	result, err = o.waitForResult(ctx, runner, result)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot wait for test result: %w", err)
 	}
 
-	fmt.Println(r.FormatResult(result, outputFormat))
+	fmt.Println(runner.FormatResult(result, outputFormat))
 
-	err = o.writeJUnitReport(ctx, r, result, opts.JUnitOuptutFile)
+	err = o.writeJUnitReport(ctx, runner, result, opts.JUnitOuptutFile)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot write junit report: %w", err)
 	}

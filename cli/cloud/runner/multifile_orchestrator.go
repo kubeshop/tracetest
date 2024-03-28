@@ -1,300 +1,305 @@
 package runner
 
-// import (
-// 	"context"
-// 	"errors"
-// 	"fmt"
-// 	"io"
-// 	"net/http"
-// 	"os"
-// 	"sync"
-// 	"time"
+import (
+	"context"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"sync"
+	"time"
 
-// 	cienvironment "github.com/cucumber/ci-environment/go"
-// 	"github.com/davecgh/go-spew/spew"
-// 	"github.com/kubeshop/tracetest/cli/openapi"
-// 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
-// 	"github.com/kubeshop/tracetest/cli/runner"
-// 	"go.uber.org/zap"
-// )
+	cienvironment "github.com/cucumber/ci-environment/go"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
+	"github.com/kubeshop/tracetest/cli/runner"
+	"go.uber.org/zap"
+)
 
-// // RunOptions defines options for running a resource
-// // IDs and DefinitionFiles are mutually exclusive and the only required options
-// type RunOptions struct {
-// 	// ID of the resource to run
-// 	IDs []string
+// RunOptions defines options for running a resource
+// IDs and DefinitionFiles are mutually exclusive and the only required options
+type RunOptions struct {
+	// path to the file with resource definition
+	// the file will be applied before running
+	DefinitionFiles []string
 
-// 	// path to the file with resource definition
-// 	// the file will be applied before running
-// 	DefinitionFiles []string
+	// varsID or path to the file with environment definition
+	VarsID string
 
-// 	// varsID or path to the file with environment definition
-// 	VarsID string
+	// By default the runner will wait for the result of the run
+	// if this option is true, the wait will be skipped
+	SkipResultWait bool
 
-// 	// By default the runner will wait for the result of the run
-// 	// if this option is true, the wait will be skipped
-// 	SkipResultWait bool
+	// Optional path to the file where the result of the run will be saved
+	// in JUnit xml format
+	JUnitOuptutFile string
 
-// 	// Optional path to the file where the result of the run will be saved
-// 	// in JUnit xml format
-// 	JUnitOuptutFile string
+	// Overrides the default required gates for the resource
+	RequiredGates []string
+}
 
-// 	// Overrides the default required gates for the resource
-// 	RequiredGates []string
-// }
+func MultiFileOrchestrator(
+	logger *zap.Logger,
+	openapiClient *openapi.APIClient,
+	variableSets resourcemanager.Client,
+	runnerRegistry runner.Registry,
+) orchestrator {
+	return orchestrator{
+		logger:         logger,
+		openapiClient:  openapiClient,
+		variableSets:   variableSets,
+		runnerRegistry: runnerRegistry,
+	}
+}
 
-// func MultiFileOrchestrator(
-// 	logger *zap.Logger,
-// 	openapiClient *openapi.APIClient,
-// 	variableSets resourcemanager.Client,
-// ) orchestrator {
-// 	return orchestrator{
-// 		logger:        logger,
-// 		openapiClient: openapiClient,
-// 		variableSets:  variableSets,
-// 	}
-// }
+type orchestrator struct {
+	logger *zap.Logger
 
-// type orchestrator struct {
-// 	logger *zap.Logger
+	openapiClient  *openapi.APIClient
+	variableSets   resourcemanager.Client
+	runnerRegistry runner.Registry
+}
 
-// 	openapiClient *openapi.APIClient
-// 	variableSets  resourcemanager.Client
-// }
+var (
+	yamlFormat = resourcemanager.Formats.Get(resourcemanager.FormatYAML)
+	jsonFormat = resourcemanager.Formats.Get(resourcemanager.FormatJSON)
+)
 
-// var (
-// 	yamlFormat = resourcemanager.Formats.Get(resourcemanager.FormatYAML)
-// 	jsonFormat = resourcemanager.Formats.Get(resourcemanager.FormatJSON)
-// )
+const (
+	ExitCodeSuccess       = 0
+	ExitCodeGeneralError  = 1
+	ExitCodeTestNotPassed = 2
+)
 
-// const (
-// 	ExitCodeSuccess       = 0
-// 	ExitCodeGeneralError  = 1
-// 	ExitCodeTestNotPassed = 2
-// )
+func (o orchestrator) Run(ctx context.Context, opts RunOptions) (exitCode int, _ error) {
+	o.logger.Debug(
+		"Running tests from definition",
+		zap.Strings("definitionFiles", opts.DefinitionFiles),
+		zap.String("varSetID", opts.VarsID),
+		zap.Bool("skipResultsWait", opts.SkipResultWait),
+		zap.String("junitOutputFile", opts.JUnitOuptutFile),
+		zap.Strings("requiredGates", opts.RequiredGates),
+	)
 
-// func (o orchestrator) Run(ctx context.Context, r runner.Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
-// 	o.logger.Debug(
-// 		"Running tests from definition",
-// 		zap.Strings("definitionFiles", opts.DefinitionFiles),
-// 		zap.Strings("IDs", opts.IDs),
-// 		zap.String("varSetID", opts.VarsID),
-// 		zap.Bool("skipResultsWait", opts.SkipResultWait),
-// 		zap.String("junitOutputFile", opts.JUnitOuptutFile),
-// 		zap.Strings("requiredGates", opts.RequiredGates),
-// 	)
+	variableSetFetcher := runner.GetVariableSetFetcher(o.logger, o.variableSets)
 
-// 	variableSetFetcher := runner.GetVariableSetFetcher(o.logger, o.variableSets)
+	varsID, err := variableSetFetcher.Fetch(ctx, opts.VarsID)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
+	}
+	o.logger.Debug("env resolved", zap.String("ID", varsID))
 
-// 	varsID, err := variableSetFetcher.Fetch(ctx, opts.VarsID)
-// 	if err != nil {
-// 		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
-// 	}
-// 	o.logger.Debug("env resolved", zap.String("ID", varsID))
+	var resources []any
+	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
 
-// 	var resources []any
-// 	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
+	resourceFetcher := runner.GetResourceFetcher(o.logger, o.runnerRegistry)
 
-// 	resourceFetcher := runner.GetResourceFetcher(o.logger, r)
+	if !hasDefinitionFilesDefined {
+		return ExitCodeGeneralError, fmt.Errorf("you must define at least two files to use the multifile orchestrator")
+	}
 
-// 	if hasDefinitionFilesDefined {
-// 		resources = make([]any, 0, len(opts.DefinitionFiles))
+	resources = make([]any, 0, len(opts.DefinitionFiles))
 
-// 		for _, definitionFile := range opts.DefinitionFiles {
-// 			resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
-// 			if err != nil {
-// 				return ExitCodeGeneralError, err
-// 			}
-// 			resources = append(resources, resource)
-// 		}
+	for _, definitionFile := range opts.DefinitionFiles {
+		resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
+		if err != nil {
+			return ExitCodeGeneralError, err
+		}
 
-// 	} else {
-// 		for _, id := range opts.IDs {
-// 			resource, err := resourceFetcher.FetchWithID(ctx, id)
-// 			if err != nil {
-// 				return ExitCodeGeneralError, err
-// 			}
-// 			resources = append(resources, resource)
-// 		}
-// 	}
+		resourceType, err := resourcemanager.GetResourceType(resource)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot extract type from resource: %w", err)
+		}
 
-// 	var result RunResult
-// 	var ev varSets
+		runner, err := o.runnerRegistry.Get(resourceType)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot find runner for resource type %s: %w", resourceType, err)
+		}
 
-// 	// iterate until we have all env vars,
-// 	// or the server returns an actual error
-// 	for {
-// 		runInfo := openapi.RunInformation{
-// 			VariableSetId: &varsID,
-// 			Variables:     ev.toOpenapi(),
-// 			Metadata:      getMetadata(),
-// 			RequiredGates: getRequiredGates(opts.RequiredGates),
-// 		}
+		runInfo := openapi.RunInformation{
+			VariableSetId: &varsID,
+			Variables:     ev.toOpenapi(),
+			Metadata:      getMetadata(),
+			RequiredGates: getRequiredGates(opts.RequiredGates),
+		}
 
-// 		result, err = r.StartRun(ctx, resource, runInfo)
-// 		if err == nil {
-// 			break
-// 		}
-// 		if !errors.Is(err, missingVarsError{}) {
-// 			// actual error, return
-// 			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
-// 		}
+		runner.StartRun(ctx, resource, runInfo)
+		resources = append(resources, resource)
+	}
 
-// 		// missing vars error
-// 		ev = askForMissingVars([]varSet(err.(missingVarsError)))
-// 		o.logger.Debug("filled variables", zap.Any("variables", ev))
-// 	}
+	var result RunResult
+	var ev varSets
 
-// 	if opts.SkipResultWait {
-// 		fmt.Println(r.FormatResult(result, outputFormat))
-// 		return ExitCodeSuccess, nil
-// 	}
+	// iterate until we have all env vars,
+	// or the server returns an actual error
+	for {
 
-// 	result, err = o.waitForResult(ctx, r, result)
-// 	if err != nil {
-// 		return ExitCodeGeneralError, fmt.Errorf("cannot wait for test result: %w", err)
-// 	}
+		result, err = r.StartRun(ctx, resource, runInfo)
+		if err == nil {
+			break
+		}
+		if !errors.Is(err, missingVarsError{}) {
+			// actual error, return
+			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
+		}
 
-// 	fmt.Println(r.FormatResult(result, outputFormat))
+		// missing vars error
+		ev = askForMissingVars([]varSet(err.(missingVarsError)))
+		o.logger.Debug("filled variables", zap.Any("variables", ev))
+	}
 
-// 	err = o.writeJUnitReport(ctx, r, result, opts.JUnitOuptutFile)
-// 	if err != nil {
-// 		return ExitCodeGeneralError, fmt.Errorf("cannot write junit report: %w", err)
-// 	}
+	if opts.SkipResultWait {
+		fmt.Println(r.FormatResult(result, outputFormat))
+		return ExitCodeSuccess, nil
+	}
 
-// 	exitCode = ExitCodeSuccess
-// 	if !result.Passed {
-// 		exitCode = ExitCodeTestNotPassed
-// 	}
+	result, err = o.waitForResult(ctx, r, result)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot wait for test result: %w", err)
+	}
 
-// 	return exitCode, nil
-// }
+	fmt.Println(r.FormatResult(result, outputFormat))
 
-// func (o orchestrator) waitForResult(ctx context.Context, r runner.Runner, result runner.RunResult) (runner.RunResult, error) {
-// 	var (
-// 		updatedResult runner.RunResult
-// 		lastError     error
-// 		wg            sync.WaitGroup
-// 	)
+	err = o.writeJUnitReport(ctx, r, result, opts.JUnitOuptutFile)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot write junit report: %w", err)
+	}
 
-// 	wg.Add(1)
-// 	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
-// 	go func() {
-// 		for range ticker.C {
-// 			updated, err := r.UpdateResult(ctx, result)
-// 			o.logger.Debug("updated result", zap.String("result", spew.Sdump(updated)))
-// 			if err != nil {
-// 				o.logger.Debug("UpdateResult failed", zap.Error(err))
-// 				lastError = err
-// 				wg.Done()
-// 				return
-// 			}
+	exitCode = ExitCodeSuccess
+	if !result.Passed {
+		exitCode = ExitCodeTestNotPassed
+	}
 
-// 			if updated.Finished {
-// 				o.logger.Debug("result is finished")
-// 				updatedResult = updated
-// 				wg.Done()
-// 				return
-// 			}
-// 			o.logger.Debug("still waiting")
-// 		}
-// 	}()
-// 	wg.Wait()
+	return exitCode, nil
+}
 
-// 	if lastError != nil {
-// 		return runner.RunResult{}, lastError
-// 	}
+func (o orchestrator) waitForResult(ctx context.Context, r runner.Runner, result runner.RunResult) (runner.RunResult, error) {
+	var (
+		updatedResult runner.RunResult
+		lastError     error
+		wg            sync.WaitGroup
+	)
 
-// 	return updatedResult, nil
-// }
+	wg.Add(1)
+	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
+	go func() {
+		for range ticker.C {
+			updated, err := r.UpdateResult(ctx, result)
+			o.logger.Debug("updated result", zap.String("result", spew.Sdump(updated)))
+			if err != nil {
+				o.logger.Debug("UpdateResult failed", zap.Error(err))
+				lastError = err
+				wg.Done()
+				return
+			}
 
-// var ErrJUnitNotSupported = errors.New("junit report is not supported for this resource type")
+			if updated.Finished {
+				o.logger.Debug("result is finished")
+				updatedResult = updated
+				wg.Done()
+				return
+			}
+			o.logger.Debug("still waiting")
+		}
+	}()
+	wg.Wait()
 
-// func (a orchestrator) writeJUnitReport(ctx context.Context, r runner.Runner, result runner.RunResult, outputFile string) error {
-// 	if outputFile == "" {
-// 		a.logger.Debug("no junit output file specified")
-// 		return nil
-// 	}
+	if lastError != nil {
+		return runner.RunResult{}, lastError
+	}
 
-// 	a.logger.Debug("saving junit report", zap.String("outputFile", outputFile))
+	return updatedResult, nil
+}
 
-// 	report, err := r.JUnitResult(ctx, result)
-// 	if err != nil {
-// 		return err
-// 	}
+var ErrJUnitNotSupported = errors.New("junit report is not supported for this resource type")
 
-// 	a.logger.Debug("junit report", zap.String("report", report))
-// 	f, err := os.Create(outputFile)
-// 	if err != nil {
-// 		return fmt.Errorf("could not create junit output file: %w", err)
-// 	}
+func (a orchestrator) writeJUnitReport(ctx context.Context, r runner.Runner, result runner.RunResult, outputFile string) error {
+	if outputFile == "" {
+		a.logger.Debug("no junit output file specified")
+		return nil
+	}
 
-// 	_, err = f.WriteString(report)
+	a.logger.Debug("saving junit report", zap.String("outputFile", outputFile))
 
-// 	return err
-// }
+	report, err := r.JUnitResult(ctx, result)
+	if err != nil {
+		return err
+	}
 
-// var source = "cli"
+	a.logger.Debug("junit report", zap.String("report", report))
+	f, err := os.Create(outputFile)
+	if err != nil {
+		return fmt.Errorf("could not create junit output file: %w", err)
+	}
 
-// func getMetadata() map[string]string {
-// 	ci := cienvironment.DetectCIEnvironment()
-// 	if ci == nil {
-// 		return map[string]string{
-// 			"source": source,
-// 		}
-// 	}
+	_, err = f.WriteString(report)
 
-// 	metadata := map[string]string{
-// 		"name":        ci.Name,
-// 		"url":         ci.URL,
-// 		"buildNumber": ci.BuildNumber,
-// 		"source":      source,
-// 	}
+	return err
+}
 
-// 	if ci.Git != nil {
-// 		metadata["branch"] = ci.Git.Branch
-// 		metadata["tag"] = ci.Git.Tag
-// 		metadata["revision"] = ci.Git.Revision
-// 	}
+var source = "cli"
 
-// 	return metadata
-// }
+func getMetadata() map[string]string {
+	ci := cienvironment.DetectCIEnvironment()
+	if ci == nil {
+		return map[string]string{
+			"source": source,
+		}
+	}
 
-// func getRequiredGates(gates []string) []openapi.SupportedGates {
-// 	if len(gates) == 0 {
-// 		return nil
-// 	}
-// 	requiredGates := make([]openapi.SupportedGates, 0, len(gates))
+	metadata := map[string]string{
+		"name":        ci.Name,
+		"url":         ci.URL,
+		"buildNumber": ci.BuildNumber,
+		"source":      source,
+	}
 
-// 	for _, g := range gates {
-// 		requiredGates = append(requiredGates, openapi.SupportedGates(g))
-// 	}
+	if ci.Git != nil {
+		metadata["branch"] = ci.Git.Branch
+		metadata["tag"] = ci.Git.Tag
+		metadata["revision"] = ci.Git.Revision
+	}
 
-// 	return requiredGates
-// }
+	return metadata
+}
 
-// // HandleRunError handles errors returned by the server when running a test.
-// // It normalizes the handling of general errors, like 404,
-// // but more importantly, it processes the missing environment variables error
-// // so the orchestrator can request them from the user.
-// func HandleRunError(resp *http.Response, reqErr error) error {
-// 	body, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		return fmt.Errorf("could not read response body: %w", err)
-// 	}
-// 	resp.Body.Close()
+func getRequiredGates(gates []string) []openapi.SupportedGates {
+	if len(gates) == 0 {
+		return nil
+	}
+	requiredGates := make([]openapi.SupportedGates, 0, len(gates))
 
-// 	if resp.StatusCode == http.StatusNotFound {
-// 		return fmt.Errorf("resource not found in server")
-// 	}
+	for _, g := range gates {
+		requiredGates = append(requiredGates, openapi.SupportedGates(g))
+	}
 
-// 	if resp.StatusCode == http.StatusUnprocessableEntity {
-// 		return buildMissingVarsError(body)
-// 	}
+	return requiredGates
+}
 
-// 	if reqErr != nil {
-// 		return fmt.Errorf("could not run test suite: %w", reqErr)
-// 	}
+// HandleRunError handles errors returned by the server when running a test.
+// It normalizes the handling of general errors, like 404,
+// but more importantly, it processes the missing environment variables error
+// so the orchestrator can request them from the user.
+func HandleRunError(resp *http.Response, reqErr error) error {
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("could not read response body: %w", err)
+	}
+	resp.Body.Close()
 
-// 	return nil
-// }
+	if resp.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("resource not found in server")
+	}
+
+	if resp.StatusCode == http.StatusUnprocessableEntity {
+		return buildMissingVarsError(body)
+	}
+
+	if reqErr != nil {
+		return fmt.Errorf("could not run test suite: %w", reqErr)
+	}
+
+	return nil
+}

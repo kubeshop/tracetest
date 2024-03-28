@@ -9,7 +9,7 @@ import (
 )
 
 type RunParameters struct {
-	IDs             []string
+	ID              string
 	DefinitionFiles []string
 	VarsID          string
 	EnvID           string
@@ -22,7 +22,7 @@ func (p RunParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errs := []error{}
 
 	hasDefinitionFilesSpecified := p.DefinitionFiles != nil && len(p.DefinitionFiles) > 0
-	hasFileIDsSpecified := p.IDs != nil && len(p.IDs) > 0
+	hasFileIDsSpecified := p.ID != "" && len(p.ID) > 0
 
 	if !hasDefinitionFilesSpecified && !hasFileIDsSpecified {
 		errs = append(errs, ParamError{

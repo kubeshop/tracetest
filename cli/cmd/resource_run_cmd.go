@@ -28,10 +28,9 @@ func init() {
 		PreRun:  setupCommand(WithOptionalResourceName()),
 		Run: WithResourceMiddleware(func(ctx context.Context, _ *cobra.Command, args []string) (string, error) {
 			hasMultipleDefinitionFilesSpecified := runParams.DefinitionFiles != nil && len(runParams.DefinitionFiles) > 1
-			hasMultipleIDsSpecified := runParams.IDs != nil && len(runParams.IDs) > 1
 
-			if hasMultipleDefinitionFilesSpecified || hasMultipleIDsSpecified {
-				return cloudCmd.RunMultipleFiles(ctx, runParams, &cliConfig)
+			if hasMultipleDefinitionFilesSpecified {
+				return cloudCmd.RunMultipleFiles(ctx, runParams, &cliConfig, runnerRegistry)
 			}
 
 			return runSingleFile(ctx)
@@ -41,7 +40,7 @@ func init() {
 	}
 
 	runCmd.Flags().StringSliceVarP(&runParams.DefinitionFiles, "file", "f", []string{}, "path to the definition file (can be defined multiple times)")
-	runCmd.Flags().StringSliceVarP(&runParams.IDs, "id", "", []string{}, "id of the resource to run (can be defined multiple times)")
+	runCmd.Flags().StringVarP(&runParams.ID, "id", "", "", "id of the resource to run (can be defined multiple times)")
 	runCmd.Flags().StringVarP(&runParams.VarsID, "vars", "", "", "variable set file or ID to be used")
 	runCmd.Flags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
 	runCmd.Flags().StringVarP(&runParams.JUnitOuptutFile, "junit", "j", "", "file path to save test results in junit format")
@@ -56,37 +55,24 @@ func init() {
 }
 
 func runSingleFile(ctx context.Context) (string, error) {
-	resourceType, err := getResourceType(runParams, resourceParams)
-	if err != nil {
-		return "", err
-	}
-
-	r, err := runnerRegistry.Get(resourceType)
-	if err != nil {
-		return "", fmt.Errorf("resource type '%s' cannot be run", resourceType)
-	}
-
 	orchestrator := runner.Orchestrator(
 		cliLogger,
 		config.GetAPIClient(cliConfig),
 		variableSetClient,
+		runnerRegistry,
 	)
 
 	if runParams.EnvID != "" {
 		runParams.VarsID = runParams.EnvID
 	}
 
-	var id, definitionFile string
-	if len(runParams.IDs) > 0 {
-		id = runParams.IDs[0]
-	}
-
+	var definitionFile string
 	if len(runParams.DefinitionFiles) > 0 {
 		definitionFile = runParams.DefinitionFiles[0]
 	}
 
 	runParams := runner.RunOptions{
-		ID:              id,
+		ID:              runParams.ID,
 		DefinitionFile:  definitionFile,
 		VarsID:          runParams.VarsID,
 		SkipResultWait:  runParams.SkipResultWait,
@@ -94,7 +80,7 @@ func runSingleFile(ctx context.Context) (string, error) {
 		RequiredGates:   runParams.RequiredGates,
 	}
 
-	exitCode, err := orchestrator.Run(ctx, r, runParams, output)
+	exitCode, err := orchestrator.Run(ctx, runParams, output)
 	if err != nil {
 		return "", err
 	}

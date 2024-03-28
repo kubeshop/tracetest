@@ -11,19 +11,19 @@ import (
 
 type ResourceFetcher interface {
 	FetchWithDefinitionFile(context.Context, string) (any, error)
-	FetchWithID(context.Context, string) (any, error)
+	FetchWithID(context.Context, string, string) (any, error)
 }
 
 type fetcher struct {
 	logger *zap.Logger
 
-	resourceRunner Runner
+	runnerRegistry Registry
 }
 
-func GetResourceFetcher(logger *zap.Logger, resourceRunner Runner) ResourceFetcher {
+func GetResourceFetcher(logger *zap.Logger, runnerRegistry Registry) ResourceFetcher {
 	return &fetcher{
 		logger:         logger,
-		resourceRunner: resourceRunner,
+		runnerRegistry: runnerRegistry,
 	}
 }
 
@@ -42,7 +42,12 @@ func (f *fetcher) FetchWithDefinitionFile(ctx context.Context, definitionFile st
 		return nil, fmt.Errorf("cannot inject local env vars: %w", err)
 	}
 
-	resource, err := f.resourceRunner.Apply(ctx, df)
+	runner, err := f.runnerRegistry.Get(file.Type())
+	if err != nil {
+		return nil, fmt.Errorf("cannot get runner for type: %s: %w", file.Type(), err)
+	}
+
+	resource, err := runner.Apply(ctx, df)
 	if err != nil {
 		return nil, fmt.Errorf("cannot apply definition file: %w", err)
 	}
@@ -51,10 +56,15 @@ func (f *fetcher) FetchWithDefinitionFile(ctx context.Context, definitionFile st
 	return resource, nil
 }
 
-func (f *fetcher) FetchWithID(ctx context.Context, resourceID string) (any, error) {
+func (f *fetcher) FetchWithID(ctx context.Context, resourceType string, resourceID string) (any, error) {
 	f.logger.Debug("Definition file not provided, fetching resource by ID", zap.String("ID", resourceID))
 
-	resource, err := f.resourceRunner.GetByID(ctx, resourceID)
+	runner, err := f.runnerRegistry.Get(resourceType)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get runner for resource type %s: %w", resourceType, err)
+	}
+
+	resource, err := runner.GetByID(ctx, resourceID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get resource by ID: %w", err)
 	}
