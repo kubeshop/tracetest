@@ -18,6 +18,8 @@ type TestSuiteRun struct {
 
 	Version int32 `json:"version,omitempty"`
 
+	RunGroupId string `json:"runGroupId,omitempty"`
+
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 
 	CompletedAt time.Time `json:"completedAt,omitempty"`
