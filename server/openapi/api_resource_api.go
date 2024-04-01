@@ -89,7 +89,7 @@ func (c *ResourceApiApiController) Routes() Routes {
 		{
 			"DeleteLinter",
 			strings.ToUpper("Delete"),
-			"/api/linters/{LinterId}",
+			"/api/linters/{linterId}",
 			c.DeleteLinter,
 		},
 		{
@@ -131,7 +131,7 @@ func (c *ResourceApiApiController) Routes() Routes {
 		{
 			"GetLinter",
 			strings.ToUpper("Get"),
-			"/api/linters/{LinterId}",
+			"/api/linters/{linterId}",
 			c.GetLinter,
 		},
 		{
@@ -227,7 +227,7 @@ func (c *ResourceApiApiController) Routes() Routes {
 		{
 			"UpdateLinter",
 			strings.ToUpper("Put"),
-			"/api/linters/{LinterId}",
+			"/api/linters/{linterId}",
 			c.UpdateLinter,
 		},
 		{
@@ -402,7 +402,7 @@ func (c *ResourceApiApiController) DeleteDemo(w http.ResponseWriter, r *http.Req
 // DeleteLinter - Delete an Linter
 func (c *ResourceApiApiController) DeleteLinter(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	linterIdParam := params["LinterId"]
+	linterIdParam := params["linterId"]
 
 	result, err := c.service.DeleteLinter(r.Context(), linterIdParam)
 	// If an error occurred, encode the error with the status code
@@ -514,7 +514,7 @@ func (c *ResourceApiApiController) GetDemo(w http.ResponseWriter, r *http.Reques
 // GetLinter - Get a specific Linter
 func (c *ResourceApiApiController) GetLinter(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	linterIdParam := params["LinterId"]
+	linterIdParam := params["linterId"]
 
 	result, err := c.service.GetLinter(r.Context(), linterIdParam)
 	// If an error occurred, encode the error with the status code
@@ -885,7 +885,7 @@ func (c *ResourceApiApiController) UpdateDemo(w http.ResponseWriter, r *http.Req
 // UpdateLinter - Update a Linter
 func (c *ResourceApiApiController) UpdateLinter(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	linterIdParam := params["LinterId"]
+	linterIdParam := params["linterId"]
 
 	linterResourceParam := LinterResource{}
 	d := json.NewDecoder(r.Body)

@@ -1,42 +1,7 @@
 version: 3.0.0
 components:
   parameters:
-    # Test parameters
-    testId:
-      in: path
-      name: testId
-      required: true
-      description: id of the test
-      schema:
-        type: string
-
-    # versioning and runs
-    runId:
-      in: path
-      name: runId
-      required: true
-      description: id of the run
-      schema:
-        type: integer
-
-    version:
-      in: path
-      name: version
-      required: true
-      description: version of the test
-      schema:
-        type: integer
-
-    # TestSuite
-    testSuiteId:
-      in: path
-      name: testSuiteId
-      required: true
-      description: id of the TestSuite
-      schema:
-        type: string
-
-    # Query parameters
+    # Query parameters for API
     take:
       in: query
       name: take
@@ -99,14 +64,7 @@ components:
         type: string
         enum: [asc, desc]
 
-    runGroupIds:
-      in: query
-      name: runGroupIds
-      description: "IDs for RunGroup"
-      schema:
-        type: string
-
-    # resource ids
+    # Resource Manager IDs
     configId:
       in: path
       name: configId
@@ -147,14 +105,54 @@ components:
       schema:
         type: string
 
-    LinterId:
+    linterId:
       in: path
-      name: LinterId
+      name: linterId
       required: true
       description: "ID of an Linter"
       schema:
         type: string
 
+    fileExtension:
+      in: path
+      name: fileExtension
+      required: true
+      schema:
+        type: string
+
+    testId:
+      in: path
+      name: testId
+      required: true
+      description: id of the test
+      schema:
+        type: string
+
+    runId:
+      in: path
+      name: runId
+      required: true
+      description: id of the run
+      schema:
+        type: integer
+
+    version:
+      in: path
+      name: version
+      required: true
+      description: version of the test
+      schema:
+        type: integer
+
+    testSuiteId:
+      in: path
+      name: testSuiteId
+      required: true
+      description: id of the TestSuite
+      schema:
+        type: string
+
+    # Cloud parameters
     runGroupId:
       in: path
       name: runGroupId
@@ -163,9 +161,9 @@ components:
       schema:
         type: string
 
-    fileExtension:
-      in: path
-      name: fileExtension
-      required: true
+    runGroupIds:
+      in: query
+      name: runGroupIds
+      description: "IDs for RunGroup"
       schema:
         type: string

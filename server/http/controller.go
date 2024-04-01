@@ -863,3 +863,19 @@ func (c *controller) SearchSpans(ctx context.Context, testID string, runID int32
 	return openapi.Response(http.StatusOK, res), nil
 
 }
+
+func (c *controller) CreateRunGroup(_ context.Context, _ openapi.RunGroup) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) GetRunGroup(_ context.Context, _ string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) GetRunGroups(_ context.Context, _ int32, _ int32, _ string, _ string, _ string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) GetRunsFromRunGroup(context.Context, int32, int32, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}

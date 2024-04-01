@@ -1048,7 +1048,7 @@ func (r ApiGetRunGroupsRequest) SortDirection(sortDirection string) ApiGetRunGro
 	return r
 }
 
-func (r ApiGetRunGroupsRequest) Execute() (*RunGroups, *http.Response, error) {
+func (r ApiGetRunGroupsRequest) Execute() (*RunGroupList, *http.Response, error) {
 	return r.ApiService.GetRunGroupsExecute(r)
 }
 
@@ -1069,13 +1069,13 @@ func (a *ApiApiService) GetRunGroups(ctx context.Context) ApiGetRunGroupsRequest
 
 // Execute executes the request
 //
-//	@return RunGroups
-func (a *ApiApiService) GetRunGroupsExecute(r ApiGetRunGroupsRequest) (*RunGroups, *http.Response, error) {
+//	@return RunGroupList
+func (a *ApiApiService) GetRunGroupsExecute(r ApiGetRunGroupsRequest) (*RunGroupList, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
 		localVarPostBody    interface{}
 		formFiles           []formFile
-		localVarReturnValue *RunGroups
+		localVarReturnValue *RunGroupList
 	)
 
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetRunGroups")

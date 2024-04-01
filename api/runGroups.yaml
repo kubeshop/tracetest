@@ -1,10 +1,13 @@
 openapi: 3.0.0
 components:
   schemas:
-    RunGroups:
-      type: array
-      items:
-        $ref: "#/components/schemas/RunGroup"
+    RunGroupList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/RunGroup"
 
     RunGroup:
       type: object

@@ -1336,12 +1336,12 @@ paths:
         500:
           description: "problem creating an Linter"
 
-  /linters/{LinterId}:
+  /linters/{linterId}:
     get:
       tags:
         - resource-api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/LinterId"
+        - $ref: "./parameters.yaml#/components/parameters/linterId"
       summary: "Get a specific Linter"
       description: "Get one Linter by its id"
       operationId: getLinter
@@ -1363,7 +1363,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/LinterId"
+        - $ref: "./parameters.yaml#/components/parameters/linterId"
       summary: "Update a Linter"
       description: "Update a Linter used on Tracetest"
       operationId: updateLinter
@@ -1395,7 +1395,7 @@ paths:
       tags:
         - resource-api
       parameters:
-        - $ref: "./parameters.yaml#/components/parameters/LinterId"
+        - $ref: "./parameters.yaml#/components/parameters/linterId"
       summary: "Delete an Linter"
       description: "Delete an Linter from Tracetest"
       operationId: deleteLinter
@@ -1408,6 +1408,7 @@ paths:
           description: "Linter not found"
         500:
           description: "problem deleting an Linter"
+
   /wizard:
     get:
       tags:
@@ -1450,6 +1451,8 @@ paths:
           description: "Wizard not found"
         500:
           description: "problem updating an Wizard"
+
+  # Run Groups
   /rungroups:
     get:
       tags:
@@ -1474,7 +1477,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./runGroups.yaml#/components/schemas/RunGroups"
+                $ref: "./runGroups.yaml#/components/schemas/RunGroupList"
         404:
           description: "Run Groups not found"
         500:
