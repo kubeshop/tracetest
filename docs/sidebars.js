@@ -876,10 +876,31 @@ const sidebars = {
           label: "Configuring Tests",
           items: [
             {
-              type: "doc",
-              id: "web-ui/creating-tests",
+              type: "category",
               label: "Creating Tests",
-            },
+              items: [
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests",
+                  label: "Creating Tests - HTTP",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-gRPC",
+                  label: "Creating Tests - gRPC",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-kafka",
+                  label: "Creating Tests - Kafka",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-traceid",
+                  label: "Creating Tests - TraceID",
+                },
+              ],
+            }, 
             {
               type: "category",
               label: "Importing Tests",
