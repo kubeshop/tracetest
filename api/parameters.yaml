@@ -60,13 +60,20 @@ components:
       schema:
         type: string
 
+    status:
+      in: query
+      name: status
+      description: "query to search resources by status"
+      schema:
+        type: string
+
     runnableResourceSortBy:
       in: query
       name: sortBy
       description: "indicates the sort field for the resources"
       schema:
         type: string
-        enum: [created, name, last_run]
+        enum: [created, name, status, last_run]
 
     sortBy:
       in: query
@@ -91,6 +98,13 @@ components:
       schema:
         type: string
         enum: [asc, desc]
+
+    runGroupIds:
+      in: query
+      name: runGroupIds
+      description: "IDs for RunGroup"
+      schema:
+        type: string
 
     # resource ids
     configId:
@@ -138,6 +152,14 @@ components:
       name: LinterId
       required: true
       description: "ID of an Linter"
+      schema:
+        type: string
+
+    runGroupId:
+      in: path
+      name: runGroupId
+      required: true
+      description: "ID of an RunGroup"
       schema:
         type: string
 
