@@ -155,6 +155,8 @@ components:
         testVersion:
           type: integer
           description: Test version used when running this test run
+        runGroupId:
+          type: string
         state:
           type: string
           enum:
@@ -242,6 +244,8 @@ components:
           additionalProperties:
             type: string
         variableSetId:
+          type: string
+        runGroupId:
           type: string
         variables:
           type: array

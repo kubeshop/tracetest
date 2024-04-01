@@ -694,8 +694,8 @@ func (a *ResourceApiApiService) DeleteLinterExecute(r ApiDeleteLinterRequest) (*
 		return nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/linters/{LinterId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"LinterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
+	localVarPath := localBasePath + "/linters/{linterId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"linterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -1377,8 +1377,8 @@ func (a *ResourceApiApiService) GetLinterExecute(r ApiGetLinterRequest) (*Linter
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/linters/{LinterId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"LinterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
+	localVarPath := localBasePath + "/linters/{linterId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"linterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -3367,8 +3367,8 @@ func (a *ResourceApiApiService) UpdateLinterExecute(r ApiUpdateLinterRequest) (*
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/linters/{LinterId}"
-	localVarPath = strings.Replace(localVarPath, "{"+"LinterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
+	localVarPath := localBasePath + "/linters/{linterId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"linterId"+"}", url.PathEscape(parameterValueToString(r.linterId, "linterId")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

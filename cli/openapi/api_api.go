@@ -22,6 +22,114 @@ import (
 // ApiApiService ApiApi service
 type ApiApiService service
 
+type ApiCreateRunGroupRequest struct {
+	ctx        context.Context
+	ApiService *ApiApiService
+	runGroup   *RunGroup
+}
+
+func (r ApiCreateRunGroupRequest) RunGroup(runGroup RunGroup) ApiCreateRunGroupRequest {
+	r.runGroup = &runGroup
+	return r
+}
+
+func (r ApiCreateRunGroupRequest) Execute() (*RunGroup, *http.Response, error) {
+	return r.ApiService.CreateRunGroupExecute(r)
+}
+
+/*
+CreateRunGroup Create a RunGroup
+
+Create a RunGroup used on Tracetest
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateRunGroupRequest
+*/
+func (a *ApiApiService) CreateRunGroup(ctx context.Context) ApiCreateRunGroupRequest {
+	return ApiCreateRunGroupRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return RunGroup
+func (a *ApiApiService) CreateRunGroupExecute(r ApiCreateRunGroupRequest) (*RunGroup, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodPost
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *RunGroup
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.CreateRunGroup")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/rungroups"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.runGroup
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiDeleteTestRunRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
@@ -796,6 +904,260 @@ func (a *ApiApiService) GetResourcesExecute(r ApiGetResourcesRequest) ([]Resourc
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetRunGroupRequest struct {
+	ctx        context.Context
+	ApiService *ApiApiService
+	runGroupId string
+}
+
+func (r ApiGetRunGroupRequest) Execute() (*RunGroup, *http.Response, error) {
+	return r.ApiService.GetRunGroupExecute(r)
+}
+
+/*
+GetRunGroup Get a run group
+
+Get a run groups in the system
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param runGroupId ID of an RunGroup
+	@return ApiGetRunGroupRequest
+*/
+func (a *ApiApiService) GetRunGroup(ctx context.Context, runGroupId string) ApiGetRunGroupRequest {
+	return ApiGetRunGroupRequest{
+		ApiService: a,
+		ctx:        ctx,
+		runGroupId: runGroupId,
+	}
+}
+
+// Execute executes the request
+//
+//	@return RunGroup
+func (a *ApiApiService) GetRunGroupExecute(r ApiGetRunGroupRequest) (*RunGroup, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *RunGroup
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetRunGroup")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/rungroups/{runGroupId}"
+	localVarPath = strings.Replace(localVarPath, "{"+"runGroupId"+"}", url.PathEscape(parameterValueToString(r.runGroupId, "runGroupId")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetRunGroupsRequest struct {
+	ctx           context.Context
+	ApiService    *ApiApiService
+	take          *int32
+	skip          *int32
+	status        *string
+	sortBy        *string
+	sortDirection *string
+}
+
+// indicates how many resources can be returned by each page
+func (r ApiGetRunGroupsRequest) Take(take int32) ApiGetRunGroupsRequest {
+	r.take = &take
+	return r
+}
+
+// indicates how many resources will be skipped when paginating
+func (r ApiGetRunGroupsRequest) Skip(skip int32) ApiGetRunGroupsRequest {
+	r.skip = &skip
+	return r
+}
+
+// query to search resources by status
+func (r ApiGetRunGroupsRequest) Status(status string) ApiGetRunGroupsRequest {
+	r.status = &status
+	return r
+}
+
+// indicates the sort field for the resources
+func (r ApiGetRunGroupsRequest) SortBy(sortBy string) ApiGetRunGroupsRequest {
+	r.sortBy = &sortBy
+	return r
+}
+
+// indicates the sort direction for the resources
+func (r ApiGetRunGroupsRequest) SortDirection(sortDirection string) ApiGetRunGroupsRequest {
+	r.sortDirection = &sortDirection
+	return r
+}
+
+func (r ApiGetRunGroupsRequest) Execute() (*RunGroupList, *http.Response, error) {
+	return r.ApiService.GetRunGroupsExecute(r)
+}
+
+/*
+GetRunGroups Get all run groups
+
+Get all the run groups in the system
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetRunGroupsRequest
+*/
+func (a *ApiApiService) GetRunGroups(ctx context.Context) ApiGetRunGroupsRequest {
+	return ApiGetRunGroupsRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return RunGroupList
+func (a *ApiApiService) GetRunGroupsExecute(r ApiGetRunGroupsRequest) (*RunGroupList, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *RunGroupList
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetRunGroups")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/rungroups"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.take != nil {
+		parameterAddToQuery(localVarQueryParams, "take", r.take, "")
+	}
+	if r.skip != nil {
+		parameterAddToQuery(localVarQueryParams, "skip", r.skip, "")
+	}
+	if r.status != nil {
+		parameterAddToQuery(localVarQueryParams, "status", r.status, "")
+	}
+	if r.sortBy != nil {
+		parameterAddToQuery(localVarQueryParams, "sortBy", r.sortBy, "")
+	}
+	if r.sortDirection != nil {
+		parameterAddToQuery(localVarQueryParams, "sortDirection", r.sortDirection, "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetRunResultJUnitRequest struct {
 	ctx        context.Context
 	ApiService *ApiApiService
@@ -861,6 +1223,136 @@ func (a *ApiApiService) GetRunResultJUnitExecute(r ApiGetRunResultJUnitRequest) 
 
 	// to determine the Accept header
 	localVarHTTPHeaderAccepts := []string{"application/xml"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
+type ApiGetRunsFromRunGroupRequest struct {
+	ctx         context.Context
+	ApiService  *ApiApiService
+	take        *int32
+	skip        *int32
+	runGroupIds *string
+}
+
+// indicates how many resources can be returned by each page
+func (r ApiGetRunsFromRunGroupRequest) Take(take int32) ApiGetRunsFromRunGroupRequest {
+	r.take = &take
+	return r
+}
+
+// indicates how many resources will be skipped when paginating
+func (r ApiGetRunsFromRunGroupRequest) Skip(skip int32) ApiGetRunsFromRunGroupRequest {
+	r.skip = &skip
+	return r
+}
+
+// IDs for RunGroup
+func (r ApiGetRunsFromRunGroupRequest) RunGroupIds(runGroupIds string) ApiGetRunsFromRunGroupRequest {
+	r.runGroupIds = &runGroupIds
+	return r
+}
+
+func (r ApiGetRunsFromRunGroupRequest) Execute() (*RunGroupRun, *http.Response, error) {
+	return r.ApiService.GetRunsFromRunGroupExecute(r)
+}
+
+/*
+GetRunsFromRunGroup Get all runs from a run group
+
+Get all runs from a run group
+
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetRunsFromRunGroupRequest
+*/
+func (a *ApiApiService) GetRunsFromRunGroup(ctx context.Context) ApiGetRunsFromRunGroupRequest {
+	return ApiGetRunsFromRunGroupRequest{
+		ApiService: a,
+		ctx:        ctx,
+	}
+}
+
+// Execute executes the request
+//
+//	@return RunGroupRun
+func (a *ApiApiService) GetRunsFromRunGroupExecute(r ApiGetRunsFromRunGroupRequest) (*RunGroupRun, *http.Response, error) {
+	var (
+		localVarHTTPMethod  = http.MethodGet
+		localVarPostBody    interface{}
+		formFiles           []formFile
+		localVarReturnValue *RunGroupRun
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "ApiApiService.GetRunsFromRunGroup")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/runs"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if r.take != nil {
+		parameterAddToQuery(localVarQueryParams, "take", r.take, "")
+	}
+	if r.skip != nil {
+		parameterAddToQuery(localVarQueryParams, "skip", r.skip, "")
+	}
+	if r.runGroupIds != nil {
+		parameterAddToQuery(localVarQueryParams, "runGroupIds", r.runGroupIds, "")
+	}
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)

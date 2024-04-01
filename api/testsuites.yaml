@@ -62,6 +62,8 @@ components:
         version:
           type: integer
           readOnly: true
+        runGroupId:
+          type: string
         createdAt:
           type: string
           format: date-time

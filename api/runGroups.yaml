@@ -1,0 +1,95 @@
+openapi: 3.0.0
+components:
+  schemas:
+    RunGroupList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/RunGroup"
+
+    RunGroup:
+      type: object
+      required:
+        - id
+      nullable: false
+      properties:
+        id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          type: string
+          enum:
+            - created
+            - inProgress
+            - succeed
+            - failed
+          readOnly: true
+        summary:
+          type: object
+          properties:
+            pending:
+              type: integer
+            succeed:
+              type: integer
+            failed:
+              type: integer
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+
+
+    RunGroupRun:
+      type: object
+      properties:
+        testId:
+          type: string
+        testVersion:
+          type: integer
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        linter:
+          $ref: "linters.yaml#/components/schemas/LinterResult"
+        requiredGatesResult:
+          $ref: "./testRunner.yaml#/components/schemas/RequiredGatesResult"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        executionTime:
+          type: integer
+          description: time in seconds it took for the test to complete, either success or fail. If the test is still running, it will show the time up to the time of the request
+        runId:
+          type: integer
+        trigger:
+          $ref: "./triggers.yaml#/components/schemas/Trigger"
+        state:
+          type: string
+          enum:
+            [
+              CREATED,
+              EXECUTING,
+              AWAITING_TRACE,
+              AWAITING_TEST_RESULTS,
+              ANALYZING_TRACE,
+              ANALYZING_ERROR,
+              FINISHED,
+              STOPPED,
+              TRIGGER_FAILED,
+              TRACE_FAILED,
+              ASSERTION_FAILED,
+            ]
+          description: Current execution state
+        result:
+          $ref: "./tests.yaml#/components/schemas/AssertionResults"

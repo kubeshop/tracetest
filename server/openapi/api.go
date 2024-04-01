@@ -18,6 +18,7 @@ import (
 // The ApiApiRouter implementation should parse necessary information from the http request,
 // pass the data to a ApiApiServicer to perform the required actions, then write the service results to the http response.
 type ApiApiRouter interface {
+	CreateRunGroup(http.ResponseWriter, *http.Request)
 	DeleteTestRun(http.ResponseWriter, *http.Request)
 	DeleteTestSuiteRun(http.ResponseWriter, *http.Request)
 	DryRunAssertion(http.ResponseWriter, *http.Request)
@@ -25,7 +26,10 @@ type ApiApiRouter interface {
 	ExpressionResolve(http.ResponseWriter, *http.Request)
 	GetOTLPConnectionInformation(http.ResponseWriter, *http.Request)
 	GetResources(http.ResponseWriter, *http.Request)
+	GetRunGroup(http.ResponseWriter, *http.Request)
+	GetRunGroups(http.ResponseWriter, *http.Request)
 	GetRunResultJUnit(http.ResponseWriter, *http.Request)
+	GetRunsFromRunGroup(http.ResponseWriter, *http.Request)
 	GetTestResultSelectedSpans(http.ResponseWriter, *http.Request)
 	GetTestRun(http.ResponseWriter, *http.Request)
 	GetTestRunEvents(http.ResponseWriter, *http.Request)
@@ -96,6 +100,7 @@ type ResourceApiApiRouter interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type ApiApiServicer interface {
+	CreateRunGroup(context.Context, RunGroup) (ImplResponse, error)
 	DeleteTestRun(context.Context, string, int32) (ImplResponse, error)
 	DeleteTestSuiteRun(context.Context, string, int32) (ImplResponse, error)
 	DryRunAssertion(context.Context, string, int32, TestSpecs) (ImplResponse, error)
@@ -103,7 +108,10 @@ type ApiApiServicer interface {
 	ExpressionResolve(context.Context, ResolveRequestInfo) (ImplResponse, error)
 	GetOTLPConnectionInformation(context.Context) (ImplResponse, error)
 	GetResources(context.Context, int32, int32, string, string, string) (ImplResponse, error)
+	GetRunGroup(context.Context, string) (ImplResponse, error)
+	GetRunGroups(context.Context, int32, int32, string, string, string) (ImplResponse, error)
 	GetRunResultJUnit(context.Context, string, int32) (ImplResponse, error)
+	GetRunsFromRunGroup(context.Context, int32, int32, string) (ImplResponse, error)
 	GetTestResultSelectedSpans(context.Context, string, int32, string) (ImplResponse, error)
 	GetTestRun(context.Context, string, int32) (ImplResponse, error)
 	GetTestRunEvents(context.Context, string, int32) (ImplResponse, error)
