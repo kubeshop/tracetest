@@ -27,7 +27,6 @@ func RunMultipleFiles(ctx context.Context, runParams *cmdutil.RunParameters, cli
 	)
 
 	orchestrator.Run(ctx, runner.RunOptions{
-		IDs:             runParams.ID,
 		DefinitionFiles: runParams.DefinitionFiles,
 		VarsID:          runParams.VarsID,
 		SkipResultWait:  runParams.SkipResultWait,

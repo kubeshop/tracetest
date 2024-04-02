@@ -102,6 +102,8 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions) (exitCode int, _
 
 	resources = make([]any, 0, len(opts.DefinitionFiles))
 
+	// call run group creation
+
 	for _, definitionFile := range opts.DefinitionFiles {
 		resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
 		if err != nil {
