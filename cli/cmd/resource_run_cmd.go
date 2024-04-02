@@ -27,10 +27,8 @@ func init() {
 		Long:    "Run tests and test suites",
 		PreRun:  setupCommand(WithOptionalResourceName()),
 		Run: WithResourceMiddleware(func(ctx context.Context, _ *cobra.Command, args []string) (string, error) {
-			hasMultipleDefinitionFilesSpecified := runParams.DefinitionFiles != nil && len(runParams.DefinitionFiles) > 1
-
-			if hasMultipleDefinitionFilesSpecified {
-				return cloudCmd.RunMultipleFiles(ctx, runParams, &cliConfig, runnerRegistry)
+			if cliConfig.Jwt != "" {
+				return cloudCmd.RunMultipleFiles(ctx, runParams, &cliConfig, runnerRegistry, output)
 			}
 
 			return runSingleFile(ctx)
@@ -106,7 +104,6 @@ func getResourceType(runParams *cmdutil.RunParameters, resourceParams *resourceP
 	}
 
 	return "", fmt.Errorf("resourceName is empty and no definition file provided")
-
 }
 
 func validRequiredGatesMsg() string {

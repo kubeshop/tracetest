@@ -16,6 +16,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/variable"
+	"github.com/kubeshop/tracetest/cli/varset"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -166,14 +167,14 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 	}
 
 	var result RunResult
-	var ev varSets
+	var ev varset.VarSets
 
 	// iterate until we have all env vars,
 	// or the server returns an actual error
 	for {
 		runInfo := openapi.RunInformation{
 			VariableSetId: &varsID,
-			Variables:     ev.toOpenapi(),
+			Variables:     ev.ToOpenapi(),
 			Metadata:      getMetadata(),
 			RequiredGates: getRequiredGates(opts.RequiredGates),
 		}
@@ -182,13 +183,13 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 		if err == nil {
 			break
 		}
-		if !errors.Is(err, missingVarsError{}) {
+		if !errors.Is(err, varset.MissingVarsError{}) {
 			// actual error, return
 			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
 		}
 
 		// missing vars error
-		ev = askForMissingVars([]varSet(err.(missingVarsError)))
+		ev = varset.AskForMissingVars([]varset.VarSet(err.(varset.MissingVarsError)))
 		o.logger.Debug("filled variables", zap.Any("variables", ev))
 	}
 
@@ -394,7 +395,7 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 	}
 
 	if resp.StatusCode == http.StatusUnprocessableEntity {
-		return buildMissingVarsError(body)
+		return varset.BuildMissingVarsError(body)
 	}
 
 	if reqErr != nil {

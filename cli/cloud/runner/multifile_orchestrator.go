@@ -12,9 +12,12 @@ import (
 
 	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/runner"
+	"github.com/kubeshop/tracetest/cli/varset"
+	"github.com/kubeshop/tracetest/server/pkg/id"
 	"go.uber.org/zap"
 )
 
@@ -40,32 +43,34 @@ type RunOptions struct {
 	RequiredGates []string
 }
 
+type MultipleRunFormatter interface {
+	Format(output formatters.MultipleRunOutput[any], format formatters.Output) string
+}
+
 func MultiFileOrchestrator(
 	logger *zap.Logger,
 	openapiClient *openapi.APIClient,
 	variableSets resourcemanager.Client,
 	runnerRegistry runner.Registry,
+	multipleRunFormatter MultipleRunFormatter,
 ) orchestrator {
 	return orchestrator{
-		logger:         logger,
-		openapiClient:  openapiClient,
-		variableSets:   variableSets,
-		runnerRegistry: runnerRegistry,
+		logger:               logger,
+		openapiClient:        openapiClient,
+		variableSets:         variableSets,
+		runnerRegistry:       runnerRegistry,
+		multipleRunFormatter: multipleRunFormatter,
 	}
 }
 
 type orchestrator struct {
 	logger *zap.Logger
 
-	openapiClient  *openapi.APIClient
-	variableSets   resourcemanager.Client
-	runnerRegistry runner.Registry
+	openapiClient        *openapi.APIClient
+	variableSets         resourcemanager.Client
+	runnerRegistry       runner.Registry
+	multipleRunFormatter MultipleRunFormatter
 }
-
-var (
-	yamlFormat = resourcemanager.Formats.Get(resourcemanager.FormatYAML)
-	jsonFormat = resourcemanager.Formats.Get(resourcemanager.FormatJSON)
-)
 
 const (
 	ExitCodeSuccess       = 0
@@ -73,7 +78,7 @@ const (
 	ExitCodeTestNotPassed = 2
 )
 
-func (o orchestrator) Run(ctx context.Context, opts RunOptions) (exitCode int, _ error) {
+func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat string) (exitCode int, _ error) {
 	o.logger.Debug(
 		"Running tests from definition",
 		zap.Strings("definitionFiles", opts.DefinitionFiles),
@@ -91,7 +96,6 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions) (exitCode int, _
 	}
 	o.logger.Debug("env resolved", zap.String("ID", varsID))
 
-	var resources []any
 	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
 
 	resourceFetcher := runner.GetResourceFetcher(o.logger, o.runnerRegistry)
@@ -100,10 +104,13 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions) (exitCode int, _
 		return ExitCodeGeneralError, fmt.Errorf("you must define at least two files to use the multifile orchestrator")
 	}
 
-	resources = make([]any, 0, len(opts.DefinitionFiles))
+	var ev varset.VarSets
+	var resources []any
 
-	// call run group creation
+	runGroupID := id.GenerateID().String()
+	runsResults := make([]runner.RunResult, 0)
 
+	// 1. create runs
 	for _, definitionFile := range opts.DefinitionFiles {
 		resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
 		if err != nil {
@@ -122,64 +129,116 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions) (exitCode int, _
 
 		runInfo := openapi.RunInformation{
 			VariableSetId: &varsID,
-			Variables:     ev.toOpenapi(),
+			Variables:     ev.ToOpenapi(),
 			Metadata:      getMetadata(),
 			RequiredGates: getRequiredGates(opts.RequiredGates),
+			RunGroupId:    &runGroupID,
 		}
 
-		runner.StartRun(ctx, resource, runInfo)
-		resources = append(resources, resource)
+		// 2. validate missing vars
+		for {
+			result, err := runner.StartRun(ctx, resource, runInfo)
+			if err == nil {
+				runsResults = append(runsResults, result)
+				resources = append(resources, resource)
+
+				break
+			}
+			if !errors.Is(err, varset.MissingVarsError{}) {
+				// actual error, return
+				return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
+			}
+
+			// missing vars error
+			ev = varset.AskForMissingVars([]varset.VarSet(err.(varset.MissingVarsError)))
+			o.logger.Debug("filled variables", zap.Any("variables", ev))
+		}
 	}
 
-	var result RunResult
-	var ev varSets
-
-	// iterate until we have all env vars,
-	// or the server returns an actual error
-	for {
-
-		result, err = r.StartRun(ctx, resource, runInfo)
-		if err == nil {
-			break
-		}
-		if !errors.Is(err, missingVarsError{}) {
-			// actual error, return
-			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
+	runnerGetter := func(resource any) (formatters.Runner[runner.RunResult], error) {
+		resourceType, err := resourcemanager.GetResourceType(resource)
+		if err != nil {
+			return nil, fmt.Errorf("cannot extract type from resource: %w", err)
 		}
 
-		// missing vars error
-		ev = askForMissingVars([]varSet(err.(missingVarsError)))
-		o.logger.Debug("filled variables", zap.Any("variables", ev))
+		runner, err := o.runnerRegistry.Get(resourceType)
+		if err != nil {
+			return nil, fmt.Errorf("cannot find runner for resource type %s: %w", resourceType, err)
+		}
+
+		return runner, nil
 	}
 
+	// 3. if skip wait, print results and exit
 	if opts.SkipResultWait {
-		fmt.Println(r.FormatResult(result, outputFormat))
+		output := formatters.MultipleRunOutput[runner.RunResult]{
+			Runs:         runsResults,
+			Resources:    resources,
+			RunGroup:     openapi.RunGroup{Id: runGroupID},
+			RunnerGetter: runnerGetter,
+			HasResults:   false,
+		}
+
+		summary := o.multipleRunFormatter.Format(output, formatters.Output(outputFormat))
+		fmt.Println(summary)
 		return ExitCodeSuccess, nil
 	}
 
-	result, err = o.waitForResult(ctx, r, result)
+	// 4. wait for the run group
+	runGroup, err := o.waitForRunGroup(ctx, runGroupID)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot wait for test result: %w", err)
 	}
 
-	fmt.Println(r.FormatResult(result, outputFormat))
+	// 5. update runs and print results
+	for i, result := range runsResults {
+		resource := resources[i]
 
-	err = o.writeJUnitReport(ctx, r, result, opts.JUnitOuptutFile)
-	if err != nil {
-		return ExitCodeGeneralError, fmt.Errorf("cannot write junit report: %w", err)
+		resourceType, err := resourcemanager.GetResourceType(resource)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot extract type from resource: %w", err)
+		}
+
+		runner, err := o.runnerRegistry.Get(resourceType)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot find runner for resource type %s: %w", resourceType, err)
+		}
+
+		// TODO: I think we can just pull the test runs from the group instead of updating each of them
+		updated, err := runner.UpdateResult(ctx, result)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot update test result: %w", err)
+		}
+		runsResults[i] = updated
+
+		err = o.writeJUnitReport(ctx, runner, result, opts.JUnitOuptutFile)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot write junit report: %w", err)
+		}
 	}
 
+	output := formatters.MultipleRunOutput[any]{
+		Runs:         runsResults,
+		Resources:    resources,
+		RunGroup:     openapi.RunGroup{Id: runGroupID},
+		RunnerGetter: runnerGetter,
+		HasResults:   true,
+	}
+
+	summary := o.multipleRunFormatter.Format(output, formatters.Output(outputFormat))
+	fmt.Println(summary)
+
 	exitCode = ExitCodeSuccess
-	if !result.Passed {
+	if runGroup.GetStatus() == "failed" {
 		exitCode = ExitCodeTestNotPassed
 	}
 
 	return exitCode, nil
 }
 
-func (o orchestrator) waitForResult(ctx context.Context, r runner.Runner, result runner.RunResult) (runner.RunResult, error) {
+func (o orchestrator) waitForRunGroup(ctx context.Context, runGroupID string) (openapi.RunGroup, error) {
 	var (
-		updatedResult runner.RunResult
+		updatedResult openapi.RunGroup
 		lastError     error
 		wg            sync.WaitGroup
 	)
@@ -188,8 +247,11 @@ func (o orchestrator) waitForResult(ctx context.Context, r runner.Runner, result
 	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
 	go func() {
 		for range ticker.C {
-			updated, err := r.UpdateResult(ctx, result)
-			o.logger.Debug("updated result", zap.String("result", spew.Sdump(updated)))
+			req := o.openapiClient.ApiApi.GetRunGroup(ctx, runGroupID)
+			runGroup, _, err := req.Execute()
+
+			// updatedResult = runGroup
+			o.logger.Debug("updated run group", zap.String("result", spew.Sdump(runGroup)))
 			if err != nil {
 				o.logger.Debug("UpdateResult failed", zap.Error(err))
 				lastError = err
@@ -197,9 +259,9 @@ func (o orchestrator) waitForResult(ctx context.Context, r runner.Runner, result
 				return
 			}
 
-			if updated.Finished {
+			if runGroup.GetStatus() == "succeed" || runGroup.GetStatus() == "failed" {
 				o.logger.Debug("result is finished")
-				updatedResult = updated
+				updatedResult = *runGroup
 				wg.Done()
 				return
 			}
@@ -209,7 +271,7 @@ func (o orchestrator) waitForResult(ctx context.Context, r runner.Runner, result
 	wg.Wait()
 
 	if lastError != nil {
-		return runner.RunResult{}, lastError
+		return openapi.RunGroup{}, lastError
 	}
 
 	return updatedResult, nil
@@ -296,7 +358,7 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 	}
 
 	if resp.StatusCode == http.StatusUnprocessableEntity {
-		return buildMissingVarsError(body)
+		return varset.BuildMissingVarsError(body)
 	}
 
 	if reqErr != nil {
