@@ -51,6 +51,12 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
+			"CreateRunGroup",
+			strings.ToUpper("Post"),
+			"/api/rungroups",
+			c.CreateRunGroup,
+		},
+		{
 			"DeleteTestRun",
 			strings.ToUpper("Delete"),
 			"/api/tests/{testId}/run/{runId}",
@@ -93,10 +99,28 @@ func (c *ApiApiController) Routes() Routes {
 			c.GetResources,
 		},
 		{
+			"GetRunGroup",
+			strings.ToUpper("Get"),
+			"/api/rungroups/{runGroupId}",
+			c.GetRunGroup,
+		},
+		{
+			"GetRunGroups",
+			strings.ToUpper("Get"),
+			"/api/rungroups",
+			c.GetRunGroups,
+		},
+		{
 			"GetRunResultJUnit",
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run/{runId}/junit.xml",
 			c.GetRunResultJUnit,
+		},
+		{
+			"GetRunsFromRunGroup",
+			strings.ToUpper("Get"),
+			"/api/runs",
+			c.GetRunsFromRunGroup,
 		},
 		{
 			"GetTestResultSelectedSpans",
@@ -231,6 +255,30 @@ func (c *ApiApiController) Routes() Routes {
 			c.UpdateWizard,
 		},
 	}
+}
+
+// CreateRunGroup - Create a RunGroup
+func (c *ApiApiController) CreateRunGroup(w http.ResponseWriter, r *http.Request) {
+	runGroupParam := RunGroup{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&runGroupParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertRunGroupRequired(runGroupParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateRunGroup(r.Context(), runGroupParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
 }
 
 // DeleteTestRun - delete a test run
@@ -396,6 +444,49 @@ func (c *ApiApiController) GetResources(w http.ResponseWriter, r *http.Request) 
 
 }
 
+// GetRunGroup - Get a run group
+func (c *ApiApiController) GetRunGroup(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	runGroupIdParam := params["runGroupId"]
+
+	result, err := c.service.GetRunGroup(r.Context(), runGroupIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetRunGroups - Get all run groups
+func (c *ApiApiController) GetRunGroups(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	statusParam := query.Get("status")
+	sortByParam := query.Get("sortBy")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.GetRunGroups(r.Context(), takeParam, skipParam, statusParam, sortByParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // GetRunResultJUnit - get test run results in JUnit xml format
 func (c *ApiApiController) GetRunResultJUnit(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -408,6 +499,31 @@ func (c *ApiApiController) GetRunResultJUnit(w http.ResponseWriter, r *http.Requ
 	}
 
 	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetRunsFromRunGroup - Get all runs from a run group
+func (c *ApiApiController) GetRunsFromRunGroup(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	runGroupIdsParam := query.Get("runGroupIds")
+	result, err := c.service.GetRunsFromRunGroup(r.Context(), takeParam, skipParam, runGroupIdsParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

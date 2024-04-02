@@ -14,6 +14,8 @@ type RunInformation struct {
 
 	VariableSetId string `json:"variableSetId,omitempty"`
 
+	RunGroupId string `json:"runGroupId,omitempty"`
+
 	Variables []VariableSetValue `json:"variables,omitempty"`
 
 	RequiredGates *[]SupportedGates `json:"requiredGates,omitempty"`

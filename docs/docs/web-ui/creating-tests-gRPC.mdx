@@ -1,6 +1,6 @@
 ---
-id: creating-tests
-title: Creating Tests - HTTP
+id: creating-tests-gRPC
+title: Creating Tests - gRPC
 description: Tracetest enables creating tests visually in the Tracetest Web UI.
 hide_table_of_contents: false
 keywords:
@@ -11,6 +11,8 @@ keywords:
   - testing
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
+
+gRPC is used extensively in modern architectures and micro-services, so we added this very useful trigger type for creating tests in Tracetest.
 
 👉 **Join our [shared Pokeshop API Demo environment](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept) and try creating a Test yourself!**
 
@@ -24,7 +26,7 @@ The "Create New Test" dialog appears.
 Choose the kind of trigger to initiate the trace:
 
 - HTTP Request - Create a basic HTTP request.
-- GRPC Request - Test and debug your GRPC request.
+- gRPC Request - Test and debug your GRPC request.
 - Kafka - Test consumers with Kafka messages.
 - TraceID - Define your test via a TraceID.
 
@@ -39,29 +41,25 @@ Then, click one of the options to continue:
 
 ![Choose Trigger](../img/choose-trigger-0.16.png)
 
-In this example, an HTTP Request has been chosen.
+In this example, gRPC Request has been chosen.
 
-![Choose Example](../img/choose-example-0.14.png)
+![Choose Example](../img/choose-gRPC-0.16.png)
 
 Input the **Name** and **Trigger** details or select one of the example provided in the drop down:
 
-![Choose Example Pokemon](../img/choose-example-pokemon-0.14.png)
+![Choose Example Pokemon](../img/choose-example-pokemon-gRPC-0.16.png)
 
 The **Pokemon - Import** example has been chosen.
 
-![Choose Example Pokemon](../img/choose-example-pokemon-import-0.14.png)
+![Choose Example Pokemon](../img/choose-example-pokemon-import-gRPC-0.16.png)
 
 Add any additional information and click **Run**:
 
-![Create Test](../img/provide-addl-information-0.14.png)
-
-The test will start:
-
-![Awaiting Trace](../img/awaiting-trace-0.14.png)
+![Create Test](../img/provide-addl-information-gRPC-0.16.png)
 
 When the test is finished, you will get the following results:
 
-![Finished Trace](../img/finished-trace-0.14.png)
+![Finished Trace](../img/finished-trace-gRPC-0.16.png)
 
 Please visit the [Test Results](../web-ui/test-results.mdx) document for an explanation of viewing the results of a test.
 

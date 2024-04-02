@@ -23,6 +23,8 @@ type TestRun struct {
 	// Test version used when running this test run
 	TestVersion int32 `json:"testVersion,omitempty"`
 
+	RunGroupId string `json:"runGroupId,omitempty"`
+
 	// Current execution state
 	State string `json:"state,omitempty"`
 

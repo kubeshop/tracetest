@@ -22,6 +22,7 @@ var _ MappedNullable = &TestSuiteRun{}
 type TestSuiteRun struct {
 	Id                          *int32             `json:"id,omitempty"`
 	Version                     *int32             `json:"version,omitempty"`
+	RunGroupId                  *string            `json:"runGroupId,omitempty"`
 	CreatedAt                   *time.Time         `json:"createdAt,omitempty"`
 	CompletedAt                 *time.Time         `json:"completedAt,omitempty"`
 	State                       *string            `json:"state,omitempty"`
@@ -112,6 +113,38 @@ func (o *TestSuiteRun) HasVersion() bool {
 // SetVersion gets a reference to the given int32 and assigns it to the Version field.
 func (o *TestSuiteRun) SetVersion(v int32) {
 	o.Version = &v
+}
+
+// GetRunGroupId returns the RunGroupId field value if set, zero value otherwise.
+func (o *TestSuiteRun) GetRunGroupId() string {
+	if o == nil || isNil(o.RunGroupId) {
+		var ret string
+		return ret
+	}
+	return *o.RunGroupId
+}
+
+// GetRunGroupIdOk returns a tuple with the RunGroupId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TestSuiteRun) GetRunGroupIdOk() (*string, bool) {
+	if o == nil || isNil(o.RunGroupId) {
+		return nil, false
+	}
+	return o.RunGroupId, true
+}
+
+// HasRunGroupId returns a boolean if a field has been set.
+func (o *TestSuiteRun) HasRunGroupId() bool {
+	if o != nil && !isNil(o.RunGroupId) {
+		return true
+	}
+
+	return false
+}
+
+// SetRunGroupId gets a reference to the given string and assigns it to the RunGroupId field.
+func (o *TestSuiteRun) SetRunGroupId(v string) {
+	o.RunGroupId = &v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
@@ -414,6 +447,9 @@ func (o TestSuiteRun) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	// skip: id is readOnly
 	// skip: version is readOnly
+	if !isNil(o.RunGroupId) {
+		toSerialize["runGroupId"] = o.RunGroupId
+	}
 	if !isNil(o.CreatedAt) {
 		toSerialize["createdAt"] = o.CreatedAt
 	}

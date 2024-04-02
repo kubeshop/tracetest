@@ -141,7 +141,7 @@ You can:
   - Elastic
   - And, many more...
   - Tell us which other trace data stores you want supported!
-- Works out of the box by adding Tracetest as an [additional pipeline](https://docs.tracetest.io/getting-started/supported-backends#using-tracetest-without-a-backend) via your OpenTelemetry Collector config.
+- Works out of the box by adding Tracetest as an [additional pipeline](https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector) via your OpenTelemetry Collector config.
 - Supporting multiple ways of creating a test, including HTTP, GRPC and Postman Collections.
 - Visualize the changes you are making to your trace as you develop, enabling Observability-Driven Development.
 - [Add assertions](https://docs.tracetest.io/using-tracetest/adding-assertions) based on response data from the trigger request and all trace data contained in the spans of your distributed trace.
