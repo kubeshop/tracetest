@@ -28,7 +28,10 @@ func init() {
 		PreRun:  setupCommand(WithOptionalResourceName()),
 		Run: WithResourceMiddleware(func(ctx context.Context, _ *cobra.Command, args []string) (string, error) {
 			if cliConfig.Jwt != "" {
-				return cloudCmd.RunMultipleFiles(ctx, runParams, &cliConfig, runnerRegistry, output)
+				exitCode, err := cloudCmd.RunMultipleFiles(ctx, runParams, &cliConfig, runnerRegistry, output)
+
+				ExitCLI(exitCode)
+				return "", err
 			}
 
 			return runSingleFile(ctx)

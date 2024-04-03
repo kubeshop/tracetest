@@ -47,14 +47,16 @@ func (f multipleRun[T]) Format(output MultipleRunOutput[T], format Output) strin
 }
 
 type jsonSummary struct {
-	RunGroup openapi.RunGroup `json:"runGroup"`
-	Runs     []any            `json:"runs"`
+	RunGroup    openapi.RunGroup `json:"runGroup"`
+	RunGroupUrl string           `json:"runGroupUrl"`
+	Runs        []any            `json:"runs"`
 }
 
 func (f multipleRun[T]) json(output MultipleRunOutput[T]) string {
 	summary := jsonSummary{
-		RunGroup: output.RunGroup,
-		Runs:     make([]any, 0, len(output.Runs)),
+		RunGroup:    output.RunGroup,
+		RunGroupUrl: fmt.Sprintf("%s/run/%s", f.baseURLFn(), output.RunGroup.GetId()),
+		Runs:        make([]any, 0, len(output.Runs)),
 	}
 
 	for i, run := range output.Runs {
@@ -77,16 +79,18 @@ func (f multipleRun[T]) json(output MultipleRunOutput[T]) string {
 	return string(bytes) + "\n"
 }
 
+var messageTemplate = "%s RunGroup: #%s (%s)\n"
+
 func (f multipleRun[T]) pretty(output MultipleRunOutput[T]) string {
-	runGroupUrl := fmt.Sprintf("%s/run/%s", f.baseURLFn(), output.RunGroup.Id)
-	message := fmt.Sprintf("%s - %s - %s\n", PASSED_TEST_ICON, *output.RunGroup.Status, runGroupUrl)
+	runGroupUrl := fmt.Sprintf("%s/run/%s", f.baseURLFn(), output.RunGroup.GetId())
 	if !output.HasResults {
-		return f.getColoredText(true, message)
+		return fmt.Sprintf(messageTemplate, PROGRESS_TEST_ICON, output.RunGroup.GetId(), runGroupUrl)
 	}
 
+	message := fmt.Sprintf(messageTemplate, PASSED_TEST_ICON, output.RunGroup.GetId(), runGroupUrl)
 	allStepsPassed := output.RunGroup.Summary.GetFailed() == 0
 	if !allStepsPassed {
-		message = fmt.Sprintf("#%s - %s - %s\n", FAILED_TEST_ICON, *output.RunGroup.Status, runGroupUrl)
+		message = fmt.Sprintf(messageTemplate, FAILED_TEST_ICON, output.RunGroup.GetId(), runGroupUrl)
 	}
 
 	// the test suite name + all steps
@@ -96,12 +100,12 @@ func (f multipleRun[T]) pretty(output MultipleRunOutput[T]) string {
 	for i, run := range output.Runs {
 		resource := output.Resources[i]
 		runner, _ := output.RunnerGetter(resource)
-		result := runner.FormatResult(run, "json")
+		result := runner.FormatResult(run, "pretty")
 
 		formattedMessages = append(formattedMessages, result)
 	}
 
-	return strings.Join(formattedMessages, "")
+	return strings.Join(formattedMessages, "  ")
 }
 
 func (f multipleRun[T]) getColoredText(passed bool, text string) string {

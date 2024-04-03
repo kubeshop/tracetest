@@ -40,7 +40,7 @@ var (
 	httpClient = &resourcemanager.HTTPClient{}
 
 	variableSetPreprocessor = preprocessor.VariableSet(cliLogger)
-	variableSetClient       = cmdutil.GetVariableSetClient(variableSetPreprocessor)
+	variableSetClient       = GetVariableSetClient(variableSetPreprocessor)
 
 	testPreprocessor = preprocessor.Test(cliLogger)
 	testClient       = resourcemanager.NewClient(
@@ -323,4 +323,25 @@ func formatItemDate(item *gabs.Container, path string) error {
 
 	item.SetP(date.Format(time.DateTime), path)
 	return nil
+}
+
+func GetVariableSetClient(preprocessor preprocessor.Preprocessor) resourcemanager.Client {
+	httpClient := &resourcemanager.HTTPClient{}
+
+	variableSetClient := resourcemanager.NewClient(
+		httpClient, cmdutil.GetLogger(),
+		"variableset", "variablesets",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "DESCRIPTION", Path: "spec.description"},
+			},
+		}),
+		resourcemanager.WithResourceType("VariableSet"),
+		resourcemanager.WithApplyPreProcessor(preprocessor.Preprocess),
+		resourcemanager.WithDeprecatedAlias("Environment"),
+	)
+
+	return variableSetClient
 }

@@ -22,9 +22,9 @@ func WithVerbose(verbose bool) loggerOption {
 }
 
 func GetLogger(opts ...loggerOption) *zap.Logger {
-	if logger != nil {
-		return logger
-	}
+	// if logger != nil {
+	// 	return logger
+	// }
 
 	loggerConfig := loggerConfig{}
 	for _, opt := range opts {
@@ -53,11 +53,9 @@ func GetLogger(opts ...loggerOption) *zap.Logger {
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
 
-	logger = zap.New(zapcore.NewCore(
+	return zap.New(zapcore.NewCore(
 		zapcore.NewConsoleEncoder(encoderCfg),
 		zapcore.Lock(os.Stdout),
 		atom,
 	))
-
-	return logger
 }

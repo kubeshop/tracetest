@@ -18,6 +18,7 @@ func GetResourceType(input any) (string, error) {
 		if typeField.Name == "Type" {
 			f := valueField.Interface()
 			val := reflect.ValueOf(f)
+			val = reflect.Indirect(val)
 
 			return val.String(), nil
 		}

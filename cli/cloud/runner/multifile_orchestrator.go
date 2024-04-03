@@ -220,7 +220,7 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 	output := formatters.MultipleRunOutput[runner.RunResult]{
 		Runs:         runsResults,
 		Resources:    resources,
-		RunGroup:     openapi.RunGroup{Id: runGroupID},
+		RunGroup:     runGroup,
 		RunnerGetter: runnerGetter,
 		HasResults:   true,
 	}

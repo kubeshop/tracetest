@@ -8,14 +8,15 @@ import (
 	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
+	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/preprocessor"
 
 	cliRunner "github.com/kubeshop/tracetest/cli/runner"
 )
 
-func RunMultipleFiles(ctx context.Context, runParams *cmdutil.RunParameters, cliConfig *config.Config, runnerRegistry cliRunner.Registry, format string) (string, error) {
+func RunMultipleFiles(ctx context.Context, runParams *cmdutil.RunParameters, cliConfig *config.Config, runnerRegistry cliRunner.Registry, format string) (int, error) {
 	if cliConfig.Jwt == "" {
-		return "", fmt.Errorf("you should be authenticated to run multiple files, please run 'tracetest configure'")
+		return cliRunner.ExitCodeGeneralError, fmt.Errorf("you should be authenticated to run multiple files, please run 'tracetest configure'")
 	}
 
 	variableSetPreprocessor := preprocessor.VariableSet(cmdutil.GetLogger())
@@ -25,18 +26,37 @@ func RunMultipleFiles(ctx context.Context, runParams *cmdutil.RunParameters, cli
 	orchestrator := runner.MultiFileOrchestrator(
 		cmdutil.GetLogger(),
 		config.GetAPIClient(*cliConfig),
-		cmdutil.GetVariableSetClient(variableSetPreprocessor),
+		GetVariableSetClient(variableSetPreprocessor),
 		runnerRegistry,
 		formatter,
 	)
 
-	orchestrator.Run(ctx, runner.RunOptions{
+	return orchestrator.Run(ctx, runner.RunOptions{
 		DefinitionFiles: runParams.DefinitionFiles,
 		VarsID:          runParams.VarsID,
 		SkipResultWait:  runParams.SkipResultWait,
 		JUnitOuptutFile: runParams.JUnitOuptutFile,
 		RequiredGates:   runParams.RequiredGates,
 	}, format)
+}
 
-	return "", nil
+func GetVariableSetClient(preprocessor preprocessor.Preprocessor) resourcemanager.Client {
+	httpClient := &resourcemanager.HTTPClient{}
+
+	variableSetClient := resourcemanager.NewClient(
+		httpClient, cmdutil.GetLogger(),
+		"variableset", "variablesets",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "DESCRIPTION", Path: "spec.description"},
+			},
+		}),
+		resourcemanager.WithResourceType("VariableSet"),
+		resourcemanager.WithApplyPreProcessor(preprocessor.Preprocess),
+		resourcemanager.WithDeprecatedAlias("Environment"),
+	)
+
+	return variableSetClient
 }
