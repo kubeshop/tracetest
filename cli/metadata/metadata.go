@@ -1,6 +1,9 @@
 package metadata
 
-import cienvironment "github.com/cucumber/ci-environment/go"
+import (
+	cienvironment "github.com/cucumber/ci-environment/go"
+	"github.com/kubeshop/tracetest/cli/config"
+)
 
 var (
 	tracetestSource     = "tracetest.source"
@@ -29,7 +32,7 @@ func GetMetadata() Metadata {
 	// https://github.com/grafana/k6/issues/1320#issuecomment-2032734378
 	metadata := Metadata{}
 	metadata[tracetestSource] = "cli"
-	metadata[tracetestCliVersion] = "0.1.8"
+	metadata[tracetestCliVersion] = config.Version
 
 	ci := cienvironment.DetectCIEnvironment()
 	if ci == nil {
