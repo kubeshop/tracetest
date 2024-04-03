@@ -2,6 +2,7 @@ package runner
 
 import (
 	"fmt"
+	"strings"
 
 	"go.uber.org/zap"
 )
@@ -33,13 +34,13 @@ func (r Registry) RegisterProxy(proxyName, runnerName string) Registry {
 var ErrNotFound = fmt.Errorf("runner not found")
 
 func (r Registry) Get(name string) (Runner, error) {
-	runner, ok := r.runners[name]
+	runner, ok := r.runners[strings.ToLower(name)]
 	if ok {
 		return runner, nil // found runner, return it to the user
 	}
 
 	// fallback, check if the runner has a proxy
-	runnerName, ok := r.proxies[name]
+	runnerName, ok := r.proxies[strings.ToLower(name)]
 	if !ok {
 		return nil, ErrNotFound
 	}
