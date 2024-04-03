@@ -11,7 +11,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/server/otlp"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"go.uber.org/zap"
@@ -108,6 +108,7 @@ func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
 }
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
+	request.ResourceSpans = fixDatadogTraceID(request.ResourceSpans)
 	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
 
@@ -144,6 +145,37 @@ func countSpans(request *pb.ExportTraceServiceRequest) int {
 	}
 
 	return count
+}
+
+func fixDatadogTraceID(in []*v1.ResourceSpans) []*v1.ResourceSpans {
+	for _, resourceSpan := range in {
+		for _, scopeSpan := range resourceSpan.ScopeSpans {
+			for _, span := range scopeSpan.Spans {
+				traceID := getTraceIDFromDatadogSpan(span)
+				span.TraceId = []byte(traceID.String())
+			}
+		}
+	}
+
+	return in
+}
+
+func getTraceIDFromDatadogSpan(span *v1.Span) trace.TraceID {
+	firstHalfTraceID := ""
+	for _, attr := range span.Attributes {
+		if attr.Key == "_dd.p.tid" {
+			firstHalfTraceID = attr.Value.GetStringValue()
+			break
+		}
+	}
+
+	realTraceID := firstHalfTraceID + trace.TraceID(span.TraceId).String()[16:]
+	traceID, err := trace.TraceIDFromHex(realTraceID)
+	if err != nil {
+		return trace.TraceID{}
+	}
+
+	return traceID
 }
 
 func (i *forwardIngester) connectToRemoteServer(ctx context.Context) error {
