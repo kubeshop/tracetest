@@ -7,22 +7,37 @@ export const options = {
 };
 
 const http = new Http();
-const testId = "kc_MgKoVR";
 const tracetest = Tracetest();
 
 let pokemonId = 6;
 
 export default function () {
-  const url = "http://localhost:8081/pokemon/import";
+  const url = "http://demo-api:8081/pokemon/import";
+  const definition = `type: Test
+spec:
+  id: import-pokemon-k6
+  name: K6
+  description: K6
+  trigger:
+    type: k6
+  specs:
+    - selector: span[tracetest.span.type="general" name="import pokemon"]
+      name: Should have imported the pokemon
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: |-
+        span[tracetest.span.type="http" net.peer.name="pokeapi.co" http.method="GET"]
+      name: Should trigger a request to the POKEAPI
+      assertions:
+        - attr:http.url   =  "https://pokeapi.co/api/v2/pokemon/${pokemonId}"
+`;
+
   const payload = JSON.stringify({
     id: pokemonId++,
   });
   const params = {
     headers: {
       "Content-Type": "application/json",
-    },
-    tracetest: {
-      testId,
     },
   };
 
@@ -31,12 +46,10 @@ export default function () {
   tracetest.runTest(
     response.trace_id,
     {
-      test_id: testId,
-      variable_name: "TRACE_ID",
       should_wait: true,
+      definition,
     },
     {
-      id: "123",
       url,
       method: "GET",
     }
