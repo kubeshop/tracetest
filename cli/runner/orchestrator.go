@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/kubeshop/tracetest/cli/metadata"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
@@ -175,7 +175,7 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 		runInfo := openapi.RunInformation{
 			VariableSetId: &varsID,
 			Variables:     ev.ToOpenapi(),
-			Metadata:      getMetadata(),
+			Metadata:      metadata.GetMetadata(),
 			RequiredGates: getRequiredGates(opts.RequiredGates),
 		}
 
@@ -341,30 +341,6 @@ func (a orchestrator) writeJUnitReport(ctx context.Context, r Runner, result Run
 }
 
 var source = "cli"
-
-func getMetadata() map[string]string {
-	ci := cienvironment.DetectCIEnvironment()
-	if ci == nil {
-		return map[string]string{
-			"source": source,
-		}
-	}
-
-	metadata := map[string]string{
-		"name":        ci.Name,
-		"url":         ci.URL,
-		"buildNumber": ci.BuildNumber,
-		"source":      source,
-	}
-
-	if ci.Git != nil {
-		metadata["branch"] = ci.Git.Branch
-		metadata["tag"] = ci.Git.Tag
-		metadata["revision"] = ci.Git.Revision
-	}
-
-	return metadata
-}
 
 func getRequiredGates(gates []string) []openapi.SupportedGates {
 	if len(gates) == 0 {
