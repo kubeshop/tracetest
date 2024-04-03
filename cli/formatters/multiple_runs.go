@@ -9,19 +9,19 @@ import (
 	"github.com/pterm/pterm"
 )
 
-type RunnerGetter func(resource any) (Runner, error)
+type RunnerGetter[T any] func(resource any) (Runner[T], error)
 
-type Runner interface {
-	FormatResult(result any, format string) string
+type Runner[T any] interface {
+	FormatResult(resource T, format string) string
 }
 
-type multipleRun struct {
+type multipleRun[T any] struct {
 	baseURLFn     func() string
 	colorsEnabled bool
 }
 
-func MultipleRun(baseURLFn func() string, colorsEnabled bool) multipleRun {
-	return multipleRun{
+func MultipleRun[T any](baseURLFn func() string, colorsEnabled bool) multipleRun[T] {
+	return multipleRun[T]{
 		baseURLFn:     baseURLFn,
 		colorsEnabled: colorsEnabled,
 	}
@@ -32,10 +32,10 @@ type MultipleRunOutput[T any] struct {
 	Resources    []any
 	HasResults   bool
 	RunGroup     openapi.RunGroup
-	RunnerGetter RunnerGetter
+	RunnerGetter RunnerGetter[T]
 }
 
-func (f multipleRun) Format(output MultipleRunOutput[any], format Output) string {
+func (f multipleRun[T]) Format(output MultipleRunOutput[T], format Output) string {
 	switch format {
 	case JSON:
 		return f.json(output)
@@ -51,7 +51,7 @@ type jsonSummary struct {
 	Runs     []any            `json:"runs"`
 }
 
-func (f multipleRun) json(output MultipleRunOutput[any]) string {
+func (f multipleRun[T]) json(output MultipleRunOutput[T]) string {
 	summary := jsonSummary{
 		RunGroup: output.RunGroup,
 		Runs:     make([]any, 0, len(output.Runs)),
@@ -77,16 +77,16 @@ func (f multipleRun) json(output MultipleRunOutput[any]) string {
 	return string(bytes) + "\n"
 }
 
-func (f multipleRun) pretty(output MultipleRunOutput[any]) string {
+func (f multipleRun[T]) pretty(output MultipleRunOutput[T]) string {
 	runGroupUrl := fmt.Sprintf("%s/run/%s", f.baseURLFn(), output.RunGroup.Id)
-	message := fmt.Sprintf("%s - %s - %s\n", PASSED_TEST_ICON, output.RunGroup.Status, runGroupUrl)
+	message := fmt.Sprintf("%s - %s - %s\n", PASSED_TEST_ICON, *output.RunGroup.Status, runGroupUrl)
 	if !output.HasResults {
 		return f.getColoredText(true, message)
 	}
 
 	allStepsPassed := output.RunGroup.Summary.GetFailed() == 0
 	if !allStepsPassed {
-		message = fmt.Sprintf("#%s - %s - %s\n", FAILED_TEST_ICON, output.RunGroup.Status, runGroupUrl)
+		message = fmt.Sprintf("#%s - %s - %s\n", FAILED_TEST_ICON, *output.RunGroup.Status, runGroupUrl)
 	}
 
 	// the test suite name + all steps
@@ -104,7 +104,7 @@ func (f multipleRun) pretty(output MultipleRunOutput[any]) string {
 	return strings.Join(formattedMessages, "")
 }
 
-func (f multipleRun) getColoredText(passed bool, text string) string {
+func (f multipleRun[T]) getColoredText(passed bool, text string) string {
 	if !f.colorsEnabled {
 		return text
 	}

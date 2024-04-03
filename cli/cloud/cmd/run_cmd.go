@@ -20,7 +20,7 @@ func RunMultipleFiles(ctx context.Context, runParams *cmdutil.RunParameters, cli
 
 	variableSetPreprocessor := preprocessor.VariableSet(cmdutil.GetLogger())
 
-	formatter := formatters.MultipleRun(func() string { return cliConfig.UI() }, true)
+	formatter := formatters.MultipleRun[cliRunner.RunResult](func() string { return cliConfig.UI() }, true)
 
 	orchestrator := runner.MultiFileOrchestrator(
 		cmdutil.GetLogger(),

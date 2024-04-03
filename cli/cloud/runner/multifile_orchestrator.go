@@ -44,7 +44,7 @@ type RunOptions struct {
 }
 
 type MultipleRunFormatter interface {
-	Format(output formatters.MultipleRunOutput[any], format formatters.Output) string
+	Format(output formatters.MultipleRunOutput[runner.RunResult], format formatters.Output) string
 }
 
 func MultiFileOrchestrator(
@@ -217,7 +217,7 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 		}
 	}
 
-	output := formatters.MultipleRunOutput[any]{
+	output := formatters.MultipleRunOutput[runner.RunResult]{
 		Runs:         runsResults,
 		Resources:    resources,
 		RunGroup:     openapi.RunGroup{Id: runGroupID},
