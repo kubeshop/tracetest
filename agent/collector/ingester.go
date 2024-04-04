@@ -7,11 +7,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubeshop/tracetest/agent/collector/processors"
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/server/otlp"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"go.uber.org/zap"
@@ -43,6 +44,9 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 		traceCache:     cfg.traceCache,
 		logger:         cfg.logger,
 		sensor:         cfg.sensor,
+		processors: []processors.Processor{
+			processors.NewDatadogProcessor(),
+		},
 	}
 
 	if startRemoteServer {
@@ -62,6 +66,9 @@ type Statistics struct {
 	LastSpanTimestamp time.Time
 }
 
+type processor interface {
+}
+
 // forwardIngester forwards all incoming spans to a remote ingester. It also batches those
 // spans to reduce network traffic.
 type forwardIngester struct {
@@ -76,6 +83,8 @@ type forwardIngester struct {
 	sensor         sensors.Sensor
 
 	statistics Statistics
+
+	processors []processors.Processor
 
 	sync.Mutex
 }
@@ -108,6 +117,10 @@ func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
 }
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
+	for _, processor := range i.processors {
+		request = processor.Process(request)
+	}
+
 	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
 
