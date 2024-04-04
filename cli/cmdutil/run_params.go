@@ -17,6 +17,7 @@ type RunParameters struct {
 	JUnitOuptutFile string
 	RequiredGates   []string
 	RunGroupID      string
+	ResourceName    string
 }
 
 func (p RunParameters) Validate(cmd *cobra.Command, args []string) []error {
@@ -29,6 +30,14 @@ func (p RunParameters) Validate(cmd *cobra.Command, args []string) []error {
 		errs = append(errs, ParamError{
 			Parameter: "resource",
 			Message:   "you must specify at least one definition file or resource ID",
+		})
+	}
+
+	isResourceNameSpecified := len(args) > 0
+	if hasFileIDsSpecified && !isResourceNameSpecified {
+		errs = append(errs, ParamError{
+			Parameter: "resource",
+			Message:   "you must specify a resource name (test|testsuite) when providing a resource ID",
 		})
 	}
 
