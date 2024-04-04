@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
 )
@@ -20,7 +21,7 @@ type generic struct {
 
 func VariableSet(logger *zap.Logger) variableSet {
 	return variableSet{
-		logger: logger,
+		logger: cmdutil.GetLogger(),
 	}
 }
 

@@ -83,31 +83,10 @@ func runSingleFile(ctx context.Context) (string, error) {
 	}
 
 	exitCode, err := orchestrator.Run(ctx, runParams, output)
-	if err != nil {
-		return "", err
-	}
-
 	ExitCLI(exitCode)
 
 	// ExitCLI will exit the process, so this return is just to satisfy the compiler
-	return "", nil
-}
-
-func getResourceType(runParams *cmdutil.RunParameters, resourceParams *resourceParameters) (string, error) {
-	if resourceParams.ResourceName != "" {
-		return resourceParams.ResourceName, nil
-	}
-
-	filePath := ""
-	if runParams.DefinitionFiles != nil && len(runParams.DefinitionFiles) > 0 {
-		filePath = runParams.DefinitionFiles[0]
-	}
-
-	if filePath != "" {
-		return cmdutil.GetResourceTypeFromFile(filePath)
-	}
-
-	return "", fmt.Errorf("resourceName is empty and no definition file provided")
+	return "", err
 }
 
 func validRequiredGatesMsg() string {
