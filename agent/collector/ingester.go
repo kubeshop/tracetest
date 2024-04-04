@@ -115,7 +115,12 @@ func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
 	for _, processor := range i.processors {
-		request = processor.Process(request)
+		newRequest, err := processor.Process(request)
+		if err != nil {
+			return nil, fmt.Errorf("cannot run processor: %w", err)
+		}
+
+		request = newRequest
 	}
 
 	spanCount := countSpans(request)

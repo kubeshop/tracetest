@@ -6,6 +6,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/collector/processors"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v11 "go.opentelemetry.io/proto/otlp/common/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
@@ -15,7 +16,10 @@ func TestTraceIDConcat(t *testing.T) {
 	traceID := id.NewRandGenerator().TraceID()
 
 	firstHalf := traceID.String()[0:16]
-	lastHalf := traceID[8:]
+	lastHalf := make([]byte, 16)
+	for i := 8; i < 16; i++ {
+		lastHalf[i] = traceID[i]
+	}
 
 	request := &pb.ExportTraceServiceRequest{
 		ResourceSpans: []*v1.ResourceSpans{
@@ -40,17 +44,14 @@ func TestTraceIDConcat(t *testing.T) {
 		},
 	}
 
-	originalSpanIds := getSpansIDs(request)
-
 	datadogProcessor := processors.NewDatadogProcessor()
-	alteredRequest := datadogProcessor.Process(request)
+	alteredRequest, err := datadogProcessor.Process(request)
+	require.NoError(t, err)
 
 	newSpanIds := getSpansIDs(alteredRequest)
 
-	for i, originalSpanID := range originalSpanIds {
-		newSpanID := newSpanIds[i]
-		assert.NotEqual(t, originalSpanID, newSpanID)
-		assert.Equal(t, traceID[:], newSpanID)
+	for _, newTraceID := range newSpanIds {
+		assert.Equal(t, traceID[:], newTraceID)
 	}
 }
 
