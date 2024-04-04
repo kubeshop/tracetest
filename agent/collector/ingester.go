@@ -66,9 +66,6 @@ type Statistics struct {
 	LastSpanTimestamp time.Time
 }
 
-type processor interface {
-}
-
 // forwardIngester forwards all incoming spans to a remote ingester. It also batches those
 // spans to reduce network traffic.
 type forwardIngester struct {
