@@ -37,6 +37,7 @@ func RunMultipleFiles(ctx context.Context, runParams *cmdutil.RunParameters, cli
 		SkipResultWait:  runParams.SkipResultWait,
 		JUnitOuptutFile: runParams.JUnitOuptutFile,
 		RequiredGates:   runParams.RequiredGates,
+		RunGroupID:      runParams.RunGroupID,
 	}, format)
 }
 

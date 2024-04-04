@@ -16,6 +16,7 @@ type RunParameters struct {
 	SkipResultWait  bool
 	JUnitOuptutFile string
 	RequiredGates   []string
+	RunGroupID      string
 }
 
 func (p RunParameters) Validate(cmd *cobra.Command, args []string) []error {

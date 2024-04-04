@@ -14,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/metadata"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/runner"
 	"github.com/kubeshop/tracetest/cli/varset"
@@ -30,6 +31,9 @@ type RunOptions struct {
 
 	// varsID or path to the file with environment definition
 	VarsID string
+
+	// runGroupID as string to define it for the entire run execution
+	RunGroupID string
 
 	// By default the runner will wait for the result of the run
 	// if this option is true, the wait will be skipped
@@ -97,62 +101,35 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 	o.logger.Debug("env resolved", zap.String("ID", varsID))
 
 	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
-
 	resourceFetcher := runner.GetResourceFetcher(o.logger, o.runnerRegistry)
 
 	if !hasDefinitionFilesDefined {
 		return ExitCodeGeneralError, fmt.Errorf("you must define at least two files to use the multifile orchestrator")
 	}
 
-	var ev varset.VarSets
+	vars := varset.VarSets{}
 	var resources []any
 
-	runGroupID := id.GenerateID().String()
+	runGroupID := opts.RunGroupID
+	if runGroupID == "" {
+		runGroupID = id.GenerateID().String()
+	}
 	runsResults := make([]runner.RunResult, 0)
+	definitionFiles, err := o.getDefinitionFiles(opts.DefinitionFiles)
+
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot read definition files: %w", err)
+	}
 
 	// 1. create runs
-	for _, definitionFile := range opts.DefinitionFiles {
-		resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
+	for _, definitionFile := range definitionFiles {
+		result, resource, err := o.createRun(ctx, resourceFetcher, &vars, opts.RequiredGates, definitionFile, varsID, runGroupID)
 		if err != nil {
-			return ExitCodeGeneralError, err
+			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
 		}
 
-		resourceType, err := resourcemanager.GetResourceType(resource)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot extract type from resource: %w", err)
-		}
-
-		runner, err := o.runnerRegistry.Get(resourceType)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot find runner for resource type %s: %w", resourceType, err)
-		}
-
-		runInfo := openapi.RunInformation{
-			VariableSetId: &varsID,
-			Variables:     ev.ToOpenapi(),
-			Metadata:      metadata.GetMetadata(),
-			RequiredGates: getRequiredGates(opts.RequiredGates),
-			RunGroupId:    &runGroupID,
-		}
-
-		// 2. validate missing vars
-		for {
-			result, err := runner.StartRun(ctx, resource, runInfo)
-			if err == nil {
-				runsResults = append(runsResults, result)
-				resources = append(resources, resource)
-
-				break
-			}
-			if !errors.Is(err, varset.MissingVarsError{}) {
-				// actual error, return
-				return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
-			}
-
-			// missing vars error
-			ev = varset.AskForMissingVars([]varset.VarSet(err.(varset.MissingVarsError)))
-			o.logger.Debug("filled variables", zap.Any("variables", ev))
-		}
+		runsResults = append(runsResults, result)
+		resources = append(resources, resource)
 	}
 
 	runnerGetter := func(resource any) (formatters.Runner[runner.RunResult], error) {
@@ -234,6 +211,58 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 	}
 
 	return exitCode, nil
+}
+
+func (o orchestrator) getDefinitionFiles(file []string) ([]string, error) {
+	files := make([]string, 0)
+
+	for _, f := range file {
+		files = append(files, fileutil.ReadDirFileNames(f)...)
+	}
+
+	return files, nil
+}
+
+func (o orchestrator) createRun(ctx context.Context, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, requiredGates []string, definitionFile string, varsID string, runGroupID string) (runner.RunResult, any, error) {
+	resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
+	if err != nil {
+		return runner.RunResult{}, nil, err
+	}
+
+	resourceType, err := resourcemanager.GetResourceType(resource)
+	if err != nil {
+		return runner.RunResult{}, nil, fmt.Errorf("cannot extract type from resource: %w", err)
+	}
+
+	r, err := o.runnerRegistry.Get(resourceType)
+	if err != nil {
+		return runner.RunResult{}, nil, fmt.Errorf("cannot find runner for resource type %s: %w", resourceType, err)
+	}
+
+	runInfo := openapi.RunInformation{
+		VariableSetId: &varsID,
+		Variables:     vars.ToOpenapi(),
+		Metadata:      metadata.GetMetadata(),
+		RequiredGates: getRequiredGates(requiredGates),
+		RunGroupId:    &runGroupID,
+	}
+
+	// 2. validate missing vars
+	for {
+		result, err := r.StartRun(ctx, resource, runInfo)
+		if err == nil {
+			return result, resource, nil
+		}
+		if !errors.Is(err, varset.MissingVarsError{}) {
+			// actual error, return
+			return result, resource, fmt.Errorf("cannot run test: %w", err)
+		}
+
+		// missing vars error
+		newVars := varset.AskForMissingVars([]varset.VarSet(err.(varset.MissingVarsError)))
+		vars = &newVars
+		o.logger.Debug("filled variables", zap.Any("variables", vars))
+	}
 }
 
 func (o orchestrator) waitForRunGroup(ctx context.Context, runGroupID string) (openapi.RunGroup, error) {

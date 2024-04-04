@@ -43,6 +43,7 @@ func init() {
 	runCmd.Flags().StringSliceVarP(&runParams.DefinitionFiles, "file", "f", []string{}, "path to the definition file (can be defined multiple times)")
 	runCmd.Flags().StringVarP(&runParams.ID, "id", "", "", "id of the resource to run (can be defined multiple times)")
 	runCmd.Flags().StringVarP(&runParams.VarsID, "vars", "", "", "variable set file or ID to be used")
+	runCmd.Flags().StringVarP(&runParams.RunGroupID, "group", "g", "", "Sets the Run Group ID for the run. This is used to group multiple runs together.")
 	runCmd.Flags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
 	runCmd.Flags().StringVarP(&runParams.JUnitOuptutFile, "junit", "j", "", "file path to save test results in junit format")
 	runCmd.Flags().StringSliceVar(&runParams.RequiredGates, "required-gates", []string{}, "override default required gate. "+validRequiredGatesMsg())

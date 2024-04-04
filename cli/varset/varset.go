@@ -10,7 +10,7 @@ import (
 
 var jsonFormat = resourcemanager.Formats.Get(resourcemanager.FormatJSON)
 
-func AskForMissingVars(missingVars []VarSet) []VarSet {
+func AskForMissingVars(missingVars []VarSet) VarSets {
 	ui.DefaultUI.Warning("Some variables are required by one or more tests")
 	ui.DefaultUI.Info("Fill the values for each variable:")
 

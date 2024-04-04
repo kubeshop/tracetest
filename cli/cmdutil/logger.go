@@ -22,9 +22,9 @@ func WithVerbose(verbose bool) loggerOption {
 }
 
 func GetLogger(opts ...loggerOption) *zap.Logger {
-	// if logger != nil {
-	// 	return logger
-	// }
+	if logger != nil {
+		return logger
+	}
 
 	loggerConfig := loggerConfig{}
 	for _, opt := range opts {
