@@ -103,10 +103,8 @@ Follow these instructions to run the Cypress example:
 2. Log into the [Tracetest app](https://app.tracetest.io/).
 3. This example is configured to use Jaeger. Ensure the environment you will be utilizing to run this example is also configured to use the Jaeger Tracing Backend by clicking on Settings, Tracing Backend, Jaeger, updating the URL to `jaeger:16685`, Test Connection and Save.
 4. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
-5. Run `docker compose -f docker-compose.yml -f docker-compose.e2e.yml up -d`.
-6. Run `npm i` in the root folder to install the dependencies.
-7. [Install k6 Tracetest extension](https://github.com/grafana/xk6) for your OS. This will create a `k6` binary.
-8. Run `XK6_TRACETEST_API_TOKEN=<TRACETEST_API_TOKEN> ./k6 run ./test/k6/import-pokemon.js -o xk6-tracetest`.
+5. Change the `POKESHOP_DEMO_URL` to `http://api:8081` in the `.env` file.
+6. Run `docker compose -f docker-compose.yml -f docker-compose.k6.yml run k6-tracetest`.
 
 Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
@@ -119,7 +117,7 @@ The project is built with Docker Compose.
 The [Pokeshop Demo App](/live-examples/pokeshop/overview) is a complete example of a distributed application using different backend and front-end services, implementation code is written in Typescript.
 
 The `docker-compose.yml` file in the root directory is for the Pokeshop Demo app and the OpenTelemetry setup.
-And the `docker-compose.e2e.yml` includes the [Tracetest Agent](/concepts/agent).
+And the `docker-compose.k6.yml` includes the [Tracetest Agent](/concepts/agent) and the K6 Load Tests.
 
 Finally, the k6 load tests can be found in `test/k6/import-pokemon.js`.
 
@@ -167,20 +165,45 @@ The instructions can be also found in the main [k6 docs](https://k6.io/docs/exte
 
 Once you have installed the k6 Tracetest binary, you can use the base k6 functionality to run load tests against instrumented services and Tracetest to run checks against the resulting telemetry data.
 
-## Creating Your Tracetest Test Definition
+## Creating Your k6 Script
 
-The `test/k6/import-pokemon.yaml` file contains the test definition that will be used to run the tests. It uses the trace id trigger which is required for the k6 integrations as well as adding assertions using test-based TDD patterns.
+The `test/k6/import-pokemon.js` file contains the k6 script that will be used to run the performance tests. It is a simple script that will trigger a `POST` request to the `/pokemon/import` Pokeshop Demo app endpoint.
 
-```yaml
-type: Test
+```javascript
+import { Http, Tracetest } from 'k6/x/tracetest';
+import { sleep } from 'k6';
+
+export const options = {
+  vus: 1,
+  duration: '5s',
+};
+
+const POKESHOP_DEMO_URL = __ENV.POKESHOP_DEMO_URL || 'http://localhost:8081';
+
+const http = new Http();
+const tracetest = Tracetest();
+
+let pokemonId = 6; // charizard
+
+export default function () {
+  const url = `${POKESHOP_DEMO_URL}/pokemon/import`;
+  const payload = JSON.stringify({
+    id: pokemonId++,
+  });
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+// tracetest test definition
+  const definition = `type: Test
 spec:
-  id: kc_MgKoVR
+  id: k6-tracetest-pokeshop-import-pokemon
   name: K6
   description: K6
   trigger:
-    type: traceid
-    traceid:
-      id: ${env:TRACE_ID}
+    type: k6
   specs:
     - selector: span[tracetest.span.type="general" name="import pokemon"]
       name: Should have imported the pokemon
@@ -190,66 +213,20 @@ spec:
         span[tracetest.span.type="http" net.peer.name="pokeapi.co" http.method="GET"]
       name: Should trigger a request to the POKEAPI
       assertions:
-        - attr:http.url   =  "https://pokeapi.co/api/v2/pokemon/6"
-    - selector: span[tracetest.span.type="database" name="create postgres.pokemon"]
-      name: Should insert the pokemon to the DB
-      assertions:
-        - attr:db.result | json_path '.name'  =  "charizard"
-```
-
-Create the test using the following command:
-
-```bash
-tracetest configure -t <TRACETEST_API_TOKEN>
-tracetest apply test -f ./test/k6/import-pokemon.yaml
-```
-
-## Creating Your k6 Script
-
-The `test/k6/import-pokemon.js` file contains the k6 script that will be used to run the performance tests. It is a simple script that will trigger a `POST` request to the `/pokemon/import` Pokeshop Demo app endpoint.
-
-```javascript
-import { Http, Tracetest } from "k6/x/tracetest";
-import { sleep } from "k6";
-
-export const options = {
-  vus: 1,
-  duration: "5s",
-};
-
-const http = new Http();
-const testId = "kc_MgKoVR";
-const tracetest = Tracetest();
-
-let pokemonId = 6; // charizard
-
-export default function () {
-  const url = "http://localhost:8081/pokemon/import";
-  const payload = JSON.stringify({
-    id: pokemonId++,
-  });
-  const params = {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    tracetest: {
-      testId,
-    },
-  };
+        - attr:http.url   =  "https://pokeapi.co/api/v2/pokemon/${pokemonId}"
+`;
 
   const response = http.post(url, payload, params);
 
   tracetest.runTest(
     response.trace_id,
     {
-      test_id: testId,
-      variable_name: "TRACE_ID",
+      definition,
       should_wait: true,
     },
     {
-      id: "123",
       url,
-      method: "GET",
+      method: 'GET',
     }
   );
 
@@ -280,27 +257,35 @@ Add the [Tracetest API Token](/concepts/environment-tokens) and [Tracetest Agent
 ```bash title=.env
 TRACETEST_API_TOKEN=<YOUR_API_TOKEN> # your environment token
 TRACETEST_AGENT_API_KEY=<YOUR_AGENT_API_KEY>
-POKESHOP_DEMO_URL=http://localhost:8081
+POKESHOP_DEMO_URL=http://api:8081
 ```
 
 ### Starting the Pokeshop Demo App
 
-To start the Pokeshop Demo App, run the following command from the root directory:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.e2e.yml up
-```
-
-This will start the Pokeshop Demo HTTP API on `http://localhost:8081/`.
-
-## Run the k6 Script
-
 Having the full setup ready, the final step is to run the k6 script. To do that, run the following command:
 
 ```bash
-XK6_TRACETEST_API_TOKEN=<TRACETEST_API_TOKEN> ./k6 run ./test/k6/import-pokemon.js -o xk6-tracetest
-context menu
-
+docker compose -f docker-compose.yml -f docker-compose.k6.yml run k6-tracetest
+WARN[0000] The "TRACETEST_SERVER_URL" variable is not set. Defaulting to a blank string.
+[+] Creating 9/9
+ ✔ Network pokeshop_default              Created                                                                                                                  0.0s
+ ✔ Container pokeshop-jaeger-1           Created                                                                                                                  0.1s
+ ✔ Container pokeshop-db-1               Created                                                                                                                  0.1s
+ ✔ Container pokeshop-cache-1            Created                                                                                                                  0.1s
+ ✔ Container pokeshop-queue-1            Created                                                                                                                  0.1s
+ ✔ Container pokeshop-tracetest-agent-1  Created                                                                                                                  0.1s
+ ✔ Container pokeshop-otel-collector-1   Created                                                                                                                  0.1s
+ ✔ Container pokeshop-worker-1           Created                                                                                                                  0.1s
+ ✔ Container pokeshop-api-1              Created                                                                                                                  0.1s
+[+] Running 8/8
+ ✔ Container pokeshop-queue-1            Healthy                                                                                                                  7.7s
+ ✔ Container pokeshop-cache-1            Healthy                                                                                                                  2.7s
+ ✔ Container pokeshop-db-1               Healthy                                                                                                                  2.7s
+ ✔ Container pokeshop-tracetest-agent-1  Started                                                                                                                  0.5s
+ ✔ Container pokeshop-jaeger-1           Healthy                                                                                                                  2.1s
+ ✔ Container pokeshop-otel-collector-1   Started                                                                                                                  0.1s
+ ✔ Container pokeshop-api-1              Started                                                                                                                  0.2s
+ ✔ Container pokeshop-worker-1           Started                                                                                                                  0.1s
 
           /\      |‾‾| /‾‾/   /‾‾/
      /\  /  \     |  |/  /   /  /
@@ -308,25 +293,25 @@ context menu
    /          \   |  |\  \ |  (‾)  |
   / __________ \  |__| \__\ \_____/ .io
 
-  execution: local
-     script: ./import-pokemon.js
-     output: xk6-tracetest-output (TestRunID: 38055)
+     execution: local
+        script: /import-pokemon.js
+        output: xk6-tracetest-output (TestRunID: 53770)
 
-  scenarios: (100.00%) 1 scenario, 1 max VUs, 35s max duration (incl. graceful stop):
-           * default: 1 looping VUs for 5s (gracefulStop: 30s)
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 35s max duration (incl. graceful stop):
+              * default: 1 looping VUs for 5s (gracefulStop: 30s)
 
-[TotalRuns=6, SuccessfulRus=1, FailedRuns=5]
-[FAILED]
-[Request=GET - http://localhost:8081/pokemon/import, TraceID=dc0718bcecceeec731b343235eb9c15a, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/11]
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718fe83cfeec7315daf10d212d351, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/4]
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718a8f4ceeec731e47f13762e61b8, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/8]
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718bcecceeec731b343235eb9c15a, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/9]
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc071893fcceeec731148270c6671a1e, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/6]
-[SUCCESSFUL]
-[Request=POST - http://localhost:8081/pokemon/import, TraceID=dc0718cee4ceeec731f3f414bf3a2a16, RunState=FINISHED FailingSpecs=false, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_807d0129a10be776/test/kc_MgKoVR/run/3]
+Goja stack:
+[RunGroup=#nE27wLbIR, Status=failed] - https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/run/nE27wLbIR
+[TotalRuns=5, SuccessfulRus=0, FailedRuns=5]
+[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc07188eb8bab0ea31d6f201f78aa048, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/11, LastError=cannot get trigger type "k6": triggerer type not found]
+[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc0718abc0bab0ea31ca7c85e07c24ff, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/12, LastError=cannot get trigger type "k6": triggerer type not found]
+[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc071896c8bab0ea31ce390164c93b9a, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/13, LastError=cannot get trigger type "k6": triggerer type not found]
+[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc071881d0bab0ea31b55c880c6665ba, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/14, LastError=cannot get trigger type "k6": triggerer type not found]
+[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc0718ebd7bab0ea31059f337a355a79, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/15, LastError=cannot get trigger type "k6": triggerer type not found]
 
-running (05.0s), 0/1 VUs, 5 complete and 0 interrupted iterations
+running (06.3s), 0/1 VUs, 5 complete and 0 interrupted iterations
 default ✓ [======================================] 1 VUs  5s
+ERRO[0010] a panic occurred during JS execution: Tracetest: 5 jobs failed
 ```
 
 ## What's Next?
