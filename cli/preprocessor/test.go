@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
@@ -16,7 +17,7 @@ type test struct {
 
 func Test(logger *zap.Logger) test {
 	return test{
-		logger: logger,
+		logger: cmdutil.GetLogger(),
 	}
 }
 

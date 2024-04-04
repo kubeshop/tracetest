@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	PASSED_TEST_ICON = "✔"
-	FAILED_TEST_ICON = "✘"
+	PASSED_TEST_ICON   = "✔"
+	FAILED_TEST_ICON   = "✘"
+	PROGRESS_TEST_ICON = "🚀"
 )
 
 type testRun struct {

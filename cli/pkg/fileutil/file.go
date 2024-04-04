@@ -16,6 +16,43 @@ type File struct {
 	contents []byte
 }
 
+func IsDir(path string) bool {
+	file, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return file.IsDir()
+}
+
+func ReadDirFileNames(path string) []string {
+	path, err := filepath.Abs(path)
+	if err != nil {
+		return []string{}
+	}
+
+	if !IsDir(path) {
+		return []string{path}
+	}
+
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return []string{}
+	}
+
+	var result []string
+	for _, file := range files {
+		// TODO: add validation for file extensions, tracetest runnable definitions (?)
+		if file.IsDir() {
+			result = append(result, ReadDirFileNames(filepath.Join(path, file.Name()))...)
+		} else {
+			result = append(result, filepath.Join(path, file.Name()))
+		}
+	}
+
+	return result
+}
+
 func Read(filePath string) (File, error) {
 	b, err := os.ReadFile(filePath)
 	if err != nil {

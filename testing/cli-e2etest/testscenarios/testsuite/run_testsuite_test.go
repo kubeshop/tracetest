@@ -11,15 +11,12 @@ import (
 )
 
 func TestRunTestSuite(t *testing.T) {
-	t.Run("should fail if test resource is selected", func(t *testing.T) {
+	t.Run("should fail as regular test suite even if test resource is selected", func(t *testing.T) {
 		// setup isolated e2e environment
 		env := environment.CreateAndStart(t)
 		defer env.Close(t)
 
 		cliConfig := env.GetCLIConfigPath(t)
-
-		// instantiate require with testing helper
-		require := require.New(t)
 
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
@@ -31,8 +28,7 @@ func TestRunTestSuite(t *testing.T) {
 
 		command := fmt.Sprintf("run test -f %s", testsuiteFile)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
-		helpers.RequireExitCodeEqual(t, result, 1)
-		require.Contains(result.StdErr, "cannot apply TestSuite to Test resource")
+		helpers.RequireExitCodeEqual(t, result, 2)
 	})
 
 	t.Run("should pass", func(t *testing.T) {

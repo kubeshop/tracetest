@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/spf13/cobra"
 )
@@ -96,14 +97,14 @@ func (p *configureParameters) Validate(cmd *cobra.Command, args []string) []erro
 
 	if flagUpdated {
 		if p.ServerURL == "" {
-			errors = append(errors, paramError{
+			errors = append(errors, cmdutil.ParamError{
 				Parameter: "server-url",
 				Message:   "server-url cannot be empty",
 			})
 		} else {
 			_, err := url.Parse(p.ServerURL)
 			if err != nil {
-				errors = append(errors, paramError{
+				errors = append(errors, cmdutil.ParamError{
 					Parameter: "server-url",
 					Message:   "server-url is not a valid URL",
 				})

@@ -10,12 +10,13 @@ import (
 	"sync"
 	"time"
 
-	cienvironment "github.com/cucumber/ci-environment/go"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/kubeshop/tracetest/cli/metadata"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/variable"
+	"github.com/kubeshop/tracetest/cli/varset"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v2"
 )
@@ -43,6 +44,11 @@ type RunOptions struct {
 
 	// Overrides the default required gates for the resource
 	RequiredGates []string
+
+	// ResourceType defines what is the type of resource that is being run. It's value
+	// is filled automatically when the user define the type of resource that will be run
+	// when they enter: tracetest run <resource-name> --id <id>
+	ResourceType string
 }
 
 // RunResult holds the result of the run
@@ -90,19 +96,22 @@ func Orchestrator(
 	logger *zap.Logger,
 	openapiClient *openapi.APIClient,
 	variableSets resourcemanager.Client,
+	runnerRegistry Registry,
 ) orchestrator {
 	return orchestrator{
-		logger:        logger,
-		openapiClient: openapiClient,
-		variableSets:  variableSets,
+		logger:         logger,
+		openapiClient:  openapiClient,
+		variableSets:   variableSets,
+		runnerRegistry: runnerRegistry,
 	}
 }
 
 type orchestrator struct {
 	logger *zap.Logger
 
-	openapiClient *openapi.APIClient
-	variableSets  resourcemanager.Client
+	openapiClient  *openapi.APIClient
+	variableSets   resourcemanager.Client
+	runnerRegistry Registry
 }
 
 var (
@@ -116,7 +125,7 @@ const (
 	ExitCodeTestNotPassed = 2
 )
 
-func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, outputFormat string) (exitCode int, _ error) {
+func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat string) (exitCode int, _ error) {
 	o.logger.Debug(
 		"Running test from definition",
 		zap.String("definitionFile", opts.DefinitionFile),
@@ -127,80 +136,76 @@ func (o orchestrator) Run(ctx context.Context, r Runner, opts RunOptions, output
 		zap.Strings("requiredGates", opts.RequiredGates),
 	)
 
-	varsID, err := o.resolveVarsID(ctx, opts.VarsID)
+	variableSetFetcher := GetVariableSetFetcher(o.logger, o.variableSets)
+
+	varsID, err := variableSetFetcher.Fetch(ctx, opts.VarsID)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot resolve variable set id: %w", err)
 	}
-	o.logger.Debug("env resolved", zap.String("ID", varsID))
+
+	resourceFetcher := GetResourceFetcher(o.logger, o.runnerRegistry)
 
 	var resource any
+
 	if opts.DefinitionFile != "" {
-		f, err := fileutil.Read(opts.DefinitionFile)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot read definition file %s: %w", opts.DefinitionFile, err)
-		}
-		df := f
-		o.logger.Debug("Definition file read", zap.String("absolutePath", df.AbsPath()))
-
-		df, err = o.injectLocalEnvVars(ctx, df)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot inject local env vars: %w", err)
-		}
-
-		resource, err = r.Apply(ctx, df)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot apply definition file: %w", err)
-		}
-		o.logger.Debug("Definition file applied", zap.String("updated", string(df.Contents())))
+		resource, err = resourceFetcher.FetchWithDefinitionFile(ctx, opts.DefinitionFile)
 	} else {
-		o.logger.Debug("Definition file not provided, fetching resource by ID", zap.String("ID", opts.ID))
-		resource, err = r.GetByID(ctx, opts.ID)
-		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot get resource by ID: %w", err)
-		}
-		o.logger.Debug("Resource fetched by ID", zap.String("ID", opts.ID), zap.Any("resource", resource))
+		resource, err = resourceFetcher.FetchWithID(ctx, opts.ID, opts.ResourceType)
+	}
+	if err != nil {
+		return ExitCodeGeneralError, err
+	}
+
+	resourceType, err := resourcemanager.GetResourceType(resource)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot extract type from resource: %w", err)
+	}
+
+	runner, err := o.runnerRegistry.Get(resourceType)
+	if err != nil {
+		return ExitCodeGeneralError, fmt.Errorf("cannot find runner for resource type %s: %w", resourceType, err)
 	}
 
 	var result RunResult
-	var ev varSets
+	var ev varset.VarSets
 
 	// iterate until we have all env vars,
 	// or the server returns an actual error
 	for {
 		runInfo := openapi.RunInformation{
 			VariableSetId: &varsID,
-			Variables:     ev.toOpenapi(),
-			Metadata:      getMetadata(),
+			Variables:     ev.ToOpenapi(),
+			Metadata:      metadata.GetMetadata(),
 			RequiredGates: getRequiredGates(opts.RequiredGates),
 		}
 
-		result, err = r.StartRun(ctx, resource, runInfo)
+		result, err = runner.StartRun(ctx, resource, runInfo)
 		if err == nil {
 			break
 		}
-		if !errors.Is(err, missingVarsError{}) {
+		if !errors.Is(err, varset.MissingVarsError{}) {
 			// actual error, return
 			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
 		}
 
 		// missing vars error
-		ev = askForMissingVars([]varSet(err.(missingVarsError)))
+		ev = varset.AskForMissingVars([]varset.VarSet(err.(varset.MissingVarsError)))
 		o.logger.Debug("filled variables", zap.Any("variables", ev))
 	}
 
 	if opts.SkipResultWait {
-		fmt.Println(r.FormatResult(result, outputFormat))
+		fmt.Println(runner.FormatResult(result, outputFormat))
 		return ExitCodeSuccess, nil
 	}
 
-	result, err = o.waitForResult(ctx, r, result)
+	result, err = o.waitForResult(ctx, runner, result)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot wait for test result: %w", err)
 	}
 
-	fmt.Println(r.FormatResult(result, outputFormat))
+	fmt.Println(runner.FormatResult(result, outputFormat))
 
-	err = o.writeJUnitReport(ctx, r, result, opts.JUnitOuptutFile)
+	err = o.writeJUnitReport(ctx, runner, result, opts.JUnitOuptutFile)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot write junit report: %w", err)
 	}
@@ -337,30 +342,6 @@ func (a orchestrator) writeJUnitReport(ctx context.Context, r Runner, result Run
 
 var source = "cli"
 
-func getMetadata() map[string]string {
-	ci := cienvironment.DetectCIEnvironment()
-	if ci == nil {
-		return map[string]string{
-			"source": source,
-		}
-	}
-
-	metadata := map[string]string{
-		"name":        ci.Name,
-		"url":         ci.URL,
-		"buildNumber": ci.BuildNumber,
-		"source":      source,
-	}
-
-	if ci.Git != nil {
-		metadata["branch"] = ci.Git.Branch
-		metadata["tag"] = ci.Git.Tag
-		metadata["revision"] = ci.Git.Revision
-	}
-
-	return metadata
-}
-
 func getRequiredGates(gates []string) []openapi.SupportedGates {
 	if len(gates) == 0 {
 		return nil
@@ -390,7 +371,7 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 	}
 
 	if resp.StatusCode == http.StatusUnprocessableEntity {
-		return buildMissingVarsError(body)
+		return varset.BuildMissingVarsError(body)
 	}
 
 	if reqErr != nil {
