@@ -40,7 +40,7 @@ var (
 	httpClient = &resourcemanager.HTTPClient{}
 
 	variableSetPreprocessor = preprocessor.VariableSet(cliLogger)
-	variableSetClient       = GetVariableSetClient(variableSetPreprocessor)
+	variableSetClient       = GetVariableSetClient(httpClient, variableSetPreprocessor)
 
 	testPreprocessor = preprocessor.Test(cliLogger)
 	testClient       = resourcemanager.NewClient(
@@ -325,9 +325,7 @@ func formatItemDate(item *gabs.Container, path string) error {
 	return nil
 }
 
-func GetVariableSetClient(preprocessor preprocessor.Preprocessor) resourcemanager.Client {
-	httpClient := &resourcemanager.HTTPClient{}
-
+func GetVariableSetClient(httpClient *resourcemanager.HTTPClient, preprocessor preprocessor.Preprocessor) resourcemanager.Client {
 	variableSetClient := resourcemanager.NewClient(
 		httpClient, cmdutil.GetLogger(),
 		"variableset", "variablesets",
