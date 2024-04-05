@@ -74,8 +74,13 @@ func runSingleFile(ctx context.Context) (string, error) {
 		definitionFile = runParams.DefinitionFiles[0]
 	}
 
+	ID := ""
+	if len(runParams.IDs) > 0 {
+		ID = runParams.IDs[0]
+	}
+
 	runParams := runner.RunOptions{
-		ID:              runParams.IDs[0],
+		ID:              ID,
 		DefinitionFile:  definitionFile,
 		VarsID:          runParams.VarsID,
 		SkipResultWait:  runParams.SkipResultWait,
