@@ -9,7 +9,7 @@ import (
 )
 
 type RunParameters struct {
-	ID              string
+	IDs             []string
 	DefinitionFiles []string
 	VarsID          string
 	EnvID           string
@@ -17,18 +17,27 @@ type RunParameters struct {
 	JUnitOuptutFile string
 	RequiredGates   []string
 	RunGroupID      string
+	ResourceName    string
 }
 
 func (p RunParameters) Validate(cmd *cobra.Command, args []string) []error {
 	errs := []error{}
 
 	hasDefinitionFilesSpecified := p.DefinitionFiles != nil && len(p.DefinitionFiles) > 0
-	hasFileIDsSpecified := p.ID != "" && len(p.ID) > 0
+	hasFileIDsSpecified := len(p.IDs) > 0
 
 	if !hasDefinitionFilesSpecified && !hasFileIDsSpecified {
 		errs = append(errs, ParamError{
 			Parameter: "resource",
 			Message:   "you must specify at least one definition file or resource ID",
+		})
+	}
+
+	isResourceNameSpecified := len(args) > 0
+	if hasFileIDsSpecified && !isResourceNameSpecified {
+		errs = append(errs, ParamError{
+			Parameter: "resource",
+			Message:   "you must specify a resource name (test|testsuite) when providing a resource IDs",
 		})
 	}
 

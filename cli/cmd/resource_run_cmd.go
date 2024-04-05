@@ -27,6 +27,7 @@ func init() {
 		Long:    "Run tests and test suites",
 		PreRun:  setupCommand(WithOptionalResourceName()),
 		Run: WithResourceMiddleware(func(ctx context.Context, _ *cobra.Command, args []string) (string, error) {
+			runParams.ResourceName = resourceParams.ResourceName
 			if cliConfig.Jwt != "" {
 				exitCode, err := cloudCmd.RunMultipleFiles(ctx, httpClient, runParams, &cliConfig, runnerRegistry, output)
 				ExitCLI(exitCode)
@@ -40,7 +41,7 @@ func init() {
 	}
 
 	runCmd.Flags().StringSliceVarP(&runParams.DefinitionFiles, "file", "f", []string{}, "path to the definition file (can be defined multiple times)")
-	runCmd.Flags().StringVarP(&runParams.ID, "id", "", "", "id of the resource to run (can be defined multiple times)")
+	runCmd.Flags().StringSliceVarP(&runParams.IDs, "id", "", []string{}, "id of the resource to run (can be defined multiple times)")
 	runCmd.Flags().StringVarP(&runParams.VarsID, "vars", "", "", "variable set file or ID to be used")
 	runCmd.Flags().StringVarP(&runParams.RunGroupID, "group", "g", "", "Sets the Run Group ID for the run. This is used to group multiple runs together.")
 	runCmd.Flags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
@@ -72,8 +73,13 @@ func runSingleFile(ctx context.Context) (string, error) {
 		definitionFile = runParams.DefinitionFiles[0]
 	}
 
+	ID := ""
+	if len(runParams.IDs) > 0 {
+		ID = runParams.IDs[0]
+	}
+
 	runParams := runner.RunOptions{
-		ID:              runParams.ID,
+		ID:              ID,
 		DefinitionFile:  definitionFile,
 		VarsID:          runParams.VarsID,
 		SkipResultWait:  runParams.SkipResultWait,

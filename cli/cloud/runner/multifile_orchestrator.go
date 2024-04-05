@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/metadata"
@@ -22,6 +23,10 @@ import (
 // RunOptions defines options for running a resource
 // IDs and DefinitionFiles are mutually exclusive and the only required options
 type RunOptions struct {
+	// if IDs is used it needs to have the ResourceName defined
+	IDs          []string
+	ResourceName string
+
 	// path to the file with resource definition
 	// the file will be applied before running
 	DefinitionFiles []string
@@ -101,36 +106,27 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 	}
 	o.logger.Debug("env resolved", zap.String("ID", varsID))
 
-	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
-	resourceFetcher := runner.GetResourceFetcher(o.logger, o.runnerRegistry)
-
-	if !hasDefinitionFilesDefined {
-		return ExitCodeGeneralError, fmt.Errorf("you must define at least two files to use the multifile orchestrator")
-	}
-
 	vars := varset.VarSets{}
-	var resources []any
+	resourceFetcher := runner.GetResourceFetcher(o.logger, o.runnerRegistry)
 
 	runGroupID := opts.RunGroupID
 	if runGroupID == "" {
 		runGroupID = id.GenerateID().String()
 	}
-	runsResults := make([]runner.RunResult, 0)
-	definitionFiles, err := o.getDefinitionFiles(opts.DefinitionFiles)
 
-	if err != nil {
-		return ExitCodeGeneralError, fmt.Errorf("cannot read definition files: %w", err)
-	}
+	var resources []any
+	var runsResults []runner.RunResult
 
-	// 1. create runs
-	for _, definitionFile := range definitionFiles {
-		result, resource, err := o.createRun(ctx, resourceFetcher, &vars, opts.RequiredGates, definitionFile, varsID, runGroupID)
+	if len(opts.DefinitionFiles) > 0 {
+		resources, runsResults, err = o.runByFiles(ctx, opts, resourceFetcher, &vars, varsID, runGroupID)
 		if err != nil {
-			return ExitCodeGeneralError, fmt.Errorf("cannot run test: %w", err)
+			return ExitCodeGeneralError, fmt.Errorf("cannot run files: %w", err)
 		}
-
-		runsResults = append(runsResults, result)
-		resources = append(resources, resource)
+	} else {
+		resources, runsResults, err = o.runByIDs(ctx, opts, resourceFetcher, &vars, varsID, runGroupID)
+		if err != nil {
+			return ExitCodeGeneralError, fmt.Errorf("cannot run by id: %w", err)
+		}
 	}
 
 	runnerGetter := func(resource any) (formatters.Runner[runner.RunResult], error) {
@@ -224,12 +220,69 @@ func (o orchestrator) getDefinitionFiles(file []string) ([]string, error) {
 	return files, nil
 }
 
-func (o orchestrator) createRun(ctx context.Context, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, requiredGates []string, definitionFile string, varsID string, runGroupID string) (runner.RunResult, any, error) {
-	resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
-	if err != nil {
-		return runner.RunResult{}, nil, err
+func (o orchestrator) runByFiles(ctx context.Context, opts RunOptions, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, varsID string, runGroupID string) ([]any, []runner.RunResult, error) {
+	resources := make([]any, 0)
+	runsResults := make([]runner.RunResult, 0)
+	var mainErr error
+
+	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
+	if !hasDefinitionFilesDefined {
+		return resources, runsResults, fmt.Errorf("no definition files defined")
 	}
 
+	definitionFiles, err := o.getDefinitionFiles(opts.DefinitionFiles)
+	if err != nil {
+		return resources, runsResults, fmt.Errorf("cannot get definition files: %w", err)
+	}
+
+	var wg sync.WaitGroup
+	wg.Add(len(definitionFiles))
+	for _, definitionFile := range definitionFiles {
+		go func(def string) {
+			defer wg.Done()
+			resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, def)
+			if err != nil {
+				mainErr = fmt.Errorf("cannot fetch resource from definition file: %w", err)
+				return
+			}
+			result, resource, err := o.createRun(ctx, resource, vars, opts.RequiredGates, varsID, runGroupID)
+			if err != nil {
+				mainErr = fmt.Errorf("cannot run test: %w", err)
+				return
+			}
+
+			runsResults = append(runsResults, result)
+			resources = append(resources, resource)
+		}(definitionFile)
+	}
+
+	wg.Wait()
+	return resources, runsResults, mainErr
+}
+
+func (o orchestrator) runByIDs(ctx context.Context, opts RunOptions, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, varsID string, runGroupID string) ([]any, []runner.RunResult, error) {
+	resources := make([]any, 0)
+	runsResults := make([]runner.RunResult, 0)
+
+	for _, id := range opts.IDs {
+		resource, err := resourceFetcher.FetchWithID(ctx, opts.ResourceName, id)
+		if err != nil {
+			return resources, runsResults, err
+		}
+
+		result, resource, err := o.createRun(ctx, resource, vars, opts.RequiredGates, varsID, runGroupID)
+		if err != nil {
+			return resources, runsResults, fmt.Errorf("cannot run test: %w", err)
+		}
+
+		runsResults = append(runsResults, result)
+		resources = append(resources, resource)
+	}
+
+	return resources, runsResults, nil
+}
+
+func (o orchestrator) createRun(ctx context.Context, resource any, vars *varset.VarSets, requiredGates []string, varsID, runGroupID string) (runner.RunResult, any, error) {
 	resourceType, err := resourcemanager.GetResourceType(resource)
 	if err != nil {
 		return runner.RunResult{}, nil, fmt.Errorf("cannot extract type from resource: %w", err)

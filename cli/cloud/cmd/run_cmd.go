@@ -33,6 +33,8 @@ func RunMultipleFiles(ctx context.Context, httpClient *resourcemanager.HTTPClien
 	)
 
 	return orchestrator.Run(ctx, runner.RunOptions{
+		IDs:             runParams.IDs,
+		ResourceName:    runParams.ResourceName,
 		DefinitionFiles: runParams.DefinitionFiles,
 		VarsID:          runParams.VarsID,
 		SkipResultWait:  runParams.SkipResultWait,
