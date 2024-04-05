@@ -2,6 +2,8 @@
 
 set -e
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 export TAG=${TAG:-dev}
 
 opts="-f docker-compose.yaml -f examples/docker-compose.demo.yaml"
@@ -76,11 +78,23 @@ tracetests() {
 
   echo "Running tracetests"
 
-  SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
   export TRACETEST_CLI=${SCRIPT_DIR}/dist/tracetest
   export TARGET_URL=http://localhost:11633
-  export TRACETEST_ENDPOINT=localhost:11633
+  export TRACETEST_ENDPOINT="http://localhost:11633/"
+  export DEMO_APP_URL=http://demo-api:8081
+  export DEMO_APP_GRPC_URL=demo-rpc:8082
+
+  cd testing/server-tracetesting
+  ./run.bash
+}
+
+tracetests-cloud() {
+
+  echo "Running tracetests on cloud"
+
+  export TRACETEST_CLI="tracetest"
+  export TARGET_URL=http://localhost:11633
+  export TRACETEST_ENDPOINT=""
   export DEMO_APP_URL=http://demo-api:8081
   export DEMO_APP_GRPC_URL=demo-rpc:8082
 
@@ -102,6 +116,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     tracetests)
       CMD+=("tracetests")
+      shift
+      ;;
+    tracetests-cloud)
+      CMD+=("tracetests-cloud")
       shift
       ;;
     up)

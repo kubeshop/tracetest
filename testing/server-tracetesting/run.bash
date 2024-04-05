@@ -1,5 +1,7 @@
 #/bin/bash
 
+BASE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 export TRACETEST_CLI=${TRACETEST_CLI:-"tracetest"}
 cmdExitCode=$("$TRACETEST_CLI" &> /dev/null; echo $?)
 if [ $cmdExitCode -ne 0 ]; then
@@ -50,28 +52,29 @@ spec:
       value: $EXAMPLE_TEST_ID
 EOF
 
+echo
 echo "variables set created:"
 cat tracetesting-vars.yaml
 
-echo "Setting up tracetest CLI configuration..."
-cat << EOF > config.yml
-scheme: http
-endpoint: $TRACETEST_ENDPOINT
-analyticsEnabled: false
-EOF
-echo "tracetest CLI set up."
-echo ""
-
+echo
 echo "Setting up test helpers..."
 
 mkdir -p results/responses
 
+if [[ $TRACETEST_ENDPOINT != "" ]]; then
+  CONFIG_FLAGS="--server-url $TRACETEST_ENDPOINT"
+fi
+
 run_test_suite_for_feature() {
   feature=$1
 
-  definition='./features/'$feature'/_test_suite.yml'
+  definition="$BASE_PATH/features/$feature/_test_suite.yml"
 
-  testCMD="$TRACETEST_CLI  --config ./config.yml run testsuite --file $definition --vars ./tracetesting-vars.yaml"
+  testCMD="$TRACETEST_CLI $CONFIG_FLAGS run testsuite --file $definition --vars $BASE_PATH/tracetesting-vars.yaml"
+  # cmd="$TRACETEST_CLI $CONFIG_FLAGS list test"
+  # echo $cmd
+  # $cmd
+  # exit
   echo $testCMD
   $testCMD
   return $?
@@ -93,8 +96,6 @@ run_test_suite_for_feature 'testsuite' || (EXIT_STATUS=$? && echo "TestSuite Tes
 
 echo ""
 echo "Tests done! Exit code: $EXIT_STATUS"
-
-rm tracetesting-vars.yaml
 
 exit $EXIT_STATUS
 
