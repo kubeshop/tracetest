@@ -15,7 +15,7 @@ if [  "$TARGET_URL" = "" ]; then
   exit 2
 fi
 
-export TRACETEST_ENDPOINT=${TRACETEST_ENDPOINT:-"localhost:11633"}
+export TRACETEST_ENDPOINT=${TRACETEST_ENDPOINT}
 export DEMO_APP_URL=${DEMO_APP_URL-"http://demo-pokemon-api.demo"}
 export DEMO_APP_GRPC_URL=${DEMO_APP_GRPC_URL-"demo-pokemon-api.demo:8082"}
 export DEMO_APP_KAFKA_BROKER=${DEMO_APP_KAFKA_BROKER-"stream:9092"}
