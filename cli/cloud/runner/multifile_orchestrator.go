@@ -221,33 +221,41 @@ func (o orchestrator) getDefinitionFiles(file []string) ([]string, error) {
 func (o orchestrator) runByFiles(ctx context.Context, opts RunOptions, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, varsID string, runGroupID string) ([]any, []runner.RunResult, error) {
 	resources := make([]any, 0)
 	runsResults := make([]runner.RunResult, 0)
+	var mainErr error
 
 	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
 	if !hasDefinitionFilesDefined {
-		return resources, runsResults, fmt.Errorf("you must define at least two files to use the multifile orchestrator")
+		return resources, runsResults, fmt.Errorf("no definition files defined")
 	}
 
 	definitionFiles, err := o.getDefinitionFiles(opts.DefinitionFiles)
 	if err != nil {
-		return resources, runsResults, fmt.Errorf("cannot read definition files: %w", err)
+		return resources, runsResults, fmt.Errorf("cannot get definition files: %w", err)
 	}
 
+	var wg sync.WaitGroup
+	wg.Add(len(definitionFiles))
 	for _, definitionFile := range definitionFiles {
-		resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, definitionFile)
-		if err != nil {
-			return resources, runsResults, err
-		}
+		go func(def string) {
+			defer wg.Done()
+			resource, err := resourceFetcher.FetchWithDefinitionFile(ctx, def)
+			if err != nil {
+				mainErr = fmt.Errorf("cannot fetch resource from definition file: %w", err)
+				return
+			}
+			result, resource, err := o.createRun(ctx, resource, vars, opts.RequiredGates, varsID, runGroupID)
+			if err != nil {
+				mainErr = fmt.Errorf("cannot run test: %w", err)
+				return
+			}
 
-		result, resource, err := o.createRun(ctx, resource, vars, opts.RequiredGates, varsID, runGroupID)
-		if err != nil {
-			return resources, runsResults, fmt.Errorf("cannot run test: %w", err)
-		}
-
-		runsResults = append(runsResults, result)
-		resources = append(resources, resource)
+			runsResults = append(runsResults, result)
+			resources = append(resources, resource)
+		}(definitionFile)
 	}
 
-	return resources, runsResults, nil
+	wg.Wait()
+	return resources, runsResults, mainErr
 }
 
 func (o orchestrator) runByIDs(ctx context.Context, opts RunOptions, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, varsID string, runGroupID string) ([]any, []runner.RunResult, error) {
