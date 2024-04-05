@@ -14,19 +14,20 @@ import (
 	cliRunner "github.com/kubeshop/tracetest/cli/runner"
 )
 
-func RunMultipleFiles(ctx context.Context, runParams *cmdutil.RunParameters, cliConfig *config.Config, runnerRegistry cliRunner.Registry, format string) (int, error) {
+func RunMultipleFiles(ctx context.Context, httpClient *resourcemanager.HTTPClient, runParams *cmdutil.RunParameters, cliConfig *config.Config, runnerRegistry cliRunner.Registry, format string) (int, error) {
 	if cliConfig.Jwt == "" {
 		return cliRunner.ExitCodeGeneralError, fmt.Errorf("you should be authenticated to run multiple files, please run 'tracetest configure'")
 	}
 
 	variableSetPreprocessor := preprocessor.VariableSet(cmdutil.GetLogger())
 
+	runGroup := runner.RunGroup(config.GetAPIClient(*cliConfig))
 	formatter := formatters.MultipleRun[cliRunner.RunResult](func() string { return cliConfig.UI() }, true)
 
 	orchestrator := runner.MultiFileOrchestrator(
 		cmdutil.GetLogger(),
-		config.GetAPIClient(*cliConfig),
-		GetVariableSetClient(variableSetPreprocessor),
+		runGroup,
+		GetVariableSetClient(httpClient, variableSetPreprocessor),
 		runnerRegistry,
 		formatter,
 	)
@@ -41,9 +42,7 @@ func RunMultipleFiles(ctx context.Context, runParams *cmdutil.RunParameters, cli
 	}, format)
 }
 
-func GetVariableSetClient(preprocessor preprocessor.Preprocessor) resourcemanager.Client {
-	httpClient := &resourcemanager.HTTPClient{}
-
+func GetVariableSetClient(httpClient *resourcemanager.HTTPClient, preprocessor preprocessor.Preprocessor) resourcemanager.Client {
 	variableSetClient := resourcemanager.NewClient(
 		httpClient, cmdutil.GetLogger(),
 		"variableset", "variablesets",

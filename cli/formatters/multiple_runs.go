@@ -79,18 +79,18 @@ func (f multipleRun[T]) json(output MultipleRunOutput[T]) string {
 	return string(bytes) + "\n"
 }
 
-var messageTemplate = "%s RunGroup: #%s (%s)\n"
+var messageTemplate = "%s RunGroup: #%s (%s)\n Summary: %d passed, %d failed, %d pending\n"
 
 func (f multipleRun[T]) pretty(output MultipleRunOutput[T]) string {
 	runGroupUrl := fmt.Sprintf("%s/run/%s", f.baseURLFn(), output.RunGroup.GetId())
 	if !output.HasResults {
-		return fmt.Sprintf(messageTemplate, PROGRESS_TEST_ICON, output.RunGroup.GetId(), runGroupUrl)
+		return fmt.Sprintf(messageTemplate, PROGRESS_TEST_ICON, output.RunGroup.GetId(), runGroupUrl, output.RunGroup.Summary.GetSucceed(), output.RunGroup.Summary.GetFailed(), output.RunGroup.Summary.GetPending())
 	}
 
-	message := fmt.Sprintf(messageTemplate, PASSED_TEST_ICON, output.RunGroup.GetId(), runGroupUrl)
+	message := fmt.Sprintf(messageTemplate, PASSED_TEST_ICON, output.RunGroup.GetId(), runGroupUrl, output.RunGroup.Summary.GetSucceed(), output.RunGroup.Summary.GetFailed(), output.RunGroup.Summary.GetPending())
 	allStepsPassed := output.RunGroup.Summary.GetFailed() == 0
 	if !allStepsPassed {
-		message = fmt.Sprintf(messageTemplate, FAILED_TEST_ICON, output.RunGroup.GetId(), runGroupUrl)
+		message = fmt.Sprintf(messageTemplate, FAILED_TEST_ICON, output.RunGroup.GetId(), runGroupUrl, output.RunGroup.Summary.GetSucceed(), output.RunGroup.Summary.GetFailed(), output.RunGroup.Summary.GetPending())
 	}
 
 	// the test suite name + all steps
