@@ -7,10 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"sync"
-	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/metadata"
 	"github.com/kubeshop/tracetest/cli/openapi"
@@ -51,20 +48,24 @@ type RunOptions struct {
 	RequiredGates []string
 }
 
-type MultipleRunFormatter interface {
+type multipleRunFormatter interface {
 	Format(output formatters.MultipleRunOutput[runner.RunResult], format formatters.Output) string
+}
+
+type runGroupWaiter interface {
+	WaitForCompletion(ctx context.Context, runGroupID string) (openapi.RunGroup, error)
 }
 
 func MultiFileOrchestrator(
 	logger *zap.Logger,
-	openapiClient *openapi.APIClient,
+	runGroupWaiter runGroupWaiter,
 	variableSets resourcemanager.Client,
 	runnerRegistry runner.Registry,
-	multipleRunFormatter MultipleRunFormatter,
+	multipleRunFormatter multipleRunFormatter,
 ) orchestrator {
 	return orchestrator{
 		logger:               logger,
-		openapiClient:        openapiClient,
+		runGroupWaiter:       runGroupWaiter,
 		variableSets:         variableSets,
 		runnerRegistry:       runnerRegistry,
 		multipleRunFormatter: multipleRunFormatter,
@@ -74,10 +75,10 @@ func MultiFileOrchestrator(
 type orchestrator struct {
 	logger *zap.Logger
 
-	openapiClient        *openapi.APIClient
+	runGroupWaiter       runGroupWaiter
 	variableSets         resourcemanager.Client
 	runnerRegistry       runner.Registry
-	multipleRunFormatter MultipleRunFormatter
+	multipleRunFormatter multipleRunFormatter
 }
 
 const (
@@ -157,7 +158,7 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 	}
 
 	// 4. wait for the run group
-	runGroup, err := o.waitForRunGroup(ctx, runGroupID)
+	runGroup, err := o.runGroupWaiter.WaitForCompletion(ctx, runGroupID)
 	if err != nil {
 		return ExitCodeGeneralError, fmt.Errorf("cannot wait for test result: %w", err)
 	}
@@ -317,47 +318,6 @@ func (o orchestrator) createRun(ctx context.Context, resource any, vars *varset.
 	}
 }
 
-func (o orchestrator) waitForRunGroup(ctx context.Context, runGroupID string) (openapi.RunGroup, error) {
-	var (
-		updatedResult openapi.RunGroup
-		lastError     error
-		wg            sync.WaitGroup
-	)
-
-	wg.Add(1)
-	ticker := time.NewTicker(1 * time.Second) // TODO: change to websockets
-	go func() {
-		for range ticker.C {
-			req := o.openapiClient.ApiApi.GetRunGroup(ctx, runGroupID)
-			runGroup, _, err := req.Execute()
-
-			// updatedResult = runGroup
-			o.logger.Debug("updated run group", zap.String("result", spew.Sdump(runGroup)))
-			if err != nil {
-				o.logger.Debug("UpdateResult failed", zap.Error(err))
-				lastError = err
-				wg.Done()
-				return
-			}
-
-			if runGroup.GetStatus() == "succeed" || runGroup.GetStatus() == "failed" {
-				o.logger.Debug("result is finished")
-				updatedResult = *runGroup
-				wg.Done()
-				return
-			}
-			o.logger.Debug("still waiting")
-		}
-	}()
-	wg.Wait()
-
-	if lastError != nil {
-		return openapi.RunGroup{}, lastError
-	}
-
-	return updatedResult, nil
-}
-
 var ErrJUnitNotSupported = errors.New("junit report is not supported for this resource type")
 
 func (a orchestrator) writeJUnitReport(ctx context.Context, r runner.Runner, result runner.RunResult, outputFile string) error {
@@ -383,8 +343,6 @@ func (a orchestrator) writeJUnitReport(ctx context.Context, r runner.Runner, res
 
 	return err
 }
-
-var source = "cli"
 
 func getRequiredGates(gates []string) []openapi.SupportedGates {
 	if len(gates) == 0 {

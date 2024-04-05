@@ -29,8 +29,7 @@ func init() {
 		Run: WithResourceMiddleware(func(ctx context.Context, _ *cobra.Command, args []string) (string, error) {
 			runParams.ResourceName = resourceParams.ResourceName
 			if cliConfig.Jwt != "" {
-				exitCode, err := cloudCmd.RunMultipleFiles(ctx, runParams, &cliConfig, runnerRegistry, output)
-
+				exitCode, err := cloudCmd.RunMultipleFiles(ctx, httpClient, runParams, &cliConfig, runnerRegistry, output)
 				ExitCLI(exitCode)
 				return "", err
 			}
