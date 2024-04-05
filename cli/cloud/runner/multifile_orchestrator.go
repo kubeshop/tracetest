@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/metadata"
