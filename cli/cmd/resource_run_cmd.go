@@ -42,7 +42,7 @@ func init() {
 	}
 
 	runCmd.Flags().StringSliceVarP(&runParams.DefinitionFiles, "file", "f", []string{}, "path to the definition file (can be defined multiple times)")
-	runCmd.Flags().StringVarP(&runParams.ID, "id", "", "", "id of the resource to run (can be defined multiple times)")
+	runCmd.Flags().StringSliceVarP(&runParams.IDs, "id", "", []string{}, "id of the resource to run (can be defined multiple times)")
 	runCmd.Flags().StringVarP(&runParams.VarsID, "vars", "", "", "variable set file or ID to be used")
 	runCmd.Flags().StringVarP(&runParams.RunGroupID, "group", "g", "", "Sets the Run Group ID for the run. This is used to group multiple runs together.")
 	runCmd.Flags().BoolVarP(&runParams.SkipResultWait, "skip-result-wait", "W", false, "do not wait for results. exit immediately after test run started")
@@ -75,7 +75,7 @@ func runSingleFile(ctx context.Context) (string, error) {
 	}
 
 	runParams := runner.RunOptions{
-		ID:              runParams.ID,
+		ID:              runParams.IDs[0],
 		DefinitionFile:  definitionFile,
 		VarsID:          runParams.VarsID,
 		SkipResultWait:  runParams.SkipResultWait,

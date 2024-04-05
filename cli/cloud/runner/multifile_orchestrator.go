@@ -25,8 +25,8 @@ import (
 // RunOptions defines options for running a resource
 // IDs and DefinitionFiles are mutually exclusive and the only required options
 type RunOptions struct {
-	// if ID is used it needs to have the ResourceName defined
-	ID           string
+	// if IDs is used it needs to have the ResourceName defined
+	IDs          []string
 	ResourceName string
 
 	// path to the file with resource definition
@@ -115,13 +115,13 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 	var resources []any
 	var runsResults []runner.RunResult
 
-	if opts.ID == "" {
+	if len(opts.DefinitionFiles) > 0 {
 		resources, runsResults, err = o.runByFiles(ctx, opts, resourceFetcher, &vars, varsID, runGroupID)
 		if err != nil {
 			return ExitCodeGeneralError, fmt.Errorf("cannot run files: %w", err)
 		}
 	} else {
-		resources, runsResults, err = o.runByID(ctx, opts, resourceFetcher, &vars, varsID, runGroupID)
+		resources, runsResults, err = o.runByIDs(ctx, opts, resourceFetcher, &vars, varsID, runGroupID)
 		if err != nil {
 			return ExitCodeGeneralError, fmt.Errorf("cannot run by id: %w", err)
 		}
@@ -250,22 +250,24 @@ func (o orchestrator) runByFiles(ctx context.Context, opts RunOptions, resourceF
 	return resources, runsResults, nil
 }
 
-func (o orchestrator) runByID(ctx context.Context, opts RunOptions, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, varsID string, runGroupID string) ([]any, []runner.RunResult, error) {
+func (o orchestrator) runByIDs(ctx context.Context, opts RunOptions, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, varsID string, runGroupID string) ([]any, []runner.RunResult, error) {
 	resources := make([]any, 0)
 	runsResults := make([]runner.RunResult, 0)
 
-	resource, err := resourceFetcher.FetchWithID(ctx, opts.ResourceName, opts.ID)
-	if err != nil {
-		return resources, runsResults, err
-	}
+	for _, id := range opts.IDs {
+		resource, err := resourceFetcher.FetchWithID(ctx, opts.ResourceName, id)
+		if err != nil {
+			return resources, runsResults, err
+		}
 
-	result, resource, err := o.createRun(ctx, resource, vars, nil, varsID, runGroupID)
-	if err != nil {
-		return resources, runsResults, fmt.Errorf("cannot run test: %w", err)
-	}
+		result, resource, err := o.createRun(ctx, resource, vars, opts.RequiredGates, varsID, runGroupID)
+		if err != nil {
+			return resources, runsResults, fmt.Errorf("cannot run test: %w", err)
+		}
 
-	runsResults = append(runsResults, result)
-	resources = append(resources, resource)
+		runsResults = append(runsResults, result)
+		resources = append(resources, resource)
+	}
 
 	return resources, runsResults, nil
 }
