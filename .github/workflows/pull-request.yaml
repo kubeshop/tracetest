@@ -329,7 +329,12 @@ jobs:
       - name: Run tests
         run: |
           ./scripts/wait-for-port.sh 11633
-          ./run.sh tracetests-cloud || (cat /tmp/docker-log; exit 1)
+          tracetest run testsuite --file testing/server-tracetesting/features/http_test/_test_suite.yml --vars tracetesting-vars
+          tracetest run testsuite --file testing/server-tracetesting/features/grpc_test/_test_suite.yml --vars tracetesting-vars
+          tracetest run testsuite --file testing/server-tracetesting/features/kafka_test/_test_suite.yml --vars tracetesting-vars
+          tracetest run testsuite --file testing/server-tracetesting/features/variableset/_test_suite.yml --vars tracetesting-vars
+          tracetest run testsuite --file testing/server-tracetesting/features/testsuite/_test_suite.yml --vars tracetesting-vars
+
 
   e2e-cli:
     name: CLI e2e tests

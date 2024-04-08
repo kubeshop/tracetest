@@ -75,7 +75,7 @@ run_test_suite_for_feature() {
 
   definition="$BASE_PATH/features/$feature/_test_suite.yml"
 
-  testCMD="$TRACETEST_CLI $CONFIG_FLAGS run testsuite --file $definition --vars tracetesting-vars"
+  testCMD="$TRACETEST_CLI $CONFIG_FLAGS run testsuite --file $definition --vars $VARS_FILE"
   echo $testCMD
   $testCMD
   return $?
