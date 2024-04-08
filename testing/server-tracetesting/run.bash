@@ -23,6 +23,8 @@ export DEMO_APP_KAFKA_BROKER=${DEMO_APP_KAFKA_BROKER-"stream:9092"}
 # TODO: think how to move this id generation to HTTP Test suite
 export EXAMPLE_TEST_ID="w2ON-RVVg"
 
+VARS_FILE="$BASE_PATH/tracetesting-vars.yaml"
+
 echo "Preparing to run tests on API..."
 echo ""
 
@@ -34,7 +36,7 @@ echo "DEMO_APP_URL:           $DEMO_APP_URL"
 echo "DEMO_APP_GRPC_URL:      $DEMO_APP_GRPC_URL"
 echo "DEMO_APP_KAFKA_BROKER:  $DEMO_APP_KAFKA_BROKER"
 
-cat << EOF > tracetesting-vars.yaml
+cat << EOF > $VARS_FILE
 type: VariableSet
 spec:
   id: tracetesting-vars
@@ -52,9 +54,12 @@ spec:
       value: $EXAMPLE_TEST_ID
 EOF
 
+t
 echo
 echo "variables set created:"
-cat tracetesting-vars.yaml
+cat $VARS_FILE
+
+$TRACETEST_CLI $CONFIG_FLAGS apply variableset --file $VARS_FILE
 
 echo
 echo "Setting up test helpers..."
@@ -70,11 +75,7 @@ run_test_suite_for_feature() {
 
   definition="$BASE_PATH/features/$feature/_test_suite.yml"
 
-  testCMD="$TRACETEST_CLI $CONFIG_FLAGS run testsuite --file $definition --vars $BASE_PATH/tracetesting-vars.yaml"
-  # cmd="$TRACETEST_CLI $CONFIG_FLAGS list test"
-  # echo $cmd
-  # $cmd
-  # exit
+  testCMD="$TRACETEST_CLI $CONFIG_FLAGS run testsuite --file $definition --vars tracetesting-vars"
   echo $testCMD
   $testCMD
   return $?

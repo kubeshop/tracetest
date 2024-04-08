@@ -315,16 +315,21 @@ jobs:
         run: |
           docker load --input dist/image.tar
 
+      - name: Configure Tracetest CLI
+        timeout-minutes: 5
+        uses: kubeshop/tracetest-github-action@v1
+        with:
+          token:  ${{secrets.TRACETEST_CLOUD_CI_TOKEN}}
+          apiKey: ${{secrets.TRACETEST_CLOUD_CI_API_KEY}}
+
       - name: Start services
         run: |
           ./run.sh down up
           ./run.sh tracetest-logs > /tmp/docker-log &
       - name: Run tests
         run: |
-          chmod +x ./dist/tracetest ./dist/tracetest-server
-
           ./scripts/wait-for-port.sh 11633
-          NATS=true ./run.sh tracetests || (cat /tmp/docker-log; exit 1)
+          ./run.sh tracetests-cloud || (cat /tmp/docker-log; exit 1)
 
   e2e-cli:
     name: CLI e2e tests
