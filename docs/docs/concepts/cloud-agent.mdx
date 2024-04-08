@@ -26,24 +26,20 @@ If you have a [publicly accessible application, then view this page](/concepts/c
 
 ## Get Started
 
-Go to your Environment Agent Settings page:
+Go to your Environment Agent Settings page.
 
-![Agent Settings](../img/agent-settings-0.14.png)
+![Agent Settings](https://res.cloudinary.com/djwdcmwdz/image/upload/v1712602150/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_597cf82c754c2a01_settings_2_bs2zc9.png)
 
-Turn the **Run Agent on the Cloud** switch on:
+Select **"Application is publicly accessible"**. This will start an instance of Tracetest Agent in your Tracetest Account.
 
-![Agent Settings Switch](../img/agent-settings-switch-0.14.png)
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1712602455/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_597cf82c754c2a01_settings_3_xyexhw.png)
 
-Wait for the Agent information is ready:
-
-![Cloud Agent](../img/agent-settings-cloud-0.14.png)
-
-Configure the public trace data store that the trace data is being written into via the configure data store tab or use the supplied OTLP endpoints to alter your OTel Collector configuration to send trace information via either gRPC or HTTP directly to Tracetest.io.
+Configure the publicly accessible tracing backend you're using via the tracing backend tab or use the supplied OTLP endpoints to alter your OpenTelemetry Collector configuration to send trace information via either gRPC or HTTP directly to Tracetest.
 
 ## How It Works
 
 - Tracetest Cloud Agent executes tests from [Tracetest](https://app.tracetest.io), so it must be able to reach the public endpoint. It gathers the response from the trigger and updates the test run.
-- Tracetest Cloud Agent listens on OTLP ports 4317 (gRPC) and 4318 (HTTP) for OpenTelemetry trace spans to capture distributed trace data and relay it to [Tracetest](https://app.tracetest.io).
+- Tracetest Cloud Agent listens on port `443` (both gRPC and HTTP) for OpenTelemetry trace spans to capture distributed trace data and relay it to [Tracetest](https://app.tracetest.io).
 - Alternatively, the Tracetest Cloud Agent can gather the associated trace data from a publicly reachable trace data store. Eg. a Grafana Cloud Tempo instance which has been configured for this environment via the Configure Data Store tab.
 - With both the response and trace, you build tests and create assertions with data from either or both of them.
 
