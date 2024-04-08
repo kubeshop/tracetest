@@ -1,6 +1,6 @@
 ---
 id: agent
-title: Tracetest Agent
+title: Tracetest Agent (Private Access)
 description: The Tracetest Agent enables Tracetest to access your application under test and to ingest trace data from your OpenTelemetry Collector or tracing backend. Learn about Tracetest Agent concepts and how it works when running in your environment as an executable, Docker container, or in your Cloud Native infrastructure.
 keywords:
   - tracetest
@@ -11,7 +11,25 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
-The Tracetest Agent enables Tracetest to access your application under test and to ingest trace data from your OpenTelemetry Collector or tracing backend. It's a lightweight, dependency-free, agent that runs in your environment as an executable, Docker container, or in your Cloud Native infrastructure.
+This page explains how Tracetest accesses your private application (VPC, firewall, etc.) and its traces to run tests.
+
+If your application is in a private environment, you will use the Tracetest Agent in your environment to run tests and ingest trace data from your OpenTelemetry Collector or tracing backend.
+
+Tracetest Agent is a lightweight, dependency-free, agent that runs in your environment as an executable, Docker container, or in your Cloud Native infrastructure.
+
+If you have a [publicly accessible application, then view this page](/concepts/cloud-agent).
+
+## Get Started
+
+Go to your Environment Agent Settings page.
+
+![Agent Settings](https://res.cloudinary.com/djwdcmwdz/image/upload/v1712586955/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_597cf82c754c2a01_settings_ykn53w.png)
+
+Select **"Application is in a private environment"**. Use the `--api-key` to run the Tracetest Agent in your environment.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1712587335/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_597cf82c754c2a01_settings_1_iumdfz.png)
+
+Configure the tracing backend you're using via the tracing backend tab or use the supplied OTLP endpoints to alter your OpenTelemetry Collector configuration to send trace information via either gRPC or HTTP directly to Tracetest.
 
 ## How It Works
 

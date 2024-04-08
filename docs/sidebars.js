@@ -701,12 +701,12 @@ const sidebars = {
         {
           type: "doc",
           id: "concepts/agent",
-          label: "Tracetest Agent",
+          label: "Tracetest Agent (Private Access)",
         },
         {
           type: "doc",
           id: "concepts/cloud-agent",
-          label: "Tracetest Cloud Agent (Beta)",
+          label: "Tracetest Cloud Agent (Public Access)",
         },
         {
           type: "doc",
