@@ -301,11 +301,15 @@ jobs:
         run: |
           ./scripts/wait-for-port.sh 11633
 
-          tracetest run testsuite --file ./testing/server-tracetesting/features/http_test/_test_suite.yml --vars tracetesting-vars || echo "HTTP Test suite failed"
-          tracetest run testsuite --file ./testing/server-tracetesting/features/grpc_test/_test_suite.yml --vars tracetesting-vars || echo "GRPC Test suite failed"
-          tracetest run testsuite --file ./testing/server-tracetesting/features/kafka_test/_test_suite.yml --vars tracetesting-vars || echo "Kafka Test suite failed"
-          tracetest run testsuite --file ./testing/server-tracetesting/features/variableset/_test_suite.yml --vars tracetesting-vars || echo "VariableSet Test suite failed"
-          tracetest run testsuite --file ./testing/server-tracetesting/features/testsuite/_test_suite.yml --vars tracetesting-vars || echo "TestSuite Test suite failed"
+          EXIT_STATUS=0
+
+          tracetest run testsuite --file ./testing/server-tracetesting/features/http_test/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "HTTP Test suite failed")
+          tracetest run testsuite --file ./testing/server-tracetesting/features/grpc_test/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "GRPC Test suite failed")
+          tracetest run testsuite --file ./testing/server-tracetesting/features/kafka_test/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "Kafka Test suite failed")
+          tracetest run testsuite --file ./testing/server-tracetesting/features/variableset/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "VariableSet Test suite failed")
+          tracetest run testsuite --file ./testing/server-tracetesting/features/testsuite/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "TestSuite Test suite failed")
+
+          exit $EXIT_STATUS
 
 
   e2e-cli:
