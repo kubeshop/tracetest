@@ -1,0 +1,56 @@
+---
+id: overview
+title: Connecting to Tracing Backends
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces. Learn how to connect tracing backends.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+Tracetest supports two types of tracing backend integrations.
+
+## Native Connection (Polling)
+
+When using a tracing backend integration that supports the native connection, Tracetest will pull telemetry data directly from your tracing backend for every test run.
+
+## OTLP Ingest Endpoint
+
+When using a tracing backend integration that does not support a native connection, or no tracing backend at all, you'll resort to using the Tracetest OTLP ingest endpoint. [Tracetest Agent](/configuration/agent) exposes an OTLP endpoint that listens for trace data on ports `4317` (gRPC) and `4318` (HTTP). As does [Tracetest Cloud Agent](/configuration/cloud-agent), but uses the same TLS port `443` for OTLP ingestion.
+
+## Supported Tracing Backends
+
+Currently, Tracetest supports the following data stores. Click on the respective data store to view configuration examples:
+
+- [AWS X-Ray](/configuration/connecting-to-data-stores/awsxray)
+- [Azure App Insights](/configuration/connecting-to-data-stores/azure-app-insights)
+- [Datadog](/configuration/connecting-to-data-stores/datadog)
+- [Dynatrace](/configuration/connecting-to-data-stores/dynatrace)
+- [Elastic APM](/configuration/connecting-to-data-stores/elasticapm)
+- [Grafana Tempo](/configuration/connecting-to-data-stores/tempo)
+- [Honeycomb](/configuration/connecting-to-data-stores/honeycomb)
+- [Instana](/configuration/connecting-to-data-stores/instana)
+- [Jaeger](/configuration/connecting-to-data-stores/jaeger)
+- [Lightstep](/configuration/connecting-to-data-stores/lightstep)
+- [New Relic](/configuration/connecting-to-data-stores/new-relic)
+- [OpenSearch](/configuration/connecting-to-data-stores/opensearch)
+- [OpenTelemetry Collector](/configuration/connecting-to-data-stores/opentelemetry-collector)
+- [SignalFX](/configuration/connecting-to-data-stores/signalfx)
+- [SigNoz](/configuration/connecting-to-data-stores/signoz)
+- [Sumo Logic](/configuration/connecting-to-data-stores/sumologic)
+
+## Using Tracetest without a Tracing Backend (OTLP ingest endpoint)
+
+Another option is to send traces directly to Tracetest using the OpenTelemetry Collector. And, you don't have to change your existing pipelines to do so.
+
+View [configuration for OpenTelemetry Collector](/configuration/connecting-to-data-stores/opentelemetry-collector) for more details.
+
+## Tracing Backend Configuration Examples
+
+- View the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
+- Follow the [**Recipes**](/examples-tutorials/recipes) for guided walkthroughs of sample use cases.
+
+We will be adding new data stores over the next couple of months - [let us know](https://github.com/kubeshop/tracetest/issues/new/choose) any additional data stores you would like to see us support.

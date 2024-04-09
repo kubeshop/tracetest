@@ -1,7 +1,7 @@
 ---
 id: overview
 title: Configuration
-description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces. Learn how to get started with creating tests once you open Tracetest.
+description: Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces. Learn how to configure Tracetest.
 keywords:
   - tracetest
   - trace-based testing
@@ -11,40 +11,29 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
-There is one configuration option with Tracetest:
+To enable Tracetest to run end-to-end tests against trace data, you need to configure access. Tracetest is designed to work with tracing backends, or to ingest trace data via an OTLP ingest endpoint.
 
-- [Agent configuration](/configuration/agent) to run it locally, in Docker, or Kubernetes.
+## Enable Tracetest to Access Your Application
 
-## Supported Trace Data Stores
+There are two configuration options for triggering tests and ingesting trace data into Tracetest:
 
-Tracetest is designed to work with different trace data stores. To enable Tracetest to run end-to-end tests against trace data, you need to configure Tracetest to access trace data.
+- [Tracetest Agent configuration (private access)](/configuration/agent): You run an agent locally in your environment, as a process, or in Docker/Kubernetes as a container. Prefferred option if you are using a VPC, firewall, etc.
+- [Tracetest Cloud Agent configuration (public access)](/configuration/cloud-agent): We run an agent in your Tracetest account with publicly accesible endpoints. You manage nothing. Prefferred option if you are using serverless architectures.
 
-Currently, Tracetest supports the following data stores. Click on the respective data store to view configuration examples:
+## Connecting Tracetest to Tracing Backends
 
-- [AWS X-Ray](/configuration/connecting-to-data-stores/awsxray)
-- [Azure App Insights](/configuration/connecting-to-data-stores/azure-app-insights)
-- [Datadog](/configuration/connecting-to-data-stores/datadog)
-- [Dynatrace](/configuration/connecting-to-data-stores/dynatrace)
-- [Elastic APM](/configuration/connecting-to-data-stores/elasticapm)
-- [Grafana Tempo](/configuration/connecting-to-data-stores/tempo)
-- [Honeycomb](/configuration/connecting-to-data-stores/honeycomb)
-- [Jaeger](/configuration/connecting-to-data-stores/jaeger)
-- [Lightstep](/configuration/connecting-to-data-stores/lightstep)
-- [New Relic](/configuration/connecting-to-data-stores/new-relic)
-- [OpenSearch](/configuration/connecting-to-data-stores/opensearch)
-- [OpenTelemetry Collector](/configuration/connecting-to-data-stores/opentelemetry-collector)
-- [SignalFX](/configuration/connecting-to-data-stores/signalfx)
-- [SigNoz](/configuration/connecting-to-data-stores/signoz)
-- [Sumo Logic](/configuration/connecting-to-data-stores/sumologic)
+Tracetest supports [two types of tracing backend integrations](/configuration/connecting-to-data-stores/overview):
 
-## Using Tracetest without a Trace Data Store
+- Native connection (polling)
+- OTLP ingest endpoint
 
-Another option is to send traces directly to Tracetest using the OpenTelemetry Collector. And, you don't have to change your existing pipelines to do so.
+:::note Want to see your options?
+[View the list of supported tracing backends, here.](/configuration/connecting-to-data-stores/overview#supported-tracing-backends)
+:::
 
-View [configuration for OpenTelemetry Collector](/configuration/connecting-to-data-stores/opentelemetry-collector) for more details.
+## Access and Tracing Backend Configuration Examples
 
-## Trace Data Store Configuration Examples
-
-Examples of configuring Tracetest to access different data stores can be found in the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples). Check out the [**Recipes**](../examples-tutorials/recipes.mdx) for guided walkthroughs of sample use cases.
+- View the [`examples` folder of the Tracetest GitHub repo](https://github.com/kubeshop/tracetest/tree/main/examples).
+- Follow the [**Recipes**](/examples-tutorials/recipes) for guided walkthroughs of sample use cases.
 
 We will be adding new data stores over the next couple of months - [let us know](https://github.com/kubeshop/tracetest/issues/new/choose) any additional data stores you would like to see us support.

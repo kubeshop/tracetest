@@ -567,8 +567,22 @@ const sidebars = {
       },
       items: [
         {
+          type: "doc",
+          id: "configuration/agent",
+          label: "Tracetest Agent (Private Access)",
+        },
+        {
+          type: "doc",
+          id: "configuration/cloud-agent",
+          label: "Tracetest Cloud Agent (Public Access)",
+        },
+        {
           type: "category",
-          label: "Connecting to Data Stores",
+          label: "Connecting to Tracing Backends",
+          link: {
+            type: "doc",
+            id: "configuration/connecting-to-data-stores/overview",
+          },
           items: [
             {
               type: "doc",
@@ -651,11 +665,6 @@ const sidebars = {
               label: "OpenTelemetry Collector Configuration File Reference",
             },
           ],
-        },
-        {
-          type: "doc",
-          id: "configuration/agent",
-          label: "Tracetest Agent",
         },
         {
           type: "doc",
