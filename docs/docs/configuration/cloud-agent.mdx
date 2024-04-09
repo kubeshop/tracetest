@@ -1,0 +1,30 @@
+---
+id: cloud-agent
+title: Configuring the Tracetest Cloud Agent (Public Access)
+description: The Tracetest Agent enables Tracetest to access your application under test and to ingest trace data from your OpenTelemetry Collector or tracing backend. Learn how to configure the Tracetest Agent that runs in your environment as an executable, Docker container, or in your Cloud Native infrastructure.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+The Tracetest Cloud Agent allows you to run Tracetest tests against public facing endpoints without deploying the Tracetest Agent locally. This allows you to trigger tests against public endpoints and collect trace data from either public tracing backends or, alternatively, directly receive incoming OTLP data.
+
+Tracetest Cloud Agent is the same as Tracetest Agent but is managed and running as part of your Tracetest account.
+
+## Start Tracetest Cloud Agent
+
+Tracetest Cloud Agent runs in your Tracetest account.
+
+[Sign in to Tracetest](https://app.tracetest.io/) and follow the instructions on the `Settings > Access` page.
+
+Select `Application is publicly accessible`.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1712602150/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_597cf82c754c2a01_settings_2_bs2zc9.png)
+
+## Configure Tracetest Cloud Agent
+
+Once started, Tracetest Cloud Agent exposes TLS port `443` to ingest traces via `gRPC` and `HTTP` and is responsible for running tests. [Read the detailed concepts here](/concepts/cloud-agent).

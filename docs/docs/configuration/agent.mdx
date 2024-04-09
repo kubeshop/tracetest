@@ -1,6 +1,6 @@
 ---
 id: agent
-title: Configuring the Tracetest Agent
+title: Configuring the Tracetest Agent (Private Access)
 description: The Tracetest Agent enables Tracetest to access your application under test and to ingest trace data from your OpenTelemetry Collector or tracing backend. Learn how to configure the Tracetest Agent that runs in your environment as an executable, Docker container, or in your Cloud Native infrastructure.
 keywords:
   - tracetest
@@ -17,20 +17,17 @@ The Tracetest Agent enables Tracetest to access your application under test and 
 
 Tracetest Agent connects to Tracetest via an API Key.
 
-[Start Tracetest Agent](../getting-started/installation.mdx) in your environment to begin testing!
+[Sign in to Tracetest](https://app.tracetest.io/) and follow the instructions on the `Settings > Access` page.
 
-Or, [sign in to Tracetest](https://app.tracetest.io/) and follow the instructions on the `Settings > Agent` page.
+Select `Application is in a private environment`.
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1696941536/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_0e807879e2e38d28_settings_j4zt1b.png)
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1712586955/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_597cf82c754c2a01_settings_ykn53w.png)
 
 ## Configure Tracetest Agent
 
-Once started, Tracetest Agent exposes OTLP ports `4317` and `4318` to ingest traces via `gRPC` and `HTTP` and is responsible for running tests. Read the detailed concepts [here](../concepts/agent).
+Once started, Tracetest Agent exposes OTLP ports `4317` and `4318` to ingest traces via `gRPC` and `HTTP` and is responsible for running tests. [Read the detailed concepts here](/concepts/agent).
 
 :::note
-Unlike with [Tracetest Core](/core/getting-started/overview.mdx), you are not required to run a dedicated [Tracetest Server](/core/configuration/server.mdx). Running Tracetest Agent and using Tracetest as the remote server requires no configuration or infrastructure management.
-:::
-
-If you are running the agent on a server and want to see detailed information about its execution, you can start the agent with the `--mode=verbose` flag:
-
+If you want to see detailed information about an isntance of Tracetest Agent, you can use the `--mode=verbose` flag:
 ![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1701300172/docs/verbose-mode_ddv3ql.png)
+:::
