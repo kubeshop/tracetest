@@ -288,7 +288,7 @@ jobs:
 
       - name: Configure Tracetest CLI
         timeout-minutes: 5
-        uses: kubeshop/tracetest-github-action@v1
+        uses: kubeshop/tracetest-github-action@39580262bc7ea7808a71a8d9147b0a96b4dfa950
         with:
           token:  ${{secrets.TRACETEST_CLOUD_CI_TOKEN}}
           apiKey: ${{secrets.TRACETEST_CLOUD_CI_API_KEY}}
