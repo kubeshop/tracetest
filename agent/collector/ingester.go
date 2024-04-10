@@ -7,11 +7,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/kubeshop/tracetest/agent/collector/processors"
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/server/otlp"
-	"go.opencensus.io/trace"
+	"go.opentelemetry.io/otel/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"go.uber.org/zap"
@@ -43,6 +44,9 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 		traceCache:     cfg.traceCache,
 		logger:         cfg.logger,
 		sensor:         cfg.sensor,
+		processors: []processors.Processor{
+			processors.NewDatadogProcessor(),
+		},
 	}
 
 	if startRemoteServer {
@@ -77,6 +81,8 @@ type forwardIngester struct {
 
 	statistics Statistics
 
+	processors []processors.Processor
+
 	sync.Mutex
 }
 
@@ -108,6 +114,15 @@ func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
 }
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
+	for _, processor := range i.processors {
+		newRequest, err := processor.Process(request)
+		if err != nil {
+			return nil, fmt.Errorf("cannot run processor: %w", err)
+		}
+
+		request = newRequest
+	}
+
 	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
 
