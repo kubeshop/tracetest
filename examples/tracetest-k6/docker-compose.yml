@@ -46,6 +46,8 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+    ports:
+      - 16685:16685
 
   cache:
     image: redis:6
