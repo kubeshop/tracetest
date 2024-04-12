@@ -29,6 +29,8 @@ type Test struct {
 	Trigger   *Trigger   `json:"trigger,omitempty"`
 	// If true, the test will not collect a trace
 	SkipTraceCollection *bool `json:"skipTraceCollection,omitempty"`
+	// ID of the polling profile to be used for this test
+	PollingProfile *string `json:"pollingProfile,omitempty"`
 	// specification of assertions that are going to be made
 	Specs []TestSpec `json:"specs,omitempty"`
 	// define test outputs, in a key/value format. The value is processed as an expression
@@ -277,6 +279,38 @@ func (o *Test) SetSkipTraceCollection(v bool) {
 	o.SkipTraceCollection = &v
 }
 
+// GetPollingProfile returns the PollingProfile field value if set, zero value otherwise.
+func (o *Test) GetPollingProfile() string {
+	if o == nil || isNil(o.PollingProfile) {
+		var ret string
+		return ret
+	}
+	return *o.PollingProfile
+}
+
+// GetPollingProfileOk returns a tuple with the PollingProfile field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Test) GetPollingProfileOk() (*string, bool) {
+	if o == nil || isNil(o.PollingProfile) {
+		return nil, false
+	}
+	return o.PollingProfile, true
+}
+
+// HasPollingProfile returns a boolean if a field has been set.
+func (o *Test) HasPollingProfile() bool {
+	if o != nil && !isNil(o.PollingProfile) {
+		return true
+	}
+
+	return false
+}
+
+// SetPollingProfile gets a reference to the given string and assigns it to the PollingProfile field.
+func (o *Test) SetPollingProfile(v string) {
+	o.PollingProfile = &v
+}
+
 // GetSpecs returns the Specs field value if set, zero value otherwise.
 func (o *Test) GetSpecs() []TestSpec {
 	if o == nil || isNil(o.Specs) {
@@ -403,6 +437,9 @@ func (o Test) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.SkipTraceCollection) {
 		toSerialize["skipTraceCollection"] = o.SkipTraceCollection
+	}
+	if !isNil(o.PollingProfile) {
+		toSerialize["pollingProfile"] = o.PollingProfile
 	}
 	if !isNil(o.Specs) {
 		toSerialize["specs"] = o.Specs
