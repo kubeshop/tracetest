@@ -11,14 +11,14 @@ import (
 	"go.uber.org/zap"
 )
 
-type applyTestFunc func(context.Context, fileutil.File) (fileutil.File, error)
+type applyResourceFunc func(context.Context, fileutil.File) (fileutil.File, error)
 
 type testSuite struct {
 	logger      *zap.Logger
-	applyTestFn applyTestFunc
+	applyTestFn applyResourceFunc
 }
 
-func TestSuite(logger *zap.Logger, applyTestFn applyTestFunc) testSuite {
+func TestSuite(logger *zap.Logger, applyTestFn applyResourceFunc) testSuite {
 	return testSuite{
 		logger:      cmdutil.GetLogger(),
 		applyTestFn: applyTestFn,
