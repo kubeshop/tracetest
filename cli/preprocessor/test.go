@@ -69,13 +69,13 @@ func (t test) mapPollingProfiles(ctx context.Context, input fileutil.File, test 
 		return openapi.TestResource{}, fmt.Errorf("cannot read polling profile file: %w", err)
 	}
 
-	testFile, err := t.applyPollingProfileFunc(ctx, f)
+	pollingProfileFile, err := t.applyPollingProfileFunc(ctx, f)
 	if err != nil {
 		return openapi.TestResource{}, fmt.Errorf("cannot apply polling profile '%s': %w", *pollingProfilePath, err)
 	}
 
 	var pollingProfile openapi.PollingProfile
-	err = yaml.Unmarshal(testFile.Contents(), &pollingProfile)
+	err = yaml.Unmarshal(pollingProfileFile.Contents(), &pollingProfile)
 	if err != nil {
 		return openapi.TestResource{}, fmt.Errorf("cannot unmarshal updated pollingProfile '%s': %w", *pollingProfilePath, err)
 	}
