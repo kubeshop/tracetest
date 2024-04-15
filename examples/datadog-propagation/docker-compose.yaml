@@ -1,0 +1,64 @@
+version: '3'
+services:
+  api-otel:
+    image: quick-start-api-otel
+    build: ./quick_start_api_otel/.
+    platform: linux/amd64
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 8080:8080
+    environment:
+      TELEMETRY_TYPE: otel
+      SERVICE_NAME: quick-start-api-otel
+      RAILS_ENV: development
+      REMOTE_API: api-datadog
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      DD_TRACE_ENABLED: false
+      DD_INSTRUMENTATION_TELEMETRY_ENABLED: false
+
+  api-datadog:
+    image: quick-start-api-datadog
+    build: ./quick_start_api_datadog/.
+    platform: linux/amd64
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 8081:8080
+    environment:
+      TELEMETRY_TYPE: datadog
+      SERVICE_NAME: quick-start-api-datadog
+      RAILS_ENV: development
+      REMOTE_API: api-otel
+      DD_TRACE_AGENT_URL: http://otel-collector:8126
+      DD_AGENT_HOST: otel-collector
+      DD_ENV: docker
+      DD_TRACE_128_BIT_TRACEID_GENERATION_ENABLED: true
+      DD_TRACE_PROPAGATION_STYLE: tracecontext
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.97.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector/collector.config.yaml:/otel-local-config.yaml
+
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      TRACETEST_DEV: ${TRACETEST_DEV}
+      TRACETEST_API_KEY: ${TRACETEST_API_KEY}
+      TRACETEST_MODE: verbose
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    ports:
+      - 16685:16685
+      - 16686:16686

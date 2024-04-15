@@ -1,0 +1,45 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+  datadog:
+    endpoint: 0.0.0.0:8126
+    read_timeout: 60s
+
+processors:
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100
+  batch:
+    timeout: 100ms
+  transform:
+    trace_statements:
+      - context: span
+        statements:
+          - set(cache["upper_trace_id"], attributes["propagation.upper_trace_id"]) where attributes["propagation.upper_trace_id"] != nil
+          - set(cache["lower_trace_id"], Substring(trace_id.string, 16, 16)) where cache["upper_trace_id"] != nil
+          - set(cache["combined_trace_id"], Concat([cache["upper_trace_id"], cache["lower_trace_id"]],"")) where cache["upper_trace_id"] != nil
+          - set(trace_id.string, cache["combined_trace_id"]) where cache["combined_trace_id"] != nil
+
+exporters:
+  debug:
+    verbosity: detailed
+
+  otlp/tracetest:
+    endpoint: tracetest-agent:4317
+    tls:
+      insecure: true
+
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp, datadog]
+      processors: [transform, probabilistic_sampler, batch]
+      exporters: [otlp/tracetest, otlp/jaeger, debug]
