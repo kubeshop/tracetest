@@ -1,5 +1,9 @@
 version: '3'
 services:
+  #########################
+  # Instrumented APIs
+  #########################
+
   api-otel:
     image: quick-start-api-otel
     build: ./quick_start_api_otel/.
@@ -9,13 +13,11 @@ services:
     ports:
       - 8080:8080
     environment:
-      TELEMETRY_TYPE: otel
-      SERVICE_NAME: quick-start-api-otel
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
       RAILS_ENV: development
       REMOTE_API: api-datadog
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
-      DD_TRACE_ENABLED: false
-      DD_INSTRUMENTATION_TELEMETRY_ENABLED: false
+      SERVICE_NAME: quick-start-api-otel
+      TELEMETRY_TYPE: otel
 
   api-datadog:
     image: quick-start-api-datadog
@@ -26,15 +28,20 @@ services:
     ports:
       - 8081:8080
     environment:
-      TELEMETRY_TYPE: datadog
-      SERVICE_NAME: quick-start-api-datadog
-      RAILS_ENV: development
-      REMOTE_API: api-otel
-      DD_TRACE_AGENT_URL: http://otel-collector:8126
       DD_AGENT_HOST: otel-collector
       DD_ENV: docker
       DD_TRACE_128_BIT_TRACEID_GENERATION_ENABLED: true
+      DD_TRACE_AGENT_URL: http://otel-collector:8126
       DD_TRACE_PROPAGATION_STYLE: tracecontext
+      INJECT_UPPER_TRACE_ID: true
+      RAILS_ENV: development
+      REMOTE_API: api-otel
+      SERVICE_NAME: quick-start-api-datadog
+      TELEMETRY_TYPE: datadog
+
+  #########################
+  # Observability stack
+  #########################
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.97.0
@@ -42,14 +49,7 @@ services:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
-      - ./collector/collector.config.yaml:/otel-local-config.yaml
-
-  tracetest-agent:
-    image: kubeshop/tracetest-agent:latest
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-      TRACETEST_API_KEY: ${TRACETEST_API_KEY}
-      TRACETEST_MODE: verbose
+      - ./collector/collector.config.step3.yaml:/otel-local-config.yaml
 
   jaeger:
     image: jaegertracing/all-in-one:latest

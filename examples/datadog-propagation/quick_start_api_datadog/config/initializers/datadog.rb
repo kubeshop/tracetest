@@ -10,14 +10,11 @@ Datadog.configure do |c|
 
   # List of header formats that should be extracted
   c.tracing.distributed_tracing.propagation_extract_style = [ 'tracecontext' ]
-  # c.tracing.distributed_tracing.propagation_extract_first = true
 
   # List of header formats that should be injected
   c.tracing.distributed_tracing.propagation_inject_style = [ 'tracecontext' ]
-
   c.tracing.distributed_tracing.propagation_style = [ 'tracecontext' ]
 
-  # c.tracing.trace_id_128_bit_generation_enabled = true
 end
 
 module Datadog
@@ -25,29 +22,16 @@ module Datadog
     module Transport
       class SerializableTrace
         def to_msgpack(packer = nil)
+          if ENV.has_key?('INJECT_UPPER_TRACE_ID')
+            return trace.spans.map { |s| SerializableSpan.new(s) }.to_msgpack(packer)
+          end
+
           upper_trace_id = trace.spans.find { |span| span.meta.has_key?('_dd.p.tid') }.meta['_dd.p.tid']
           trace.spans.each do |span|
             span.meta["propagation.upper_trace_id"] = upper_trace_id
           end
 
           trace.spans.map { |s| SerializableSpan.new(s) }.to_msgpack(packer)
-        end
-
-        def to_json(*args)
-          upper_trace_id = trace.spans.find { |span| span.meta.has_key?('_dd.p.tid') }.meta['_dd.p.tid']
-          trace.spans.each do |span|
-            span.meta["propagation.upper_trace_id"] = upper_trace_id
-          end
-
-          trace.spans.map do |s|
-            span_as_hash = SerializableSpan.new(s).to_hash
-
-            puts '----------------'
-            puts "#{span_as_hash}"
-            puts '----------------'
-
-            span_as_hash
-          end.to_json(*args)
         end
       end
     end

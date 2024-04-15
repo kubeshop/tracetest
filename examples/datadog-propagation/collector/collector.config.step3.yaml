@@ -18,7 +18,7 @@ processors:
     trace_statements:
       - context: span
         statements:
-          - set(cache["upper_trace_id"], attributes["_dd.p.tid"]) where attributes["_dd.p.tid"] != nil
+          - set(cache["upper_trace_id"], attributes["propagation.upper_trace_id"]) where attributes["propagation.upper_trace_id"] != nil
           - set(cache["lower_trace_id"], Substring(trace_id.string, 16, 16)) where cache["upper_trace_id"] != nil
           - set(cache["combined_trace_id"], Concat([cache["upper_trace_id"], cache["lower_trace_id"]],"")) where cache["upper_trace_id"] != nil
           - set(trace_id.string, cache["combined_trace_id"]) where cache["combined_trace_id"] != nil

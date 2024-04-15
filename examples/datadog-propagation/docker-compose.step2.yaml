@@ -1,0 +1,63 @@
+version: '3'
+services:
+  #########################
+  # Instrumented APIs
+  #########################
+
+  api-otel:
+    image: quick-start-api-otel
+    build: ./quick_start_api_otel/.
+    platform: linux/amd64
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 8080:8080
+    environment:
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://otel-collector:4318/v1/traces
+      RAILS_ENV: development
+      REMOTE_API: api-datadog
+      SERVICE_NAME: quick-start-api-otel
+      TELEMETRY_TYPE: otel
+
+  api-datadog:
+    image: quick-start-api-datadog
+    build: ./quick_start_api_datadog/.
+    platform: linux/amd64
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - 8081:8080
+    environment:
+      DD_AGENT_HOST: otel-collector
+      DD_ENV: docker
+      DD_TRACE_128_BIT_TRACEID_GENERATION_ENABLED: true
+      DD_TRACE_AGENT_URL: http://otel-collector:8126
+      DD_TRACE_PROPAGATION_STYLE: tracecontext
+      RAILS_ENV: development
+      REMOTE_API: api-otel
+      SERVICE_NAME: quick-start-api-datadog
+      TELEMETRY_TYPE: datadog
+
+  #########################
+  # Observability stack
+  #########################
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.97.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector/collector.config.step2.yaml:/otel-local-config.yaml
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    ports:
+      - 16685:16685
+      - 16686:16686
