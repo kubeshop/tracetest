@@ -194,3 +194,20 @@ Available functions:
 :::tip
 [Continue reading about Test Outputs, here.](/cli/creating-test-outputs)
 :::
+
+### Defining a polling profile
+
+Some tests have different requirements than others, it means that some will take longer to run than other tests, so it's crucial to be able to
+define the trace polling strategy at the test level:\
+
+```yaml
+type: Test
+spec:
+  name: my test
+  pollingProfile: ./my-polling-profile.yaml
+  trigger: http
+  httpRequest:
+    ...
+```
+
+This will make all runs from this test to use this specific test profile, and in case no value is defined, the test will use your default polling profile.
