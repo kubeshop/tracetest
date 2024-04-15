@@ -30,10 +30,15 @@ docker compose -f ./docker-compose.step1.yaml up
 
 The second file, `docker-compose.step2.yaml`, runs the OTel Collector with a `transform` processor that fixes the `TraceID` for spans that have `_dd.p.tid` attribute. After calling a `curl` request, you should see one trace that has the first span of the Datadog-instrumented API call along with all spans emitted by the OTelSDK-instrumented API, and another trace with Datadog-instrumented API that doesn't have `_dd.p.tid` attribute. You can run it with:
 ```sh
-docker compose -f ./docker-compose.step1.yaml up
+docker compose -f ./docker-compose.step2.yaml up
 ```
 
-The third file, `docker-compose.step3.yaml`, does a patch on `ddtrace` to inject `_dd.p.tid` attribute on each span instrumented by `ddtrace`, renaming the  runs the OTel Collector with a `transform` processor that fixes the `TraceID` for spans that have `_dd.p.tid` attribute. After calling a `curl` request, you should see one trace that has the first span of the Datadog-instrumented API call along with all spans emitted by the OTelSDK-instrumented API, and another trace with Datadog-instrumented API that doesn't have `_dd.p.tid` attribute. You can run it with:
+The third file, `docker-compose.step3.yaml`, does a patch on `ddtrace` to inject `_dd.p.tid` attribute on each span instrumented by `ddtrace`, also renaming `_dd.p.tid` attribute to `propagation.upper_trace_id`. This version runs the OTel Collector with a `transform` processor that fixes the `TraceID` for spans that have `propagation.upper_trace_id` attribute. After calling a `curl` request, you should see just one trace with all spans emitted by the OTelSDK-instrumented API and Datadog-instrumented API. You can run it with:
 ```sh
-docker compose -f ./docker-compose.step1.yaml up
+docker compose -f ./docker-compose.step3.yaml up
+```
+
+The last file, `docker-compose.step4.yaml`, adds Tracetest to the stack to allow us to test the traces and guarantee that everything is working right. You can run it with:
+```sh
+TRACETEST_API_KEY=your-api-key docker compose -f ./docker-compose.step4.yaml up
 ```
