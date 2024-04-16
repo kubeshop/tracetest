@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "artillery": "^2.0.7",
-    "artillery-engine-tracetest": "^0.0.32",
-    "artillery-plugin-tracetest": "^0.0.32"
+    "artillery": "2.0.9-83ceb0d",
+    "artillery-engine-tracetest": "^0.0.37",
+    "artillery-plugin-tracetest": "^0.0.37"
   }
 }

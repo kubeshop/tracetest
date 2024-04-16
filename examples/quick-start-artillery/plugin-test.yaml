@@ -1,8 +1,8 @@
 config:
   target: "http://localhost:8081"
   phases:
-    - duration: 1
-      arrivalRate: 1
+    - duration: 5
+      arrivalRate: 5
   plugins:
     publish-metrics:
       - type: "open-telemetry"
@@ -22,7 +22,7 @@ config:
             environment: "test"
             tool: "Artillery"
     tracetest:
-      token: <YOUR_TRACETES_ENV_TOKEN>
+      token: <YOUR_TRACETEST_TOKEN>
       definition: import-pokemon-plugin.yaml
       runInfo:
         variables:
