@@ -1,0 +1,33 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+  datadog:
+    endpoint: 0.0.0.0:8126
+    read_timeout: 60s
+
+processors:
+  probabilistic_sampler:
+    hash_seed: 22
+    sampling_percentage: 100
+
+  batch:
+    timeout: 100ms
+
+exporters:
+  debug:
+    verbosity: detailed
+
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp, datadog]
+      processors: [probabilistic_sampler, batch]
+      exporters: [otlp/jaeger, debug]
