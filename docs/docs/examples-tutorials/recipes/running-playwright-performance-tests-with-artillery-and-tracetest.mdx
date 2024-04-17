@@ -31,7 +31,16 @@ This integration is compatible with [Artillery v2.0.10](https://github.com/artil
 
 ## Why is this important?
 
-The Tracetest integration for Playwright enables your current Playwright tests to easily capture a full distributed trace from your OpenTelemetry instrumented frontend and backend system. You can embed a Tracetest in this Playwright test, and allow trace-based testing assertions to be applied across this entire flow, enabling true end-to-end tests across your entire system. Taking it a step further you can use the Playwright engine in Artillery to run performance tests on top if it.
+The Tracetest integration for Playwright enables your current Playwright tests to easily capture a full distributed trace from your OpenTelemetry instrumented front-end and back-end system.
+
+You can embed a Tracetest test in this Playwright test, and allow trace-based testing assertions to be applied across this entire flow, enabling true end-to-end tests across your entire system. Taking it a step further you can use the Playwright engine in Artillery to run performance tests on top if it.
+
+Because you're using traces as test specs you can:
+
+- Get faster MTTR for failing performance tests
+- Assert against the Artillery test execution, Playwright test execution, and the system under test
+- Validate functionality of other parts of your system that may be broken, even when performance tests are passing
+
 
 ## The `@tracetest/playwright` npm Package
 
