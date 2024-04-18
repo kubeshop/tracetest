@@ -134,7 +134,7 @@ You can:
 
 # 🚀 Getting Started
 
-<p align="center">pe
+<p align="center">
   <a target="_new" href="https://kubeshop.wistia.com/medias/dw06408oqz">
     <img src="/assets/introvideo.png" style="width:66%;height:auto">
     <p align="center">
@@ -151,9 +151,9 @@ The easiest and most reliable way to test microservices and distributed apps wit
 
 Get the same experience as with the Cloud-based Managed Tracetest but self-hosted in your own infrastructure. [Book a call](https://dub.sh/tracetest-demo) to get into early access.
 
-### Hobby Self-hosted Open-source Tracetest Core
+## Hobby Self-hosted Open-source Tracetest Core
 
-[Deploy a hobby self-hosted instance of Tracetest Core](/core/getting-started/installation) as a Docker container. It's not suitable for production, but a great way to start using Tracetest Core in local environments.
+[Deploy a hobby self-hosted instance of Tracetest Core](https://docs.tracetest.io/core/getting-started/installation) as a Docker container. It's not suitable for production, but a great way to start using Tracetest Core in local environments.
 
 ### 1️⃣ Install the Tracetest CLI
 
