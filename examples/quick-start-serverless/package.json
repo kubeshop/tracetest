@@ -10,7 +10,7 @@
     "@opentelemetry/instrumentation-fetch": "^0.48.0",
     "@opentelemetry/sdk-trace-base": "^1.21.0",
     "@opentelemetry/sdk-trace-node": "^1.21.0",
-    "@tracetest/client": "^0.0.27",
+    "@tracetest/client": "^0.0.37",
     "@types/aws-lambda": "^8.10.133",
     "@types/node": "^20.11.17",
     "dotenv": "^16.4.1",

@@ -39,9 +39,9 @@ test.beforeAll(async () => {
   });
 });
 
-test.beforeEach(async ({ page }, { title }) => {
+test.beforeEach(async ({ page }, info) => {
   await page.goto('/');
-  await tracetest?.capture(title, page);
+  await tracetest?.capture(page, info);
 });
 
 // optional step to break the playwright script in case a Tracetest test fails
