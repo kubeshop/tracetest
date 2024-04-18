@@ -28,11 +28,11 @@ const WelcomeGuides = [
     button: 'Go to GitHub',
   },
   {
-    name: '⚙️ Configure trace data stores',
-    url: '/configuration/overview#supported-trace-data-stores',
+    name: '⚙️ Configure access and tracing backend',
+    url: '/configuration/overview',
     description: (
       <Translate>
-        Connect your existing trace data store or send traces to Tracetest directly!
+        Configure app access & connect tracing backend / OTLP ingestion!
       </Translate>
     ),
     button: 'Configure',
