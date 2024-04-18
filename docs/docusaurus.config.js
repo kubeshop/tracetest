@@ -121,7 +121,7 @@ const config = {
         // content:
         //   '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/pricing">Tracetest Open Beta is Live. Try it! Give us feedback! 🙌</a>',
         content:
-          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/tracetest-is-going-to-kubecon-cloudnativecon-europe-in-paris">Tracetest is going to KubeCon + CloudNativeCon Europe in Paris 🇫🇷</a>',
+          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/observability-at-kubecon-cloudnativecon-europe-2024-in-paris">👉 Check out the "Observability 🔭 at KubeCon CloudNativeCon EU 2024 Paris" recap! 👈</a>',
         isCloseable: false,
       },  
       navbar: {
