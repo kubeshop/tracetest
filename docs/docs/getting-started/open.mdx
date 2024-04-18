@@ -13,7 +13,9 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 This page showcases opening the Tracetest Web UI and creating a test against the [microservice sample Pokeshop API](/live-examples/pokeshop/overview).
 
-Once you've installed Tracetest, as explained in the [installation guide](./installation.mdx), the Tracetest Agent is running on `localhost` ports `4317` and `4318`. You then access the Tracetest Web UI on [`app.tracetest.io`](https://app.tracetest.io). Here's what will greet you after a fresh install.
+Once you've signed in to Tracetest, as explained in the [installation guide](./installation.mdx), the [Tracetest Agent](/concepts/agent) is running in your environment on ports `4317` and `4318`, or you'll get an API endpoint if you're using the [Tracetest Cloud Agent](/concepts/cloud-agent).
+
+You access the Tracetest Web UI on [`app.tracetest.io`](https://app.tracetest.io). Here's what will greet you after a fresh install.
 
 ![Landing page Tracetest](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688474565/docs/screely-1688474539641_kbhvvc.png)
 
@@ -67,40 +69,6 @@ flowchart TD
 ```
 </details>
 
-
-### Configure the Pokeshop API Demo resource
-
-Configure the `demo` [resource](/core/configuration/provisioning) to quickly create tests either in the Web UI or with the CLI.
-
-In the Web UI go to **Settings > Demo**, toggle **Enable Pokeshop**, and add:
-
-- HTTP Endpoint: `http://localhost:8081`
-- GRPC Endpoint: `localhost:8082`
-
-![Settings](https://res.cloudinary.com/djwdcmwdz/image/upload/v1696251763/docs/screely-1696251756346_ptxb9m.png)
-
-Create a file called `tracetest-provision.yaml`.
-
-```yaml title=tracetest-provision.yaml
----
-type: Demo
-spec:
-  type: pokeshop
-  enabled: true
-  name: pokeshop
-  pokeshop:
-    httpEndpoint: http://localhost:8081
-    grpcEndpoint: localhost:8082
-```
-
-With the CLI, run the command below to enable the `demo` resource.
-
-```bash
-tracetest apply demo -f tracetest-provision.yaml
-```
-
-You can now quickly create tests against the Pokeshop API.
-
 ## Creating Trace-based Tests
 
 You can create tests in two ways:
@@ -122,11 +90,7 @@ On the top right, click the **Create** button and select **Create New Test** in 
 
 ![Create a new test](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688475179/docs/screely-1688475174365_ckq3cn.png)
 
-Select an **HTTP Request** as the **test trigger**, and choose the **Pokeshop - Import** example.
-
-![Select Pokeshop example](https://res.cloudinary.com/djwdcmwdz/image/upload/v1688475514/docs/screely-1688475510090_r6hqmx.png)
-
-This will populate a sample API test against a POST endpoint in the Pokeshop app demo. Clicking **Create & Run** will save and trigger the test.
+Select an **HTTP Request** as the **test trigger**. Clicking **Create & Run** will save and trigger the test.
 
 ![API test against POST endpoint](https://res.cloudinary.com/djwdcmwdz/image/upload/v1696253160/docs/screely-1696253153066_khjz8y.png)
 

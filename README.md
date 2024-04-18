@@ -132,6 +132,57 @@ You can:
       - attr:tracetest.span.duration < 100ms
   ```
 
+# 🚀 Getting Started
+
+<p align="center">pe
+  <a target="_new" href="https://kubeshop.wistia.com/medias/dw06408oqz">
+    <img src="/assets/introvideo.png" style="width:66%;height:auto">
+    <p align="center">
+      Click on the image or this link to watch the "Tracetest Intro Video" video (< 2 minutes)
+    </p>
+  </a>
+</p>
+
+## Cloud-based Managed Tracetest (Free to get started!)
+
+The easiest and most reliable way to test microservices and distributed apps with OpenTelemetry distributed traces is signing up for free at [app.tracetest.io](https://app.tracetest.io/). After creating an account, getting started is as easy as [installing the Tracetest Agent](https://docs.tracetest.io/getting-started/installation).
+
+## Enterprise Self-hosted Tracetest (Coming soon...)
+
+Get the same experience as with the Cloud-based Managed Tracetest but self-hosted in your own infrastructure. [Book a call](https://dub.sh/tracetest-demo) to get into early access.
+
+## Self-hosted Open-source Tracetest Core
+
+### 1️⃣ Install the Tracetest CLI
+
+```bash
+curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s
+```
+
+> [:gear: Read the CLI installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-cli)
+
+### 2️⃣ Install the Tracetest Server
+
+```bash
+tracetest server install
+```
+
+This command will launch an install wizard that automatically installs Tracetest and a [sample Pokeshop Demo app](https://docs.tracetest.io/live-examples/pokeshop/overview) into either Docker or Kubernetes based on your selection.
+
+Or, install Tracetest with Helm. The Tracetest Helm charts are located [here](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
+
+```bash
+helm install tracetest kubeshop/tracetest --namespace=tracetest --create-namespace
+```
+
+> [:gear: Read the Server installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-server)
+
+### 3️⃣ Open Tracetest
+
+Once you've installed Tracetest Server, access the Tracetest Web UI on `http://localhost:11633`.
+
+Check out the [Opening Tracetest guide](https://docs.tracetest.io/core/getting-started/open) to start creating and running tests!
+
 # 🔥 Features
 
 - Works out of the box with your existing OpenTelemetry instrumentation, supporting [numerous trace data stores](https://docs.tracetest.io/configuration/overview/#supported-trace-data-stores), including:
@@ -158,47 +209,6 @@ You can:
 - Define [test suites/transactions](https://docs.tracetest.io/concepts/transactions) to chain tests together and use variables obtained from a test in a subsequent test. These variables can also be loaded from the environment.
 - Run comprehensive [trace analysis and validation](https://docs.tracetest.io/analyzer/concepts) to adhere to OpenTelemetry rules and standards.
 - Configure [test runner](https://docs.tracetest.io/configuration/test-runner) behavior with required gates used when executing your tests to determine whether to mark the test as passed or failed.
-
-# 🚀 Getting Started
-
-<p align="center">
-  <a target="_new" href="https://kubeshop.wistia.com/medias/dw06408oqz">
-    <img src="/assets/introvideo.png" style="width:66%;height:auto">
-    <p align="center">
-      Click on the image or this link to watch the "Tracetest Intro Video" video (< 2 minutes)
-    </p>
-  </a>
-</p>
-
-## 1️⃣ Install the Tracetest CLI
-
-```bash
-curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s
-```
-
-> [:gear: Read the CLI installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-cli)
-
-## 2️⃣ Install the Tracetest Server
-
-```bash
-tracetest server install
-```
-
-This command will launch an install wizard that automatically installs Tracetest and a [sample Pokeshop Demo app](https://docs.tracetest.io/live-examples/pokeshop/overview) into either Docker or Kubernetes based on your selection.
-
-Or, install Tracetest with Helm. The Tracetest Helm charts are located [here](https://github.com/kubeshop/helm-charts/tree/main/charts/tracetest).
-
-```bash
-helm install tracetest kubeshop/tracetest --namespace=tracetest --create-namespace
-```
-
-> [:gear: Read the Server installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-server)
-
-## 3️⃣ Open Tracetest
-
-Once you've installed Tracetest Server, access the Tracetest Web UI on `http://localhost:11633`.
-
-Check out the [Opening Tracetest guide](https://docs.tracetest.io/getting-started/open) to start creating and running tests!
 
 # 🤔 How does Tracetest work?
 
