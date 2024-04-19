@@ -69,7 +69,7 @@ func NewStopperWorker(opts ...StopperOption) *StopperWorker {
 	return worker
 }
 
-func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest) error {
+func (w *StopperWorker) Stop(ctx context.Context, request *proto.StopRequest) error {
 	ctx, span := w.tracer.Start(ctx, "StopRequest Worker operation")
 	defer span.End()
 
@@ -78,15 +78,15 @@ func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest
 
 	errorCounter, _ := w.meter.Int64Counter("tracetest.agent.stopworker.errors")
 
-	w.logger.Debug("Stop request received", zap.Any("stopRequest", stopRequest))
-	w.observer.StartStopRequest(stopRequest)
+	w.logger.Debug("Stop request received", zap.Any("stopRequest", request))
+	w.observer.StartStopRequest(request)
 
-	cacheKey := key(stopRequest.TestID, stopRequest.RunID)
+	cacheKey := key(request.TestID, request.RunID)
 	cancelFn, found := w.cancelContexts.Get(cacheKey)
 	if !found {
 		err := fmt.Errorf("cancel func for StopRequest not found")
-		w.logger.Error(err.Error(), zap.String("testID", stopRequest.TestID), zap.Int32("runID", stopRequest.RunID))
-		w.observer.EndStopRequest(stopRequest, err)
+		w.logger.Error(err.Error(), zap.String("testID", request.TestID), zap.Int32("runID", request.RunID))
+		w.observer.EndStopRequest(request, err)
 		span.RecordError(err)
 
 		errorCounter.Add(ctx, 1)
@@ -94,9 +94,9 @@ func (w *StopperWorker) Stop(ctx context.Context, stopRequest *proto.StopRequest
 		return err
 	}
 
-	cancelFn(errors.New(stopRequest.Type))
+	cancelFn(errors.New(request.Type))
 
-	w.observer.EndStopRequest(stopRequest, nil)
+	w.observer.EndStopRequest(request, nil)
 
 	return nil
 }

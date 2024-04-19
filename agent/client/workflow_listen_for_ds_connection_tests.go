@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
-	"github.com/kubeshop/tracetest/server/telemetry"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 	"go.uber.org/zap"
 )
 
@@ -48,12 +48,8 @@ func (c *Client) startDataStoreConnectionTestListener(ctx context.Context) error
 				continue
 			}
 
-			ctx, err := telemetry.ExtractContextFromStream(stream)
-			if err != nil {
-				logger.Error("could not extract context from stream", zap.Error(err))
-				log.Println("could not extract context from stream %w", err)
-			}
-
+			// we want a new context per request, not to reuse the one from the stream
+			ctx := telemetry.InjectMetadataIntoContext(context.Background(), req.Metadata)
 			err = c.dataStoreConnectionListener(ctx, &req)
 			if err != nil {
 				logger.Error("could not handle data store connection test request", zap.Error(err))

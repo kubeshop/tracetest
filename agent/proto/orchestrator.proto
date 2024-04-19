@@ -50,10 +50,11 @@ message Empty {}
 
 // StopRequest is a user request to intercept a running test.
 // It can be used to stop a test or skip the polling.
-message StopRequest{
-  string testID = 1;
-  int32 runID = 2;
-  string type = 3;
+message StopRequest {
+    map <string, string> metadata = 1;
+    string testID = 2;
+    int32 runID = 3;
+    string type = 4;
 }
 
 // ConnectRequest is the initial request sent by the agent to the orchestrator
@@ -81,7 +82,8 @@ message SessionConfiguration {
 
 // ShutdownRequest is a request sent by the server to an agent so it should shut down
 message ShutdownRequest {
-    string reason = 1;
+    map <string, string> metadata = 1;
+    string reason = 2;
 }
 
 // AgentIdentification contains data used by the server to validate an agent identity
@@ -90,11 +92,12 @@ message AgentIdentification {
 }
 
 message TriggerRequest{
-    string requestID = 1;
-    string testID = 2;
-    int32 runID = 3;
-    string traceID = 4;
-    Trigger trigger = 5;
+    map <string, string> metadata = 1;
+    string requestID = 2;
+    string testID = 3;
+    int32 runID = 4;
+    string traceID = 5;
+    Trigger trigger = 6;
 }
 
 message Trigger {
@@ -161,11 +164,12 @@ message TraceIDRequest {
 }
 
 message TriggerResponse {
-    string requestID = 1;
-    AgentIdentification agentIdentification = 2;
-    string testID = 3;
-    int32 runID = 4;
-    TriggerResult triggerResult = 5;
+    map <string, string> metadata = 1;
+    string requestID = 2;
+    AgentIdentification agentIdentification = 3;
+    string testID = 4;
+    int32 runID = 5;
+    TriggerResult triggerResult = 6;
 }
 
 message TriggerResult {
@@ -199,29 +203,33 @@ message Error {
 }
 
 message OTLPConnectionTestRequest {
-    string requestID = 1;
+    map <string, string> metadata = 1;
+    string requestID = 2;
     // If set as true, the agent needs to reset the span counter and doesn't need to
     // report the number of spans back to the server.
-    bool resetCounter = 2;
+    bool resetCounter = 3;
 }
 
 message OTLPConnectionTestResponse {
-    string requestID = 1;
-    AgentIdentification agentIdentification = 2;
-    int64 spanCount = 3;
-    int64 lastSpanTimestamp = 4;
+    map <string, string> metadata = 1;
+    string requestID = 2;
+    AgentIdentification agentIdentification = 3;
+    int64 spanCount = 4;
+    int64 lastSpanTimestamp = 5;
 }
 
 message DataStoreConnectionTestRequest {
-    string requestID = 1;
-    DataStore datastore = 2;
+    map <string, string> metadata = 1;
+    string requestID = 2;
+    DataStore datastore = 3;
 }
 
 message DataStoreConnectionTestResponse {
-    string requestID = 1;
-    bool successful = 2;
-    AgentIdentification agentIdentification = 3;
-    DataStoreConnectionTestSteps steps = 4;
+    map <string, string> metadata = 1;
+    string requestID = 2;
+    bool successful = 3;
+    AgentIdentification agentIdentification = 4;
+    DataStoreConnectionTestSteps steps = 5;
 }
 
 message DataStoreConnectionTestSteps {
@@ -239,11 +247,12 @@ message DataStoreConnectionTestStep {
 }
 
 message PollingRequest {
-    string requestID = 1;
-    string testID = 2;
-    int32 runID = 3;
-    string traceID = 4;
-    DataStore datastore = 5;
+    map <string, string> metadata = 1;
+    string requestID = 2;
+    string testID = 3;
+    int32 runID = 4;
+    string traceID = 5;
+    DataStore datastore = 6;
 }
 
 message DataStore {
@@ -338,14 +347,15 @@ message TLSSetting {
 }
 
 message PollingResponse {
-    string requestID = 1;
-    AgentIdentification agentIdentification = 2;
-    string testID = 3;
-    int32 runID = 4;
-    string traceID = 5;
-    repeated Span spans = 6;
-    bool traceFound = 7;
-    Error error = 8;
+    map <string, string> metadata = 1;
+    string requestID = 2;
+    AgentIdentification agentIdentification = 3;
+    string testID = 4;
+    int32 runID = 5;
+    string traceID = 6;
+    repeated Span spans = 7;
+    bool traceFound = 8;
+    Error error = 9;
 }
 
 message Span {

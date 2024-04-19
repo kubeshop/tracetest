@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 )
 
 func (c *Client) SendTriggerResponse(ctx context.Context, response *proto.TriggerResponse) error {
@@ -13,6 +14,8 @@ func (c *Client) SendTriggerResponse(ctx context.Context, response *proto.Trigge
 	if response.AgentIdentification == nil {
 		response.AgentIdentification = c.sessionConfig.AgentIdentification
 	}
+
+	response.Metadata = telemetry.ExtractMetadataFromContext(ctx)
 
 	_, err := client.SendTriggerResult(ctx, response)
 	if err != nil {

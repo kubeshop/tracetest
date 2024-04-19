@@ -14,8 +14,6 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	tracesdk "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func setupTriggerWorker(t *testing.T) (*mocks.GrpcServerMock, collector.TraceCache) {
@@ -153,8 +151,4 @@ func createHelloWorldApi() *httptest.Server {
 		w.Write([]byte(`{"hello": "world"}`))
 		w.WriteHeader(http.StatusOK)
 	}))
-}
-
-func getTracer() trace.Tracer {
-	return tracesdk.NewTracerProvider().Tracer("asd")
 }

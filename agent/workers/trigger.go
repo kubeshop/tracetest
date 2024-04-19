@@ -12,7 +12,6 @@ import (
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/agent/workers/trigger"
-	agentTrigger "github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"go.opentelemetry.io/otel/metric"
@@ -24,7 +23,7 @@ import (
 type TriggerWorker struct {
 	logger                 *zap.Logger
 	client                 *client.Client
-	registry               *agentTrigger.Registry
+	registry               *trigger.Registry
 	traceCache             collector.TraceCache
 	observer               event.Observer
 	sensor                 sensors.Sensor
@@ -90,11 +89,11 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 		opt(worker)
 	}
 
-	registry := agentTrigger.NewRegistry(worker.tracer)
-	registry.Add(agentTrigger.HTTP())
-	registry.Add(agentTrigger.GRPC())
-	registry.Add(agentTrigger.TRACEID())
-	registry.Add(agentTrigger.KAFKA())
+	registry := trigger.NewRegistry(worker.tracer)
+	registry.Add(trigger.HTTP())
+	registry.Add(trigger.GRPC())
+	registry.Add(trigger.TRACEID())
+	registry.Add(trigger.KAFKA())
 
 	// Assign registry into worker
 	worker.registry = registry
@@ -102,7 +101,7 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 	return worker
 }
 
-func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
+func (w *TriggerWorker) Trigger(ctx context.Context, request *proto.TriggerRequest) error {
 	ctx, span := w.tracer.Start(ctx, "TriggerRequest Worker operation")
 	defer span.End()
 
@@ -111,25 +110,25 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 	errorCounter, _ := w.meter.Int64Counter("tracetest.agent.triggerworker.errors")
 
-	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", triggerRequest))
-	w.observer.StartTriggerExecution(triggerRequest)
+	w.logger.Debug("Trigger request received", zap.Any("triggerRequest", request))
+	w.observer.StartTriggerExecution(request)
 
 	var err error
-	w.stoppableProcessRunner(ctx, triggerRequest.TestID, triggerRequest.RunID, func(subcontext context.Context) {
-		err = w.trigger(subcontext, triggerRequest)
+	w.stoppableProcessRunner(ctx, request.TestID, request.RunID, func(subcontext context.Context) {
+		err = w.trigger(subcontext, request)
 	}, func(_ string) {
 		err = executor.ErrUserCancelled
 	})
 
 	if err != nil {
 		w.logger.Error("Trigger error", zap.Error(err))
-		w.observer.EndTriggerExecution(triggerRequest, err)
+		w.observer.EndTriggerExecution(request, err)
 
 		sendErr := w.client.SendTriggerResponse(ctx, &proto.TriggerResponse{
-			RequestID:           triggerRequest.RequestID,
+			RequestID:           request.RequestID,
 			AgentIdentification: w.client.SessionConfiguration().AgentIdentification,
-			TestID:              triggerRequest.GetTestID(),
-			RunID:               triggerRequest.GetRunID(),
+			TestID:              request.GetTestID(),
+			RunID:               request.GetRunID(),
 			TriggerResult: &proto.TriggerResult{
 				Error: &proto.Error{
 					Message: err.Error(),
@@ -152,7 +151,7 @@ func (w *TriggerWorker) Trigger(ctx context.Context, triggerRequest *proto.Trigg
 		errorCounter.Add(ctx, 1)
 	}
 
-	w.observer.EndTriggerExecution(triggerRequest, err)
+	w.observer.EndTriggerExecution(request, err)
 
 	return nil
 }
@@ -181,7 +180,7 @@ func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.Trigg
 		w.traceCache.Append(triggerRequest.TraceID, []*v1.Span{})
 	}
 
-	response, err := triggerer.Trigger(ctx, triggerConfig, &agentTrigger.Options{
+	response, err := triggerer.Trigger(ctx, triggerConfig, &trigger.Options{
 		TraceID: traceID,
 		SpanID:  id.NewRandGenerator().SpanID(),
 		TestID:  id.ID(triggerRequest.TestID),
@@ -208,7 +207,7 @@ func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 func convertProtoToTrigger(pt *proto.Trigger) trigger.Trigger {
 	return trigger.Trigger{
-		Type:    agentTrigger.TriggerType(pt.Type),
+		Type:    trigger.TriggerType(pt.Type),
 		HTTP:    convertProtoHttpTriggerToHttpTrigger(pt.Http),
 		GRPC:    convertProtoGrpcTriggerToGrpcTrigger(pt.Grpc),
 		TraceID: convertProtoTraceIDTriggerToTraceIDTrigger(pt.TraceID),
@@ -344,7 +343,7 @@ func convertProtoKafkaAuthToKafkaAuth(kafkaAuthentication *proto.KafkaAuthentica
 	}
 }
 
-func convertResponseToProtoResponse(request *proto.TriggerRequest, response agentTrigger.Response) *proto.TriggerResponse {
+func convertResponseToProtoResponse(request *proto.TriggerRequest, response trigger.Response) *proto.TriggerResponse {
 	return &proto.TriggerResponse{
 		TestID: request.TestID,
 		RunID:  request.RunID,

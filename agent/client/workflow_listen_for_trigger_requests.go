@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
-	"github.com/kubeshop/tracetest/server/telemetry"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 	"go.uber.org/zap"
 )
 
@@ -25,8 +25,8 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 
 	go func() {
 		for {
-			resp := proto.TriggerRequest{}
-			err := stream.RecvMsg(&resp)
+			req := proto.TriggerRequest{}
+			err := stream.RecvMsg(&req)
 			if err != nil {
 				logger.Error("could not get message from stop stream", zap.Error(err))
 			}
@@ -48,13 +48,9 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 				continue
 			}
 
-			ctx, err := telemetry.ExtractContextFromStream(stream)
-			if err != nil {
-				logger.Error("could not extract context from stream", zap.Error(err))
-				log.Println("could not extract context from stream %w", err)
-			}
-
-			err = c.triggerListener(ctx, &resp)
+			// we want a new context per request, not to reuse the one from the stream
+			ctx := telemetry.InjectMetadataIntoContext(context.Background(), req.Metadata)
+			err = c.triggerListener(ctx, &req)
 			if err != nil {
 				logger.Error("could not handle trigger request", zap.Error(err))
 				fmt.Println(err.Error())
