@@ -14,8 +14,6 @@ import (
 	"github.com/kubeshop/tracetest/agent/workers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	tracesdk "go.opentelemetry.io/otel/sdk/trace"
-	"go.opentelemetry.io/otel/trace"
 )
 
 func setupTriggerWorker(t *testing.T) (*mocks.GrpcServerMock, collector.TraceCache) {
@@ -48,7 +46,10 @@ func TestTrigger(t *testing.T) {
 	targetServer := createHelloWorldApi()
 	traceID := "42a2c381da1a5b3a32bc4988bf2431b0"
 
-	triggerRequest := &proto.TriggerRequest{
+	req := &proto.TriggerRequest{
+		Metadata: map[string]string{
+			"traceparent": "00-e42e7689e67c64b65ddd3a023a2f8f9d-afad25d95241afce-01",
+		},
 		TestID:  "my test",
 		RunID:   1,
 		TraceID: traceID,
@@ -67,19 +68,20 @@ func TestTrigger(t *testing.T) {
 	ctx := ContextWithTracingEnabled()
 
 	// make the control plane send a trigger request to the agent
-	controlPlane.SendTriggerRequest(ctx, triggerRequest)
+	controlPlane.SendTriggerRequest(ctx, req)
 	time.Sleep(1 * time.Second)
 
-	response := controlPlane.GetLastTriggerResponse()
+	resp := controlPlane.GetLastTriggerResponse()
 
-	require.NotNil(t, response)
-	assert.Equal(t, "http", response.Data.TriggerResult.Type)
-	assert.Equal(t, int32(http.StatusOK), response.Data.TriggerResult.Http.StatusCode)
-	assert.JSONEq(t, `{"hello": "world"}`, string(response.Data.TriggerResult.Http.Body))
+	require.NotNil(t, resp)
+	assert.Equal(t, "http", resp.Data.TriggerResult.Type)
+	assert.Equal(t, int32(http.StatusOK), resp.Data.TriggerResult.Http.StatusCode)
+	assert.JSONEq(t, `{"hello": "world"}`, string(resp.Data.TriggerResult.Http.Body))
 
 	_, traceIdIsWatched := cache.Get(traceID)
 	assert.True(t, traceIdIsWatched)
-	assert.True(t, SameTraceID(ctx, response.Context))
+
+	assert.Equal(t, req.Metadata["traceparent"], resp.Data.Metadata["traceparent"])
 }
 
 func TestTriggerAgainstGoogle(t *testing.T) {
@@ -153,8 +155,4 @@ func createHelloWorldApi() *httptest.Server {
 		w.Write([]byte(`{"hello": "world"}`))
 		w.WriteHeader(http.StatusOK)
 	}))
-}
-
-func getTracer() trace.Tracer {
-	return tracesdk.NewTracerProvider().Tracer("asd")
 }

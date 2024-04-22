@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/proto"
+	"github.com/kubeshop/tracetest/agent/telemetry"
 	"go.uber.org/zap"
 )
 
@@ -25,8 +26,8 @@ func (c *Client) startStopListener(ctx context.Context) error {
 
 	go func() {
 		for {
-			resp := proto.StopRequest{}
-			err := stream.RecvMsg(&resp)
+			req := proto.StopRequest{}
+			err := stream.RecvMsg(&req)
 			if err != nil {
 				logger.Error("could not get message from stop stream", zap.Error(err))
 			}
@@ -48,8 +49,9 @@ func (c *Client) startStopListener(ctx context.Context) error {
 				continue
 			}
 
-			// TODO: get context from request
-			err = c.stopListener(context.Background(), &resp)
+			// we want a new context per request, not to reuse the one from the stream
+			ctx := telemetry.InjectMetadataIntoContext(context.Background(), req.Metadata)
+			err = c.stopListener(ctx, &req)
 			if err != nil {
 				logger.Error("could not handle stop request", zap.Error(err))
 				fmt.Println(err.Error())

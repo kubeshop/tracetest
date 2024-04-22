@@ -20,3 +20,7 @@ trim_trailing_whitespace = false
 
 [COMMIT_EDITMSG]
 max_line_length = 0
+
+[*.proto]
+indent_style = space
+indent_size = 4

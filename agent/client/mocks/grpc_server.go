@@ -10,9 +10,6 @@ import (
 	"github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
-	"github.com/kubeshop/tracetest/server/telemetry"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 )
 
@@ -73,13 +70,7 @@ func (s *GrpcServerMock) start(wg *sync.WaitGroup, port int) error {
 
 	s.port = lis.Addr().(*net.TCPAddr).Port
 
-	server := grpc.NewServer(
-		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor(
-			otelgrpc.WithPropagators(
-				propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}),
-			),
-		)),
-	)
+	server := grpc.NewServer()
 	proto.RegisterOrchestratorServer(server, s)
 
 	s.server = server
@@ -121,12 +112,7 @@ func (s *GrpcServerMock) RegisterTriggerAgent(id *proto.AgentIdentification, str
 
 	for {
 		triggerRequest := <-s.triggerChannel
-		err := telemetry.InjectContextIntoStream(triggerRequest.Context, stream)
-		if err != nil {
-			log.Println(err.Error())
-		}
-
-		err = stream.Send(triggerRequest.Data)
+		err := stream.Send(triggerRequest.Data)
 		if err != nil {
 			log.Println("could not send trigger request to agent: %w", err)
 		}
@@ -150,12 +136,8 @@ func (s *GrpcServerMock) RegisterPollerAgent(id *proto.AgentIdentification, stre
 
 	for {
 		pollerRequest := <-s.pollingChannel
-		err := telemetry.InjectContextIntoStream(pollerRequest.Context, stream)
-		if err != nil {
-			log.Println(err.Error())
-		}
 
-		err = stream.Send(pollerRequest.Data)
+		err := stream.Send(pollerRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -169,12 +151,8 @@ func (s *GrpcServerMock) RegisterDataStoreConnectionTestAgent(id *proto.AgentIde
 
 	for {
 		dsTestRequest := <-s.dataStoreTestChannel
-		err := telemetry.InjectContextIntoStream(dsTestRequest.Context, stream)
-		if err != nil {
-			log.Println(err.Error())
-		}
 
-		err = stream.Send(dsTestRequest.Data)
+		err := stream.Send(dsTestRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -188,12 +166,8 @@ func (s *GrpcServerMock) RegisterOTLPConnectionTestListener(id *proto.AgentIdent
 
 	for {
 		testRequest := <-s.otlpConnectionTestChannel
-		err := telemetry.InjectContextIntoStream(testRequest.Context, stream)
-		if err != nil {
-			log.Println(err.Error())
-		}
 
-		err = stream.Send(testRequest.Data)
+		err := stream.Send(testRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
@@ -230,12 +204,8 @@ func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.Poll
 func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.AgentIdentification, stream proto.Orchestrator_RegisterShutdownListenerServer) error {
 	for {
 		shutdownRequest := <-s.terminationChannel
-		err := telemetry.InjectContextIntoStream(shutdownRequest.Context, stream)
-		if err != nil {
-			log.Println(err.Error())
-		}
 
-		err = stream.Send(shutdownRequest.Data)
+		err := stream.Send(shutdownRequest.Data)
 		if err != nil {
 			log.Println("could not send polling request to agent: %w", err)
 		}
