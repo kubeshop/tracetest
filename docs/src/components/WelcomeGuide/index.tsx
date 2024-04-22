@@ -1,7 +1,6 @@
 /* eslint-disable global-require */
 
 import React from 'react';
-import clsx from 'clsx';
 import Translate from '@docusaurus/Translate';
 import Link from '@docusaurus/Link';
 import Heading from '@theme/Heading';
@@ -15,7 +14,6 @@ const WelcomeGuides = [
         Set up Tracetest and start trace-based testing your distributed system.
       </Translate>
     ),
-    button: 'Start',
   },
   {
     name: '🤩 Open Source',
@@ -25,17 +23,15 @@ const WelcomeGuides = [
         Check out the Tracetest GitHub repo! Please consider giving us a star! ⭐️
       </Translate>
     ),
-    button: 'Go to GitHub',
   },
   {
-    name: '⚙️ Configure access and tracing backend',
+    name: '⚙️ Configure Access and Tracing Backend',
     url: '/configuration/overview',
     description: (
       <Translate>
-        Configure app access & connect tracing backend / OTLP ingestion!
+        Configure app access & connect tracing backend or OTLP ingestion!
       </Translate>
     ),
-    button: 'Configure',
   },
   {
     name: '🙄 New to Trace-based Testing?',
@@ -45,32 +41,27 @@ const WelcomeGuides = [
         Read about the concepts of trace-based testing to learn more!
       </Translate>
     ),
-    button: 'View Concepts',
   },
 ];
 
 interface Props {
   name: string;
   url: string;
-  button: string;
   description: JSX.Element;
 }
 
-function WelcomeGuideCard({name, url, description, button}: Props) {
+function WelcomeGuideCard({name, url, description}: Props) {
   return (
     <div className="col col--6 margin-bottom--lg">
-      <div className={clsx('card')}>
-        <div className="card__body">
-          <Heading as="h3">{name}</Heading>
-          <p>{description}</p>
-        </div>
-        <div className="card__footer">
-          <div className="button-group button-group--block">
-            <Link className="button button--secondary" to={url}>
-              {button}
-            </Link>
+      <div className="gs__card">
+      <div className="card">
+        <Link to={url}>
+          <div className="card__body">
+            <Heading as="h3">{name}</Heading>
+            <p>{description}</p>
           </div>
-        </div>
+        </Link>
+      </div>
       </div>
     </div>
   );
