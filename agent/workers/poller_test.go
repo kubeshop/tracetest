@@ -37,7 +37,10 @@ func TestPollerWorker(t *testing.T) {
 
 	tempoAPI := createTempoFakeApi()
 
-	pollingRequest := proto.PollingRequest{
+	req := proto.PollingRequest{
+		Metadata: map[string]string{
+			"traceparent": "00-e42e7689e67c64b65ddd3a023a2f8f9d-afad25d95241afce-01",
+		},
 		TestID:  "test",
 		RunID:   1,
 		TraceID: "42a2c381da1a5b3a32bc4988bf2431b0",
@@ -52,18 +55,18 @@ func TestPollerWorker(t *testing.T) {
 		},
 	}
 
-	controlPlane.SendPollingRequest(ctx, &pollingRequest)
+	controlPlane.SendPollingRequest(ctx, &req)
 
 	time.Sleep(1 * time.Second)
 
 	// expect traces to be sent to endpoint
-	pollingResponse := controlPlane.GetLastPollingResponse()
-	require.NotNil(t, pollingResponse, "agent did not send polling response back to server")
+	resp := controlPlane.GetLastPollingResponse()
+	require.NotNil(t, resp, "agent did not send polling response back to server")
 
 	// Very rudimentar sorting algorithm for only two items in the array
 	// first item is always the root span, second is it's child
 	var spans = make([]*proto.Span, 2)
-	for _, span := range pollingResponse.Data.Spans {
+	for _, span := range resp.Data.Spans {
 		if span.ParentId == "" {
 			spans[0] = span
 		} else {
@@ -75,7 +78,7 @@ func TestPollerWorker(t *testing.T) {
 	assert.Equal(t, "", spans[0].ParentId)
 	assert.Equal(t, spans[0].Id, spans[1].ParentId)
 
-	assert.True(t, SameTraceID(ctx, pollingResponse.Context))
+	assert.Equal(t, req.Metadata["traceparent"], resp.Data.Metadata["traceparent"])
 }
 
 func createTempoFakeApi() *httptest.Server {

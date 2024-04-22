@@ -160,7 +160,7 @@ func getAttributeValue(value *v11.AnyValue) string {
 }
 
 func createSpanID(id []byte) trace.SpanID {
-	if id == nil {
+	if len(id) == 0 {
 		return trace.SpanID{}
 	}
 
@@ -171,7 +171,7 @@ func createSpanID(id []byte) trace.SpanID {
 }
 
 func CreateTraceID(id []byte) trace.TraceID {
-	if id == nil {
+	if len(id) == 0 {
 		return trace.TraceID{}
 	}
 

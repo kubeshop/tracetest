@@ -10,8 +10,6 @@ import (
 	"github.com/avast/retry-go"
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/proto"
-	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
-	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 )
 
@@ -72,13 +70,7 @@ func (s *GrpcServerMock) start(wg *sync.WaitGroup, port int) error {
 
 	s.port = lis.Addr().(*net.TCPAddr).Port
 
-	server := grpc.NewServer(
-		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor(
-			otelgrpc.WithPropagators(
-				propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}),
-			),
-		)),
-	)
+	server := grpc.NewServer()
 	proto.RegisterOrchestratorServer(server, s)
 
 	s.server = server
