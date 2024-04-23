@@ -1,7 +1,6 @@
 /* eslint-disable global-require */
 
 import React from 'react';
-import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import Translate from '@docusaurus/Translate';
 import Heading from '@theme/Heading';
@@ -15,7 +14,6 @@ const CoreGettingStartedGuides = [
         Set up Tracetest Core and start trace-based testing your distributed system.
       </Translate>
     ),
-    button: 'Start',
   },
   {
     name: '🙌 Open Tracetest Core',
@@ -25,7 +23,6 @@ const CoreGettingStartedGuides = [
         After installing it, open Tracetest Core start to creating trace-based tests.
       </Translate>
     ),
-    button: 'Create tests',
   },
   {
     name: '🤔 Don\'t have OpenTelemetry?',
@@ -35,7 +32,6 @@ const CoreGettingStartedGuides = [
         Install OpenTelemetry in 5 minutes without any code changes!
       </Translate>
     ),
-    button: 'Configure OpenTelemetry',
   },
   {
     name: '🤩 Open Source',
@@ -45,32 +41,27 @@ const CoreGettingStartedGuides = [
         Check out the Tracetest GitHub repo! Please consider giving us a star! ⭐️
       </Translate>
     ),
-    button: 'Go to GitHub',
   },
 ];
 
 interface Props {
   name: string;
   url: string;
-  button: string;
   description: JSX.Element;
 }
 
-function CoreGettingStartedGuideCard({name, url, description, button}: Props) {
+function CoreGettingStartedGuideCard({name, url, description}: Props) {
   return (
     <div className="col col--6 margin-bottom--lg">
-      <div className={clsx('card')}>
-        <div className="card__body">
-          <Heading as="h3">{name}</Heading>
-          <p>{description}</p>
-        </div>
-        <div className="card__footer">
-          <div className="button-group button-group--block">
-            <Link className="button button--secondary" to={url}>
-              {button}
-            </Link>
+      <div className="gs__card">
+      <div className="card">
+        <Link to={url}>
+          <div className="card__body">
+            <Heading as="h3">{name}</Heading>
+            <p>{description}</p>
           </div>
-        </div>
+        </Link>
+      </div>
       </div>
     </div>
   );

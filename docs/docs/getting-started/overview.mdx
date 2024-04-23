@@ -22,11 +22,11 @@ import {TracetestGettingStartedGuideCardsRow, TracetestCoreGettingStartedGuideCa
 
 Tracetest is a cloud-native application, designed to run in the cloud. Get started in three ways.
 
-- **[Cloud-based Managed Tracetest](https://app.tracetest.io/) (Free to get started!)**: Use managed infrastructure with collaboration for teams, and additional features on top of Core.
+- **[Cloud-based Managed Tracetest](https://app.tracetest.io/) (Free to get started!)**: Use managed infrastructure with collaboration for teams, and additional features on top of Tracetest Core.
 - **Enterprise Self-hosted Tracetest (Coming soon...)**: Same experience as with Cloud-based Managed Tracetest but self-hosted in your own infrastructure. **[Book a call](https://dub.sh/tracetest-demo) to get into early access.**
 - **[Hobby Self-hosted Open-source Tracetest Core](/core/getting-started/overview)**: Deploy a hobby instance in your own infrastructure with Docker or Kubernetes. Not suitable for production workloads.
 
-## Getting Started with Tracetest Managed Platform
+## Cloud-based Managed Tracetest
 
 **We recommend using [Cloud-based Managed Tracetest](https://app.tracetest.io/)**. It's the easiest way to test microservices and distributed apps with OpenTelemetry distributed traces. Tracetest provides managed infrastructure, [collaboration for teams](/concepts/environments), [RBAC](/concepts/roles-and-permissions), [organizations](/concepts/organizations), [dependency-free config](/concepts/agent), [agentless serverless config](/concepts/cloud-agent), and much more.
 
@@ -36,10 +36,31 @@ Get started with the installation guide below, tailored for microservice and dis
 <TracetestGettingStartedGuideCardsRow />
 ```
 
-## Getting Started with Tracetest Core
+### Features Available in Cloud-based Managed Tracetest
+
+#### All Tracetest Core features, plus...
+
+- The usual cloud-based managed capability: SSO, accounts, organizations, roles, ability to run multiple environments, sharing, and security.
+- Additional test triggers: Cypress, Playwright, k6, Artillery, with more coming soon.
+- Additional test automation options: GitHub Actions, `@tracetest/client` npm module, with more coming soon.
+- Grouped test runs: Organize multiple tests into a single "test run group". These tests can then be executed simultaneously in parallel. The system will wait for all tests in the group to complete before delivering a consolidated "pass/fail" outcome. This functionality is particularly beneficial for halting CI/CD processes if any test in the group fails.
+- Test coverage overview: "Run" tab to monitor actively running tests with extensive meta tagging and filtering.
+- Public + private access, with Tracetest Agent or Tracetest Cloud Agent.
+- Secrets management (coming soon...)
+
+## Hobby Self-hosted Open-source Tracetest Core
 
 Tracetest Core is a cloud-native application, packaged and distributed as a Docker image and designed to run in a containerized environment.
 
 ```mdx-code-block
 <TracetestCoreGettingStartedGuideCardsRow />
 ```
+
+### Features Available in Open-source Tracetest Core
+
+#### Tracetest Core functionality
+
+- [Open-Source Features](https://github.com/kubeshop/tracetest?tab=readme-ov-file#-features)
+- Test triggers: HTTP/GRPC, Trace ID, Kafka
+- Test specifications: Selector language + Assertions
+- Test automation options: CLI + Deep Link

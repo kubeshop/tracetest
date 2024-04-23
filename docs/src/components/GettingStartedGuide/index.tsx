@@ -40,7 +40,7 @@ interface Props {
 
 function GettingStartedGuideCard({name, url, description, button}: Props) {
   return (
-    <div className="col col--6 margin-bottom--lg">
+    <div className="col col--6">
       <div className="gs__card">
       <div className="card">
         <Link to={url}>
