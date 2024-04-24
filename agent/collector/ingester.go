@@ -108,16 +108,26 @@ func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
 }
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
+	go i.ingestSpans(ctx, request)
+
+	return &pb.ExportTraceServiceResponse{
+		PartialSuccess: &pb.ExportTracePartialSuccess{
+			RejectedSpans: 0,
+		},
+	}, nil
+}
+
+func (i *forwardIngester) ingestSpans(ctx context.Context, request *pb.ExportTraceServiceRequest) {
 	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
 
-	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
 	i.statistics.SpanCount += int64(spanCount)
 	i.statistics.LastSpanTimestamp = time.Now()
-
-	i.sensor.Emit(events.SpanCountUpdated, i.statistics.SpanCount)
+	realSpanCount := i.statistics.SpanCount
 
 	i.buffer.mutex.Unlock()
+
+	i.sensor.Emit(events.SpanCountUpdated, realSpanCount)
 	i.logger.Debug("received spans", zap.Int("count", spanCount))
 
 	if i.traceCache != nil {
@@ -127,12 +137,6 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 		i.cacheTestSpans(request.ResourceSpans)
 		i.sensor.Emit(events.TraceCountUpdated, len(i.traceIDs))
 	}
-
-	return &pb.ExportTraceServiceResponse{
-		PartialSuccess: &pb.ExportTracePartialSuccess{
-			RejectedSpans: 0,
-		},
-	}, nil
 }
 
 func countSpans(request *pb.ExportTraceServiceRequest) int {
