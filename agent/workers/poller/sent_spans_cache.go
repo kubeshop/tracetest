@@ -40,6 +40,7 @@ func (c *SentSpansCache) Set(traceID, spanID string) {
 	}
 
 	trace.Spans[spanID] = true
+	trace.LastSpanTime = time.Now()
 	c.cache.Set(traceID, trace)
 }
 
