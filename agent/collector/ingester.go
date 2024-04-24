@@ -45,14 +45,14 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 		sensor:         cfg.sensor,
 	}
 
-	if startRemoteServer {
-		err := ingester.connectToRemoteServer(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("could not connect to remote server: %w", err)
-		}
+	// if startRemoteServer {
+	// 	err := ingester.connectToRemoteServer(ctx)
+	// 	if err != nil {
+	// 		return nil, fmt.Errorf("could not connect to remote server: %w", err)
+	// 	}
 
-		go ingester.startBatchWorker()
-	}
+	// 	go ingester.startBatchWorker()
+	// }
 
 	return ingester, nil
 }
