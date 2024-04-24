@@ -108,7 +108,7 @@ func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
 }
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
-	go i.ingestSpans(ctx, request)
+	go i.ingestSpans(request)
 
 	return &pb.ExportTraceServiceResponse{
 		PartialSuccess: &pb.ExportTracePartialSuccess{
@@ -117,7 +117,7 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 	}, nil
 }
 
-func (i *forwardIngester) ingestSpans(ctx context.Context, request *pb.ExportTraceServiceRequest) {
+func (i *forwardIngester) ingestSpans(request *pb.ExportTraceServiceRequest) {
 	spanCount := countSpans(request)
 	i.buffer.mutex.Lock()
 

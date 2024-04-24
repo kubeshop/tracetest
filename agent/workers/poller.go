@@ -303,6 +303,12 @@ func convertTraceInToProtoSpans(trace traces.Trace) []*proto.Span {
 		spans = append(spans, &protoSpan)
 	}
 
+	// hack to prevent the "Temporary root span" to be sent alone to the server.
+	// This causes the server to be confused when evaluating the trace
+	if len(spans) == 1 && spans[0].Name == traces.TemporaryRootSpanName {
+		return []*proto.Span{}
+	}
+
 	return spans
 }
 
