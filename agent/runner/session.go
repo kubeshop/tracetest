@@ -150,6 +150,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 	pollingWorker := workers.NewPollerWorker(
 		controlPlaneClient,
 		workers.WithInMemoryDatastore(poller.NewInMemoryDatastore(traceCache)),
+		workers.WithPollerTraceCache(traceCache),
 		workers.WithPollerObserver(observer),
 		workers.WithPollerStoppableProcessRunner(processStopper.RunStoppableProcess),
 		workers.WithPollerLogger(logger),

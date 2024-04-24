@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"log"
 
-	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/agent/client"
+	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/telemetry"
@@ -25,13 +25,13 @@ import (
 
 type PollerWorker struct {
 	client                 *client.Client
-	sentSpanIDs            *gocache.Cache[string, bool]
 	inmemoryDatastore      tracedb.TraceDB
 	logger                 *zap.Logger
 	observer               event.Observer
 	stoppableProcessRunner StoppableProcessRunner
 	tracer                 trace.Tracer
 	meter                  metric.Meter
+	traceCache             collector.TraceCache
 }
 
 type PollerOption func(*PollerWorker)
@@ -45,6 +45,12 @@ func WithInMemoryDatastore(datastore tracedb.TraceDB) PollerOption {
 func WithPollerObserver(observer event.Observer) PollerOption {
 	return func(pw *PollerWorker) {
 		pw.observer = observer
+	}
+}
+
+func WithPollerTraceCache(cache collector.TraceCache) PollerOption {
+	return func(pw *PollerWorker) {
+		pw.traceCache = cache
 	}
 }
 
@@ -74,12 +80,11 @@ func WithPollerMeter(meter metric.Meter) PollerOption {
 
 func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker {
 	pollerWorker := &PollerWorker{
-		client:      client,
-		sentSpanIDs: gocache.New[string, bool](),
-		logger:      zap.NewNop(),
-		observer:    event.NewNopObserver(),
-		tracer:      telemetry.GetNoopTracer(),
-		meter:       telemetry.GetNoopMeter(),
+		client:   client,
+		logger:   zap.NewNop(),
+		observer: event.NewNopObserver(),
+		tracer:   telemetry.GetNoopTracer(),
+		meter:    telemetry.GetNoopMeter(),
 	}
 
 	for _, opt := range opts {
@@ -199,21 +204,6 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		pollingResponse.TraceFound = true
 		pollingResponse.Spans = convertTraceInToProtoSpans(trace)
 		w.logger.Debug("Converted trace", zap.Any("trace", trace), zap.Any("pollingResponse", spew.Sdump(pollingResponse)))
-
-		// remove sent spans
-		newSpans := make([]*proto.Span, 0, len(pollingResponse.Spans))
-		for _, span := range pollingResponse.Spans {
-			runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
-			w.logger.Debug("Checking if span was already sent", zap.String("runKey", runKey))
-			_, alreadySent := w.sentSpanIDs.Get(runKey)
-			if !alreadySent {
-				w.logger.Debug("Span was not sent", zap.String("runKey", runKey))
-				newSpans = append(newSpans, span)
-			} else {
-				w.logger.Debug("Span was already sent", zap.String("runKey", runKey))
-			}
-		}
-		pollingResponse.Spans = newSpans
 		w.logger.Debug("Filtered spans", zap.Any("pollingResponse", spew.Sdump(pollingResponse)))
 	}
 
@@ -224,15 +214,12 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		return err
 	}
 
-	// mark spans as sent
+	spanIDs := make([]string, 0, len(pollingResponse.Spans))
 	for _, span := range pollingResponse.Spans {
-		runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
-		w.logger.Debug("Marking span as sent", zap.String("runKey", runKey))
-		// TODO: we can set the expiration for this key to be
-		// 1 second after the pollingProfile max waiting time
-		// but we need to get that info here from controlplane
-		w.sentSpanIDs.Set(runKey, true)
+		spanIDs = append(spanIDs, span.Id)
 	}
+
+	w.traceCache.RemoveSpans(request.TraceID, spanIDs)
 
 	return nil
 }
