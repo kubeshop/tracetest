@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 
-	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/agent/client"
@@ -16,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/telemetry"
 	"github.com/kubeshop/tracetest/agent/tracedb"
 	"github.com/kubeshop/tracetest/agent/tracedb/connection"
+	"github.com/kubeshop/tracetest/agent/workers/poller"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -27,7 +27,7 @@ import (
 type PollerWorker struct {
 	client                 *client.Client
 	inmemoryDatastore      tracedb.TraceDB
-	sentSpanIDs            *gocache.Cache[string, bool]
+	sentSpansCache         *poller.SentSpansCache
 	logger                 *zap.Logger
 	observer               event.Observer
 	stoppableProcessRunner StoppableProcessRunner
@@ -82,12 +82,12 @@ func WithPollerMeter(meter metric.Meter) PollerOption {
 
 func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker {
 	pollerWorker := &PollerWorker{
-		client:      client,
-		logger:      zap.NewNop(),
-		sentSpanIDs: gocache.New[string, bool](),
-		observer:    event.NewNopObserver(),
-		tracer:      telemetry.GetNoopTracer(),
-		meter:       telemetry.GetNoopMeter(),
+		client:         client,
+		logger:         zap.NewNop(),
+		sentSpansCache: poller.NewSentSpansCache(),
+		observer:       event.NewNopObserver(),
+		tracer:         telemetry.GetNoopTracer(),
+		meter:          telemetry.GetNoopMeter(),
 	}
 
 	for _, opt := range opts {
@@ -213,7 +213,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		for _, span := range pollingResponse.Spans {
 			runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
 			w.logger.Debug("Checking if span was already sent", zap.String("runKey", runKey))
-			_, alreadySent := w.sentSpanIDs.Get(runKey)
+			alreadySent := w.sentSpansCache.Get(request.TraceID, runKey)
 			if !alreadySent {
 				w.logger.Debug("Span was not sent", zap.String("runKey", runKey))
 				newSpans = append(newSpans, span)
@@ -243,7 +243,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		// TODO: we can set the expiration for this key to be
 		// 1 second after the pollingProfile max waiting time
 		// but we need to get that info here from controlplane
-		w.sentSpanIDs.Set(runKey, true)
+		w.sentSpansCache.Set(request.TraceID, runKey)
 	}
 
 	w.traceCache.RemoveSpans(request.TraceID, spanIDs)
