@@ -49,7 +49,11 @@ func (c *traceCache) RemoveSpans(traceID string, spanID []string) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	spans, _ := c.internalCache.Get(traceID)
+	spans, found := c.internalCache.Get(traceID)
+	if !found {
+		return
+	}
+
 	newSpans := make([]*v1.Span, 0, len(spans))
 	for _, span := range spans {
 		currentSpanID := trace.SpanID(span.SpanId).String()
