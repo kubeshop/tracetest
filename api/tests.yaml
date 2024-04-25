@@ -43,6 +43,9 @@ components:
         skipTraceCollection:
           type: boolean
           description: If true, the test will not collect a trace
+        pollingProfile:
+          type: string
+          description: ID of the polling profile to be used for this test
         specs:
           type: array
           items:

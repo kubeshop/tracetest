@@ -42,8 +42,29 @@ var (
 	variableSetPreprocessor = preprocessor.VariableSet(cliLogger)
 	variableSetClient       = GetVariableSetClient(httpClient, variableSetPreprocessor)
 
-	testPreprocessor = preprocessor.Test(cliLogger)
-	testClient       = resourcemanager.NewClient(
+	pollingProfileClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"pollingprofile", "pollingprofiles",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "STRATEGY", Path: "spec.strategy"},
+			},
+		}),
+		resourcemanager.WithResourceType("PollingProfile"),
+	)
+
+	testPreprocessor = preprocessor.Test(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
+		updated, err := pollingProfileClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
+		if err != nil {
+			return input, fmt.Errorf("cannot apply polling profile: %w", err)
+		}
+
+		return fileutil.New(input.AbsPath(), []byte(updated)), nil
+	})
+
+	testClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
 		"test", "tests",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
@@ -164,20 +185,7 @@ var (
 				}),
 			),
 		).
-		Register(
-			resourcemanager.NewClient(
-				httpClient, cliLogger,
-				"pollingprofile", "pollingprofiles",
-				resourcemanager.WithTableConfig(resourcemanager.TableConfig{
-					Cells: []resourcemanager.TableCellConfig{
-						{Header: "ID", Path: "spec.id"},
-						{Header: "NAME", Path: "spec.name"},
-						{Header: "STRATEGY", Path: "spec.strategy"},
-					},
-				}),
-				resourcemanager.WithResourceType("PollingProfile"),
-			),
-		).
+		Register(pollingProfileClient).
 		Register(
 			resourcemanager.NewClient(
 				httpClient, cliLogger,

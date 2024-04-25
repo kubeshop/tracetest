@@ -30,6 +30,9 @@ type Test struct {
 	// If true, the test will not collect a trace
 	SkipTraceCollection bool `json:"skipTraceCollection,omitempty"`
 
+	// ID of the polling profile to be used for this test
+	PollingProfile string `json:"pollingProfile,omitempty"`
+
 	// specification of assertions that are going to be made
 	Specs []TestSpec `json:"specs,omitempty"`
 

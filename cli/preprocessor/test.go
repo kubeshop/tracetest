@@ -12,12 +12,14 @@ import (
 )
 
 type test struct {
-	logger *zap.Logger
+	logger                  *zap.Logger
+	applyPollingProfileFunc applyResourceFunc
 }
 
-func Test(logger *zap.Logger) test {
+func Test(logger *zap.Logger, applyPollingProfileFunc applyResourceFunc) test {
 	return test{
-		logger: cmdutil.GetLogger(),
+		logger:                  cmdutil.GetLogger(),
+		applyPollingProfileFunc: applyPollingProfileFunc,
 	}
 }
 
@@ -27,6 +29,12 @@ func (t test) Preprocess(ctx context.Context, input fileutil.File) (fileutil.Fil
 	if err != nil {
 		t.logger.Error("error parsing test", zap.String("content", string(input.Contents())), zap.Error(err))
 		return input, fmt.Errorf("could not unmarshal test yaml: %w", err)
+	}
+
+	test, err = t.mapPollingProfiles(ctx, input, test)
+	if err != nil {
+		t.logger.Error("error mapping polling profiles from test", zap.String("content", string(input.Contents())), zap.Error(err))
+		return input, fmt.Errorf("could not map polling profiles referenced in test yaml: %w", err)
 	}
 
 	test, err = t.consolidateGRPCFile(input, test)
@@ -40,6 +48,41 @@ func (t test) Preprocess(ctx context.Context, input fileutil.File) (fileutil.Fil
 	}
 
 	return fileutil.New(input.AbsPath(), marshalled), nil
+}
+
+func (t test) mapPollingProfiles(ctx context.Context, input fileutil.File, test openapi.TestResource) (openapi.TestResource, error) {
+	if test.Spec.PollingProfile == nil {
+		return test, nil
+	}
+
+	pollingProfilePath := test.Spec.PollingProfile
+	if !fileutil.LooksLikeFilePath(*pollingProfilePath) {
+		t.logger.Debug("does not look like a file path",
+			zap.String("path", *pollingProfilePath),
+		)
+
+		return test, nil
+	}
+
+	f, err := fileutil.Read(input.RelativeFile(*pollingProfilePath))
+	if err != nil {
+		return openapi.TestResource{}, fmt.Errorf("cannot read polling profile file: %w", err)
+	}
+
+	pollingProfileFile, err := t.applyPollingProfileFunc(ctx, f)
+	if err != nil {
+		return openapi.TestResource{}, fmt.Errorf("cannot apply polling profile '%s': %w", *pollingProfilePath, err)
+	}
+
+	var pollingProfile openapi.PollingProfile
+	err = yaml.Unmarshal(pollingProfileFile.Contents(), &pollingProfile)
+	if err != nil {
+		return openapi.TestResource{}, fmt.Errorf("cannot unmarshal updated pollingProfile '%s': %w", *pollingProfilePath, err)
+	}
+
+	test.Spec.PollingProfile = &pollingProfile.Spec.Id
+
+	return test, nil
 }
 
 func (t test) consolidateGRPCFile(input fileutil.File, test openapi.TestResource) (openapi.TestResource, error) {
