@@ -246,7 +246,9 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		w.sentSpansCache.Set(request.TraceID, runKey)
 	}
 
-	w.traceCache.RemoveSpans(request.TraceID, spanIDs)
+	if w.traceCache != nil {
+		w.traceCache.RemoveSpans(request.TraceID, spanIDs)
+	}
 
 	return nil
 }
