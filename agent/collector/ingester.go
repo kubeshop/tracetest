@@ -2,8 +2,6 @@ package collector
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -15,8 +13,6 @@ import (
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type stoppable interface {
@@ -37,21 +33,11 @@ func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg rem
 	ingester := &forwardIngester{
 		BatchTimeout:   batchTimeout,
 		RemoteIngester: cfg,
-		buffer:         &buffer{},
 		traceIDs:       make(map[string]bool, 0),
 		done:           make(chan bool),
 		traceCache:     cfg.traceCache,
 		logger:         cfg.logger,
 		sensor:         cfg.sensor,
-	}
-
-	if startRemoteServer {
-		err := ingester.connectToRemoteServer(ctx)
-		if err != nil {
-			return nil, fmt.Errorf("could not connect to remote server: %w", err)
-		}
-
-		go ingester.startBatchWorker()
 	}
 
 	return ingester, nil
@@ -67,8 +53,7 @@ type Statistics struct {
 type forwardIngester struct {
 	BatchTimeout   time.Duration
 	RemoteIngester remoteIngesterConfig
-	client         pb.TraceServiceClient
-	buffer         *buffer
+	mutex          sync.Mutex
 	traceIDs       map[string]bool
 	done           chan bool
 	traceCache     TraceCache
@@ -90,11 +75,6 @@ type remoteIngesterConfig struct {
 	sensor            sensors.Sensor
 }
 
-type buffer struct {
-	mutex sync.Mutex
-	spans []*v1.ResourceSpans
-}
-
 func (i *forwardIngester) Statistics() Statistics {
 	return i.statistics
 }
@@ -108,16 +88,26 @@ func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
 }
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
-	spanCount := countSpans(request)
-	i.buffer.mutex.Lock()
+	go i.ingestSpans(request)
 
-	i.buffer.spans = append(i.buffer.spans, request.ResourceSpans...)
+	return &pb.ExportTraceServiceResponse{
+		PartialSuccess: &pb.ExportTracePartialSuccess{
+			RejectedSpans: 0,
+		},
+	}, nil
+}
+
+func (i *forwardIngester) ingestSpans(request *pb.ExportTraceServiceRequest) {
+	spanCount := countSpans(request)
+	i.mutex.Lock()
+
 	i.statistics.SpanCount += int64(spanCount)
 	i.statistics.LastSpanTimestamp = time.Now()
+	realSpanCount := i.statistics.SpanCount
 
-	i.sensor.Emit(events.SpanCountUpdated, i.statistics.SpanCount)
+	i.mutex.Unlock()
 
-	i.buffer.mutex.Unlock()
+	i.sensor.Emit(events.SpanCountUpdated, realSpanCount)
 	i.logger.Debug("received spans", zap.Int("count", spanCount))
 
 	if i.traceCache != nil {
@@ -127,12 +117,6 @@ func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceSer
 		i.cacheTestSpans(request.ResourceSpans)
 		i.sensor.Emit(events.TraceCountUpdated, len(i.traceIDs))
 	}
-
-	return &pb.ExportTraceServiceResponse{
-		PartialSuccess: &pb.ExportTracePartialSuccess{
-			RejectedSpans: 0,
-		},
-	}, nil
 }
 
 func countSpans(request *pb.ExportTraceServiceRequest) int {
@@ -144,71 +128,6 @@ func countSpans(request *pb.ExportTraceServiceRequest) int {
 	}
 
 	return count
-}
-
-func (i *forwardIngester) connectToRemoteServer(ctx context.Context) error {
-	conn, err := grpc.DialContext(ctx, i.RemoteIngester.URL, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		i.logger.Error("could not connect to remote server", zap.Error(err))
-		return fmt.Errorf("could not connect to remote server: %w", err)
-	}
-
-	i.client = pb.NewTraceServiceClient(conn)
-	return nil
-}
-
-func (i *forwardIngester) startBatchWorker() {
-	i.logger.Debug("starting batch worker", zap.Duration("batch_timeout", i.BatchTimeout))
-	ticker := time.NewTicker(i.BatchTimeout)
-	done := make(chan bool)
-	for {
-		select {
-		case <-done:
-			i.logger.Debug("stopping batch worker")
-			return
-		case <-ticker.C:
-			i.logger.Debug("executing batch")
-			err := i.executeBatch(context.Background())
-			if err != nil {
-				i.logger.Error("could not execute batch", zap.Error(err))
-				log.Println(err)
-			}
-		}
-	}
-}
-
-func (i *forwardIngester) executeBatch(ctx context.Context) error {
-	i.buffer.mutex.Lock()
-	newSpans := i.buffer.spans
-	i.buffer.spans = []*v1.ResourceSpans{}
-	i.buffer.mutex.Unlock()
-
-	if len(newSpans) == 0 {
-		i.logger.Debug("no spans to forward")
-		return nil
-	}
-
-	err := i.forwardSpans(ctx, newSpans)
-	if err != nil {
-		i.logger.Error("could not forward spans", zap.Error(err))
-		return err
-	}
-
-	i.logger.Debug("successfully forwarded spans", zap.Int("count", len(newSpans)))
-	return nil
-}
-
-func (i *forwardIngester) forwardSpans(ctx context.Context, spans []*v1.ResourceSpans) error {
-	_, err := i.client.Export(ctx, &pb.ExportTraceServiceRequest{
-		ResourceSpans: spans,
-	})
-
-	if err != nil {
-		i.logger.Error("could not forward spans to remote server", zap.Error(err))
-		return fmt.Errorf("could not forward spans to remote server: %w", err)
-	}
-
-	return nil
 }
 
 func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {

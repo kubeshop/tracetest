@@ -6,15 +6,16 @@ import (
 	"fmt"
 	"log"
 
-	gocache "github.com/Code-Hex/go-generics-cache"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/fluidtruck/deepcopy"
 	"github.com/kubeshop/tracetest/agent/client"
+	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/event"
 	"github.com/kubeshop/tracetest/agent/proto"
 	"github.com/kubeshop/tracetest/agent/telemetry"
 	"github.com/kubeshop/tracetest/agent/tracedb"
 	"github.com/kubeshop/tracetest/agent/tracedb/connection"
+	"github.com/kubeshop/tracetest/agent/workers/poller"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
 	"github.com/kubeshop/tracetest/server/traces"
@@ -25,13 +26,14 @@ import (
 
 type PollerWorker struct {
 	client                 *client.Client
-	sentSpanIDs            *gocache.Cache[string, bool]
 	inmemoryDatastore      tracedb.TraceDB
+	sentSpansCache         *poller.SentSpansCache
 	logger                 *zap.Logger
 	observer               event.Observer
 	stoppableProcessRunner StoppableProcessRunner
 	tracer                 trace.Tracer
 	meter                  metric.Meter
+	traceCache             collector.TraceCache
 }
 
 type PollerOption func(*PollerWorker)
@@ -45,6 +47,12 @@ func WithInMemoryDatastore(datastore tracedb.TraceDB) PollerOption {
 func WithPollerObserver(observer event.Observer) PollerOption {
 	return func(pw *PollerWorker) {
 		pw.observer = observer
+	}
+}
+
+func WithPollerTraceCache(cache collector.TraceCache) PollerOption {
+	return func(pw *PollerWorker) {
+		pw.traceCache = cache
 	}
 }
 
@@ -74,12 +82,12 @@ func WithPollerMeter(meter metric.Meter) PollerOption {
 
 func NewPollerWorker(client *client.Client, opts ...PollerOption) *PollerWorker {
 	pollerWorker := &PollerWorker{
-		client:      client,
-		sentSpanIDs: gocache.New[string, bool](),
-		logger:      zap.NewNop(),
-		observer:    event.NewNopObserver(),
-		tracer:      telemetry.GetNoopTracer(),
-		meter:       telemetry.GetNoopMeter(),
+		client:         client,
+		logger:         zap.NewNop(),
+		sentSpansCache: poller.NewSentSpansCache(),
+		observer:       event.NewNopObserver(),
+		tracer:         telemetry.GetNoopTracer(),
+		meter:          telemetry.GetNoopMeter(),
 	}
 
 	for _, opt := range opts {
@@ -205,7 +213,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		for _, span := range pollingResponse.Spans {
 			runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
 			w.logger.Debug("Checking if span was already sent", zap.String("runKey", runKey))
-			_, alreadySent := w.sentSpanIDs.Get(runKey)
+			alreadySent := w.sentSpansCache.Get(request.TraceID, runKey)
 			if !alreadySent {
 				w.logger.Debug("Span was not sent", zap.String("runKey", runKey))
 				newSpans = append(newSpans, span)
@@ -214,6 +222,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 			}
 		}
 		pollingResponse.Spans = newSpans
+
 		w.logger.Debug("Filtered spans", zap.Any("pollingResponse", spew.Sdump(pollingResponse)))
 	}
 
@@ -224,14 +233,21 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		return err
 	}
 
-	// mark spans as sent
+	spanIDs := make([]string, 0, len(pollingResponse.Spans))
 	for _, span := range pollingResponse.Spans {
+		spanIDs = append(spanIDs, span.Id)
+
+		// mark span as sent
 		runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
 		w.logger.Debug("Marking span as sent", zap.String("runKey", runKey))
 		// TODO: we can set the expiration for this key to be
 		// 1 second after the pollingProfile max waiting time
 		// but we need to get that info here from controlplane
-		w.sentSpanIDs.Set(runKey, true)
+		w.sentSpansCache.Set(request.TraceID, runKey)
+	}
+
+	if w.traceCache != nil {
+		w.traceCache.RemoveSpans(request.TraceID, spanIDs)
 	}
 
 	return nil
@@ -314,6 +330,12 @@ func convertTraceInToProtoSpans(trace traces.Trace) []*proto.Span {
 			Attributes: attributes,
 		}
 		spans = append(spans, &protoSpan)
+	}
+
+	// hack to prevent the "Temporary root span" to be sent alone to the server.
+	// This causes the server to be confused when evaluating the trace
+	if len(spans) == 1 && spans[0].Name == traces.TemporaryRootSpanName {
+		return []*proto.Span{}
 	}
 
 	return spans

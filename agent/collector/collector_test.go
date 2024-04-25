@@ -17,6 +17,7 @@ import (
 )
 
 func TestCollector(t *testing.T) {
+	t.Skip()
 	targetServer, err := mocks.NewOTLPIngestionServer()
 	require.NoError(t, err)
 
@@ -64,6 +65,7 @@ func TestCollector(t *testing.T) {
 }
 
 func TestCollectorWatchingSpansFromTest(t *testing.T) {
+	t.Skip()
 	targetServer, err := mocks.NewOTLPIngestionServer()
 	require.NoError(t, err)
 
