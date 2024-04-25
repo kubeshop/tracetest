@@ -80,6 +80,101 @@
       "destination": "/cli/creating-tests",
       "source": "/cli/test-definition-file/",
       "statusCode": 301
+    },
+    {
+      "destination": "/cli/creating-tests",
+      "source": "/cli/test-definition-file",
+      "statusCode": 301
+    },
+    {
+      "destination": "/web-ui/test-results",
+      "source": "/test-results/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/web-ui/test-results",
+      "source": "/test-results",
+      "statusCode": 301
+    },
+    {
+      "destination": "/cli/configuring-your-cli",
+      "source": "/command-line-tool/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/cli/configuring-your-cli",
+      "source": "/command-line-tool",
+      "statusCode": 301
+    },
+    {
+      "destination": "/cli/configuring-your-cli",
+      "source": "/cli/command-line-tool",
+      "statusCode": 301
+    },
+    {
+      "destination": "/cli/configuring-your-cli",
+      "source": "/cli/command-line-tool/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/ci-cd-automation/tekton-pipeline",
+      "source": "/examples-tutorials/recipes/running-tracetest-with-tekton/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/ci-cd-automation/tekton-pipeline",
+      "source": "/examples-tutorials/recipes/running-tracetest-with-tekton",
+      "statusCode": 301
+    },
+    {
+      "destination": "/getting-started/installation",
+      "source": "/getting-started/detailed-installation",
+      "statusCode": 301
+    },
+    {
+      "destination": "/getting-started/installation",
+      "source": "/getting-started/detailed-installation/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/web-ui/creating-tests",
+      "source": "/using-tracetest/create-test/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/web-ui/creating-tests",
+      "source": "/using-tracetest/create-test",
+      "statusCode": 301
+    },
+    {
+      "destination": "/",
+      "source": "/introduction/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/",
+      "source": "/introduction",
+      "statusCode": 301
+    },
+    {
+      "destination": "/configuration/connecting-to-data-stores/overview",
+      "source": "/getting-started/supported-backends/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/configuration/connecting-to-data-stores/overview",
+      "source": "/getting-started/supported-backends",
+      "statusCode": 301
+    },
+    {
+      "destination": "/getting-started/installation",
+      "source": "/deployment/overview/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/getting-started/installation",
+      "source": "/deployment/overview",
+      "statusCode": 301
     }
   ]
 }
