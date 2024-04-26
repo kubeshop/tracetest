@@ -887,10 +887,14 @@ const sidebars = {
             {
               type: "category",
               label: "Creating Tests",
+              link: {
+                type: "doc",
+                id: "web-ui/creating-tests",
+              },
               items: [
                 {
                   type: "doc",
-                  id: "web-ui/creating-tests",
+                  id: "web-ui/creating-tests-http",
                   label: "Creating Tests - HTTP",
                 },
                 {
@@ -907,6 +911,26 @@ const sidebars = {
                   type: "doc",
                   id: "web-ui/creating-tests-traceid",
                   label: "Creating Tests - TraceID",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-cypress",
+                  label: "Creating Tests - Cypress",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-playwright",
+                  label: "Creating Tests - Playwright",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-k6",
+                  label: "Creating Tests - k6",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-artillery",
+                  label: "Creating Tests - Artillery",
                 },
               ],
             }, 

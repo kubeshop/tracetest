@@ -25,7 +25,7 @@ const WelcomeGuides = [
     ),
   },
   {
-    name: '⚙️ Configure Access and Tracing Backend',
+    name: '⚙️ Configure Access & Trace Ingestion',
     url: '/configuration/overview',
     description: (
       <Translate>
