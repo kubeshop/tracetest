@@ -110,7 +110,7 @@ trigger:
     httpRequest:
         url: http://my-api.com
         method: GET
-        authentication:
+        auth:
             type: basic
             basic:
                 user: my-username
@@ -125,7 +125,7 @@ trigger:
     httpRequest:
         url: http://my-api.com
         method: GET
-        authentication:
+        auth:
             type: apiKey
             apiKey:
                 key: X-Key
@@ -141,7 +141,7 @@ trigger:
     httpRequest:
         url: http://my-api.com
         method: GET
-        authentication:
+        auth:
             type: bearer
             bearer:
                 token: my-token
