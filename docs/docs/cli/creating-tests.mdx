@@ -89,6 +89,20 @@ trigger:
   type: http|grpc|kafka|traceid|cypress|playwright|k6|artillery
 ```
 
+Choose the kind of trigger to initiate the trace:
+
+- [HTTP Request - Create a basic HTTP request.](/cli/creating-tests-http)
+- [GRPC Request - Test and debug your GRPC request.](/cli/creating-tests-grpc)
+- [Kafka - Test consumers with Kafka messages.](/cli/creating-tests-kafka)
+- [TraceID - Define your test via a TraceID.](/cli/creating-tests-traceid)
+
+Or, choose to use an external integration to trigger Tracetest:
+
+- [Cypress](/web-ui/creating-tests-cypress)
+- [Playwright](/web-ui/creating-tests-playwright)
+- [k6](/web-ui/creating-tests-k6)
+- [Artillery](/web-ui/creating-tests-artillery)
+
 ## Specs
 
 This section defines test specifications. You can use the [selector language](/concepts/selectors) to pick which spans to test against. Then, use the [assertions](/concepts/assertions) to validate attribute values.
