@@ -1,0 +1,125 @@
+---
+id: creating-tests-http
+title: Defining HTTP Tests as Text Files
+description: Tracetest enables developers to define tests as text files and run them using a CLI. Integrate the execution of tests in your existing CI pipeline.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+When defining an HTTP trigger, you are required to define a `httpRequest` object containing the request Tracetest will send to your system, this is where you define: `url`, `method`, `headers`, `authentication`, and `body`.
+
+> Note: Some APIs require the `Content-Type` header to respond. If you are not able to trigger your application, check if you are sending this header and if its value is correct.
+
+```yaml
+trigger:
+  type: http
+  httpRequest:
+    url: http://demo-pokemon-api.demo/pokemon/import
+    method: POST
+    headers:
+    - key: Content-Type
+      value: application/json
+    body: '{ "id": 52 }'
+```
+
+## Authentication
+
+Currently, we support three authentication methods for HTTP requests: `basic authentication`, `api key`, and `bearer token`. Here is one example of each authentication method:
+
+**Basic Authentication**
+
+```yaml
+trigger:
+    type: http
+    httpRequest:
+        url: http://my-api.com
+        method: GET
+        auth:
+            type: basic
+            basic:
+                user: my-username
+                password: mypassword
+```
+
+**API Key Authentication**
+
+```yaml
+trigger:
+    type: http
+    httpRequest:
+        url: http://my-api.com
+        method: GET
+        auth:
+            type: apiKey
+            apiKey:
+                key: X-Key
+                value: my-key
+                in: header # Either "header" or "query"
+```
+
+**Bearer Token Authentication**
+
+```yaml
+trigger:
+    type: http
+    httpRequest:
+        url: http://my-api.com
+        method: GET
+        auth:
+            type: bearer
+            bearer:
+                token: my-token
+```
+
+## Body
+
+Currently, Tracetest supports `raw` body types that enable you to send text formats over HTTP: JSON, for example.
+
+```yaml
+trigger:
+    type: http
+    httpRequest:
+        url: http://my-api.com
+        method: POST
+        body: '{"name": "my Json Object"}'
+```
+
+### Generator Functions
+
+Sometimes we want to randomize our test data. Maybe we want to try new values or maybe we know our API will fail if the same id is provided more than once. For this use case, you can define generator functions in the test trigger.
+
+Generator functions can be invoked as part of expressions. Therefore, you only need to invoke it as `uuid()`. However, you might want to generate values and concatenate them with static texts as well. For this, you can use the string interpolation feature: `"your user id is ${uuid()}`.
+
+Available functions:
+
+| Function              | Description |
+| :-------------------- | --------------------------------------------------------------------------------------------- |
+| `uuid()`              | Generates a random v4 uuid.                                                                   |
+| `firstName()`         | Generates a random English first name.                                                        |
+| `lastName()`          | Generates a random English last name.                                                         |
+| `fullName()`          | Generates a random English first and last name.                                               |
+| `email()`             | Generates a random email address.                                                             |
+| `phone()`             | Generates a random phone number.                                                              |
+| `creditCard()`        | Generates a random credit card number (from 12 to 19 digits).                                 |
+| `creditCardCvv()`     | Generates a random credit card cvv (3 digits).                                                |
+| `creditCardExpDate()` | Generates a random credit card expiration date (mm/yy).                                       |
+| `randomInt(min, max)` | Generates a random integer contained in the closed interval defined by [`min`, `max`].        |
+| `date(format?)`       | Get the current date and formats it. Default is `YYYY-MM-DD` but you can specify other formats.|
+| `dateTime(format?)`   | Get the current datetime and formats it. Default is RFC3339 but you can specify other formats.|
+
+:::tip
+[Continue reading about date and datetime formats here.](https://www.w3.org/TR/NOTE-datetime)
+:::
+
+:::tip
+[Continue reading about Test Specs here.](/cli/creating-test-specifications)
+:::
+
+:::tip
+[Continue reading about Test Outputs, here.](/cli/creating-test-outputs)
+:::

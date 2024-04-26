@@ -887,10 +887,14 @@ const sidebars = {
             {
               type: "category",
               label: "Creating Tests",
+              link: {
+                type: "doc",
+                id: "web-ui/creating-tests",
+              },
               items: [
                 {
                   type: "doc",
-                  id: "web-ui/creating-tests",
+                  id: "web-ui/creating-tests-http",
                   label: "Creating Tests - HTTP",
                 },
                 {
@@ -907,6 +911,26 @@ const sidebars = {
                   type: "doc",
                   id: "web-ui/creating-tests-traceid",
                   label: "Creating Tests - TraceID",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-cypress",
+                  label: "Creating Tests - Cypress",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-playwright",
+                  label: "Creating Tests - Playwright",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-k6",
+                  label: "Creating Tests - k6",
+                },
+                {
+                  type: "doc",
+                  id: "web-ui/creating-tests-artillery",
+                  label: "Creating Tests - Artillery",
                 },
               ],
             }, 
@@ -999,9 +1023,34 @@ const sidebars = {
           label: "Configuring Tests",
           items: [
             {
-              type: "doc",
-              id: "cli/creating-tests",
+              type: "category",
+              link: {
+                type: "doc",
+                id: "cli/creating-tests",
+              },
               label: "Creating Tests",
+              items: [
+                {
+                  type: "doc",
+                  id: "cli/creating-tests-http",
+                  label: "Creating Tests - HTTP",
+                },
+                {
+                  type: "doc",
+                  id: "cli/creating-tests-grpc",
+                  label: "Creating Tests - gRPC",
+                },
+                {
+                  type: "doc",
+                  id: "cli/creating-tests-kafka",
+                  label: "Creating Tests - Kafka",
+                },
+                {
+                  type: "doc",
+                  id: "cli/creating-tests-traceid",
+                  label: "Creating Tests - TraceID",
+                },
+              ],
             },
             {
               type: "doc",

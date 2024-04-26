@@ -1,0 +1,26 @@
+---
+id: creating-tests-kafka
+title: Defining Kafka Tests as Text Files
+description: Tracetest enables developers to define tests as text files and run them using a CLI. Integrate the execution of tests in your existing CI pipeline.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+When defining a Kafka trigger, you are required to define a `kafka` object containing the request Tracetest will send to your system. You also define: `brokerUrls`, `topic`, `headers`, `messageKey`, and `messageValue`.
+
+```yaml
+trigger:
+  type: kafka
+  kafka:
+    brokerUrls:
+    - ${var:POKESHOP_KAFKA_BROKER}
+    topic: pokemon
+    headers: []
+    messageKey: snorlax-key
+    messageValue: "{\"id\":144}"
+```

@@ -1,0 +1,131 @@
+---
+id: creating-tests-grpc
+title: Defining gRPC Tests as Text Files
+description: Tracetest enables developers to define tests as text files and run them using a CLI. Integrate the execution of tests in your existing CI pipeline.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+When defining a gRPC trigger, you are required to define a `protobufFile` object containing the request Tracetest will send to your system. You also define: `address`, `method`, and `request`.
+
+```yaml
+trigger:
+  type: grpc
+  grpc:
+    protobufFile: ./path/to/file.proto
+    address: payment.opentelemetry.demo
+    method: oteldemo.PaymentService.Charge
+    request: |-
+      {
+        "amount": {
+          "currencyCode": "USD",
+          "units": 43,
+          "nanos": 130000000
+        },
+        "creditCard": {
+          "creditCardNumber": "0000-0000-0000-0000",
+          "creditCardCvv": 672,
+          "creditCardExpirationYear": 2039,
+          "creditCardExpirationMonth": 1
+        }
+      }
+```
+
+## Authentication
+
+Currently, we support the same authentication methods for gRPC requests as for HTTP requests.
+
+**Basic Authentication**
+
+```yaml
+trigger:
+  type: grpc
+  grpc:
+    protobufFile: ./path/to/file.proto
+    address: payment.opentelemetry.demo
+    method: oteldemo.PaymentService.Charge
+    auth:
+      type: basic
+      basic:
+        user: my-username
+        password: mypassword
+    request: |-
+      {
+        "amount": {
+          "currencyCode": "USD",
+          "units": 43,
+          "nanos": 130000000
+        },
+        "creditCard": {
+          "creditCardNumber": "0000-0000-0000-0000",
+          "creditCardCvv": 672,
+          "creditCardExpirationYear": 2039,
+          "creditCardExpirationMonth": 1
+        }
+      }
+```
+
+**API Key Authentication**
+
+```yaml
+trigger:
+  type: grpc
+  grpc:
+    protobufFile: ./path/to/file.proto
+    address: payment.opentelemetry.demo
+    method: oteldemo.PaymentService.Charge
+    auth:
+      type: apiKey
+      apiKey:
+        key: X-Key
+        value: my-key
+        in: header # Either "header" or "query"
+    request: |-
+      {
+        "amount": {
+          "currencyCode": "USD",
+          "units": 43,
+          "nanos": 130000000
+        },
+        "creditCard": {
+          "creditCardNumber": "0000-0000-0000-0000",
+          "creditCardCvv": 672,
+          "creditCardExpirationYear": 2039,
+          "creditCardExpirationMonth": 1
+        }
+      }
+```
+
+**Bearer Token Authentication**
+
+```yaml
+trigger:
+  type: grpc
+  grpc:
+    protobufFile: ./path/to/file.proto
+    address: payment.opentelemetry.demo
+    method: oteldemo.PaymentService.Charge
+    auth:
+      type: bearer
+      bearer:
+        token: my-token
+    request: |-
+      {
+        "amount": {
+          "currencyCode": "USD",
+          "units": 43,
+          "nanos": 130000000
+        },
+        "creditCard": {
+          "creditCardNumber": "0000-0000-0000-0000",
+          "creditCardCvv": 672,
+          "creditCardExpirationYear": 2039,
+          "creditCardExpirationMonth": 1
+        }
+      }
+```
