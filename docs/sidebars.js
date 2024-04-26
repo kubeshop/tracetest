@@ -1023,9 +1023,34 @@ const sidebars = {
           label: "Configuring Tests",
           items: [
             {
-              type: "doc",
-              id: "cli/creating-tests",
+              type: "category",
+              link: {
+                type: "doc",
+                id: "cli/creating-tests",
+              },
               label: "Creating Tests",
+              items: [
+                {
+                  type: "doc",
+                  id: "cli/creating-tests-http",
+                  label: "Creating Tests - HTTP",
+                },
+                {
+                  type: "doc",
+                  id: "cli/creating-tests-grpc",
+                  label: "Creating Tests - gRPC",
+                },
+                {
+                  type: "doc",
+                  id: "cli/creating-tests-kafka",
+                  label: "Creating Tests - Kafka",
+                },
+                {
+                  type: "doc",
+                  id: "cli/creating-tests-traceid",
+                  label: "Creating Tests - TraceID",
+                },
+              ],
             },
             {
               type: "doc",

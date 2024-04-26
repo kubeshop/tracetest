@@ -27,7 +27,7 @@ To solve that, the best approach would be to enable developers to define their t
 
 ## Definition
 
-The definition can be broken into three parts: `test information` including `triggering transaction`, `assertions`, and `outputs`. Here is a real test we have on Tracetest to test our Pokemon demo API:
+The definition can be broken into three parts: `test information` including `triggering transaction`, `assertions`, and `outputs`. Here is a real test we have on Tracetest to test our [Pokeshop Demo API](/live-examples/pokeshop/overview).
 
 ```yaml
 type: Test
@@ -72,133 +72,53 @@ spec:
 
 ## Test Information
 
-Currently, you can only define the test name.
+Currently, you can define:
+
+- test name
+- test description
+- test id (if it is known)
 
 ## Trigger
 
-This section defines how Tracetest will interact with your application: send an HTTP request, a GRPC call, send a message to a message broker, etc. Currently, only HTTP calls are supported, please let us know any other triggering mechanism that you require to test your application.
+This section defines how Tracetest will interact with your application. You can send an HTTP request, a GRPC call, send a message to a message broker, use an existing TraceID, etc.
 
 The attribute `type` defines which trigger method you are going to use to interact with your application. The rest of the attributes in this section rely on the value you define there.
 
-### HTTP Trigger
-
-When defining a HTTP trigger, you are required to define a `httpRequest` object containing the request Tracetest will send to your system, this is where you define: `url`, `method`, `headers`, `authentication`, and `body`.
-
-> Note: Some APIs require the `Content-Type` header to respond. If you are not able to trigger your application, check if you are sending this header and if its value is correct.
-
 ```yaml
 trigger:
-  type: http
-  httpRequest:
-    url: http://demo-pokemon-api.demo/pokemon/import
-    method: POST
-    headers:
-    - key: Content-Type
-      value: application/json
-    body: '{ "id": 52 }'
+  type: http|grpc|kafka|traceid|cypress|playwright|k6|artillery
 ```
 
-#### Authentication
+## Specs
 
-Currently, we support three authentication methods for HTTP requests: `basic authentication`, `api key`, and `bearer token`. Here is one example of each authentication method:
-
-**Basic Authentication**
+This section defines test specifications. You can use the [selector language](/concepts/selectors) to pick which spans to test against. Then, use the [assertions](/concepts/assertions) to validate attribute values.
 
 ```yaml
-trigger:
-    type: http
-    httpRequest:
-        url: http://my-api.com
-        method: GET
-        authentication:
-            type: basic
-            basic:
-                user: my-username
-                password: mypassword
+specs:
+  - selector: span[tracetest.span.type="http"]
+    name: "All HTTP Spans: Status  code is 200"
+    assertions:
+    - attr:http.status_code   =   200
+  - selector: span[tracetest.span.type="database"]
+    name: "All Database Spans: Processing time is less than 100ms"
+    assertions:
+    - attr:tracetest.span.duration < 2s
 ```
 
-**API Key Authentication**
+## Outputs 
+
+This section defines test outputs. You can define an output value from a test to use as input for subsequent tests.
 
 ```yaml
-trigger:
-    type: http
-    httpRequest:
-        url: http://my-api.com
-        method: GET
-        authentication:
-            type: apiKey
-            apiKey:
-                key: X-Key
-                value: my-key
-                in: header # Either "header" or "query"
+outputs:
+  - name: MY_OUTPUT
+    selector: span[tracetest.span.type="general" name="Tracetest trigger"]
+    value: attr:name
 ```
 
-**Bearer Token Authentication**
+## Defining a polling profile
 
-```yaml
-trigger:
-    type: http
-    httpRequest:
-        url: http://my-api.com
-        method: GET
-        authentication:
-            type: bearer
-            bearer:
-                token: my-token
-```
-
-#### Body
-
-Currently, Testkube supports `raw` body types that enable you to send text formats over HTTP: JSON, for example.
-
-```yaml
-trigger:
-    type: http
-    httpRequest:
-        url: http://my-api.com
-        method: POST
-        body: '{"name": "my Json Object"}'
-```
-
-### Generator Functions
-
-Sometimes we want to randomize our test data. Maybe we want to try new values or maybe we know our API will fail if the same id is provided more than once. For this use case, you can define generator functions in the test trigger.
-
-Generator functions can be invoked as part of expressions. Therefore, you only need to invoke it as `uuid()`. However, you might want to generate values and concatenate them with static texts as well. For this, you can use the string interpolation feature: `"your user id is ${uuid()}`.
-
-Available functions:
-
-| Function              | Description |
-| :-------------------- | --------------------------------------------------------------------------------------------- |
-| `uuid()`              | Generates a random v4 uuid.                                                                   |
-| `firstName()`         | Generates a random English first name.                                                        |
-| `lastName()`          | Generates a random English last name.                                                         |
-| `fullName()`          | Generates a random English first and last name.                                               |
-| `email()`             | Generates a random email address.                                                             |
-| `phone()`             | Generates a random phone number.                                                              |
-| `creditCard()`        | Generates a random credit card number (from 12 to 19 digits).                                 |
-| `creditCardCvv()`     | Generates a random credit card cvv (3 digits).                                                |
-| `creditCardExpDate()` | Generates a random credit card expiration date (mm/yy).                                       |
-| `randomInt(min, max)` | Generates a random integer contained in the closed interval defined by [`min`, `max`].        |
-| `date(format?)`       | Get the current date and formats it. Default is `YYYY-MM-DD` but you can specify other formats.|
-| `dateTime(format?)`   | Get the current datetime and formats it. Default is RFC3339 but you can specify other formats.|
-
-:::tip
-[Continue reading about date and datetime formats here.](https://www.w3.org/TR/NOTE-datetime)
-:::
-
-:::tip
-[Continue reading about Test Specs here.](/cli/creating-test-specifications)
-:::
-
-:::tip
-[Continue reading about Test Outputs, here.](/cli/creating-test-outputs)
-:::
-
-### Defining a polling profile
-
-Some tests have different requirements than others, it means that some will take longer to run than other tests, so it's crucial to be able to
-define the trace polling strategy at the test level:\
+Some tests have different requirements than others, it means that some will take longer to run than other tests, so it's crucial to be able to define the trace polling strategy at the test level.
 
 ```yaml
 type: Test
