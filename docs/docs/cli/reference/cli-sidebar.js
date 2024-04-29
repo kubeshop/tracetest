@@ -92,6 +92,11 @@ const pages = [
 		label: "tracetest version",
 		id: "cli/reference/tracetest_version"
 	},
+    {
+        type: "doc",
+		label: "tracetest wait",
+		id: "cli/reference/tracetest_wait"
+	},
 ]
 
 module.exports = pages;
