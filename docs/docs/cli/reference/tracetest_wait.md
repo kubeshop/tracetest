@@ -1,25 +1,21 @@
 # CLI Reference
-## tracetest list
+## tracetest wait
 
-List resources
+Waits for a run group to be finished
 
 ### Synopsis
 
-List resources from your Tracetest server
+Waits for a run group to be finished and displays the result
 
 ```
-tracetest list analyzer|config|datastore|demo|env|organization|pollingprofile|test|testrunner|testsuite|variableset [flags]
+tracetest wait group [flags]
 ```
 
 ### Options
 
 ```
-      --all                    All
-  -h, --help                   help for list
-      --skip int32             Skip number
-      --sortBy string          Sort by
-      --sortDirection string   Sort direction (default "desc")
-      --take int32             Take number (default 20)
+  -h, --help        help for wait
+      --id string   Run Group ID to wait
 ```
 
 ### Options inherited from parent commands
