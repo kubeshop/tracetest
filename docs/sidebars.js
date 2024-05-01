@@ -744,33 +744,8 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "concepts/assertions",
-          label: "Assertions",
-        },
-        // {
-        //   type: "doc",
-        //   id: "concepts/data-stores",
-        //   label: "Data Stores",
-        // },
-        {
-          type: "doc",
-          id: "concepts/variable-sets",
-          label: "Variable Sets",
-        },
-        {
-          type: "doc",
-          id: "concepts/selectors",
-          label: "Selectors",
-        },
-        // {
-        //   type: "doc",
-        //   id: "concepts/tests",
-        //   label: "Tests",
-        // },
-        {
-          type: "doc",
-          id: "concepts/expressions",
-          label: "Expressions",
+          id: "concepts/tests",
+          label: "Tests",
         },
         {
           type: "doc",
@@ -779,9 +754,44 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/runs",
+          label: "Runs",
+        },
+        {
+          type: "doc",
+          id: "concepts/run-groups",
+          label: "Run Groups",
+        },
+        {
+          type: "doc",
+          id: "concepts/selectors",
+          label: "Selectors",
+        },
+        {
+          type: "doc",
+          id: "concepts/expressions",
+          label: "Expressions",
+        },
+        {
+          type: "doc",
+          id: "concepts/assertions",
+          label: "Assertions",
+        },
+        {
+          type: "doc",
+          id: "concepts/variable-sets",
+          label: "Variable Sets",
+        },
+        {
+          type: "doc",
           id: "concepts/ad-hoc-testing",
           label: "Ad-hoc Testing",
         },
+        // {
+        //   type: "doc",
+        //   id: "concepts/data-stores",
+        //   label: "Data Stores",
+        // },
         {
           type: "doc",
           id: "concepts/versioning",
