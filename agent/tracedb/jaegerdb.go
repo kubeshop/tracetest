@@ -43,6 +43,13 @@ func saveConnectionToCache(grpcConfig *datastore.GRPCClientSettings, traceDB Tra
 	connectionPool[grpcConfig.Endpoint] = traceDB
 }
 
+func invalidateConnectionCache(endpoint string) {
+	connectionPoolMutex.Lock()
+	defer connectionPoolMutex.Unlock()
+
+	delete(connectionPool, endpoint)
+}
+
 type jaegerTraceDB struct {
 	realTraceDB
 	dataSource datasource.DataSource
@@ -107,6 +114,7 @@ func (jtd *jaegerTraceDB) Ready() bool {
 }
 
 func (jtd *jaegerTraceDB) Close() error {
+	invalidateConnectionCache(jtd.dataSource.Endpoint())
 	return jtd.dataSource.Close()
 }
 

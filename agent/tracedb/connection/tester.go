@@ -10,13 +10,18 @@ type TestStep interface {
 	TestConnection(ctx context.Context) model.ConnectionTestStep
 }
 
+type CloseableTestStep interface {
+	TestStep
+	CloseConnection() error
+}
+
 type TesterOption func(*Tester)
 
 type Tester struct {
 	portLinterStep         TestStep
 	connectivityTestStep   TestStep
 	authenticationTestStep TestStep
-	pollingTestStep        TestStep
+	pollingTestStep        CloseableTestStep
 }
 
 func NewTester(opts ...TesterOption) Tester {
@@ -53,6 +58,7 @@ func (t *Tester) TestConnection(ctx context.Context) (res model.ConnectionResult
 	res.FetchTraces = t.pollingTestStep.TestConnection(ctx)
 	if res.FetchTraces.Error != nil {
 		res.FetchTraces.Status = model.StatusFailed
+		t.pollingTestStep.CloseConnection()
 	}
 
 	return
