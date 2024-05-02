@@ -172,6 +172,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 
 	dsFactory := tracedb.Factory(nil)
 	ds, err := dsFactory(*datastoreConfig)
+	defer ds.Close()
 	if err != nil {
 		w.logger.Error("Invalid datastore", zap.Error(err))
 		log.Printf("Invalid datastore: %s", err.Error())
