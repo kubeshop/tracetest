@@ -172,12 +172,12 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 
 	dsFactory := tracedb.Factory(nil)
 	ds, err := dsFactory(*datastoreConfig)
-	defer ds.Close()
 	if err != nil {
 		w.logger.Error("Invalid datastore", zap.Error(err))
 		log.Printf("Invalid datastore: %s", err.Error())
 		return err
 	}
+	defer ds.Close()
 	w.logger.Debug("Created datastore", zap.Any("datastore", ds), zap.Bool("isOTLPBasedProvider", datastoreConfig.IsOTLPBasedProvider()))
 
 	if datastoreConfig.IsOTLPBasedProvider() && w.inmemoryDatastore != nil {
