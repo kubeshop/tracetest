@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 
 	pb "github.com/kubeshop/tracetest/agent/internal/proto-gen-go/api_v3"
 	"github.com/kubeshop/tracetest/agent/tracedb/connection"
@@ -22,12 +23,36 @@ func jaegerDefaultPorts() []string {
 	return []string{"16685"}
 }
 
+var (
+	connectionPool      map[string]TraceDB = make(map[string]TraceDB)
+	connectionPoolMutex sync.Mutex
+)
+
+func getConnectionFromCache(grpcConfig *datastore.GRPCClientSettings) (TraceDB, bool) {
+	connectionPoolMutex.Lock()
+	defer connectionPoolMutex.Unlock()
+
+	connection, ok := connectionPool[grpcConfig.Endpoint]
+	return connection, ok
+}
+
+func saveConnectionToCache(grpcConfig *datastore.GRPCClientSettings, traceDB TraceDB) {
+	connectionPoolMutex.Lock()
+	defer connectionPoolMutex.Unlock()
+
+	connectionPool[grpcConfig.Endpoint] = traceDB
+}
+
 type jaegerTraceDB struct {
 	realTraceDB
 	dataSource datasource.DataSource
 }
 
 func newJaegerDB(grpcConfig *datastore.GRPCClientSettings) (TraceDB, error) {
+	if connection, ok := getConnectionFromCache(grpcConfig); ok {
+		return connection, nil
+	}
+
 	baseConfig := &datastore.MultiChannelClientConfig{
 		Type: datastore.MultiChannelClientTypeGRPC,
 		Grpc: grpcConfig,
@@ -37,9 +62,13 @@ func newJaegerDB(grpcConfig *datastore.GRPCClientSettings) (TraceDB, error) {
 		GRPC: jaegerGrpcGetTraceByID,
 	})
 
-	return &jaegerTraceDB{
+	traceDB := &jaegerTraceDB{
 		dataSource: dataSource,
-	}, nil
+	}
+
+	saveConnectionToCache(grpcConfig, traceDB)
+
+	return traceDB, nil
 }
 
 func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
