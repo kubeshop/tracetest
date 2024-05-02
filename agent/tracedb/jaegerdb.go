@@ -37,11 +37,9 @@ func newJaegerDB(grpcConfig *datastore.GRPCClientSettings) (TraceDB, error) {
 		GRPC: jaegerGrpcGetTraceByID,
 	})
 
-	traceDB := &jaegerTraceDB{
+	return &jaegerTraceDB{
 		dataSource: dataSource,
-	}
-
-	return traceDB, nil
+	}, nil
 }
 
 func (jtd *jaegerTraceDB) Connect(ctx context.Context) error {
