@@ -64,6 +64,7 @@ message StopRequest {
 message ConnectRequest {
     string apiKey = 1;
     string name = 2;
+    string environmentID = 3;
 }
 
 // ConnectResponse is the Orchestrator response to the ConnectRequest. It contains
