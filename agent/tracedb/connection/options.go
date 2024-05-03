@@ -24,7 +24,7 @@ func WithAuthenticationTest(step TestStep) TesterOption {
 	}
 }
 
-func WithPollingTest(step TestStep) TesterOption {
+func WithPollingTest(step CloseableTestStep) TesterOption {
 	return func(t *Tester) {
 		t.pollingTestStep = step
 	}

@@ -12,6 +12,7 @@ import (
 type DataStore interface {
 	GetTraceByID(context.Context, string) (traces.Trace, error)
 	GetTraceID() trace.TraceID
+	Close() error
 }
 
 type tracePollingTestStep struct {
@@ -35,6 +36,10 @@ func (s *tracePollingTestStep) TestConnection(ctx context.Context) model.Connect
 	}
 }
 
-func TracePollingTestStep(ds DataStore) TestStep {
+func (s *tracePollingTestStep) CloseConnection() error {
+	return s.dataStore.Close()
+}
+
+func TracePollingTestStep(ds DataStore) CloseableTestStep {
 	return &tracePollingTestStep{ds}
 }

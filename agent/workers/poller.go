@@ -177,6 +177,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		log.Printf("Invalid datastore: %s", err.Error())
 		return err
 	}
+	defer ds.Close()
 	w.logger.Debug("Created datastore", zap.Any("datastore", ds), zap.Bool("isOTLPBasedProvider", datastoreConfig.IsOTLPBasedProvider()))
 
 	if datastoreConfig.IsOTLPBasedProvider() && w.inmemoryDatastore != nil {
