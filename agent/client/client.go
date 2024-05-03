@@ -26,9 +26,10 @@ const (
 )
 
 type Config struct {
-	APIKey     string
-	AgentName  string
-	PingPeriod time.Duration
+	APIKey        string
+	AgentName     string
+	EnvironmentID string
+	PingPeriod    time.Duration
 }
 
 type SessionConfig struct {
@@ -170,8 +171,9 @@ func (c *Client) getConnectionRequest() (*proto.ConnectRequest, error) {
 	}
 
 	request := proto.ConnectRequest{
-		ApiKey: c.config.APIKey,
-		Name:   name,
+		ApiKey:        c.config.APIKey,
+		EnvironmentID: c.config.EnvironmentID,
+		Name:          name,
 	}
 
 	return &request, nil

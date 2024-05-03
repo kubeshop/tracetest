@@ -120,6 +120,7 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
+		client.WithEnvironmentID(config.EnvironmentID),
 		client.WithLogger(logger),
 	)
 	if err != nil {
