@@ -70,6 +70,10 @@ var startCmd = &cobra.Command{
 			flags.Mode = agentConfig.Mode(cfg.Mode)
 		}
 
+		if flags.EnvironmentID != "" {
+			cfg.EnvironmentID = flags.EnvironmentID
+		}
+
 		err = agentRunner.Run(ctx, cliConfig, flags, verbose)
 		return "", err
 	})),

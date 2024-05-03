@@ -88,7 +88,7 @@ Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces 
 
 func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 	if cfg.AgentApiKey != "" {
-		err := s.StartAgent(ctx, cfg.AgentEndpoint, cfg.AgentApiKey, cfg.UIEndpoint)
+		err := s.StartAgent(ctx, cfg.AgentEndpoint, cfg.AgentApiKey, cfg.UIEndpoint, cfg.EnvironmentID)
 		if err != nil {
 			s.ui.Error(err.Error())
 		}
@@ -106,13 +106,13 @@ func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 		return
 	}
 
-	err = s.StartAgent(ctx, cfg.AgentEndpoint, env.AgentApiKey, cfg.UIEndpoint)
+	err = s.StartAgent(ctx, cfg.AgentEndpoint, env.AgentApiKey, cfg.UIEndpoint, cfg.EnvironmentID)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
 }
 
-func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoint string) error {
+func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoint, environmentID string) error {
 	cfg, err := agentConfig.LoadConfig()
 	s.logger.Debug("Loaded agent config", zap.Any("config", cfg))
 	if err != nil {
@@ -131,6 +131,12 @@ func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoi
 		cfg.APIKey = agentApiKey
 	}
 	s.logger.Debug("Agent api key", zap.String("apiKey", cfg.APIKey))
+
+	if environmentID != "" {
+		s.logger.Debug("Overriding agent environment id", zap.String("environment", environmentID))
+		cfg.EnvironmentID = environmentID
+	}
+	s.logger.Debug("Agent environment id", zap.String("environmentID", cfg.EnvironmentID))
 
 	if s.mode == agentConfig.Mode_Desktop {
 		s.logger.Debug("Starting agent in desktop mode")

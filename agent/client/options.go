@@ -21,6 +21,12 @@ func WithAgentName(name string) Option {
 	}
 }
 
+func WithEnvironmentID(id string) Option {
+	return func(c *Client) {
+		c.config.EnvironmentID = id
+	}
+}
+
 func WithPingPeriod(period time.Duration) Option {
 	return func(c *Client) {
 		c.config.PingPeriod = period

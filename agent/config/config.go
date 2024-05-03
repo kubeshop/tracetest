@@ -13,6 +13,7 @@ import (
 type Config struct {
 	APIKey            string `mapstructure:"api_key"`
 	Name              string `mapstructure:"agent_name"`
+	EnvironmentID     string `mapstructure:"environment_id"`
 	ServerURL         string `mapstructure:"server_url"`
 	CollectorEndpoint string `mapstructure:"collector_endpoint"`
 	Mode              string `mapstructure:"mode"`
@@ -46,6 +47,7 @@ func LoadConfig() (Config, error) {
 
 	vp.SetDefault("AGENT_NAME", getHostname())
 	vp.SetDefault("API_KEY", "")
+	vp.SetDefault("ENVIRONMENT_ID", "")
 	vp.SetDefault("SERVER_URL", "https://app.tracetest.io")
 	vp.SetDefault("COLLECTOR_ENDPOINT", "")
 	vp.SetDefault("MODE", "")
