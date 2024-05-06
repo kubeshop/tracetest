@@ -719,6 +719,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/polling-profiles",
+          label: "Polling Profiles",
+        },
+        {
+          type: "doc",
           id: "concepts/architecture",
           label: "Architecture",
         },
@@ -933,7 +938,7 @@ const sidebars = {
                   label: "Creating Tests - Artillery",
                 },
               ],
-            }, 
+            },
             {
               type: "category",
               label: "Importing Tests",
