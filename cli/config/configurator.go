@@ -403,6 +403,13 @@ func SetupHttpClient(cfg Config) *resourcemanager.HTTPClient {
 	extraHeaders.Set("x-environment-id", cfg.EnvironmentID)
 	extraHeaders.Set("Authorization", fmt.Sprintf("Bearer %s", cfg.Jwt))
 
+	if cfg.OrganizationID == "" {
+		extraHeaders.Set("x-organization-id", "default")
+	}
+	if cfg.EnvironmentID == "" {
+		extraHeaders.Set("x-environment-id", "default")
+	}
+
 	return resourcemanager.NewHTTPClient(fmt.Sprintf("%s%s", cfg.URL(), cfg.Path()), extraHeaders)
 }
 
