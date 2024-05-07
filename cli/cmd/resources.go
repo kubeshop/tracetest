@@ -55,6 +55,48 @@ var (
 		resourcemanager.WithResourceType("PollingProfile"),
 	)
 
+	envTokensClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"environmenttoken", "environmenttokens",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "ROLE", Path: "spec.role"},
+				{Header: "ISSUED AT", Path: "spec.issuedAt"},
+				{Header: "EXPIRES AT", Path: "spec.expiresAt"},
+			},
+		}),
+		resourcemanager.WithResourceType("EnvironmentToken"),
+	)
+
+	orgInvitesClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"invite", "invites",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "TO", Path: "spec.to"},
+				{Header: "Role", Path: "spec.role"},
+				{Header: "TYPE", Path: "spec.type"},
+				{Header: "STATUS", Path: "spec.status"},
+			},
+		}),
+		resourcemanager.WithResourceType("Invite"),
+	)
+
+	environmentClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"environment", "environments",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+			},
+		}),
+		resourcemanager.WithResourceType("Environment"),
+	)
+
 	testPreprocessor = preprocessor.Test(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
 		updated, err := pollingProfileClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
 		if err != nil {
@@ -138,13 +180,6 @@ var (
 		resourcemanager.WithDeprecatedAlias("Transaction"),
 	)
 
-	// deprecated resources
-	deprecatedEnvironmentClient = resourcemanager.NewClient(
-		httpClient, cliLogger,
-		"environment", "environments",
-		resourcemanager.WithProxyResource("variableset"),
-	)
-
 	deprecatedTransactionsClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
 		"transaction", "transactions",
@@ -185,6 +220,8 @@ var (
 				}),
 			),
 		).
+		Register(envTokensClient).
+		Register(orgInvitesClient).
 		Register(pollingProfileClient).
 		Register(
 			resourcemanager.NewClient(
@@ -250,9 +287,9 @@ var (
 		Register(testClient).
 		Register(organizationsClient).
 		Register(environmentClient).
+		Register(environmentMeClient).
 
 		// deprecated resources
-		Register(deprecatedEnvironmentClient).
 		Register(deprecatedTransactionsClient)
 
 	organizationsClient = resourcemanager.NewClient(
@@ -267,7 +304,7 @@ var (
 		resourcemanager.WithListPath("elements"),
 	)
 
-	environmentClient = resourcemanager.NewClient(
+	environmentMeClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
 		"env", "environments",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
