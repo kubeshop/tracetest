@@ -23,6 +23,8 @@ test will use that profile when trying to fetch the trace from the tracing backe
 polling profile per test. This makes more sense than having a single profile, due to some tests being pretty quick to run and others can take minutes
 to hours to finish executing.
 
+## Adding a Polling Profile in the CLI
+
 ```yaml
 # test.yaml
 type: Test
@@ -47,5 +49,40 @@ spec:
         timeout: 60s
 ```
 
-**retryDelay**: How long Tracetest must wait between trace polling tries. If set as 5s, Tracetest will try to get the trace every 5 seconds.
+**retryDelay**: How long Tracetest must wait between trace polling tries. In this example, Tracetest will try to get the trace every 5 seconds.
+
 **timeout**: How long Tracetest must keep trying getting a trace. If it takes more than the value set in timeout, the test fails.
+
+## Working with Polling Profiles in the UX
+
+In the Tracetest UX, select **Settings** and then select **Trace Polling**:
+
+![Trace Polling UX](../img/trace-polling-ux.png)
+
+Here you will create polling profiles for your environment and see all of the polling profiles already created. Click the **Edit** button for a profile to make changes.
+
+![Trace Polling UX2](../img/trace-polling-ux-2.png)
+
+The **Edit Polling Profiles** pop up appears where changes can be made to the profile:
+
+![Edit Polling Profile](../img/edit-polling-profile.png)
+
+To create a Polling Profile, click on the **Add Polling Profile** button:
+
+![Add Polling Profile](../img/add-polling-profile.png)
+
+The **Create Polling Profile** pop up appears:
+
+![Add Polling Profile Pop Up](../img/add-polling-profile-pop-up.png)
+
+Input a polling profile name, use the toggle to indicate whether this profile will be a Default profile (a default for all test runs), and pick a polling strategy.
+
+The options for Polling Profile Strategy are:
+
+- **Periodic:** Tracetest periodically queries the tracing backend at predefined intervals to fetch trace data.
+
+- **No-polling:** Tracetest does not query the tracing backend for trace data. It skips the fetching trace step.
+
+A Polling Profile can also be selected from a test. After selecting a test, on the **Trigger** tab, select the **Settings** tab and select an existing polling profile from the drop down.
+
+![Select Polling Profile from Test](../img/select-polling-profile-from-test.png)
