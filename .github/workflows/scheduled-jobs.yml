@@ -175,3 +175,45 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  failure-notification:
+    name: Check failure
+    needs: [pokeshop-trace-based-tests, pokeshop-serverless-trace-based-tests, otel-demo-trace-based-tests]
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    steps:
+      - name: Send message on Slack
+        if: ${{ needs.pokeshop-trace-based-tests.result == 'failure' && needs.pokeshop-serverless-trace-based-tests.result == 'failure' && needs.otel-demo-trace-based-tests.result == 'failure' }}
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          # check the block kit builder docs to understand how it works
+          # and how to modify it: https://api.slack.com/block-kit
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":red_circle: :loudspeaker: All synthetic monitoring crashed :loudspeaker: :red_circle:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\nFailed"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
