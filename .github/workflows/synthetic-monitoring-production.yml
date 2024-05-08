@@ -1,11 +1,11 @@
-name: Synthetic monitoring with Tracetest
+name: Synthetic monitoring Tracetest (Production)
 
 on:
   # allows the manual trigger
   workflow_dispatch:
 
   schedule:
-  - cron: '0 */1 * * *' # every hour
+  - cron: '*/15,30,45,0 * * * *' # every 15-minutes
 
 jobs:
   pokeshop-trace-based-tests:
@@ -41,7 +41,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": ":warning: Synthetic Monitoring Alert - Pokeshop Demo :warning:",
+                    "text": ":warning: Synthetic Monitoring Alert - Pokeshop Demo",
                     "emoji": true
                   }
                 },
@@ -97,7 +97,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": ":warning: Synthetic Monitoring Alert - Serverless Pokeshop Demo :warning:",
+                    "text": ":warning: Synthetic Monitoring Alert - Serverless Pokeshop Demo",
                     "emoji": true
                   }
                 },
@@ -153,7 +153,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": ":warning: Synthetic Monitoring Alert - OTel Demo :warning:",
+                    "text": ":warning: Synthetic Monitoring Alert - OTel Demo",
                     "emoji": true
                   }
                 },
@@ -177,7 +177,7 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
   failure-notification:
-    name: Check failure
+    name: Check if failure happened in all monitors
     needs: [pokeshop-trace-based-tests, pokeshop-serverless-trace-based-tests, otel-demo-trace-based-tests]
     runs-on: ubuntu-latest
     if: ${{ failure() }}
@@ -195,7 +195,7 @@ jobs:
                   "type": "header",
                   "text": {
                     "type": "plain_text",
-                    "text": ":red_circle: :loudspeaker: All synthetic monitoring crashed :loudspeaker: :red_circle:",
+                    "text": ":red_circle: :loudspeaker: All synthetic monitoring crashed on production! cc: @team-tracetest",
                     "emoji": true
                   }
                 },
