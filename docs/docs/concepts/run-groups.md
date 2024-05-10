@@ -36,7 +36,7 @@ The way to use run groups from the CLI is by running multiple folders at once:
 
 ![Run Groups CLI](../img/run-groups-cli.png)
 
-![Run Groups CLI 2](../img/run-groups-cli-2.png)
+![Run Groups CLI 2](../img/run-groups-cli-2.jpg)
 
 Users can also manually wait for a run group to be done from the CLI.
 
