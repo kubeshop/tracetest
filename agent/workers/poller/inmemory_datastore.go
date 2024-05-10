@@ -37,7 +37,7 @@ func (d *inmemoryDatastore) GetEndpoints() string {
 // GetTraceByID implements tracedb.TraceDB.
 func (d *inmemoryDatastore) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	spans, found := d.cache.Get(traceID)
-	if !found || !d.cache.Exists(traceID) {
+	if !found && !d.cache.Exists(traceID) {
 		return traces.Trace{}, connection.ErrTraceNotFound
 	}
 
