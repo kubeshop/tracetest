@@ -234,9 +234,9 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		return err
 	}
 
-	spanIDs := make([]string, 0, len(pollingResponse.Spans))
+	// spanIDs := make([]string, 0, len(pollingResponse.Spans))
 	for _, span := range pollingResponse.Spans {
-		spanIDs = append(spanIDs, span.Id)
+		// spanIDs = append(spanIDs, span.Id)
 
 		// mark span as sent
 		runKey := fmt.Sprintf("%d-%s-%s", request.RunID, request.TestID, span.Id)
@@ -244,12 +244,12 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 		// TODO: we can set the expiration for this key to be
 		// 1 second after the pollingProfile max waiting time
 		// but we need to get that info here from controlplane
-		w.sentSpansCache.Set(request.TraceID, runKey)
+		// w.sentSpansCache.Set(request.TraceID, runKey)
 	}
 
-	if w.traceCache != nil {
-		w.traceCache.RemoveSpans(request.TraceID, spanIDs)
-	}
+	// if w.traceCache != nil {
+	// 	w.traceCache.RemoveSpans(request.TraceID, spanIDs)
+	// }
 
 	return nil
 }
