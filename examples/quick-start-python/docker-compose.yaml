@@ -9,7 +9,19 @@ services:
     ports:
       - "8080:8080"
     # using the command here instead of the Dockerfile
-    command: opentelemetry-instrument --traces_exporter otlp --service_name app --exporter_otlp_endpoint otel-collector:4317 --exporter_otlp_insecure true flask run --host=0.0.0.0 --port=8080
+    command: opentelemetry-instrument --traces_exporter otlp --service_name app --exporter_otlp_endpoint ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT} --exporter_otlp_insecure true flask run --host=0.0.0.0 --port=8080
     depends_on:
-      tracetest:
+      tracetest-agent:
         condition: service_started
+      # tracetest: # For Tracetest Core
+      #   condition: service_started
+
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+    ports:
+      - 4317:4317
+      - 4318:4318
