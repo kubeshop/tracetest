@@ -22,7 +22,7 @@ module Datadog
     module Transport
       class SerializableTrace
         def to_msgpack(packer = nil)
-          if ENV.has_key?('INJECT_UPPER_TRACE_ID')
+          if !ENV.has_key?('INJECT_UPPER_TRACE_ID')
             return trace.spans.map { |s| SerializableSpan.new(s) }.to_msgpack(packer)
           end
 

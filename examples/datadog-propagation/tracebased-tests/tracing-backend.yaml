@@ -1,0 +1,10 @@
+type: DataStore
+spec:
+  id: current
+  name: Jaeger Tracing Backend
+  type: jaeger
+  default: true
+  jaeger:
+    endpoint: jaeger:16685
+    tls:
+      insecure: true

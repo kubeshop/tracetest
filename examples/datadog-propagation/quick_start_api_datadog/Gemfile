@@ -28,7 +28,7 @@ gem "puma", "~> 5.6"
 gem "tzinfo-data"
 
 # Adding support for Datadog
-gem "ddtrace", require: "ddtrace/auto_instrument"
+gem "ddtrace", "1.23.0", require: "ddtrace/auto_instrument"
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
