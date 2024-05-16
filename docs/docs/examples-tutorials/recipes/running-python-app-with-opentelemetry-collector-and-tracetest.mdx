@@ -156,11 +156,16 @@ def home():
     return "App works."
 ```
 
-
-
 ## Run Tracetest Tests
 
-Open the URL and [start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the `http://app:8080/automatic` or `http://app:8080/manual` URLs in your test creation, because your Node.js app and Tracetest Agent are in the same network.
+1. Open [Tracetest](https://app.tracetest.io/)
+2. Start creating tests! Make sure to use the `http://app:8080/automatic` or `http://app:8080/manual` URLs in your test creation. 
+3. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
+
+```bash
+tracetest configure -t <YOUR_API_TOKEN>
+tracetest run test -f ./test-api.yaml
+```
 
 Here's a sample of a failed test run, which happens if you use this selector and assertion pair.
 
@@ -175,15 +180,6 @@ attr:http.status_code = 200
 ```
 
 ![assertion](https://res.cloudinary.com/djwdcmwdz/image/upload/v1715620289/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_tests_ayy2cq.png)
-
-To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests).
-
-From the root of the quick start directory, run:
-
-```bash
-tracetest configure -t <YOUR_API_TOKEN>
-tracetest run test -f ./test-api.yaml
-```
 
 ```mdx-code-block
   </TabItem>

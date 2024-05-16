@@ -46,7 +46,7 @@ This is a quick start on how to configure a Node.js app to use OpenTelemetry ins
 
 The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
 
-Clone the Tracetest project and go to the Node.js Quickstart with Manual Instrumentation:
+Clone the Tracetest project and go to the Node.js Quickstart:
 
 ```bash
 git clone https://github.com/kubeshop/tracetest
@@ -103,7 +103,14 @@ docker compose up -d
 
 ## Run Tracetest Tests
 
-Open the URL and [start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the `http://app:8080/` URL in your test creation, because your Node.js app and Tracetest Agent are in the same network.
+1. Open [Tracetest](https://app.tracetest.io/)
+2. Start creating tests! Make sure to use the `http://app:8080/` URL in your test creation. 
+3. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
+
+```bash
+tracetest configure -t <YOUR_API_TOKEN>
+tracetest run test -f ./test-api.yaml
+```
 
 Here's a sample of a failed test run, which happens if you use this selector and assertion pair.
 
@@ -120,15 +127,6 @@ attr: books.list.count = 4
 ![assertion](https://res.cloudinary.com/djwdcmwdz/image/upload/v1715607148/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_56b66bc6e1a1cbbd_test_e9CCQuLSg_run_3_selectedAssertion_0_selectedSpan_d0c03aa5d02b9975_uqhhwl.png)
 
 It fails because of the `books.length` is equal to `3`.
-
-To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests).
-
-From the root of the quick start directory, run:
-
-```bash
-tracetest configure -t <YOUR_API_TOKEN>
-tracetest run test -f ./test-api.yaml
-```
 
 ```mdx-code-block
   </TabItem>
