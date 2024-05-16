@@ -57,12 +57,13 @@ var (
 
 	envTokensClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"token", "tokens",
+		"token", "environmenttokens",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "spec.id"},
 				{Header: "NAME", Path: "spec.name"},
 				{Header: "ROLE", Path: "spec.role"},
+				{Header: "REVOKED", Path: "spec.isRevoked"},
 				{Header: "ISSUED AT", Path: "spec.issuedAt"},
 				{Header: "EXPIRES AT", Path: "spec.expiresAt"},
 			},
@@ -72,7 +73,7 @@ var (
 
 	orgInvitesClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"organizationinvite", "organizationinvites",
+		"organizationinvite", "invites",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "spec.id"},
