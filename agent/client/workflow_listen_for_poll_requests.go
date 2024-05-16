@@ -49,11 +49,13 @@ func (c *Client) startPollerListener(ctx context.Context) error {
 
 			// we want a new context per request, not to reuse the one from the stream
 			ctx := telemetry.InjectMetadataIntoContext(context.Background(), req.Metadata)
-			err = c.pollListener(ctx, &req)
-			if err != nil {
-				logger.Error("could not handle poll request", zap.Error(err))
-				fmt.Println(err.Error())
-			}
+			go func() {
+				err = c.pollListener(ctx, &req)
+				if err != nil {
+					logger.Error("could not handle poll request", zap.Error(err))
+					fmt.Println(err.Error())
+				}
+			}()
 		}
 	}()
 	return nil
