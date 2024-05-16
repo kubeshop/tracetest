@@ -61,12 +61,46 @@ services:
     ports:
       - 29092:29092
 
-  # Cloud-based Managed Tracetest
-  tracetest-agent:
-    image: kubeshop/tracetest-agent:latest
+  tracetest:
+    image: kubeshop/tracetest:${TAG:-latest}
+    platform: linux/amd64
+    volumes:
+      - type: bind
+        source: ./tracetest/tracetest-config.yaml
+        target: /app/tracetest.yaml
+      - type: bind
+        source: ./tracetest/tracetest-provision.yaml
+        target: /app/provisioning.yaml
+    ports:
+      - 11633:11633
+    command: --provisioning-file /app/provisioning.yaml
+    depends_on:
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
+      jaeger:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:11633"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
     environment:
-      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
-      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+      TRACETEST_DEV: ${TRACETEST_DEV}
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+    ports:
+      - 5432:5432
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.59.0
