@@ -12,11 +12,5 @@ spec:
     # Create your ID and Key under Administration > Security > Access Keys
     # in your Sumo Logic account:
     # https://help.sumologic.com/docs/manage/security/access-keys/#create-your-access-key
-    # accessID: "your-access-id"
-    # accessKey: "your-access-key"
-    accessID: "suRkFOKbR0Ferv"
-    accessKey: "gZzgx8DRnBQFw8U9pwHyTkjsQG3j7MFDOVMk5Fp6saornrxL6XxDuJXLFFER2Mqw"
-
-
-# suRkFOKbR0Ferv
-# gZzgx8DRnBQFw8U9pwHyTkjsQG3j7MFDOVMk5Fp6saornrxL6XxDuJXLFFER2Mqw
+    accessID: "your-access-id"
+    accessKey: "your-access-key"
