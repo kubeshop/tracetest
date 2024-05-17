@@ -54,7 +54,7 @@ On the **Test Runner** tab, click on **Resource Definition**:
 
 ### Variable Sets
 
-In the navigation panel on the left of the screen, click on **Variable Sets**:
+In the navigation panel on the left of the screen, click on **Variable Sets**.
 
 ![Variable Set Resource Definition](../img/test-runner-resource-definition.png)
 
