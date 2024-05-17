@@ -2,7 +2,7 @@
 
 ## Resource Definition
 
-The Tracetest UX provides several options for maintaining Resource Definitions for Tracetest constructs.
+The Tracetest Web UI provides several options for maintaining Resource Definitions for Tracetest constructs.
 
 ### Tracing Backend
 
