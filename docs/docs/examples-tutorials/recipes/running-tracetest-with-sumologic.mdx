@@ -88,9 +88,9 @@ Configure the `.env` like shown below.
 TRACETEST_API_KEY="<YOUR_TRACETEST_API_KEY>"
 ```
 
-The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files. Traces will be sent to Tracetest Agent.
+The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files.
 
-Choosing the `tracing.otel.grpc.js` file will send traces to Tracetest Agent's `GRPC` endpoint.
+Choosing the `tracing.otel.grpc.js` file will send traces to Sumo Logic OpenTelemetry Collector's `GRPC` endpoint.
 
 Enabling the tracer is done by preloading the trace file. As seen in the `package.json`.
 
