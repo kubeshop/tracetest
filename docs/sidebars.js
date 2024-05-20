@@ -789,6 +789,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/environment-automation",
+          label: "Environment Automation",
+        },
+        {
+          type: "doc",
           id: "concepts/ad-hoc-testing",
           label: "Ad-hoc Testing",
         },
