@@ -1,0 +1,22 @@
+version: '3'
+services:
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+  
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.100.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
+
+  tempo:
+    image: grafana/tempo:2.4.2
+    command: ["-config.file=/etc/tempo.yaml"]
+    volumes:
+      - ./tracetest/tempo.config.yaml:/etc/tempo.yaml
