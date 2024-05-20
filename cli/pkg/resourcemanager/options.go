@@ -1,14 +1,15 @@
 package resourcemanager
 
 type options struct {
-	applyPreProcessor applyPreProcessorFn
-	prefixGetterFn    prefixGetterFn
-	tableConfig       TableConfig
-	listPath          string
-	deleteSuccessMsg  string
-	resourceType      string
-	deprecatedAlias   string
-	proxyResource     string
+	applyPreProcessor  applyPreProcessorFn
+	applyPostProcessor applyPreProcessorFn
+	prefixGetterFn     prefixGetterFn
+	tableConfig        TableConfig
+	listPath           string
+	deleteSuccessMsg   string
+	resourceType       string
+	deprecatedAlias    string
+	proxyResource      string
 }
 
 type option func(*options)
@@ -16,6 +17,12 @@ type option func(*options)
 func WithApplyPreProcessor(preProcessor applyPreProcessorFn) option {
 	return func(o *options) {
 		o.applyPreProcessor = preProcessor
+	}
+}
+
+func WithApplyPostProcessor(postProcessor applyPreProcessorFn) option {
+	return func(o *options) {
+		o.applyPostProcessor = postProcessor
 	}
 }
 

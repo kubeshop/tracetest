@@ -165,5 +165,13 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 		}
 	}
 
+	if c.options.applyPostProcessor != nil {
+		var err error
+		_, err = c.options.applyPostProcessor(ctx, originalInputFile)
+		if err != nil {
+			return "", fmt.Errorf("cannot postprocess Apply request: %w", err)
+		}
+	}
+
 	return requestedFormat.Format(string(body), c.options.tableConfig, c.options.listPath)
 }

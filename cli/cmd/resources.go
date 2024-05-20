@@ -13,7 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
-	"github.com/kubeshop/tracetest/cli/preprocessor"
+	"github.com/kubeshop/tracetest/cli/processor"
 	"github.com/kubeshop/tracetest/cli/runner"
 )
 
@@ -39,7 +39,7 @@ var (
 var (
 	httpClient = &resourcemanager.HTTPClient{}
 
-	variableSetPreprocessor = preprocessor.VariableSet(cliLogger)
+	variableSetPreprocessor = processor.VariableSet(cliLogger)
 	variableSetClient       = GetVariableSetClient(httpClient, variableSetPreprocessor)
 
 	pollingProfileClient = resourcemanager.NewClient(
@@ -57,7 +57,7 @@ var (
 
 	envTokensClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"token", "environmenttokens",
+		"environmenttoken", "environmenttokens",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "spec.id"},
@@ -73,7 +73,7 @@ var (
 
 	orgInvitesClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"organizationinvite", "invites",
+		"invite", "invites",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "spec.id"},
@@ -86,6 +86,24 @@ var (
 		resourcemanager.WithResourceType("Invite"),
 	)
 
+	environmentPostproessor = processor.Environment(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
+		client, err := envResources.Get(strings.ToLower(input.Type()))
+		if err != nil {
+			return input, fmt.Errorf("cannot get client for resource type '%s': %w", input.Type(), err)
+		}
+
+		_, err = client.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
+		if err != nil {
+			return input, fmt.Errorf("cannot apply resource: %w", err)
+		}
+
+		return input, nil
+	}, func(ctx context.Context, envID string) error {
+		cliConfig.EnvironmentID = envID
+		setupResources()
+		return nil
+	})
+
 	environmentClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
 		"environment", "environments",
@@ -96,9 +114,10 @@ var (
 			},
 		}),
 		resourcemanager.WithResourceType("Environment"),
+		resourcemanager.WithApplyPostProcessor(environmentPostproessor.Postprocess),
 	)
 
-	testPreprocessor = preprocessor.Test(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
+	testPreprocessor = processor.Test(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
 		updated, err := pollingProfileClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
 		if err != nil {
 			return input, fmt.Errorf("cannot apply polling profile: %w", err)
@@ -142,7 +161,7 @@ var (
 		resourcemanager.WithApplyPreProcessor(testPreprocessor.Preprocess),
 	)
 
-	testSuitePreprocessor = preprocessor.TestSuite(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
+	testSuitePreprocessor = processor.TestSuite(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
 		updated, err := testClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
 		if err != nil {
 			return input, fmt.Errorf("cannot apply test: %w", err)
@@ -187,7 +206,7 @@ var (
 		resourcemanager.WithProxyResource("testsuite"),
 	)
 
-	resources = resourcemanager.NewRegistry().
+	envResources = resourcemanager.NewRegistry().
 			Register(
 			resourcemanager.NewClient(
 				httpClient, cliLogger,
@@ -285,10 +304,12 @@ var (
 		).
 		Register(variableSetClient).
 		Register(testSuiteClient).
-		Register(testClient).
-		Register(organizationsClient).
-		Register(environmentClient).
-		Register(environmentMeClient).
+		Register(testClient)
+
+	resources = envResources.
+			Register(organizationsClient).
+			Register(environmentClient).
+			Register(environmentMeClient).
 
 		// deprecated resources
 		Register(deprecatedTransactionsClient)
@@ -371,7 +392,7 @@ func formatItemDate(item *gabs.Container, path string) error {
 	return nil
 }
 
-func GetVariableSetClient(httpClient *resourcemanager.HTTPClient, preprocessor preprocessor.Preprocessor) resourcemanager.Client {
+func GetVariableSetClient(httpClient *resourcemanager.HTTPClient, preprocessor processor.Preprocessor) resourcemanager.Client {
 	variableSetClient := resourcemanager.NewClient(
 		httpClient, cmdutil.GetLogger(),
 		"variableset", "variablesets",

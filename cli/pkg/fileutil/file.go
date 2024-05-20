@@ -21,7 +21,6 @@ func IsDir(path string) bool {
 	if err != nil {
 		return false
 	}
-
 	return file.IsDir()
 }
 
