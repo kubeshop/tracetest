@@ -300,11 +300,11 @@ const sidebars = {
               id: "examples-tutorials/recipes/running-tracetest-with-tempo",
               label: "Node.js and Grafana Tempo",
             },
-            {
-              type: "doc",
-              id: "examples-tutorials/recipes/running-tracetest-with-grafana-cloud-tempo",
-              label: "Node.js and Grafana Cloud Tempo",
-            },
+            // {
+            //   type: "doc",
+            //   id: "examples-tutorials/recipes/running-tracetest-with-grafana-cloud-tempo",
+            //   label: "Node.js and Grafana Cloud Tempo",
+            // },
           ],
         },
         {
