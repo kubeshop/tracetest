@@ -38,9 +38,9 @@ services:
       retries: 60
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.73.0
+    image: otel/opentelemetry-collector-contrib:0.100.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+      - ./collector.config.yaml:/otel-local-config.yaml

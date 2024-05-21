@@ -14,7 +14,7 @@ exporters:
   otlp:
     endpoint: tempo-us-central1.grafana.net:443
     headers:
-      authorization: Basic <grafana_auth_hash>
+      authorization: Basic <hash>
       # https://grafana.com/blog/2021/04/13/how-to-send-traces-to-grafana-clouds-tempo-service-with-opentelemetry-collector/
     tls:
       insecure: false
@@ -24,4 +24,8 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [logging, otlp]
+
+
+# $ echo -n "user:token" | base64
+# use this hash 👆
