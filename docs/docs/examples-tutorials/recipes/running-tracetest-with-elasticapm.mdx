@@ -1,6 +1,6 @@
 ---
 id: running-tracetest-with-elasticapm
-title: Node.js and Elastic APM
+title: Node.js, Elasticsearch and Elastic APM
 description: Quick start on how to configure a Node.js app to use Elastic APM Agent with traces and Tracetest for enhancing your E2E and integration tests with trace-based testing.
 hide_table_of_contents: true
 keywords:
@@ -156,7 +156,6 @@ You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose]
 
 - `docker-compose.yml` - Docker Compose file that starts the whole environment.
   - Elastic stack single node cluster with Elasticsearch, Kibana and, the APM Server.
-  - OTel collector to support Tracetest.
   - Tracetest instance.
 - `app.js` - Sample NodeJS application listening on port 8080 and instrumented with Elastic Nodejs APM agent.
 

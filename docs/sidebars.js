@@ -287,7 +287,7 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
-              label: "Node.js and Elastic APM",
+              label: "Node.js, Elasticsearch and Elastic APM",
             },
             {
               type: "doc",
