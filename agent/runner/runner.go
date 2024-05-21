@@ -96,17 +96,17 @@ func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 		return
 	}
 
-	env, err := s.getEnvironment(ctx, cfg)
+	agentToken, err := s.getAgentToken(ctx, cfg.FullURL(), cfg.OrganizationID, cfg.EnvironmentID, cfg.Jwt)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
 
-	if env.AgentApiKey == "" {
+	if agentToken == "" {
 		s.ui.Error("You are attempting to start the agent in an environment you do not have admin rights to. Please ask the administrator of this environment to grant you admin rights.")
 		return
 	}
 
-	err = s.StartAgent(ctx, cfg.AgentEndpoint, env.AgentApiKey, cfg.UIEndpoint, cfg.EnvironmentID)
+	err = s.StartAgent(ctx, cfg.AgentEndpoint, agentToken, cfg.UIEndpoint, "")
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
