@@ -165,45 +165,12 @@ services:
     #   retries: 120
     #   test: ["CMD", "nc", "-z", "localhost", "8200"]
 
-  tracetest:
-    image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
     environment:
-      - ELASTICSEARCH_SSL_VERIFICATION_MODE=none
-      - TRACETEST_DEV=${TRACETEST_DEV}
-    volumes:
-      - type: bind
-        source: ./tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest-provision.yaml
-        target: /app/provision.yaml
-    command: --provisioning-file /app/provision.yaml
-    ports:
-      - 11633:11633
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 10s
-      timeout: 30s
-      retries: 120
-
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    ports:
-      - 5432:5432
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 10s
-      timeout: 10s
-      retries: 120
+      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
 
   app:
     image: quick-start-nodejs-elastic-apm
@@ -214,7 +181,6 @@ services:
     depends_on:
       apm-server:
         condition: service_started
-
 
 volumes:
   certs:

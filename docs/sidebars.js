@@ -289,6 +289,11 @@ const sidebars = {
               id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
               label: "Node.js and Elastic APM",
             },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-elastic-opentelemetry",
+              label: "Node.js, Elasticsearch and OpenTelemetry",
+            },
           ],
         },
         {
