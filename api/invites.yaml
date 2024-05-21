@@ -1,0 +1,129 @@
+openapi: 3.0.1
+
+components:
+  responses:
+    Invites:
+      description: "successful operation for invites"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Invites"
+
+    InviteResources:
+      description: "successful operation for invites"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InviteResources"
+
+    Invite:
+      description: "successful operation for invites"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Invite"
+    InviteResource:
+      description: "successful operation for invites"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InviteResource"
+
+  requestBodies:
+    Invite:
+      description: invite details body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Invite"
+
+    InviteResource:
+      description: invite resource details body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InviteResource"
+
+  schemas:
+    InviteResource:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Invite
+        spec:
+          $ref: "#/components/schemas/Invite"
+
+    Invite:
+      required:
+        - id
+        - to
+        - role
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          $ref: "./members.yaml#/components/schemas/Role"
+        to:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        sentAt:
+          type: string
+          format: date-time
+        type:
+          type: string
+          enum:
+            - "email"
+            - "public"
+          default: email
+        status:
+          type: string
+          enum:
+            - "pending"
+            - "accepted"
+            - "revoked"
+          default: pending
+        returnTo:
+          type: string
+        environments:
+          type: array
+          items:
+            $ref: "#/components/schemas/InviteEnvironment"
+    InviteEnvironment:
+      required:
+        - id
+        - role
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          $ref: "./members.yaml#/components/schemas/Role"
+        environment:
+          $ref: "./environments.yaml#/components/schemas/Environment"
+
+    InviteResources:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InviteResource"
+        count:
+          type: integer
+
+    Invites:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Invite"
+        count:
+          type: integer

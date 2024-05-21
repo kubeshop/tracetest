@@ -1,0 +1,105 @@
+openapi: 3.0.1
+
+components:
+  responses:
+    Tokens:
+      description: "successful operation for tokens"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Tokens"
+    Token:
+      description: "successful operation for token"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Token"
+    JWT:
+      description: "successful operation for jwt"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/JWT"
+  requestBodies:
+    Token:
+      description: invite details body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Token"
+    TokenResource:
+      description: invite resource details body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TokenResource"
+
+  schemas:
+    TokenResource:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Token
+        spec:
+          $ref: "#/components/schemas/Token"
+    TokenResources:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Token"
+        count:
+          type: integer
+    Tokens:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Token"
+        count:
+          type: integer
+    Token:
+      type: object
+      required:
+        - id
+        - name
+        - role
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          description: token name
+          example: "my-token"
+        isRevoked:
+          type: boolean
+        role:
+          $ref: "./members.yaml#/components/schemas/Role"
+        userID:
+          type: string
+        duration:
+          type: integer
+          description: token duration in minutes
+          example: 3600
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    JWT:
+      type: object
+      required:
+        - jwt
+      properties:
+        jwt:
+          type: string

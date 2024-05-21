@@ -1,0 +1,134 @@
+openapi: 3.0.1
+
+components:
+  responses:
+    EnvironmentResource:
+      description: "successful operation for environment"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EnvironmentResource"
+
+    Environment:
+      description: "successful operation for environment"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Environment"
+
+    EnvironmentResources:
+      description: "successful operation for environment"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EnvironmentResources"
+
+    Environments:
+      description: "successful operation for environment"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Environments"
+
+    EnvironmentsMe:
+      description: "successful operation for environment"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EnvironmentsMe"
+
+  requestBodies:
+    Environment:
+      description: environment details body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Environment"
+
+    EnvironmentResource:
+      description: environment resource details body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EnvironmentResource"
+
+  schemas:
+    EnvironmentResources:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/EnvironmentResource"
+        count:
+          type: integer
+
+    EnvironmentsMe:
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: "#/components/schemas/Environment"
+        count:
+          type: integer
+
+    Environments:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Environment"
+        count:
+          type: integer
+
+    EnvironmentResource:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Environment
+        spec:
+          $ref: "#/components/schemas/Environment"
+
+    Environment:
+      type: object
+      required:
+        - connected
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+        isLocal:
+          type: boolean
+          example: false
+        userID:
+          type: string
+        organizationID:
+          type: string
+          description: organizationID
+          example: "733420bd-7e56-461f-8431-6378759e60ae"
+        agentApiKey:
+          type: string
+        resources:
+          type: string
