@@ -15,3 +15,13 @@ services:
     image: public.ecr.aws/sumologic/sumologic-otel-collector:0.75.0-sumo-0
     volumes:
       - ./collector.config.yaml:/etc/otel/config.yaml
+    environment:
+      # Find the Sumo Logic Installation Token here: https://help.sumologic.com/docs/manage/security/installation-tokens/
+      - SUMOLOGIC_INSTALLATION_TOKEN=${SUMOLOGIC_INSTALLATION_TOKEN}
+
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}

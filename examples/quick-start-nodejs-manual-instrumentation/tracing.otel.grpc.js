@@ -6,6 +6,9 @@ const { SemanticResourceAttributes } = require("@opentelemetry/semantic-conventi
 const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node")
 const { BatchSpanProcessor } = require("@opentelemetry/sdk-trace-base")
 
+const dotenv = require("dotenv")
+dotenv.config()
+
 const resource = Resource.default().merge(
   new Resource({
     [SemanticResourceAttributes.SERVICE_NAME]: "quick-start-nodejs-manual-instrumentation",
@@ -14,7 +17,7 @@ const resource = Resource.default().merge(
 )
 
 const provider = new NodeTracerProvider({ resource: resource })
-const exporter = new OTLPTraceExporter({ url: 'http://otel-collector:4317' })
+const exporter = new OTLPTraceExporter()
 const processor = new BatchSpanProcessor(exporter)
 provider.addSpanProcessor(processor)
 provider.register()

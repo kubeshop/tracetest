@@ -40,17 +40,17 @@ services:
       retries: 60
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.100.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+      - ./collector.config.yaml:/otel-local-config.yaml
     depends_on:
       - tempo
 
   tempo:
-    image: grafana/tempo:2.0.0
+    image: grafana/tempo:2.4.2
     command: ["-config.file=/etc/tempo.yaml"]
     volumes:
       - ./tracetest/tempo.config.yaml:/etc/tempo.yaml

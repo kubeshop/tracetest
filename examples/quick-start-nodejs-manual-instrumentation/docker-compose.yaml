@@ -6,9 +6,24 @@ services:
     command: npm run app-with-grpc-tracer
     ports:
       - "8080:8080"
+    environment:
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+
   availability:
     image: quick-start-nodejs-availability
     build: .
     command: npm run availability-with-grpc-tracer
     ports:
       - "8080"
+    environment:
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+    ports:
+      - 4317:4317
+      - 4318:4318
