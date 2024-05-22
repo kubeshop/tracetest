@@ -57,7 +57,7 @@ var (
 
 	envTokensClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
-		"token", "environmentokens",
+		"environmenttoken", "environmenttokens",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{
 				{Header: "ID", Path: "spec.id"},
