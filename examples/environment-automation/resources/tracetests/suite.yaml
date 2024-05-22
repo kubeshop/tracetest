@@ -1,0 +1,10 @@
+type: TestSuite
+spec:
+  id: pokeshop-demo-test-suite
+  name: Pokeshop Synthetic tests
+  description: Simulate a user doing a series of imports on Pokeshop and listing its results
+  steps:
+    - pokeshop-demo-add-pokemon
+    - pokeshop-demo-import-pokemon-queue
+    - pokeshop-demo-import-pokemon-stream
+    - pokeshop-demo-list-pokemon

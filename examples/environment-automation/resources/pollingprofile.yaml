@@ -1,0 +1,10 @@
+type: PollingProfile
+spec:
+  id: Mj4Xw2PSR
+  name: my-new-default-profile
+  default: true
+  strategy: periodic
+  periodic:
+    retryDelay: 2s
+    timeout: 30s
+    selectorMatchRetries: 5

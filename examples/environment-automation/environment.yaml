@@ -1,0 +1,8 @@
+type: Environment
+spec:
+  id: ttenv_dd3bb7e26a187dc1
+  name: my-demo-environment-4
+  description: My environment description
+  resources: ./resources
+  agentConfiguration:
+    serverless: true
