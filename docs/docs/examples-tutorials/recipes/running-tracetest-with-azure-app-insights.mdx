@@ -50,7 +50,7 @@ This is a simple quick start guide on how to configure a Node.js app to use inst
 - Sign up to [Azure](https://azure.microsoft.com/en-us)
 - Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 - Create an Application Insights app and get a [Connection String](https://learn.microsoft.com/en-us/azure/azure-monitor/app/sdk-connection-string?tabs=dotnet5#find-your-connection-string)
-- Get the Azure Resource ARM id for the Application Insights instance and generate an access token
+- Get the [Azure Resource ARM id for the Application Insights instance and generate an access token](https://learn.microsoft.com/en-us/azure/azure-monitor/app/azure-ad-authentication)
 
 **Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
@@ -70,7 +70,7 @@ Follow these instructions to run the quick start:
 1. Copy the `.env.template` file to `.env`.
 2. Log into the [Tracetest app](https://app.tracetest.io/).
 3. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
-4. Run `docker compose -f ./docker-compose.agent.yaml up -d`.
+4. Run `docker compose up -d`.
 5. Fill out the `resourceArmId: <your-arm-id>` and `accessToken: <your-access-token>` in the `tracetest-tracing-backend.yaml`.
 6. This example is configured to use the Azure Application Insights Tracing Backend. Ensure the environment you're using to run this example is configured to use the Application Insights Tracing Backend by clicking on Settings, Tracing Backend, Azure Application Insights, Save. Or, use the CLI as explained below.
 7. Run tests from the Tracetest Web UI by accessing the app with the URL `http://app:8080/`.
@@ -90,6 +90,7 @@ The Node.js app is a simple Express app, contained in [the `app.js` file](https:
 Configure the `.env` like shown below.
 
 ```bash
+CONNECTION_STRING="<YOUR_APP_INSIGHTS_CONNECTION_STRING>"
 TRACETEST_API_KEY="<YOUR_TRACETEST_API_KEY>"
 ```
 
@@ -109,9 +110,13 @@ Enabling the tracer is done by preloading the trace file. As seen in the `packag
 
 Create an Application Insights resource in your Azure account. The Resource ID is the `resourceArmId` you need.
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1716387729/docs/portal.azure.com__quickstart_true_zhkstd.png)
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1716403759/docs/portal.azure.com__quickstart_true_xfnk5t.png)
 
 Get the `accessToken` by [following this guide](https://learn.microsoft.com/en-us/azure/azure-monitor/app/azure-ad-authentication?tabs=net). Or if you are running Tracetest from a authorized container, you can use the default Active Directory Authentication.
+
+:::note
+[Read the Azure Application Insights tracing backend configuration guide to learn more.](/configuration/connecting-to-data-stores/azure-app-insights)
+:::
 
 Configure Azure Application Insights as a Tracing Backend in Tracetest:
 
@@ -133,7 +138,7 @@ tracetest config -t <YOUR_API_TOKEN>
 tracetest apply datastore -f ./tracetest-tracing-backend.yaml
 ```
 
-## Run the Node.js App, Elasticsearch, Elastic APM, and OpenTelemetry Collector with Docker Compose
+## Run the Node.js App and OpenTelemetry Collector with Docker Compose
 
 The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/docker-compose.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/Dockerfile) in the root directory contain the Node.js app.
 
@@ -150,7 +155,7 @@ This will start the Node.js app and Tracetest Agent.
 ## Run Tracetest Tests
 
 1. Open [Tracetest](https://app.tracetest.io/)
-2. [Configure Tempo as a tracing backend](/configuration/connecting-to-data-stores/elasticapm) if you have not already as explained above.
+2. [Configure Azure Application Insights as a tracing backend](/configuration/connecting-to-data-stores/azure-app-insights) if you have not already as explained above.
 3. Start creating tests! Make sure to use the `http://app:8080/` URL in your test creation. 
 4. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
 

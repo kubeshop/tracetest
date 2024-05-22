@@ -14,13 +14,17 @@ exporters:
     endpoint: tracetest:4317
     tls:
       insecure: true
+  otlp/tracetest-agent:
+    endpoint: tracetest-agent:4317
+    tls:
+      insecure: true
 
 service:
   pipelines:
     traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tracetest]
+      exporters: [otlp/tracetest, otlp/tracetest-agent]
     traces/appinsights:
       receivers: [otlp]
       exporters: [azuremonitor]
