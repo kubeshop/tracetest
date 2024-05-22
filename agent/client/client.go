@@ -229,7 +229,12 @@ func (c *Client) handleDisconnectionError(inputErr error) (bool, error) {
 		return false, inputErr
 	}
 
-	log.Printf("Reconnecting agent due to error: %s", inputErr.Error())
+	errMsg := ""
+	if inputErr != nil {
+		errMsg = inputErr.Error()
+	}
+
+	log.Printf("Reconnecting agent due to error: %s", errMsg)
 	err := retry.Do(func() error {
 		return c.reconnect()
 	})
@@ -243,7 +248,10 @@ func (c *Client) handleDisconnectionError(inputErr error) (bool, error) {
 
 func isConnectionError(err error) bool {
 	if err == nil {
-		return false
+		// If `err` is nil, it means that `stream.RecvMsg` returned without a message.
+		// This is a very good indicative that the stream got closed by the server (probably the pod was killed)
+		// So, in this case, we force the client to reconnect to the server.
+		return true
 	}
 
 	possibleErrors := []string{
