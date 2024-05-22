@@ -21,6 +21,7 @@ var _ MappedNullable = &VariableSetValue{}
 type VariableSetValue struct {
 	Key   *string `json:"key,omitempty"`
 	Value *string `json:"value,omitempty"`
+	Type  *string `json:"type,omitempty"`
 }
 
 // NewVariableSetValue instantiates a new VariableSetValue object
@@ -29,6 +30,8 @@ type VariableSetValue struct {
 // will change when the set of required properties is changed
 func NewVariableSetValue() *VariableSetValue {
 	this := VariableSetValue{}
+	var type_ string = "raw"
+	this.Type = &type_
 	return &this
 }
 
@@ -37,6 +40,8 @@ func NewVariableSetValue() *VariableSetValue {
 // but it doesn't guarantee that properties required by API are set
 func NewVariableSetValueWithDefaults() *VariableSetValue {
 	this := VariableSetValue{}
+	var type_ string = "raw"
+	this.Type = &type_
 	return &this
 }
 
@@ -104,6 +109,38 @@ func (o *VariableSetValue) SetValue(v string) {
 	o.Value = &v
 }
 
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *VariableSetValue) GetType() string {
+	if o == nil || isNil(o.Type) {
+		var ret string
+		return ret
+	}
+	return *o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *VariableSetValue) GetTypeOk() (*string, bool) {
+	if o == nil || isNil(o.Type) {
+		return nil, false
+	}
+	return o.Type, true
+}
+
+// HasType returns a boolean if a field has been set.
+func (o *VariableSetValue) HasType() bool {
+	if o != nil && !isNil(o.Type) {
+		return true
+	}
+
+	return false
+}
+
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *VariableSetValue) SetType(v string) {
+	o.Type = &v
+}
+
 func (o VariableSetValue) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -119,6 +156,9 @@ func (o VariableSetValue) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Value) {
 		toSerialize["value"] = o.Value
+	}
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
 	}
 	return toSerialize, nil
 }

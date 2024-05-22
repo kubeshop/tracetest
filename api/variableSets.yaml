@@ -42,3 +42,9 @@ components:
           type: string
         value:
           type: string
+        type:
+          type: string
+          default: raw
+          enum:
+            - raw
+            - secret
