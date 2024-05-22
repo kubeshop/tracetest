@@ -27,7 +27,7 @@ func (c *Client) startHeartBeat(ctx context.Context) error {
 				return
 			}
 
-			reconnected, err := c.handleDisconnectionError(err)
+			reconnected, err := c.handleDisconnectionError(err, nil)
 			if reconnected {
 				log.Println("reconnected to ping stream")
 				return

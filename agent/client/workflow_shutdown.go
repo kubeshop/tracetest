@@ -24,8 +24,8 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 
 	go func() {
 		for {
-			resp := proto.ShutdownRequest{}
-			err := stream.RecvMsg(&resp)
+			req := proto.ShutdownRequest{}
+			err := stream.RecvMsg(&req)
 
 			if err != nil {
 				logger.Error("could not get message from shutdown stream", zap.Error(err))
@@ -36,7 +36,7 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 				return
 			}
 
-			reconnected, err := c.handleDisconnectionError(err)
+			reconnected, err := c.handleDisconnectionError(err, &req)
 			if reconnected {
 				logger.Warn("reconnected to shutdown stream")
 				return
@@ -50,7 +50,7 @@ func (c *Client) startShutdownListener(ctx context.Context) error {
 			}
 
 			// TODO: get context from request
-			err = c.shutdownListener(context.Background(), &resp)
+			err = c.shutdownListener(context.Background(), &req)
 			if err != nil {
 				logger.Error("could not handle shutdown request", zap.Error(err))
 				fmt.Println(err.Error())
