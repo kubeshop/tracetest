@@ -1,4 +1,4 @@
-# Tracetest + Elastic native APM agent
+# Tracetest + Elastic APM + OpenTelemetry
 
 > [Read the detailed recipe for setting up Elastic APM with Tractest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-with-elastic-opentelemetry)
 
