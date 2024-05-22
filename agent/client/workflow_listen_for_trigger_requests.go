@@ -35,7 +35,7 @@ func (c *Client) startTriggerListener(ctx context.Context) error {
 				return
 			}
 
-			reconnected, err := c.handleDisconnectionError(err)
+			reconnected, err := c.handleDisconnectionError(err, &req)
 			if reconnected {
 				logger.Warn("reconnected to stop stream")
 				return

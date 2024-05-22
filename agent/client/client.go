@@ -223,13 +223,17 @@ func (c *Client) reconnect() error {
 	return c.Start(context.Background())
 }
 
-func (c *Client) handleDisconnectionError(inputErr error) (bool, error) {
-	if !isConnectionError(inputErr) {
-		// if it's nil or any error other than the one we care about, return it and let the caller handle it
+type request interface {
+	String() string
+}
+
+func (c *Client) handleDisconnectionError(inputErr error, req request) (bool, error) {
+	if !isConnectionError(inputErr, req) {
+		// if any error other than the one we care about, return it and let the caller handle it
 		return false, inputErr
 	}
 
-	errMsg := ""
+	errMsg := "stream was closed by the server"
 	if inputErr != nil {
 		errMsg = inputErr.Error()
 	}
@@ -246,12 +250,21 @@ func (c *Client) handleDisconnectionError(inputErr error) (bool, error) {
 	return true, nil
 }
 
-func isConnectionError(err error) bool {
-	if err == nil {
-		// If `err` is nil, it means that `stream.RecvMsg` returned without a message.
+func isConnectionError(err error, req request) bool {
+	if err == nil && req == nil {
+		return false
+	}
+
+	if err == nil && req.String() == "" {
+		// If `err` is nil and the request is empty, it means that `stream.RecvMsg` returned without a message.
 		// This is a very good indicative that the stream got closed by the server (probably the pod was killed)
 		// So, in this case, we force the client to reconnect to the server.
 		return true
+	}
+
+	if err == nil {
+		// if error is nil, but the request it not empty, it means that `stream.RecvMsg` ran successfully
+		return false
 	}
 
 	possibleErrors := []string{
