@@ -11,7 +11,7 @@ services:
       - TRACETEST_API_KEY=${TRACETEST_API_KEY}
 
   otel-collector:
-    image: otel/opentelemetry-collector:0.54.0
+    image: otel/opentelemetry-collector:0.101.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
