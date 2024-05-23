@@ -11,16 +11,25 @@ processors:
 exporters:
   logging:
     loglevel: debug
-  # OTLP for Tracetest
+
+  # OTLP for Hobby Tracetest Core
+  # Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
   otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest:4317
     tls:
       insecure: true
+
+  # Cloud-based Managed Tracetest
+  otlp/tracetest-agent:
+    endpoint: tracetest-agent:4317
+    tls:
+      insecure: true
+
   # OTLP for Honeycomb
   otlp/honeycomb:
     endpoint: "api.honeycomb.io:443"
     headers:
-      "x-honeycomb-team": <HONEYCOMB_API_KEY>
+      "x-honeycomb-team": ${HONEYCOMB_API_KEY}
       # "x-honeycomb-dataset": "<HONEYCOMB_DATASET>" # optional
       # Read more in docs here: https://docs.honeycomb.io/getting-data-in/otel-collector/
 
@@ -29,7 +38,7 @@ service:
     traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tracetest]
+      exporters: [otlp/tracetest, otlp/tracetest-agent]
     traces/honeycomb:
       receivers: [otlp]
       processors: [batch]
