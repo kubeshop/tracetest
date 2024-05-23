@@ -80,15 +80,20 @@ func (f testRun) json(output TestRunOutput) string {
 
 func (f testRun) pretty(output TestRunOutput) string {
 	if output.IsFailed {
+		lastError := ""
+		if errState := output.Run.LastErrorState; errState != nil {
+			lastError = *errState
+		}
+
+		testInfoMessage := f.formatMessage("%s %s (%s)",
+			FAILED_TEST_ICON,
+			*output.Test.Name,
+			output.RunWebURL,
+		)
+
 		return f.getColoredText(false, fmt.Sprintf("%s\n%s",
-			f.formatMessage("%s %s (%s)",
-				FAILED_TEST_ICON,
-				*output.Test.Name,
-				output.RunWebURL,
-			),
-			f.formatMessage("\tReason: %s\n",
-				*output.Run.LastErrorState,
-			),
+			testInfoMessage,
+			f.formatMessage("\tReason: %s\n", lastError),
 		))
 	}
 
