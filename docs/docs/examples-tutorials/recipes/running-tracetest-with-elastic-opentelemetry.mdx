@@ -121,7 +121,7 @@ tracetest apply datastore -f ./tracetest-tracing-backend.yaml
 
 ## Run the Node.js App, Elasticsearch, Elastic APM, and OpenTelemetry Collector with Docker Compose
 
-The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-elasticapm-with-otel/docker-compose.agent.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-elasticapm-with-otel/Dockerfile) in the root directory contain the Node.js app.
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-elasticapm-with-otel/docker-compose.agent.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-elasticapm-with-otel/Dockerfile) are in the root directory contain the Node.js app.
 
 The [`docker-compose.agent.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-elasticapm-with-otel/docker-compose.agent.yaml) also contains the Tracetest Agent, OpenTelemetry Collector, Elasticsearch, Kibana, and Elastic APM server.
 
@@ -135,7 +135,7 @@ This will start the Node.js app, OpenTelemetry Collector, and Elastic APM server
 
 ## Run Tracetest Tests
 
-1. Open [Tracetest](https://app.tracetest.io/)
+1. Open [Tracetest](https://app.tracetest.io/).
 2. [Configure Elastic as a tracing backend](/configuration/connecting-to-data-stores/elasticapm) if you have not already as explained above.
 3. Start creating tests! Make sure to use the `http://app:8080/` URL in your test creation. 
 4. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
@@ -229,7 +229,7 @@ app:
 The `docker-compose.yaml` contains 6 services that configure Tracetest and Elastic.
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
-- [**Elasticsearch**](https://www.elastic.co/elasticsearch/) - Data store and search engine. (Also contains a `setup` service to configure Elasticsearch)
+- [**Elasticsearch**](https://www.elastic.co/elasticsearch/) - Data store and search engine. (Also contains a `setup` service to configure Elasticsearch).
 - [**Elastic APM**](https://www.elastic.co/observability/application-performance-monitoring) - Elastic application performance monitoring and traces.
 - [**Kibana**](https://www.elastic.co/kibana/) - Kibana is a free and open user interface that lets you visualize your Elasticsearch data and navigate the Elastic Stack.
 - [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
