@@ -62,7 +62,7 @@ const ExamplesTutorialsOverview = [
     url: '/examples-tutorials/tutorials',
     description: (
       <Translate >
-        Check out the following blog posts with Tracetest-related content.
+        Check out blog posts with Tracetest-related content.
       </Translate>
     ),
     button: 'Learn more',
@@ -79,18 +79,15 @@ interface Props {
 function ExamplesTutorialsOverviewCard({name, url, description, button}: Props) {
   return (
     <div className="col col--6 margin-bottom--lg">
-      <div className={clsx('card')}>
-        <div className="card__body">
-          <Heading as="h3">{name}</Heading>
-          <p>{description}</p>
-        </div>
-        <div className="card__footer">
-          <div className="button-group button-group--block">
-            <Link className="button button--secondary" to={url}>
-              {button}
-            </Link>
+      <div className="gs__card">
+      <div className="card">
+        <Link to={url}>
+          <div className="card__body">
+            <Heading as="h3">{name}</Heading>
+            <p>{description}</p>
           </div>
-        </div>
+        </Link>
+      </div>
       </div>
     </div>
   );

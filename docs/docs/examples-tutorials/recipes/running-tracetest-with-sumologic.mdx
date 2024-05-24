@@ -30,30 +30,87 @@ This is a simple quick start on how to configure a Node.js app to use OpenTeleme
 
 ```mdx-code-block
 <Tabs groupId="running-tracetest-without-a-trace-data-store">
-  <TabItem value="Tracetest" label="Tracetest" default>
+  <TabItem value="Tracetest" label="Cloud-based Managed Tracetest" default>
 ```
 
 ## Prerequisites
 
-You can run this example with [Docker](https://docs.docker.com/get-docker/).
+**Tracetest Account**:
+
+- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
+- Create an [environment](/concepts/environments).
+- Create an [environment token](/concepts/environment-tokens).
+- Have access to the environment's [agent API key](/configuration/agent).
+
+**Sumo Logic Account**:
+
+- Sign up to Sumo Logic
+- Create a Sumo Logic [installation token](https://help.sumologic.com/docs/manage/security/installation-tokens/)
+- Create a Sumo Logic [`accessID` and `accessKey`](https://help.sumologic.com/docs/manage/security/access-keys/#create-an-access-key)
+
+**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+## Run This Quckstart Example
+
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
+
+Clone the Tracetest project and go to the Sumo Logic Node.js Quickstart:
+
+```bash
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/quick-start-sumologic-nodejs
+```
+
+Follow these instructions to run the quick start:
+
+1. Copy the `.env.template` file to `.env`.
+2. Log into the [Tracetest app](https://app.tracetest.io/).
+3. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
+4. Run `docker compose up -d`.
+5. This example is configured to use the Sumo Logic Tracing Backend. Ensure the environment you're using to run this example is configured to use the Sumo Logic Tracing Backend by clicking on Settings, Tracing Backend, Sumo Logic, Save. Or, use the CLI as explained below.
+6. Run tests from the Tracetest Web UI by accessing the app with the URL `http://app:8080/`.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
 ## Project Structure
 
 The project contains [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), [Sumo Logic OpenTelemetry Collector](https://github.com/SumoLogic/sumologic-otel-collector/tree/main), and a Node.js app.
 
-### 1. Tracetest Agent
+The `docker-compose.yaml` file in the root directory of the quick start runs the Node.js app and the [Tracetest Agent](/concepts/agent) setup.
 
-Install and run Tracetest Agent locally.
+## Configuring the Node.js App
 
-```bash title=Terminal
-tracetest start
+The Node.js app is a simple Express app, contained in the `app.js` file.
+
+Configure the `.env` like shown below.
+
+```bash
+TRACETEST_API_KEY="<YOUR_TRACETEST_API_KEY>"
 ```
 
-Once started, Tracetest Agent will:
+The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files.
 
-- Expose OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion.
-- Be able to trigger test runs in the environment where it is running.
-- Be able to connect to a trace data store that is not accessible outside of your environment.
+Choosing the `tracing.otel.grpc.js` file will send traces to Sumo Logic OpenTelemetry Collector's `GRPC` endpoint.
+
+Enabling the tracer is done by preloading the trace file. As seen in the `package.json`.
+
+```json
+"scripts": {
+  "app-with-grpc-tracer": "node -r ./tracing.otel.grpc.js app.js",
+},
+```
+
+## Configuring Sumo Logic
+
+Configure the `.env` like shown below.
+
+```bash
+SUMOLOGIC_INSTALLATION_TOKEN="<YOUR_SUMOLOGIC_INSTALLATION_TOKEN>"
+```
+
+:::note Configure Sumo Logic Installation Token
+View the [Sumo Logic docs here](https://help.sumologic.com/docs/manage/security/installation-tokens/) to learn more about installation tokens.
+:::
 
 Configure Sumo Logic as a Tracing Backend:
 
@@ -81,131 +138,22 @@ spec:
 :::
 
 ```bash
+tracetest config -t <YOUR_API_TOKEN>
 tracetest apply datastore -f ./tracetest.datastore.yaml
-```
-
-### 2. Node.js App
-
-The Node.js app is a simple Express app, contained in the `app.js` file.
-
-The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files.
-Traces will be sent to Tracetest Agent.
-
-Here's the content of the `tracing.otel.grpc.js` file:
-
-```js
-const opentelemetry = require('@opentelemetry/sdk-node')
-const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node')
-const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
-
-const sdk = new opentelemetry.NodeSDK({
-  // OTEL_EXPORTER_OTLP_TRACES_ENDPOINT is passed into "new OTLPTraceExporter" automatically
-  traceExporter: new OTLPTraceExporter(),
-  instrumentations: [getNodeAutoInstrumentations()],
-})
-sdk.start()
-```
-
-Choosing the `tracing.otel.grpc.js` file will send traces to Tracetest Agent's `GRPC`.
-
-Configure it an environment variable:
-- Running in Docker: `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317`
-
-Enabling the tracer is done by preloading the trace file.
-
-```bash
-node -r ./tracing.otel.grpc.js app.js
-```
-
-In the `package.json` you will see two npm scripts for running the respective tracers alongside the `app.js`.
-
-```json
-"scripts": {
-  "with-grpc-tracer":"node -r ./tracing.otel.grpc.js app.js",
-  "with-http-tracer":"node -r ./tracing.otel.http.js app.js"
-},
-```
-
-To start the server, run this command:
-
-```bash
-npm run with-grpc-tracer
-# or
-npm run with-http-tracer
 ```
 
 ## Run the Node.js App and Sumo Logic OpenTelemetry Collector with Docker Compose
 
-The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-sumologic-nodejs/docker-compose.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-sumologic-nodejs/Dockerfile) in the root directory are for the Node.js app.
 
-As you can see, the `Dockerfile` uses the command above.
+And, the `docker-compose.yaml` contains one service for the Node.js app, one service for the Sumo Logic OpenTelemetry Collector, and one service for Tracetest Agent.
 
-```Dockerfile
-FROM node:slim
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 8080
-CMD [ "npm", "run", "with-grpc-tracer" ]
-```
-
-And, the `docker-compose.yaml` contains one service for the Node.js app and one service for the Sumo Logic OpenTelemetry Collector.
-
-```yaml
-version: '3'
-services:
-  app:
-    image: quick-start-nodejs
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
-
-  otel-collector:
-    image: public.ecr.aws/sumologic/sumologic-otel-collector:0.75.0-sumo-0
-    volumes:
-      - ./collector.config.yaml:/etc/otel/config.yaml
-```
-
-Traces sent to Sumo Logic from the OpenTelemetry Collector.
-
-The `collector.config.yaml` configures the OpenTelemetry Collector. It receives traces via either `grpc` or `http`. Then, exports them to Sumo Logic via the Sumo Logic `extension` and an `installation_token`.
-
-:::note Configure Sumo Logic Installation Token
-View the [Sumo Logic docs here](https://help.sumologic.com/docs/manage/security/installation-tokens/) to learn more about installation tokens.
-:::
-
-```yaml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
-
-exporters:
-  sumologic:
-
-extensions:
-  sumologic:
-    installation_token: <your-sumologic-installation-token>
-
-service:
-  extensions: [sumologic]
-  pipelines:
-    traces:
-      receivers: [otlp]
-      exporters: [sumologic]
-```
+[The `collector.config.yaml` configures the OpenTelemetry Collector](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-sumologic-nodejs/collector.config.yaml). It receives traces via either `grpc` or `http`. Then, exports them to Sumo Logic via the Sumo Logic `extension` and an `installation_token`.
 
 To start it, run this command:
 
 ```bash
-docker compose build # optional if you haven't already built the image
-docker compose up
+docker compose up -d
 ```
 
 This will start the Node.js app and Sumo Logic OpenTelemetry Collector and send the traces to Sumo Logic.
@@ -213,35 +161,18 @@ This will start the Node.js app and Sumo Logic OpenTelemetry Collector and send 
 ## Run Tracetest Tests
 
 1. Open [Tracetest](https://app.tracetest.io/)
-2. [Configure Sumo Logic as a trace data store](/configuration/connecting-to-data-stores/sumologic) if you have not already as explained in ["1. Tracetest Agent"](#1-tracetest-agent).
-3. Start creating tests! Make sure to use the `http://localhost:8080/` URL in your test creation.
+2. [Configure Sumo Logic as a tracing backend](/configuration/connecting-to-data-stores/sumologic) if you have not already as explained above.
+3. Start creating tests! Make sure to use the `http://app:8080/` URL in your test creation. 
+4. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
 
-    Alternatively, you can import this test as a quick start!
-
-    ```yaml
-    type: Test
-    spec:
-      id: W656Q0c4g
-      name: Test API
-      description: Test the App.
-      trigger:
-        type: http
-        httpRequest:
-          url: http://localhost:8080
-          method: GET
-          headers:
-          - key: Content-Type
-            value: application/json
-      specs:
-      - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
-        assertions:
-        - attr:http.status_code  =  200
-        - attr:tracetest.span.duration  <  500ms
-    ```
+```bash
+tracetest configure -t <YOUR_API_TOKEN>
+tracetest run test -f ./test-api.yaml
+```
 
 ```mdx-code-block
   </TabItem>
-  <TabItem value="Tracetest Core" label="Tracetest Core">
+  <TabItem value="Tracetest Core" label="Hobby Open-Source Tracetest Core">
 ```
 
 ## Prerequisites

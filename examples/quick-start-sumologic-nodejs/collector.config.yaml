@@ -12,7 +12,7 @@ extensions:
     # Create an Installation Token in your account at
     # Administration > Security > Installation Tokens:
     # https://help.sumologic.com/docs/manage/security/installation-tokens/
-    installation_token: <your-sumologic-installation-token>
+    installation_token: ${env:SUMOLOGIC_INSTALLATION_TOKEN}
 
 service:
   extensions: [sumologic]

@@ -1,0 +1,7 @@
+---
+type: DataStore
+spec:
+  id: current
+  name: Honeycomb
+  type: honeycomb
+  default: true

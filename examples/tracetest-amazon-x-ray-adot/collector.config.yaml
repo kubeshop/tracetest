@@ -12,13 +12,17 @@ exporters:
     endpoint: tracetest:4317
     tls:
       insecure: true
+  otlp/tracetest-agent:
+    endpoint: tracetest-agent:4317
+    tls:
+      insecure: true
 
 service:
   pipelines:
     traces/tracetest:
       receivers: [awsxray]
       processors: [batch]
-      exporters: [otlp/tracetest]
+      exporters: [otlp/tracetest, otlp/tracetest-agent]
     traces/awsxray:
       receivers: [awsxray]
       exporters: [awsxray]

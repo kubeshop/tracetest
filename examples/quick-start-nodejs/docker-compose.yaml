@@ -8,11 +8,14 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Local Tracetest Agent: GRPC
-      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4317
-      # Local Tracetest Agent: HTTP
-      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://host.docker.internal:4318/v1/traces
-      # Tracetest Core: GRPC
-      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
-      # Tracetest Core: HTTP
-      # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4318/v1/traces
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+    ports:
+      - 4317:4317
+      - 4318:4318

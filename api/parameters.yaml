@@ -167,3 +167,27 @@ components:
       description: "IDs for RunGroup"
       schema:
         type: string
+
+    inviteID:
+      in: path
+      name: inviteID
+      required: true
+      description: "ID for invite"
+      schema:
+        type: string
+
+    tokenID:
+      in: path
+      name: tokenID
+      required: true
+      description: "ID for token"
+      schema:
+        type: string
+
+    environmentID:
+      in: path
+      required: true
+      name: environmentID
+      description: "ID for environment"
+      schema:
+        type: string

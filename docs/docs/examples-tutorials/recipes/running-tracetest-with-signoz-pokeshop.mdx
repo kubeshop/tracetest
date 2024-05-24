@@ -2,7 +2,7 @@
 id: running-tracetest-with-signoz-pokeshop
 title: Pokeshop API and SigNoz
 description: Quick start how to configure the Pokeshop API Demo to use Tracetest for enhancing your E2E and integration tests with trace-based testing with SigNoz as a trace data store.
-hide_table_of_contents: false
+hide_table_of_contents: true
 keywords:
   - tracetest
   - trace-based testing
@@ -11,6 +11,10 @@ keywords:
   - testing
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
 
 :::note
 [Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-signoz-pokeshop)
@@ -25,6 +29,113 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 ## Pokeshop API with SigNoz, OpenTelemetry and Tracetest
 
 This is a simple quick start guide on how to configure a fully instrumented API to be used with Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use SigNoz as the trace data store and the Pokeshop API to generate the telemetry data.
+
+```mdx-code-block
+<Tabs groupId="running-tracetest-without-a-trace-data-store">
+  <TabItem value="Tracetest" label="Cloud-based Managed Tracetest" default>
+```
+
+## Prerequisites
+
+**Tracetest Account**:
+
+- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
+- Create an [environment](/concepts/environments).
+- Create an [environment token](/concepts/environment-tokens).
+- Have access to the environment's [agent API key](/configuration/agent).
+
+**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+## Run This Quckstart Example
+
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
+
+Clone the Tracetest project and go to the SigNoz Pokeshop Quickstart:
+
+```bash
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/tracetest-signoz-pokeshop
+```
+
+Follow these instructions to run the quick start:
+
+1. Copy the `.env.template` file to `.env`.
+2. Log into the [Tracetest app](https://app.tracetest.io/).
+3. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
+4. Run `docker compose -f ./docker-compose.agent.yaml up -d`.
+5. This example is configured to use the SigNoz Tracing Backend. Ensure the environment you're using to run this example is configured to use the SigNoz Tracing Backend by clicking on Settings, Tracing Backend, SigNoz, Save. Or, use the CLI as explained below.
+6. Run tests from the Tracetest Web UI by accessing the app with the URL `http://demo-api:8081/pokemon/import`.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
+
+## Project Structure
+
+The project contains the [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), and the [Pokeshop Demo app](/live-examples/pokeshop/overview).
+
+The `docker-compose.agent.yaml` file in the root directory of the quick start runs the Pokeshop Demo app, [SigNoz](https://github.com/SigNoz/signoz), and the [Tracetest Agent](/concepts/agent) setup.
+
+## Configuring the Pokeshop Demo App
+
+The Pokeshop API is a fully instrumented REST API that makes use of different services to mimic a real life scenario.
+
+It is instrumented using the [OpenTelemetry standards for Node.js](https://opentelemetry.io/docs/instrumentation/js/getting-started/nodejs/), sending the data to the ADOT collector that will be pushing the telemetry information to both the AWS X-Ray service.
+
+This is a [fragment from the main tracing file](https://github.com/kubeshop/pokeshop/blob/master/api/src/telemetry/tracing.ts) from the [Pokeshop API repo](https://github.com/kubeshop/pokeshop).
+
+Configure the `.env` like shown below.
+
+```bash
+TRACETEST_API_KEY="<YOUR_TRACETEST_API_KEY>"
+TRACETEST_API_TOKEN="<YOUR_TRACETEST_TOKEN>"
+```
+
+## Configuring SigNoz
+
+Configure [SigNoz as a Tracing Backend](/configuration/connecting-to-data-stores/signoz) in Tracetest.
+
+```yaml title="tracetest-tracing-backend.yaml"
+---
+type: DataStore
+spec:
+  name: Signoz
+  type: signoz
+```
+
+```bash
+tracetest config -t <YOUR_API_TOKEN>
+tracetest apply datastore -f ./tracetest/tracetest-tracing-backend.yaml
+```
+
+## Run the Pokeshop Demo App, SigNoz, and Tracetest Agent with Docker Compose
+
+The [`docker-compose.agent.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-signoz-pokeshop/docker-compose.agent.yaml) in the root directory contains the Pokeshop Demo app services.
+
+The [`docker-compose.agent.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-signoz-pokeshop/docker-compose.agent.yaml) also contains the Tracetest Agent, OpenTelemetry Collector and all SigNoz services.
+
+To start it, run this command:
+
+```bash
+docker compose -f ./docker-compose.agent.yaml up -d
+```
+
+This will start the Pokeshop Demo app, SigNoz, OpenTelemetry Collector, and Tracetest Agent.
+
+## Run Tracetest Tests
+
+1. Open [Tracetest](https://app.tracetest.io/)
+2. [Configure SigNoz as a tracing backend](/configuration/connecting-to-data-stores/signoz) if you have not already as explained above.
+3. Start creating tests! Make sure to use the `http://demo-api:8081/pokemon/import` URL in your test creation. 
+4. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
+
+```bash
+tracetest configure -t <YOUR_API_TOKEN>
+tracetest run test -f ./tests/test.yaml
+```
+
+```mdx-code-block
+  </TabItem>
+  <TabItem value="Tracetest Core" label="Hobby Open-Source Tracetest Core">
+```
 
 ## Prerequisites
 
@@ -647,6 +758,11 @@ You can also drill down into a particular trace.
 ![signoz trace drilldown](https://res.cloudinary.com/djwdcmwdz/image/upload/v1692364964/Blogposts/Docs/screely-1692364957669_te7pe2.png)
 
 With SigNoz and Tracetest, you get the best of both worlds. You can run trace-based tests and automate running E2E and integration tests against real trace data. And, use SigNoz to get a historical overview of all traces your distributed application generates.
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
 
 ## Learn More
 

@@ -287,7 +287,12 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-elasticapm",
-              label: "Node.js and Elastic APM",
+              label: "Node.js, Elasticsearch and Elastic APM",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-elastic-opentelemetry",
+              label: "Node.js, Elasticsearch and OpenTelemetry",
             },
           ],
         },
@@ -300,6 +305,11 @@ const sidebars = {
               id: "examples-tutorials/recipes/running-tracetest-with-tempo",
               label: "Node.js and Grafana Tempo",
             },
+            // {
+            //   type: "doc",
+            //   id: "examples-tutorials/recipes/running-tracetest-with-grafana-cloud-tempo",
+            //   label: "Node.js and Grafana Cloud Tempo",
+            // },
           ],
         },
         {
@@ -786,6 +796,11 @@ const sidebars = {
           type: "doc",
           id: "concepts/variable-sets",
           label: "Variable Sets",
+        },
+        {
+          type: "doc",
+          id: "concepts/environment-automation",
+          label: "Environment Automation",
         },
         {
           type: "doc",

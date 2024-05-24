@@ -1548,3 +1548,216 @@ paths:
           description: "Run Group not found"
         500:
           description: "problem getting the Run Group runs"
+
+  /invites:
+    get:
+      description: Lists pending invites
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/query"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
+      tags:
+        - api
+      summary: Lists all invites
+      operationId: listInvites
+      responses:
+        "200":
+          $ref: "./invites.yaml#/components/responses/InviteResources"
+
+    post:
+      description: Creates pending email invite
+      tags:
+        - api
+      summary: Creates a pending invite
+      operationId: createInvite
+      requestBody:
+        $ref: "./invites.yaml#/components/requestBodies/InviteResource"
+      responses:
+        "201":
+          $ref: "./invites.yaml#/components/responses/InviteResource"
+
+    put:
+      description: Upserts invite
+      tags:
+        - api
+      summary: Upserts a pending invite
+      operationId: upsertInvite
+      requestBody:
+        $ref: "./invites.yaml#/components/requestBodies/InviteResource"
+      responses:
+        "201":
+          $ref: "./invites.yaml#/components/responses/InviteResource"
+
+  /invites/{inviteID}:
+    parameters:
+        - $ref: "./parameters.yaml#/components/parameters/inviteID"
+    get:
+      description: get invite
+      tags:
+        - api
+      summary: Get invite
+      operationId: getInvite
+      responses:
+        "200":
+          $ref: "./invites.yaml#/components/responses/InviteResource"
+
+    put:
+      description: Updates pending email invite
+      tags:
+        - api
+      summary: Updates a pending invite
+      operationId: updateInvite
+      requestBody:
+        $ref: "./invites.yaml#/components/requestBodies/InviteResource"
+      responses:
+        "201":
+          $ref: "./invites.yaml#/components/responses/InviteResource"
+
+    delete:
+      description: delete pending invite
+      tags:
+        - api
+      summary: Delete pending invite
+      operationId: deleteInvite
+      responses:
+        "201":
+          $ref: "./invites.yaml#/components/responses/InviteResource"
+
+  /tokens:
+    get:
+      description: Lists tokens
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/query"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
+      tags:
+        - api
+      summary: Lists all tokens
+      operationId: listTokens
+      responses:
+        "200":
+          $ref: "./tokens.yaml#/components/responses/Tokens"
+
+    post:
+      description: Creates a new token
+      tags:
+        - api
+      summary: Creates a new token
+      operationId: createToken
+      requestBody:
+        $ref: "./tokens.yaml#/components/requestBodies/Token"
+      responses:
+        "201":
+          $ref: "./tokens.yaml#/components/responses/Token"
+
+    put:
+      description: Upserts a new token
+      tags:
+        - api
+      summary: Upserts a new token
+      operationId: upsertToken
+      requestBody:
+        $ref: "./tokens.yaml#/components/requestBodies/Token"
+      responses:
+        "201":
+          $ref: "./tokens.yaml#/components/responses/Token"
+
+  /tokens/{tokenID}:
+    parameters:
+        - $ref: "./parameters.yaml#/components/parameters/tokenID"
+    delete:
+      description: delete token
+      tags:
+        - api
+      summary: Delete token for environment
+      operationId: deleteToken
+      responses:
+        "201":
+          $ref: "./tokens.yaml#/components/responses/Token"
+
+    put:
+      description: update token
+      tags:
+        - api
+      summary: Update token for environment
+      operationId: updateToken
+      responses:
+        "201":
+          $ref: "./tokens.yaml#/components/responses/Token"
+
+  /environments:
+    get:
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+        - $ref: "./parameters.yaml#/components/parameters/query"
+        - $ref: "./parameters.yaml#/components/parameters/sortDirection"
+      tags:
+        - api
+      summary: List environments
+      description: List environments from an organization
+      operationId: listEnvironments
+      responses:
+        "200":
+          $ref: "./environments.yaml#/components/responses/EnvironmentResources"
+
+    post:
+      tags:
+        - api
+      summary: "Create new environment"
+      description: "Create test environment"
+      operationId: createEnvironment
+      requestBody:
+        $ref: "./environments.yaml#/components/requestBodies/EnvironmentResource"
+      responses:
+        "200":
+          $ref: "./environments.yaml#/components/responses/Environment"
+
+    put:
+      tags:
+        - api
+      summary: "Upsert new environment"
+      description: "Upsert test environment"
+      operationId: upsertEnvironment
+      requestBody:
+        $ref: "./environments.yaml#/components/requestBodies/EnvironmentResource"
+      responses:
+        "200":
+          $ref: "./environments.yaml#/components/responses/EnvironmentResource"
+
+  /environments/{environmentID}:
+    parameters:
+        - $ref: "./parameters.yaml#/components/parameters/environmentID"
+    get:
+      tags:
+        - api
+      summary: Get environment by ID
+      description: Get test environment by ID from CRD in kubernetes cluster
+      operationId: getEnvironment
+      responses:
+        "200":
+          $ref: "./environments.yaml#/components/responses/EnvironmentResource"
+
+    put:
+      tags:
+        - api
+      summary: "Update environment"
+      description: "Update environment with given request body"
+      operationId: updateEnvironment
+      requestBody:
+        $ref: "./environments.yaml#/components/requestBodies/EnvironmentResource"
+      responses:
+        "200":
+          $ref: "./environments.yaml#/components/responses/EnvironmentResource"
+
+    delete:
+      tags:
+        - api
+      summary: Delete test environment
+      description: Deletes a test environment
+      operationId: deleteEnvironment
+      responses:
+        "204":
+          $ref: "./environments.yaml#/components/responses/EnvironmentResource"

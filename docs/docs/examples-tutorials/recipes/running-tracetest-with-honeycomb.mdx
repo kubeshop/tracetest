@@ -2,7 +2,7 @@
 id: running-tracetest-with-honeycomb
 title: Node.js and Honeycomb
 description: Quick start how to configure the OpenTelemetry Demo to use Tracetest for enhancing your E2E and integration tests with trace-based testing with Honeycomb as a trace data store.
-hide_table_of_contents: false
+hide_table_of_contents: true
 keywords:
   - tracetest
   - trace-based testing
@@ -11,6 +11,10 @@ keywords:
   - testing
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
 
 :::note
 [Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-honeycomb)
@@ -23,6 +27,116 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 ## Node.js App with Honeycomb, OpenTelemetry and Tracetest
 
 This is a quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your E2E and integration tests with trace-based testing and Honeycomb as a trace data store.
+
+```mdx-code-block
+<Tabs groupId="running-tracetest-without-a-trace-data-store">
+  <TabItem value="Tracetest" label="Cloud-based Managed Tracetest" default>
+```
+
+## Prerequisites
+
+**Tracetest Account**:
+
+- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
+- Create an [environment](/concepts/environments).
+- Create an [environment token](/concepts/environment-tokens).
+- Have access to the environment's [agent API key](/configuration/agent).
+
+**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+## Run This Quckstart Example
+
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
+
+Clone the Tracetest project and go to the Node.js Quickstart:
+
+```bash
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/tracetest-honeycomb
+```
+
+Follow these instructions to run the quick start:
+
+1. Copy the `.env.template` file to `.env`.
+2. Log into the [Tracetest app](https://app.tracetest.io/).
+3. This example is configured to use the Honeycomb Tracing Backend. Ensure the environment you will be utilizing to run this example is also configured to use the Honeycomb Tracing Backend by clicking on Settings, Tracing Backend, Honeycomb, Save.
+4. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
+5. Run `docker compose -f ./docker-compose.agent.yaml up -d`.
+6. Run tests from the Tracetest Web UI by accessing the app with the URL `http://app:8080/`.
+
+Follow along with the sections below for a detailed breakdown of what the example you just ran did and how it works.
+
+## Project Structure
+
+The quick start Node.js project is built with Docker Compose and contains the Tracetest Agent and a Node.js app.
+
+The `docker-compose.agent.yaml` file in the root directory of the quick start runs the Node.js app and the [Tracetest Agent](/concepts/agent) setup.
+
+## Configuring the Node.js App
+
+The Node.js app is a simple Express app, contained in the `app.js` file.
+
+Configure the `.env` like shown below.
+
+```bash
+TRACETEST_API_KEY="<YOUR_TRACETEST_API_KEY>"
+HONEYCOMB_API_KEY="<YOUR_HONEYCOMB_API_KEY>"
+```
+
+The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files. Traces will be sent to Tracetest Agent.
+
+Choosing [the `tracing.otel.grpc.js` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-honeycomb/tracing.otel.grpc.js) will send traces to Tracetest Agent's `GRPC` endpoint.
+
+Enabling the tracer is done by preloading the trace file. As seen in the `package.json`.
+
+```json
+"scripts": {
+  "app-with-grpc-tracer": "node -r ./tracing.otel.grpc.js app.js",
+},
+```
+
+## Configuring Honeycomb
+
+Configure [Honeycomb as a Tracing Backend](/configuration/connecting-to-data-stores/honeycomb) in Tracetest.
+
+```yaml title="tracetest-tracing-backend.yaml"
+---
+type: DataStore
+spec:
+  name: Honeycomb
+  type: honeycomb
+  default: true
+```
+
+```bash
+tracetest config -t <YOUR_API_TOKEN>
+tracetest apply datastore -f ./tracetest-tracing-backend.yaml
+```
+
+## Run the Node.js App, OpenTelemetry Collector, and Tracetest Agent with Docker Compose
+
+To start the full setup, run the following command:
+
+```bash
+docker compose -f ./docker-compose.agent.yaml up -d
+```
+
+## Run Tracetest Tests
+
+1. Open [Tracetest](https://app.tracetest.io/).
+2. [Configure Honeycomb as a tracing backend](/configuration/connecting-to-data-stores/honeycomb) if you have not already as explained above.
+3. Start creating tests! Make sure to use the `http://app:8080/` URL in your test creation. 
+4. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
+
+```bash
+tracetest configure -t <YOUR_API_TOKEN>
+tracetest run test -f ./test-api.yaml
+```
+
+```mdx-code-block
+  </TabItem>
+  <TabItem value="Tracetest Core" label="Hobby Open-Source Tracetest Core">
+```
 
 ## Prerequisites
 
@@ -350,6 +464,11 @@ You can also drill down into a particular trace.
 ![Honeycomb trace drilldown](https://res.cloudinary.com/djwdcmwdz/image/upload/v1683042900/Blogposts/Docs/honeycome_dashboard_gyisdg.png)
 
 With Honeycomb and Tracetest, you get the best of both worlds. You can run trace-based tests and automate running E2E and integration tests against real trace data. And, use Honeycomb to get a historical overview of all traces your distributed application generates.
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
 
 ## Learn More
 

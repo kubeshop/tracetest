@@ -6,21 +6,11 @@ This is a simple quick start on how to configure a Node.js app to use OpenTeleme
 
 ## Steps to run Tracetest
 
-### 1. Start the Tracetest Agent locally
+### 1. Configure Tracetest Agent and Sumo Logic
 
 - Sign up on [`app.tracetest.io`](https://app.tracetest.io).
 - Create a new environment.
 - Copy the start command under `Settings > Agent`.
-
-```bash
-tracetest start --api-key <YOUR_API_KEY>
-```
-
-Once started, Tracetest Agent will:
-
-- Expose OTLP ports 4317 (gRPC) and 4318 (HTTP) for trace ingestion.
-- Be able to trigger test runs in the environment where it is running.
-- Be able to connect to a trace data store that is not accessible outside of your environment. Eg. a Sumo Logic OpenTelemetry Collector instance running in the cluster without an ingress controller.
 
 Configure Sumo Logic as a Tracing Backend:
 
@@ -43,16 +33,12 @@ tracetest apply datastore -f ./tracetest.datastore.yaml
 
 ### 2. Start Node.js App
 
-You can run the example with Docker.
+Set the env vars in the `.env` file.
 
-#### Docker Compose
-
-Set the env vars in `docker-compose.yaml` as follows:
-
-- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317`
+Run the example with Docker.
 
 ```bash
-docker compose up --build
+docker compose up -d
 ```
 
 ### 3. Run tests
@@ -67,10 +53,6 @@ tracetest run test -f ./test-api.yaml
 ## Steps to run Tracetest Core
 
 ### 1. Start Node.js App and Tracetest Core with Docker Compose
-
-Set the env vars in `docker-compose.yaml` as follows:
-
-- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317`
 
 ```bash
 docker compose -f ./docker-compose.yaml -f ./tracetest/docker-compose.yaml up --build

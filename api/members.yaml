@@ -1,0 +1,79 @@
+openapi: 3.0.1
+
+components:
+  responses:
+    Members:
+      description: "successful operation for members"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Members"
+    Member:
+      description: "successful operation for members"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Member"
+  requestBodies:
+    MemberRole:
+      description: member role update body
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - role
+            properties:
+              role:
+                $ref: "#/components/schemas/Role"
+    AssignMember:
+      description: member role update body
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - role
+              - id
+            properties:
+              role:
+                $ref: "#/components/schemas/Role"
+              id:
+                type: string
+  schemas:
+    Role:
+      type: string
+      enum:
+        - owners
+        - members
+        - admins
+        - billers
+        - engineers
+        - runners
+        - agent
+    Member:
+      required:
+        - id
+        - user
+        - role
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          $ref: "#/components/schemas/Role"
+        user:
+          $ref: "./users.yaml#/components/schemas/User"
+        invite:
+          $ref: "./invites.yaml#/components/schemas/Invite"
+    Members:
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: "#/components/schemas/Member"
+        nextToken:
+          type: string

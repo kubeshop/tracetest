@@ -1,6 +1,7 @@
 ---
 type: DataStore
 spec:
+  id: current
   name: Sumo Logic
   type: sumologic
   sumologic:
