@@ -1,0 +1,7 @@
+type: EnvironmentToken
+spec:
+  id: GI1su-PIg
+  name: my-engineers-token
+  role: engineers
+  isRevoked: false
+

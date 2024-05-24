@@ -1,0 +1,14 @@
+type: DataStore
+spec:
+  id: current
+  name: jaeger
+  type: jaeger
+  default: true
+  createdAt: 2023-10-16T19:39:35.345567Z
+  jaeger:
+    endpoint: demo-pokeshop-jaeger-query.demo:16685
+    headers:
+      "": ""
+    tls:
+      insecure: true
+      settings: {}
