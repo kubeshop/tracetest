@@ -45,127 +45,120 @@ Last, but not least important, if multiple tests are run inside a run group, the
 
 ## Using Run Groups from the CLI
 
-The way to use run groups from the CLI is by running multiple folders at once:
+:::note
+[Check out the sample code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/environment-automation)
+:::
 
-![Run Groups CLI](../img/run-groups-cli.png)
+You can run multiple tests at once by providing multiple `-f file.yaml` parameters to the `tracetest run test` command. These tests will be placed under the same run group.
 
-![Run Groups CLI 2](../img/run-groups-cli-2.jpg)
+You can also manually wait for a run group to be done from the CLI. 
 
-Users can also manually wait for a run group to be done from the CLI.
+View the [sample code](https://github.com/kubeshop/tracetest/tree/main/examples/environment-automation). You will see multiple test definitions.
 
-The above screenshots show that now you can run multiple tests at once by providing multiple `-f <file.yaml` parameters to the `tracetest run test` command. All those tests will be placed under the same run group.
+```yaml title="facebook.yaml"
+type: Test
+spec:
+  id: facebook-test
+  name: Facebook
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: facebook.com
+      headers:
+        - key: Content-Type
+          value: application/json
+  skipTraceCollection: true
+```
+
+```yaml title="google.yaml"
+type: Test
+spec:
+  id: google-test
+  name: Google
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: google.com
+      headers:
+        - key: Content-Type
+          value: application/json
+  skipTraceCollection: true
+```
+
+Run these two tests in a run group like this:
+
+```bash
+tracetest run test -f facebook.yaml -f google.yaml -f file.yaml -f ...
+```
 
 Normally, if you run two tests separately, both test runs would be part of different run groups:
 
-```
+```bash
 tracetest run test -f test1.yaml
 ```
 
-```
+```bash
 tracetest run test -f test2.yaml
 ```
 
-Now you also can specify the run group id when running a test. This would make the test part of the run group.
+You also can specify the run group id when running a test. This would make the test part of the run group.
 
-```
+```bash
 tracetest run test -f test1.yaml --group my-pipeline
 tracetest run test -f test2.yaml --group my-pipeline
 ```
 
 With the `--group` argument, both tests would be run in parallel but would be seen inside the same run group.
 
-## Examples
-```
-# test1.yaml
+## Running multiple tests inside the same group
 
-type: Test
-spec:
-	name: There are tests in the database
-	type: http
-	httpRequest:
-		url: ${env:ENDPOINT}/api/tests
-		method: GET
-	specs:
-	- selector: span[name = "Tracetest Trigger"]
-	  assertions:
-	  - attr:tracetest.response.body | json_path '$.count' > 0
-```
-
-```
-# test2.yaml
-
-type: Test
-spec:
-	name: Check if there are suites ino the database
-	type: http
-	httpRequest:
-		url: ${env:ENDPOINT}/api/testsuites
-		method: GET
-	specs:
-	- selector: span[name = "Tracetest Trigger"]
-	  assertions:
-	  - attr:tracetest.response.body | json_path '$.count' > 0
-```
-
-### Running multiple tests inside the same group
-
-```
+```bash
 tracetest run test -f test1.yaml -f test2.yaml
 ```
 
 Both test runs will be shown on the same run group (with a random id).
 
-### Running multiple tests inside the same group and choosing the group id
+## Running multiple tests inside the same group and choosing the group id
 
-```
+```bash
 tracetest run test -f test1.yaml -f test2.yaml --group my-group-id
 ```
 
 Both tests will be shown on the same run group (id = my-group-id). If this run group already exists, the two new runs will be placed there with any other test run from that group.
 
-### Adding a new run to an existing group
+## Adding a new run to an existing group
 
-```
+```bash
 tracetest run test -f test3.yaml --group my-group-id
 ```
+
 This new run will be part of the `my-group-id` group along with the `test1` and `test2` runs.
 
-### Running a suite and some tests inside the same group
+## Running a suite and some tests inside the same group
 
-```
+```bash
 tracetest run test -f suite.yaml -f test1.yaml -f test2.yaml
 ```
 
 Test suites can also be part of a run group along with other suites or tests.
 
-### Difference between a test suite and a run group
+## Difference between a test suite and a run group
 
-![Run Groups Chart](../img/run-groups-chart.png)
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1716551731/docs/mermaid-js.github.io_mermaid-live-editor__view_lj7fe6.png)
 
-Mermaid code (works on GitHub and our doc page) to generate the Gantt graph.
+### Execution time
 
-```
-gantt
-    title Test suite vs run group execution
-    dateFormat  HH:mm
-    axisFormat %H:%M
-    section Test suite
-    Test 1     :t1, 15:00, 1m
-    Test 2     :t2, after t1 , 2m
-    Test 3     :t3, after t2, 3m
-    Test 4     :t4, after t3, 1m
+A test suite only executes the next test when the current test has finished running. So if it contains 4 tests that take 1 minute each, the whole suite will take 4 minutes to complete. Run group tests are run in parallel, so if the same 4 tests are run inside a group, it will complete in 1 minute.
 
-    section Run Group
-    Test 1     :r1, 15:00, 1m
-    Test 2     :r2, 15:00, 2m
-    Test 3     :r3, 15:00, 3m
-    Test 4     :r4, 15:00, 1m
-```
+### Using data from a previous test
 
-**Execution time:** A test suite only executes the next test when the current test has finished running. So if it contains 4 tests that take 1 minute each, the whole suite will take 4 minutes to complete. Run group tests are run in parallel, so if the same 4 tests are run inside a group, it will complete in 1 minute.
+In suites, you can chain your tests and share data from one test to another. For example, getting the response from the first test and use it as part of the second test definition. This is not possible with run groups.
 
-**Using data from a previous test:** In suites, you can chain your tests and share data from one test to another. For example, getting the response from the first test and use it as part of the second test definition. This is not possible with run groups.
+### Composition
 
-**Composition:** Suites can only contain tests inside of it. Groups can contain both tests and suites. This means that if you have 5 tests where 3 are totally independent but the other 2 need each other to work, you can use groups to run those tests in an efficient way: running the suite (with 2 tests) and the 3 independent tests in parallel. If all tests take 1 minute to run, the run group would take 2 minutes to run.
+Suites can only contain tests inside of it. Groups can contain both tests and suites. This means that if you have 5 tests where 3 are totally independent but the other 2 need each other to work, you can use groups to run those tests in an efficient way:
 
-
+- Running the suite (with 2 tests) and the 3 independent tests in parallel.
+- If all tests take 1 minute to run, the run group would take 2 minutes to run.
