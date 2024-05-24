@@ -1,5 +1,6 @@
 node_modules
 .DS_Store
+.env
 
 signoz/data/alertmanager/*
 signoz/data/clickhouse/*

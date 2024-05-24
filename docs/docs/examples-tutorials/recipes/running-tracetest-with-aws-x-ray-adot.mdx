@@ -2,7 +2,7 @@
 id: running-tracetest-with-aws-x-ray-adot
 title: Node.js with AWS X-Ray (Node.js SDK) and AWS Distro for OpenTelemetry
 description: Quick start on how to configure a Node.js app with OpenTelemetry traces, AWS X-Ray as a trace data store, including AWS Distro for OpenTelemetry, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: false
+hide_table_of_contents: true
 keywords:
   - tracetest
   - trace-based testing
@@ -11,6 +11,10 @@ keywords:
   - testing
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
 
 :::note
 [Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-amazon-x-ray-adot)
@@ -22,9 +26,141 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 [AWS Distro for OpenTelemetry (ADOT)](https://aws-otel.github.io/docs/getting-started/collector) is a secure, production-ready, AWS-supported distribution of the OpenTelemetry project. Part of the Cloud Native Computing Foundation, OpenTelemetry provides open source APIs, libraries and agents to collect distributed traces and metrics for application monitoring.
 
-## Sample Node.js API with AWS X-Ray (Node.js SDK), AWS Distro for OpenTelemetry and Tracetest
+## Node.js API with AWS X-Ray (Node.js SDK), AWS Distro for OpenTelemetry and Tracetest
 
 This is a simple quick start guide on how to configure a Node.js app to use instrumentation with traces and Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use AWS X-Ray as the trace data store, the ADOT as a middleware and a Node.js app to generate the telemetry data.
+
+```mdx-code-block
+<Tabs groupId="running-tracetest-without-a-trace-data-store">
+  <TabItem value="Tracetest" label="Cloud-based Managed Tracetest" default>
+```
+
+## Prerequisites
+
+**Tracetest Account**:
+
+- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
+- Create an [environment](/concepts/environments).
+- Create an [environment token](/concepts/environment-tokens).
+- Have access to the environment's [agent API key](/configuration/agent).
+
+**AWS Account**:
+
+- Sign up to [AWS](https://aws.amazon.com/).
+- Install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
+
+**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+## Run This Quckstart Example
+
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
+
+Clone the Tracetest project and go to the AWS X-Ray Node.js Quickstart:
+
+```bash
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/tracetest-amazon-x-ray-adot
+```
+
+Follow these instructions to run the quick start:
+
+1. Copy the `.env.template` file to `.env`.
+2. Log into the [Tracetest app](https://app.tracetest.io/).
+3. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
+4. Fill out the AWS credentials in the `.env` file. You can [create credentials by following this guide](/configuration/connecting-to-data-stores/awsxray).
+5. Run `docker compose -f ./docker-compose.agent.yaml up -d`.
+6. This example is configured to use the OpenTelemetry Collector (OTLP) Tracing Backend. Ensure the environment you're using to run this example is configured to use the OpenTelemetry Collector Tracing Backend by clicking on Settings, Tracing Backend, OpenTelemetry Collector, Save. Or, use the CLI as explained below.
+7. Run tests from the Tracetest Web UI by accessing the app with the URL `http://app:3000/http-request/`.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
+
+## Project Structure
+
+The project contains the [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), and a Node.js app.
+
+The `docker-compose.agent.yaml` file in the root directory of the quick start runs the Node.js app, [AWS Distro for OpenTelemetry (ADOT)](https://aws-otel.github.io/docs/getting-started/collector), and the [Tracetest Agent](/concepts/agent) setup.
+
+## Configuring the Node.js App
+
+The Node.js app is a simple Express app, contained in [the `index.js` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray-adot/src/index.js).
+
+Configure the `.env` like shown below.
+
+```bash
+AWS_ACCESS_KEY_ID="<YOUR_AWS_ACCESS_KEY_ID>"
+AWS_SECRET_ACCESS_KEY="<YOUR_AWS_SECRET_ACCESS_KEY>"
+AWS_SESSION_TOKEN="<YOURAWS_SESSION_TOKEN>"
+AWS_REGION="<YOUR_AWS_REGION>"
+TRACETEST_API_KEY="<YOUR_TRACETEST_API_KEY>"
+TRACETEST_API_TOKEN="<YOUR_TRACETEST_TOKEN>"
+```
+
+The X-Ray tracing is contained in the `index.js` file. Traces will be sent to AWS X-Ray via ADOT.
+
+## Configuring AWS X-Ray
+
+Get temporary credentials.
+
+```bash
+aws sts get-session-token
+```
+
+```json title="Output"
+{
+  "Credentials": {
+    "AccessKeyId": "<yourkeyid>",
+    "SecretAccessKey": "<youraccesskey>",
+    "SessionToken": "<yoursessiontoken>",
+    "Expiration": "2024-05-23T21:01:38+00:00"
+  }
+}
+```
+
+Configure [OTLP as a Tracing Backend](/configuration/connecting-to-data-stores/opentelemetry-collector) in Tracetest.
+
+```yaml title="tracetest-tracing-backend.yaml"
+---
+type: DataStore
+spec:
+  name: otlp
+  type: otlp
+```
+
+```bash
+tracetest config -t <YOUR_API_TOKEN>
+tracetest apply datastore -f ./tracetest-tracing-backend.yaml
+```
+
+## Run the Node.js App, ADOT, and Tracetest Agent with Docker Compose
+
+The [`docker-compose.agent.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray-adot/docker-compose.agent.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray-adot/Dockerfile) in the root directory contain the Node.js app.
+
+The [`docker-compose.agent.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray-adot/docker-compose.agent.yaml) also contains the Tracetest Agent and ADOT.
+
+To start it, run this command:
+
+```bash
+docker compose -f ./docker-compose.agent.yaml up -d
+```
+
+This will start the Node.js app and Tracetest Agent.
+
+## Run Tracetest Tests
+
+1. Open [Tracetest](https://app.tracetest.io/).
+2. [Configure OpenTelemetry Collector as a tracing backend](/configuration/connecting-to-data-stores/opentelemetry-collector) if you have not already as explained above.
+3. Start creating tests! Make sure to use the `http://app:3000/http-request/` URL in your test creation. 
+4. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
+
+```bash
+tracetest configure -t <YOUR_API_TOKEN>
+tracetest run test -f ./test-api.yaml
+```
+
+```mdx-code-block
+  </TabItem>
+  <TabItem value="Tracetest Core" label="Hobby Open-Source Tracetest Core">
+```
 
 ## Prerequisites
 
@@ -236,6 +372,11 @@ docker-compose up
 
 This will start your Tracetest instance on `http://localhost:11633/`. Open the instance and start creating tests!
 Make sure to use the `http://app:3000/` url in your test creation, because your Node.js app and Tracetest are in the same network.
+
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
 
 ## Learn More
 

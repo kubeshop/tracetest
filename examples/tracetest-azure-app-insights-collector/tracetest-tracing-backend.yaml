@@ -1,0 +1,9 @@
+---
+type: DataStore
+spec:
+  id: current
+  name: azureappinsights
+  type: azureappinsights
+  azureappinsights:
+    connectionType: collector
+    useAzureActiveDirectoryAuth: false

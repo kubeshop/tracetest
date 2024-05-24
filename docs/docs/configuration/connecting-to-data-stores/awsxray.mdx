@@ -33,7 +33,14 @@ In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, sele
 
 ![AWS X-Ray Settings](../img/configure-awsxray-0.11.3.png)
 
-From the configuration page, add your AWS credentials. You can use temporary credentials by running `aws sts get-session-token`.
+From the configuration page, add your AWS credentials.
+
+You can use temporary credentials by running:
+
+```bash
+aws sts get-session-token
+```
+
 Lastly, you can ensure the connection is working as expected by pressing the `Test Connection` button.
 
 ## Connect Tracetest to AWS X-Ray with the CLI
