@@ -61,3 +61,35 @@ This will open the modal for the Variable Set's resource definition:
 
 ![ Resource Definition Modal](../img/variable-set-resource-definition-modal.png)
 
+## Provisioning Environments
+
+Tracetest allows the creation of an environment from the CLI and provisioning it with any type of resource, including tests, test suites, tracing backends, test runners, polling profiles, invites, tokens, etc.
+
+Use this feature to quickly spin up new environments for integration testing or CI builds.
+
+:::note
+You can find code examples [here](https://github.com/kubeshop/tracetest/tree/main/examples/environment-automation).
+These files are in a folder called [“/resources”](https://github.com/kubeshop/tracetest/tree/main/examples/environment-automation/resources).
+:::
+
+```
+type: Environment
+spec:
+  name: my-demo-env
+  description: My env desc
+  resources: ./resources # this is a folder
+```
+The apply command for creating this environment:
+
+```
+tracetest apply environment -f ./path/to/environment.yaml
+```
+
+You will now see the environment and tests in the Tracetest UX:
+
+![Environments](../img/environments.png)
+
+![Environment Tests](../img/environment-tests.png)
+
+
+

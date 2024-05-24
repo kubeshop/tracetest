@@ -77,3 +77,26 @@ specs:
 Both `var:URL` and `var:API_TOKEN` would be replaced by the variables defined in the chosen variable set where the test will run. So, if the chosen variable set was `dev.env`, its values would be replaced by `https://app-dev.com` and `dev-key`, respectively.
 
 For details on creating and editing varaible sets in the CLI, please visit [CLI Creating Variable Sets](/cli/creating-variable-sets).
+
+## Using Secrets in Variable Sets
+
+Variable Sets accept secrets.  A variable can be a `secret` or a `raw` variable in the UI. 
+
+![Create Variable Set Values](../img/create-variable-set-values.png)
+
+A VariableSet with a secret value can be registered via the CLI like this:
+
+```
+type: VariableSet
+spec:
+  id: test-1
+  name: Test 1
+  description: test
+  values:
+  - key: SOME_SECRET
+    value: my-precious
+    type: secret
+  - key: NO_SO_SECRET
+    value: aha!
+    type: raw
+```
