@@ -78,11 +78,11 @@ Follow along with the sections below for an in detail breakdown of what the exam
 
 ## Project Structure
 
-The project contains [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), and the [Pokeshop Demo app](/live-examples/pokeshop/overview).
+The project contains the [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), and the [Pokeshop Demo app](/live-examples/pokeshop/overview).
 
 The `docker-compose.agent.yaml` file in the root directory of the quick start runs the Pokeshop Demo app, [AWS Distro for OpenTelemetry (ADOT)](https://aws-otel.github.io/docs/getting-started/collector), and the [Tracetest Agent](/concepts/agent) setup.
 
-## Configuring the Pokeshop Demo app
+## Configuring the Pokeshop Demo App
 
 The Pokeshop API is a fully instrumented REST API that makes use of different services to mimic a real life scenario.
 
@@ -158,7 +158,7 @@ This will start the Pokeshop Demo app, ADOT, and Tracetest Agent.
 
 ## Run Tracetest Tests
 
-1. Open [Tracetest](https://app.tracetest.io/)
+1. Open [Tracetest](https://app.tracetest.io/).
 2. [Configure AWS X-Ray as a tracing backend](/configuration/connecting-to-data-stores/awsxray) if you have not already as explained above.
 3. Start creating tests! Make sure to use the `http://demo-api:8081/pokemon/import` URL in your test creation. 
 4. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
