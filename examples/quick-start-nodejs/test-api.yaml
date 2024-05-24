@@ -1,7 +1,7 @@
 type: Test
 spec:
-  id: W656Q0c4f
-  name: T2
+  id: W656Q0c4g
+  name: Test API
   description: akadlkasjdf
   trigger:
     type: http
