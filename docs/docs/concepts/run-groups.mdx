@@ -13,6 +13,10 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
+:::tip Commercial Feature
+[Feature available only in Cloud-based Managed Tracetest & Enterprise Self-hosted Tracetest.](https://tracetest.io/pricing)
+:::
+
 Run Groups are containers that encapsulate one or more runs. Each time a test run is executed in the Tracetest app, a run group is generated that can be found in the UI.
 
 ![Run Groups UI](../img/run-groups-ui.png)
@@ -39,7 +43,7 @@ Users are allowed to attach more runs to a run group by adding them in the run i
 
 Run groups are essential for integrations! Without it, a k6 test could potentially generate thousands of test runs that would pollute the environment and make it almost impossible to search for test runs not associated with that k6 test run.
 
-Another good use case for run groups is for CI runs: usually we don’t run a single test or a single test suite to test our systems. You can expect some users to have dozens of suites being run during a CI pipeline. With run groups, all the suite runs from the same pipeline will be shown on the same screen, making it easier for users to understand what failed. 
+Another good use case for run groups is for CI runs: usually we don't run a single test or a single test suite to test our systems. You can expect some users to have dozens of suites being run during a CI pipeline. With run groups, all the suite runs from the same pipeline will be shown on the same screen, making it easier for users to understand what failed. 
 
 Last, but not least important, if multiple tests are run inside a run group, they will run in parallel and finish faster than if you use a test suite to organize your tests. (Test suites run sequentially, so for the next test to be run, the current test must finish executing, which can be pretty time consuming.)
 
@@ -112,6 +116,8 @@ tracetest run test -f test2.yaml --group my-pipeline
 
 With the `--group` argument, both tests would be run in parallel but would be seen inside the same run group.
 
+The CLI will by default wait for the group to finish running. Use the `-W` or `--skip-result-wait` flags to not wait for results and exit immediately after the run group has started.
+
 ## Running multiple tests inside the same group
 
 ```bash
@@ -136,7 +142,15 @@ tracetest run test -f test3.yaml --group my-group-id
 
 This new run will be part of the `my-group-id` group along with the `test1` and `test2` runs.
 
-## Running a suite and some tests inside the same group
+## Running multiple tests via `id` inside the same group and choosing the group id
+
+```bash
+tracetest run test --id testid1 --id testid2 --group my-group-id
+```
+
+You can also use the `--id` of a test saved in Tracetest instead of a test definition file.
+
+## Running a test suite and multiple tests inside the same run group
 
 ```bash
 tracetest run test -f suite.yaml -f test1.yaml -f test2.yaml
