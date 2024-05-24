@@ -1,0 +1,6 @@
+type: Invite
+spec:
+  id: pqx2w0PSR
+  to: pedro10@kubeshop.io
+  role: engineers
+  status: pending

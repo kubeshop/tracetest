@@ -1,0 +1,7 @@
+type: TestSuite
+spec:
+  id: test-suite
+  name: test-suite
+  description: ""
+  steps:
+    - google-test
