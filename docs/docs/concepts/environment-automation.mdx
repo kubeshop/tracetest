@@ -1,4 +1,17 @@
-# Environment Automation
+---
+id: environment-automation
+title: Environment Automation
+description: Tracetest uses the concept of Run Groups that encapsulate one or more runs. Each time a test run is executed in the Tracetest app, a run group is generated that can be found in the UI.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - test runs
+  - test run groups
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
 
 ## Resource Definition
 
@@ -72,7 +85,7 @@ You can find code examples [here](https://github.com/kubeshop/tracetest/tree/mai
 These files are in a folder called [“/resources”](https://github.com/kubeshop/tracetest/tree/main/examples/environment-automation/resources).
 :::
 
-```
+```yaml title="environment.yaml"
 type: Environment
 spec:
   name: my-demo-env
@@ -81,11 +94,11 @@ spec:
 ```
 The apply command for creating this environment:
 
-```
+```bash title="Terminal"
 tracetest apply environment -f ./path/to/environment.yaml
 ```
 
-You will now see the environment and tests in the Tracetest UX:
+You will now see the created environment and all resources from the `resources` folder in the Tracetest Web UI.
 
 ![Environments](../img/environments.png)
 
