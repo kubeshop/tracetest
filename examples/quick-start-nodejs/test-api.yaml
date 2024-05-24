@@ -1,7 +1,7 @@
 type: Test
 spec:
   id: W656Q0c4g
-  name: http://app:8080
+  name: Test API
   description: akadlkasjdf
   trigger:
     type: http
