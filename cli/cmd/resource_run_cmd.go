@@ -40,7 +40,7 @@ func init() {
 		PostRun: teardownCommand,
 	}
 
-	runCmd.Flags().StringSliceVarP(&runParams.DefinitionFiles, "file", "f", []string{}, "path to the definition file (can be defined multiple times)")
+	runCmd.Flags().StringSliceVarP(&runParams.DefinitionFiles, "file", "f", []string{}, "path to the definition file (you can define multiple paths by repeating this option), or alternatively, you can pass a directory.")
 	runCmd.Flags().StringSliceVarP(&runParams.IDs, "id", "", []string{}, "id of the resource to run (can be defined multiple times)")
 	runCmd.Flags().StringVarP(&runParams.VarsID, "vars", "", "", "variable set file or ID to be used")
 	runCmd.Flags().StringVarP(&runParams.RunGroupID, "group", "g", "", "Sets the Run Group ID for the run. This is used to group multiple runs together.")
