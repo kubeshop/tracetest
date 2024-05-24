@@ -18,10 +18,13 @@ func (c *Client) startHeartBeat(ctx context.Context) error {
 
 	go func() {
 		for range ticker.C {
+
+			c.mutex.Lock()
 			_, err := client.Ping(ctx, c.sessionConfig.AgentIdentification)
 			if err != nil {
 				log.Println("could not send ping: %w", err)
 			}
+			c.mutex.Unlock()
 			if isEndOfFileError(err) || isCancelledError(err) {
 				log.Println("ping stream closed")
 				return

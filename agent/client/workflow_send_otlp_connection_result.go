@@ -14,6 +14,8 @@ func (c *Client) SendOTLPConnectionResult(ctx context.Context, response *proto.O
 	response.AgentIdentification = c.sessionConfig.AgentIdentification
 	response.Metadata = telemetry.ExtractMetadataFromContext(ctx)
 
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	_, err := client.SendOTLPConnectionTestResult(ctx, response)
 	if err != nil {
 		return fmt.Errorf("could not send otlp connection result request: %w", err)

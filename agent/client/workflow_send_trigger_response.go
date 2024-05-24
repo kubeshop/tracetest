@@ -17,6 +17,8 @@ func (c *Client) SendTriggerResponse(ctx context.Context, response *proto.Trigge
 
 	response.Metadata = telemetry.ExtractMetadataFromContext(ctx)
 
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	_, err := client.SendTriggerResult(ctx, response)
 	if err != nil {
 		return fmt.Errorf("could not send trigger result request: %w", err)

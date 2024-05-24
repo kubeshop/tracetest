@@ -14,6 +14,8 @@ func (c *Client) SendTrace(ctx context.Context, response *proto.PollingResponse)
 	response.AgentIdentification = c.sessionConfig.AgentIdentification
 	response.Metadata = telemetry.ExtractMetadataFromContext(ctx)
 
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	_, err := client.SendPolledSpans(ctx, response)
 	if err != nil {
 		return fmt.Errorf("could not send polled spans result request: %w", err)
