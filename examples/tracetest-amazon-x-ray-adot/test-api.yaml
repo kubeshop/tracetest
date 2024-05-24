@@ -1,0 +1,17 @@
+type: Test
+spec:
+  id: W656Q0c4g
+  name: Test API
+  description: Test the App.
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: http://app:3000/http-request/
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" http.method="GET"]
+    assertions:
+    - attr:tracetest.span.duration  <  200ms

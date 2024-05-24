@@ -1,0 +1,13 @@
+type: Test
+spec:
+  id: twitter-test
+  name: Twitter
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: twitter.com
+      headers:
+        - key: Content-Type
+          value: application/json
+  skipTraceCollection: true

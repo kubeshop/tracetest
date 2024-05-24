@@ -208,7 +208,7 @@ services:
       retries: 120
 
   otel-collector:
-    image: otel/opentelemetry-collector:0.54.0
+    image: otel/opentelemetry-collector:0.100.0
     ports:
       - "55679:55679"
       - "4317:4317"
