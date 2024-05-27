@@ -34,7 +34,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":warning: Synthetic Monitoring failed for Pokeshop Demo. *Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+              "text": ":warning: Synthetic Monitoring failed for *Pokeshop Demo*. Pipeline: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
@@ -66,7 +66,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":warning: Synthetic Monitoring failed for Serverless Pokeshop Demo. *Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+              "text": ":warning: Synthetic Monitoring failed for *Serverless Pokeshop Demo*. Pipeline: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
@@ -98,7 +98,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":warning: Synthetic Monitoring failed for OTel Demo. *Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+              "text": ":warning: Synthetic Monitoring failed for *OTel Demo*. Pipeline: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
@@ -116,7 +116,7 @@ jobs:
         with:
           payload: |
             {
-              "text": ":red_circle: :loudspeaker: All synthetic monitoring crashed on production! *Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
+              "text": ":red_circle: :loudspeaker: *All synthetic monitoring crashed on production!* Pipeline: \n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
