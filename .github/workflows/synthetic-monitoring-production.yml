@@ -32,33 +32,9 @@ jobs:
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          # check the block kit builder docs to understand how it works
-          # and how to modify it: https://api.slack.com/block-kit
           payload: |
             {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": ":warning: Synthetic Monitoring Alert - Pokeshop Demo",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\nFailed"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
-                    }
-                  ]
-                }
-              ]
+              "text": ":warning: Synthetic Monitoring failed for *Pokeshop Demo*. Pipeline: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
@@ -88,33 +64,9 @@ jobs:
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          # check the block kit builder docs to understand how it works
-          # and how to modify it: https://api.slack.com/block-kit
           payload: |
             {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": ":warning: Synthetic Monitoring Alert - Serverless Pokeshop Demo",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\nFailed"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
-                    }
-                  ]
-                }
-              ]
+              "text": ":warning: Synthetic Monitoring failed for *Serverless Pokeshop Demo*. Pipeline: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
@@ -144,33 +96,9 @@ jobs:
         if: ${{ failure() }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          # check the block kit builder docs to understand how it works
-          # and how to modify it: https://api.slack.com/block-kit
           payload: |
             {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": ":warning: Synthetic Monitoring Alert - OTel Demo",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\nFailed"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
-                    }
-                  ]
-                }
-              ]
+              "text": ":warning: Synthetic Monitoring failed for *OTel Demo*. Pipeline: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
@@ -186,33 +114,9 @@ jobs:
         if: ${{ needs.pokeshop-trace-based-tests.result == 'failure' && needs.pokeshop-serverless-trace-based-tests.result == 'failure' && needs.otel-demo-trace-based-tests.result == 'failure' }}
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          # check the block kit builder docs to understand how it works
-          # and how to modify it: https://api.slack.com/block-kit
           payload: |
             {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": ":red_circle: :loudspeaker: All synthetic monitoring crashed on production! cc: @team-tracetest",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\nFailed"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Pipeline:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
-                    }
-                  ]
-                }
-              ]
+              "text": ":red_circle: :loudspeaker: *All synthetic monitoring crashed on production!* Pipeline: \n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View workflow>"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SYNTETIC_MONITORING_SLACK_WEBHOOK_URL }}
