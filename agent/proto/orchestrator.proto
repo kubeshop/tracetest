@@ -315,7 +315,7 @@ message SumoLogicConfig {
 
 message HttpClientSettings {
     string url = 1;
-    repeated HttpHeader headers = 2;
+    map<string, string> headers = 2;
     TLS tls = 3;
     HttpAuthentication authentication = 4;
 }
@@ -325,7 +325,7 @@ message GrpcClientSettings {
     int64 readBufferSize = 2;
     int64 writeBufferSize = 3;
     bool waitForReady = 4;
-    HttpHeader headers = 5;
+    map<string, string> headers = 5;
     string balancerName = 6;
     string compression = 7;
     TLS tls = 8;
