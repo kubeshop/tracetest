@@ -754,6 +754,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/organization-tokens",
+          label: "Organization Tokens",
+        },
+        {
+          type: "doc",
           id: "concepts/environment-tokens",
           label: "Environment Tokens",
         },
