@@ -1,0 +1,49 @@
+service: tracetest-layers
+frameworkVersion: "3"
+
+package:
+  include:
+    - collector.yaml
+
+plugins:
+  - serverless-plugin-typescript
+
+custom:
+  tableName: tracetest-pokemons
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment:
+    TABLE_NAME: ${self:custom.tableName}
+    OPENTELEMETRY_COLLECTOR_CONFIG_FILE: /var/task/collector.yaml
+    AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-handler
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "Fn::GetAtt": [PokemonsTable, Arn]
+
+functions:
+  api:
+    handler: src/handler.importPokemon
+    events:
+      - httpApi:
+          path: /import
+          method: post
+    layers:
+      - arn:aws:lambda:us-east-1:184161586896:layer:opentelemetry-nodejs-0_6_0:1
+      - arn:aws:lambda:us-east-1:184161586896:layer:opentelemetry-collector-amd64-0_6_0:1
+resources:
+  # DynamoDB
+  - ${file(resources/dynamodb.yml)}
