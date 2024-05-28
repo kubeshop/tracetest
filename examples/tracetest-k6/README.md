@@ -49,18 +49,6 @@ WARN[0000] The "TRACETEST_SERVER_URL" variable is not set. Defaulting to a blank
      scenarios: (100.00%) 1 scenario, 1 max VUs, 35s max duration (incl. graceful stop):
               * default: 1 looping VUs for 5s (gracefulStop: 30s)
 
-Goja stack:
-[RunGroup=#BlfA2YxIg, Status=failed] - https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/run/BlfA2YxIg
-[TotalRuns=1, SuccessfulRus=0, FailedRuns=1]
-[FAILED Request=GET - http://demo-api:8081/pokemon/import, TraceID=dc071892e690abea3133062b5d9aa298, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/import-pokemon-k6/run/11]
-[FAILED Request=GET - http://demo-api:8081/pokemon/import, TraceID=dc0718ffed90abea3162c624004519f2, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/import-pokemon-k6/run/12]
-[FAILED Request=GET - http://demo-api:8081/pokemon/import, TraceID=dc0718e9f590abea3134c5682550bbd5, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/import-pokemon-k6/run/13]
-[FAILED Request=GET - http://demo-api:8081/pokemon/import, TraceID=dc0718d3fd90abea31a06e8b40545477, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/import-pokemon-k6/run/14]
-[FAILED Request=GET - http://demo-api:8081/pokemon/import, TraceID=dc0718bd8591abea31c86274fb4b7e0d, RunState=FINISHED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/import-pokemon-k6/run/15]
-
-running (16.3s), 0/1 VUs, 5 complete and 0 interrupted iterations
-default ✓ [======================================] 1 VUs  5s
-ERRO[0020] a panic occurred during JS execution: Tracetest: 1 jobs failed
 ```
 
 ## What's Next?

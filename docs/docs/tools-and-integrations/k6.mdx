@@ -300,19 +300,11 @@ WARN[0000] The "TRACETEST_SERVER_URL" variable is not set. Defaulting to a blank
      scenarios: (100.00%) 1 scenario, 1 max VUs, 35s max duration (incl. graceful stop):
               * default: 1 looping VUs for 5s (gracefulStop: 30s)
 
-Goja stack:
-[RunGroup=#nE27wLbIR, Status=failed] - https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/run/nE27wLbIR
-[TotalRuns=5, SuccessfulRus=0, FailedRuns=5]
-[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc07188eb8bab0ea31d6f201f78aa048, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/11, LastError=cannot get trigger type "k6": triggerer type not found]
-[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc0718abc0bab0ea31ca7c85e07c24ff, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/12, LastError=cannot get trigger type "k6": triggerer type not found]
-[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc071896c8bab0ea31ce390164c93b9a, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/13, LastError=cannot get trigger type "k6": triggerer type not found]
-[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc071881d0bab0ea31b55c880c6665ba, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/14, LastError=cannot get trigger type "k6": triggerer type not found]
-[FAILED Request=GET - http://api:8081/pokemon/import, TraceID=dc0718ebd7bab0ea31059f337a355a79, RunState=TRIGGER_FAILED FailingSpecs=true, TracetestURL= https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/k6-tracetest-pokeshop-import-pokemon/run/15, LastError=cannot get trigger type "k6": triggerer type not found]
-
-running (06.3s), 0/1 VUs, 5 complete and 0 interrupted iterations
-default ✓ [======================================] 1 VUs  5s
-ERRO[0010] a panic occurred during JS execution: Tracetest: 5 jobs failed
 ```
+
+:::tip View these tests in our Demo environment
+[👉 Join our shared Pokeshop API Demo environment.](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept)
+:::
 
 ## What's Next?
 
