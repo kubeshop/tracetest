@@ -73,11 +73,26 @@ In the navigation panel on the left of the screen, click on **Variable Sets**.
 
 This will open the modal for the Variable Set's resource definition:
 
-![ Resource Definition Modal](../img/variable-set-resource-definition-modal.png)
+![Resource Definition Modal](../img/variable-set-resource-definition-modal.png)
 
 ## Provisioning Environments
 
-Tracetest allows the creation of an environment from the CLI and provisioning it with any type of resource, including tests, test suites, tracing backends, test runners, polling profiles, invites, tokens, etc.
+Tracetest allows the creation of an environment from the CLI and provisioning it with any type of resource. 
+
+The resources that can be provisioned in an environment are:
+
+- `analyzer`
+- `config`
+- `datastore`
+- `demo`
+- `environment`
+- `environmenttoken`
+- `invite`
+- `pollingprofile`
+- `test`
+- `testrunner`
+- `testsuite`
+- `variableset`
 
 Use this feature to quickly spin up new environments for integration testing or CI builds.
 
@@ -106,4 +121,18 @@ You will now see the created environment and all resources from the `resources` 
 ![Environment Tests](../img/environment-tests.png)
 
 
+## CI Environments
 
+Environments can be created in an automation/CI pipeline without user interaction.
+
+These environments can be generated for PRs or feature branches, when merging code, when deploying code to `QA`, `staging`, or beyond.
+
+### Role Access
+
+An automated environment can only be accessed by an `admin` or `owner` role. As a `member` role you will see a `Send Request` button when accessing the environment link. 
+
+![request access](https://res.cloudinary.com/djwdcmwdz/image/upload/v1716963408/docs/no-access-min_1_zdsuie.png)
+
+The `admin` and `owner` can grant access via an email they recieve after the request is clicked.
+
+![grant access email](https://res.cloudinary.com/djwdcmwdz/image/upload/v1716962956/docs/image_67_kgtqkp.png)
