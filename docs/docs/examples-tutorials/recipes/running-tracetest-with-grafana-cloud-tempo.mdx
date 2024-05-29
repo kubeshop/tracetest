@@ -47,6 +47,11 @@ This is a simple quick start on how to configure a Node.js app to use OpenTeleme
 - Create an [environment token](/concepts/environment-tokens).
 - Have access to the environment's [agent API key](/configuration/agent).
 
+**Grafana Cloud Account**
+
+- Sign up to [Grafana Cloud](https://grafana.com/auth/sign-in/).
+- [Create tokens for both reading and writing traces by following this guide](https://grafana.com/blog/2021/04/13/how-to-send-traces-to-grafana-clouds-tempo-service-with-opentelemetry-collector/).
+
 **Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
 ## Run This Quckstart Example
@@ -301,7 +306,6 @@ The `docker-compose.yaml` in the `tracetest` directory is configured with four s
 
 - **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
 - [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
-- [**Tempo**](https://grafana.com/oss/tempo/) - Grafana Tempo is an open source, easy-to-use, and high-scale distributed tracing backend.
 - [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
 
 ```yaml
@@ -355,13 +359,6 @@ services:
       - ./tracetest/collector.config.yaml:/otel-local-config.yaml
     depends_on:
       - tempo
-
-  tempo:
-    image: grafana/tempo:2.0.0
-    command: ["-config.file=/etc/tempo.yaml"]
-    volumes:
-      - ./tracetest/tempo.config.yaml:/etc/tempo.yaml
-
 ```
 
 Tracetest depends on Postgres, Tempo and the OpenTelemetry Collector. All three services require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
@@ -370,70 +367,6 @@ To start both the Node.js app and Tracetest, we will run this command:
 
 ```bash
 docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
-```
-
-The `tempo.config.yaml` file contains the initial config for running Tempo.
-
-The key takeaway is the server block.
-
-```yaml
-#...
-server:
-  http_listen_port: 3100
-  grpc_listen_port: 9095
-#...
-```
-
-We'll use the following code. Check out the full Tempo config for reference.
-
-```yaml
-auth_enabled: false
-
-server:
-  http_listen_port: 3100
-  grpc_listen_port: 9095
-
-distributor:
-  receivers:                           # this configuration will listen on all ports and protocols that tempo is capable of.
-    jaeger:                            # the receives all come from the OpenTelemetry collector.  more configuration information can
-      protocols:                       # be found there: https://github.com/open-telemetry/opentelemetry-collector/tree/master/receiver
-        thrift_http:                   #
-        grpc:                          # for a production deployment you should only enable the receivers you need!
-        thrift_binary:
-        thrift_compact:
-    zipkin:
-    otlp:
-      protocols:
-        http:
-        grpc:
-    opencensus:
-
-ingester:
-  trace_idle_period: 10s               # the length of time after a trace has not received spans to consider it complete and flush it
-  max_block_bytes: 1_000_000           # cut the head block when it hits this size or ...
-  #traces_per_block: 1_000_000
-  max_block_duration: 5m               #   this much time passes
-
-compactor:
-  compaction:
-    compaction_window: 1h              # blocks in this time window will be compacted together
-    max_compaction_objects: 1000000    # maximum size of compacted blocks
-    block_retention: 1h
-    compacted_block_retention: 10m
-
-storage:
-  trace:
-    backend: local                     # backend configuration to use
-    wal:
-      path: /tmp/tempo/wal            # where to store the the wal locally
-      #bloom_filter_false_positive: .05 # bloom filter false positive rate.  lower values create larger filters but fewer false positives
-      #index_downsample: 10             # number of traces per index record
-    local:
-      path: /tmp/tempo/blocks
-    pool:
-      max_workers: 100                 # the worker pool mainly drives querying, but is also used for polling the blocklist
-      queue_depth: 10000
-
 ```
 
 The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and defining the trace data store and exporter. The exporter is set to the OpenTelemetry Collector.
@@ -462,73 +395,58 @@ telemetry:
 server:
   telemetry:
     exporter: collector
-
 ```
 
-The `tracetest-provision.yaml` file defines the trace data store, set to Tempo, meaning the traces will be stored in Tempo and Tracetest will fetch them from Tempo when running tests.
+The `tracetest-provision.yaml` file defines the trace data store, set to Grafana Cloud Tempo, meaning the traces will be stored in Tempo and Tracetest will fetch them from Tempo when running tests.
 
 How does Tracetest fetch traces?
 
-Tracetest uses `tempo:9095` to connect to Tempo and fetch trace data.
+Tracetest uses `https://tempo-us-central1.grafana.net/tempo` to connect to Tempo and fetch trace data.
 
 ```yaml
 # tracetest-provision.yaml
 
 ---
-type: PollingProfile
-spec:
-  name: Default
-  strategy: periodic
-  default: true
-  periodic:
-    retryDelay: 5s
-    timeout: 10m
-
----
 type: DataStore
 spec:
-  name: Tempo
+  name: Grafana Tempo Cloud
   type: tempo
   tempo:
-    type: grpc
-    grpc:
-      endpoint: tempo:9095
-      tls:
-        insecure: true
+    type: http
+    http:
+      url: https://tempo-us-central1.grafana.net/tempo
+      headers:
+        Authorization: Basic <grafana_auth_hash>
+        # https://grafana.com/blog/2021/04/13/how-to-send-traces-to-grafana-clouds-tempo-service-with-opentelemetry-collector/
 
 ```
 
 How do traces reach Tempo?
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tempo's OTLP gRPC endpoint `tempo:4317`.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tempo's OTLP HTTP endpoint `tempo-us-central1.grafana.net:443`.
 
 ```yaml
 # collector.config.yaml
+
 receivers:
   otlp:
     protocols:
       grpc:
       http:
 
-processors:
-  batch:
-    timeout: 100ms
-
 exporters:
   logging:
-    loglevel: debug
-  otlp/1:
-    endpoint: tempo:4317
-    tls:
-      insecure: true
+    verbosity: detailed
+  otlp:
+    endpoint: tempo-us-central1.grafana.net:443
+    headers:
+      authorization: Basic <base64 encoded username:password>
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp/1]
-
+      exporters: [logging, otlp]
 ```
 
 ## Run Both the Node.js App and Tracetest
