@@ -1,0 +1,27 @@
+type: Test
+spec:
+  id: MnZ_kD7Ig
+  name: Pokeshop - Import
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: http://demo-api:8081/pokemon/import
+      body: "{\"id\":837483}"
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET" http.method="GET"]
+    name: Validate that the external API does not contain an exception.
+    assertions:
+    - attr:span.events not-contains "exception"
+  - selector: span[tracetest.span.type="http"]
+    name: "All HTTP Spans: Status  code is 200"
+    assertions:
+    - attr:http.status_code = 200
+  - selector: span[tracetest.span.type="database"]
+    name: "All Database Spans: Processing time is less than 100ms"
+    assertions:
+    - attr:tracetest.span.duration < 100ms
