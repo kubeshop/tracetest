@@ -1,0 +1,8 @@
+type: TestSuite
+spec:
+  id: pokeshop-demo-test-suite
+  name: Pokeshop Demo Test Suite
+  steps:
+    - ../tests/add-pokemon.yaml
+    - ../tests/import-pokemon.yaml
+    - ../tests/list-pokemons.yaml
