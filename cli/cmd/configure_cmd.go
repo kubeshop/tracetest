@@ -36,7 +36,7 @@ var configureCmd = &cobra.Command{
 			flags.ServerURL = configParams.ServerURL
 		}
 
-		if flagProvided(cmd, "token") {
+		if configParams.Token != "" {
 			flags.Token = configParams.Token
 		}
 
@@ -62,13 +62,13 @@ var deprecatedEndpoint string
 func init() {
 	configureCmd.PersistentFlags().BoolVarP(&configParams.Global, "global", "g", false, "configuration will be saved in your home dir")
 
-	configureCmd.PersistentFlags().StringVarP(&configParams.Token, "token", "t", "", "set authetication with token, so the CLI won't ask you for authentication")
+	configureCmd.PersistentFlags().StringVarP(&configParams.Token, "token", "t", defaultToken, "set authetication with token, so the CLI won't ask you for authentication")
 	configureCmd.PersistentFlags().StringVarP(&configParams.EnvironmentID, "environment", "", "", "set environmentID, so the CLI won't ask you for it")
 	configureCmd.PersistentFlags().StringVarP(&configParams.OrganizationID, "organization", "", "", "set organizationID, so the CLI won't ask you for it")
 
 	configureCmd.PersistentFlags().BoolVarP(&configParams.CI, "ci", "", false, "if cloud is used, don't ask for authentication")
 
-	configureCmd.PersistentFlags().StringVarP(&deprecatedEndpoint, "endpoint", "e", "", "set the value for the endpoint, so the CLI won't ask for this value")
+	configureCmd.PersistentFlags().StringVarP(&deprecatedEndpoint, "endpoint", "e", defaultEndpoint, "set the value for the endpoint, so the CLI won't ask for this value")
 	configureCmd.PersistentFlags().MarkDeprecated("endpoint", "use --server-url instead")
 	configureCmd.PersistentFlags().MarkShorthandDeprecated("e", "use --server-url instead")
 

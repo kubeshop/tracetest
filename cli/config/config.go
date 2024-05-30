@@ -29,6 +29,7 @@ type Config struct {
 	OrganizationID    string `yaml:"organizationID,omitempty"`
 	EnvironmentID     string `yaml:"environmentID,omitempty"`
 	Token             string `yaml:"token,omitempty"`
+	IsOrgToken        bool   `yaml:"isOrgToken,omitempty"`
 	Jwt               string `yaml:"jwt,omitempty"`
 	AgentApiKey       string `yaml:"-"`
 	EndpointOverriden bool   `yaml:"-"`

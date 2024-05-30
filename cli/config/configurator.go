@@ -329,6 +329,9 @@ func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
 	if environmentId != "" {
 		c.logger.Debug("Using environment ID from token", zap.String("environmentID", environmentId))
 		c.flags.EnvironmentID = environmentId
+	} else {
+		c.logger.Debug("Environment ID not found in token, using default")
+		cfg.IsOrgToken = true
 	}
 
 	return cfg, nil
@@ -374,7 +377,7 @@ func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config
 	}
 
 	cfg.EnvironmentID = c.flags.EnvironmentID
-	if cfg.EnvironmentID == "" && c.flags.AgentApiKey == "" {
+	if cfg.EnvironmentID == "" && c.flags.AgentApiKey == "" && !cfg.IsOrgToken {
 		c.logger.Debug("Environment ID not found, prompting for environment")
 		envID, err := c.environmentSelector(ctx, cfg, prev)
 		if err != nil {
