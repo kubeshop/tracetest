@@ -1,0 +1,21 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+exporters:
+  logging:
+    verbosity: detailed
+  otlp:
+    endpoint: tempo-us-central1.grafana.net:443
+    headers:
+      authorization: Basic <base64 encoded username:password>
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging, otlp]

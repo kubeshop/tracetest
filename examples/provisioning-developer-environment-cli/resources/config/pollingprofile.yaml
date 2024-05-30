@@ -1,0 +1,10 @@
+type: PollingProfile
+spec:
+  id: pokeshop-demo
+  name: pokeshop-demo
+  default: true
+  strategy: periodic
+  periodic:
+    retryDelay: 5s
+    timeout: 1m
+    selectorMatchRetries: 3

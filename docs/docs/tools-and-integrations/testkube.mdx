@@ -139,9 +139,9 @@ spec:
 
 Execute the following command to create the test executor object in Testkube. Do not forget to provide the path to your Tracetest definition file using the `--file` argument, and also the following variables:
 
-- `TRACETEST_TOKEN`: your [environment token](../concepts/environment-token.mdx).
-- `TRACETEST_ENVIRONMENT`: your [environment id](../concepts/environments.mdx).
-- `TRACETEST_ORGANIZATION`: your [organization id](../concepts/organizations.mdx).
+- `TRACETEST_TOKEN`: your [environment token](/concepts/environment-tokens).
+- `TRACETEST_ENVIRONMENT`: your [environment id](/concepts/environments).
+- `TRACETEST_ORGANIZATION`: your [organization id](/concepts/organizations).
 
 ```bash
 kubectl testkube create test --file my/file/location.yaml --type "tracetest/test" --name pokeshop-tracetest-test --variable TRACETEST_TOKEN=tracetest-token --variable TRACETEST_ENVIRONMENT=tracetest-environment-id --variable TRACETEST_ORGANIZATION=tracetest-organization-id

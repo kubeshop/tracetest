@@ -1,0 +1,7 @@
+type: Environment
+spec:
+  id: automated-pokeshop-demo-2
+  name: Automated Pokeshop Demo
+  agentConfiguration:
+    serverless: true
+  resources: ./resources
