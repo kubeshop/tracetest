@@ -1,0 +1,11 @@
+type: DataStore
+spec:
+  id: tracing-backend
+  name: jaeger
+  type: jaeger
+  default: true
+  jaeger:
+    endpoint: localhost:16685
+    tls:
+      insecure: true
+      settings: {}
