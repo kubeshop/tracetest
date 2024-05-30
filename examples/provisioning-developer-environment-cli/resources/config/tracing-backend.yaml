@@ -1,0 +1,11 @@
+type: DataStore
+spec:
+  id: tracing-backend
+  name: jaeger
+  type: jaeger
+  default: true
+  jaeger:
+    endpoint: demo-pokeshop-jaeger-query.demo:16685
+    tls:
+      insecure: true
+      settings: {}
