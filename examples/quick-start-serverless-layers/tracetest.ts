@@ -40,8 +40,8 @@ const definition: TestResource = {
     },
     specs: [
       {
-        selector: 'span[tracetest.span.type="database"]',
-        name: 'All Database Spans: Processing time is less than 100ms',
+        selector: 'span[name contains "DynamoDB"]',
+        name: 'All DynamoDB Spans: Processing time is less than 100ms',
         assertions: ['attr:tracetest.span.duration < 100ms'],
       },
       {
