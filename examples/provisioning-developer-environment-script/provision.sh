@@ -11,5 +11,8 @@ tracetest configure --token $TRACETEST_TOKEN
 ENVIRONMENT_ID=$(tracetest apply environment -f environment.yaml --output json | jq -r '.spec.id')
 echo "Environment ID: $ENVIRONMENT_ID"
 
+# switching to the environment
+tracetest configure --environment $ENVIRONMENT_ID
+
 # start agent
 tracetest start --api-key $TRACETEST_TOKEN --environment $ENVIRONMENT_ID

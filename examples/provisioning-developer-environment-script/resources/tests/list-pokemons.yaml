@@ -16,11 +16,11 @@ spec:
     name: GET /pokemon endpoint was called and returned valid data
     assertions:
     - attr:http.status_code  =  200
-  - selector: span[tracetest.span.type="database" name="count pokeshop.pokemon" db.system="postgres" db.name="pokeshop" db.user="ashketchum" db.operation="count" db.sql.table="pokemon"]
+  - selector: span[tracetest.span.type="database" name="count postgres.pokemon" db.system="postgres" db.name="postgres" db.user="postgres" db.operation="count" db.sql.table="pokemon"]
     name: A count operation was triggered on database
     assertions:
     - attr:db.operation = "count"
-  - selector: span[tracetest.span.type="database" name="findMany pokeshop.pokemon" db.system="postgres" db.name="pokeshop" db.user="ashketchum" db.operation="findMany" db.sql.table="pokemon"]
+  - selector: span[tracetest.span.type="database" name="findMany postgres.pokemon" db.system="postgres" db.name="postgres" db.user="postgres" db.operation="findMany" db.sql.table="pokemon"]
     name: A select operation was triggered on database
     assertions:
     - attr:db.operation = "findMany"

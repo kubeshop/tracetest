@@ -27,7 +27,7 @@ spec:
     name: The request sent to API is valid
     assertions:
     - attr:validation.is_valid = "true"
-  - selector: span[tracetest.span.type="database" name="create pokeshop.pokemon" db.operation="create" db.sql.table="pokemon"]
+  - selector: span[tracetest.span.type="database" name="create postgres.pokemon" db.operation="create" db.sql.table="pokemon"]
     name: A Pokemon was inserted on database
     assertions:
     - attr:db.result | json_path '$.imageUrl'  =  "https://assets.pokemon.com/assets/cms2/img/pokedex/full/052.png"
