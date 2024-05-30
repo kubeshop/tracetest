@@ -1,0 +1,14 @@
+type: Test
+spec:
+  id: 3akbV7yIR
+  name: Test Nodejs API
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: http://app:8080
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+    assertions:
+    - attr:http.status_code  =  200
+    - attr:tracetest.span.duration  <  500ms
