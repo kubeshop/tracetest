@@ -77,7 +77,7 @@ func (t *kafkaTriggerer) getConfig(request *KafkaRequest) kafka.Config {
 const TriggerTypeKafka TriggerType = "kafka"
 
 type KafkaRequest struct {
-	BrokerURLs      []string             `json:"brokerUrls"`
+	BrokerURLs      []string             `expr_enabled:"true" json:"brokerUrls"`
 	Topic           string               `expr_enabled:"true" json:"topic"`
 	Headers         []KafkaMessageHeader `json:"headers"`
 	Authentication  *KafkaAuthenticator  `json:"authetication,omitempty"`
