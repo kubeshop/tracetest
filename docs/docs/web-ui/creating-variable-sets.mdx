@@ -43,20 +43,3 @@ To export a YAML definition of a variable set, click **Variable Set Definition**
 Variable Sets accept secrets.  A variable can be a `secret` or a `raw` variable in the UI. 
 
 ![Create Variable Set Values](../img/create-variable-set-values.png)
-
-A VariableSet with a secret value can be registered via the CLI like this:
-
-```
-type: VariableSet
-spec:
-  id: test-1
-  name: Test 1
-  description: test
-  values:
-  - key: SOME_SECRET
-    value: my-precious
-    type: secret
-  - key: NO_SO_SECRET
-    value: aha!
-    type: raw
-```
