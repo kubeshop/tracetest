@@ -1,0 +1,5 @@
+type: Environment
+spec:
+  id: automated-pokeshop-demo-local
+  name: Automated Pokeshop Demo Local
+  resources: ./resources

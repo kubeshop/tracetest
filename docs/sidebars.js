@@ -369,6 +369,11 @@ const sidebars = {
               id: "examples-tutorials/recipes/provisioning-developer-environment-cli",
               label: "Provisioning Developer Environment with CLI",
             },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/provisioning-developer-environment-script",
+              label: "Provisioning Developer Environment with a Script",
+            },
           ],
         },
       ],
