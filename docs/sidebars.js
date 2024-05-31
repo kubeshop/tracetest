@@ -360,6 +360,17 @@ const sidebars = {
             },
           ],
         },
+        {
+          type: "category",
+          label: "Automation & Provisioning",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/provisioning-developer-environment-cli",
+              label: "Provisioning Developer Environment with CLI",
+            },
+          ],
+        },
       ],
     },
     {
