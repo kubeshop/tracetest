@@ -11,7 +11,9 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
-A common use case for tests is to assert the same behavior across multiple environments (dev, staging, and production, for example). To make sure all of these environments will have the same behavior, it is important that the tests executed against those environments test the same aspects. To reduce the risks of diverging tests, Tracetest allows you to organize different environments configurations using global objects called **Variable Sets**.
+A common use case for tests is to assert the same behavior across multiple environments (dev, staging, and production, for example). To make sure all of these environments will have the same behavior, it is important that the tests executed against those environments test the same aspects.
+
+To reduce the risks of diverging tests, Tracetest allows you to organize different environments configurations using global objects called **Variable Sets**.
 
 :::tip
 For details on creating and editing varaible sets in the CLI, please visit [CLI Creating Variable Sets](/cli/creating-variable-sets).
@@ -20,6 +22,8 @@ For details on creating and editing varaible sets in the CLI, please visit [CLI 
 :::tip
 For details on creating and editing varaible sets in the Web UI, please visit [Web UI Creating Variable Sets](/web-ui/creating-variable-sets).
 :::
+
+## Secrets Management
 
 Variable Sets can accept secrets. A variable can be a `secret` or a `raw` variable in the Web UI and CLI. 
 
