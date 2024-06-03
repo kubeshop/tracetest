@@ -1,0 +1,17 @@
+type: Test
+spec:
+  id: W656Q0c42
+  name: Test API 2
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080
+      method: GET
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+    assertions:
+    - attr:http.status_code  =  404
+    - attr:tracetest.span.duration  <  3500ms
