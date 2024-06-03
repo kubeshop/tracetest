@@ -1,0 +1,23 @@
+version: '3'
+services:
+  app:
+    image: tracetest-run-groups
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    command:
+      - "--mode=verbose"
+    environment:
+      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+    ports:
+      - 4317:4317
+      - 4318:4318
