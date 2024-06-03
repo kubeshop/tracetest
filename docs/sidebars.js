@@ -448,6 +448,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "ci-cd-automation/github-actions-pipeline-with-secrets",
+          label: "Github Actions Pipeline with Secrets",
+        },
+        {
+          type: "doc",
           id: "ci-cd-automation/testkube-pipeline",
           label: "Testkube Kubernetes-native Test Runner Pipeline",
         },
