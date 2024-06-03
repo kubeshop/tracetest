@@ -1386,13 +1386,13 @@ flowchart TD
 
 In previous examples, It was always used the equality comparator (`=`), however, the selector language supports a number of comparisons:
 
-* = (equal)
-* != (not equal)
-* < (less than)
-* <= (less or equal to)
-* > (greater than)
-* >= (greater or equal to)
-* contains
-* not-contains
-
-> Both `contains` and `not-contains` are operators for string comparison. So both sides of the operation must be strings
+| Operation     | Description                                                      |
+| :------------ | :--------------------------------------------------------------- |
+| `=`           | both values are equal                                            |
+| `!=`          | both values are different                                        |
+| `<`           | value on the left is less than the value on the right            |
+| `<=`          | value on the left is less or equal to the value on the right     |
+| `>`           | value on the left is greater than the value on the right         |
+| `>=`          | value on the left is greater or equal to the value on the right  |
+| `contains`    | string on the left contains the string on the right              |
+| `not-contains`| string on the left does not contain the string on the right      |
