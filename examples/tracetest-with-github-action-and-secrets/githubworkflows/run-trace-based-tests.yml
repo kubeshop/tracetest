@@ -1,0 +1,57 @@
+name: Run trace-based tests
+
+on:
+  # runs on every push to main
+  push:
+    branches: [main]
+
+  # allows run manually via Actions tab on Github
+  workflow_dispatch:
+
+env:
+  TRACETEST_API_KEY: ${{secrets.TRACETEST_API_KEY}}
+
+jobs:
+  run-trace-based-tests:
+    name: Run trace based tests for Payment Ecosystem
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure Tracetest CLI
+        uses: kubeshop/tracetest-github-action@v1
+        with:
+          token: ${{secrets.TRACETEST_CLI_TOKEN}}
+
+      - name: Run APIs locally with docker compose
+        run: |
+          docker-compose up -d
+          docker compose logs -f > /tmp/docker-log &
+
+      - name: Configure Tracing Backend
+        run: |
+          tracetest datastore apply --file ./tracing-backend.yaml
+
+      - name: Inject secrets as a variable set on Tracetest
+        run: |
+          cat << EOF > vars.yaml
+          type: VariableSet
+          spec:
+            id: tracetesting-vars
+            name: AuthKeys for test
+            description: Variables used in basic auth for my API
+            values:
+            - key: USER
+              value: admin
+            - key: PASSWORD
+              value: ${{secrets.API_SECRET_PASSWORD}}
+              type: secret
+          EOF
+
+          tracetest apply variableset --file ./vars.yaml
+
+      - name: Run trace-based tests
+        run: |
+          tracetest run test --vars tracetesting-vars --file ./trace-based-test.yaml
