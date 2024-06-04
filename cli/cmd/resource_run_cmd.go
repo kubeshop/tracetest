@@ -20,7 +20,7 @@ var (
 	runCmd    *cobra.Command
 )
 
-const ExitCodeResourceNotFound = -1
+const ExitCodeResourceNotFound = 3
 
 func init() {
 	runCmd = &cobra.Command{

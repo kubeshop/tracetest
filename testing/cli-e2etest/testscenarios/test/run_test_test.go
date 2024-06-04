@@ -230,6 +230,9 @@ func TestRunTestWithInvalidArgs(t *testing.T) {
 	cliConfig := env.GetCLIConfigPath(t)
 
 	t.Run("should return an error message", func(t *testing.T) {
+		// instantiate require with testing helper
+		require := require.New(t)
+
 		// Given I am a Tracetest CLI user
 		// And I have my server recently created
 		// And the datasource is already set
@@ -240,6 +243,9 @@ func TestRunTestWithInvalidArgs(t *testing.T) {
 
 		command := fmt.Sprintf("run test -f %s", testFile)
 		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
-		helpers.RequireExitCodeEqual(t, result, 1)
+		helpers.RequireExitCodeEqual(t, result, 3)
+
+		// checks if the error message is valid
+		require.Contains(result.StdOut, "Invalid definition file found, stopping execution")
 	})
 }
