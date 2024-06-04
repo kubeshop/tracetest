@@ -58,3 +58,8 @@ func IsFilePathToRelativeDir(path, dir string) bool {
 
 	return IsFilePath(fullPath)
 }
+
+func IsExistingFile(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
