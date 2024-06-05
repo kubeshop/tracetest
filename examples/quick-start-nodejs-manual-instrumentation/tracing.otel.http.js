@@ -24,7 +24,16 @@ provider.register()
 
 const sdk = new opentelemetry.NodeSDK({
   traceExporter: exporter,
-  instrumentations: [getNodeAutoInstrumentations()],
+  instrumentations: [
+    getNodeAutoInstrumentations({
+      '@opentelemetry/instrumentation-fs': {
+        enabled: false
+      },
+      '@opentelemetry/instrumentation-net': {
+        enabled: false
+      },
+    })
+  ],
   serviceName: 'quick-start-nodejs-manual-instrumentation'
 })
 sdk.start()
