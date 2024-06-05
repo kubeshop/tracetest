@@ -275,6 +275,9 @@ func isConnectionError(err error, req request) bool {
 		// From time to time, the server can start sending those errors to the
 		// agent. This mitigates the risk of an agent getting stuck in an error state
 		"unexpected HTTP status code received from server: 500",
+
+		// This is an experimental idea to handle the multiple header error
+		"SendHeader called multiple times",
 	}
 	for _, possibleErr := range possibleErrors {
 		if strings.Contains(err.Error(), possibleErr) {
