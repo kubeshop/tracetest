@@ -9,6 +9,7 @@ import (
 	"net/http/httputil"
 
 	"github.com/Jeffail/gabs/v2"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
 )
@@ -56,7 +57,7 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 		return "", err
 	}
 
-	c.logger.Debug("Applying resource",
+	c.logger.Debug("Resource Apply",
 		zap.String("format", requestedFormat.String()),
 		zap.String("resource", c.resourceName),
 		zap.String("inputFile", inputFile.AbsPath()),
@@ -71,9 +72,9 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 		}
 	}
 
-	c.logger.Debug("preprocessed",
-		zap.String("inputFile", inputFile.AbsPath()),
-		zap.String("contents", string(inputFile.Contents())),
+	c.logger.Debug("Ressource Apply",
+		zap.String("preprocessed.inputFile", inputFile.AbsPath()),
+		zap.String("preprocessed.contents", string(inputFile.Contents())),
 	)
 
 	prefix := ""
@@ -112,9 +113,11 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 	)
 
 	resp, err := c.client.do(req)
+	c.logger.Debug("Resource Apply", zap.String("request", spew.Sdump(req)))
 	if err != nil {
 		return "", fmt.Errorf("cannot execute Apply request: %w", err)
 	}
+	c.logger.Debug("Resource Apply", zap.String("response.status", resp.Status))
 	defer resp.Body.Close()
 
 	d, _ = httputil.DumpResponse(resp, true)
@@ -133,7 +136,7 @@ func (c Client) Apply(ctx context.Context, inputFile fileutil.File, requestedFor
 		return "", fmt.Errorf("cannot read Apply response: %w", err)
 	}
 
-	c.logger.Debug("file has id?", zap.Bool("hasID", originalInputFile.HasID()))
+	c.logger.Debug("Resource Apply", zap.Bool("hasID", originalInputFile.HasID()), zap.String("response.body", string(body)))
 	// if the original file doesn't have an ID, we need to get the server generated ID from the response
 	// and write it to the original file
 	if !originalInputFile.HasID() {

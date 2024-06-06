@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/davecgh/go-spew/spew"
+	"go.uber.org/zap"
 )
 
 type ListOption struct {
@@ -43,14 +46,15 @@ func (c Client) List(ctx context.Context, opt ListOption, format Format) (string
 	}
 
 	resp, err := c.client.do(req)
+	c.logger.Debug("Resource List", zap.String("request", spew.Sdump(req)))
 	if err != nil {
 		return "", fmt.Errorf("cannot execute List request: %w", err)
 	}
 	defer resp.Body.Close()
+	c.logger.Debug("Resource List", zap.String("response.status", resp.Status))
 
 	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
-
 		return "", fmt.Errorf("could not list resource: %w", err)
 	}
 
@@ -59,5 +63,6 @@ func (c Client) List(ctx context.Context, opt ListOption, format Format) (string
 		return "", fmt.Errorf("cannot read List response: %w", err)
 	}
 
+	c.logger.Debug("Resource List", zap.String("response.body", string(body)))
 	return format.Format(string(body), c.options.tableConfig, c.options.listPath)
 }

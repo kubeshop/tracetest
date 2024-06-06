@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
+	"github.com/davecgh/go-spew/spew"
 	"go.uber.org/zap"
 )
 
@@ -36,6 +37,7 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 	)
 
 	resp, err := c.client.do(req)
+	c.logger.Debug("Resource Get", zap.String("request", spew.Sdump(req)))
 	if err != nil {
 		return "", fmt.Errorf("cannot execute Get request: %w", err)
 	}
@@ -46,6 +48,7 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 		zap.String("response", string(d)),
 	)
 
+	c.logger.Debug("Resource Get", zap.String("response.status", resp.Status))
 	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
 		if errors.Is(err, ErrNotFound) {
@@ -60,5 +63,6 @@ func (c Client) Get(ctx context.Context, id string, format Format) (string, erro
 		return "", fmt.Errorf("cannot read Get response: %w", err)
 	}
 
+	c.logger.Debug("Resource Get", zap.String("response.body", string(body)))
 	return format.Format(string(body), c.options.tableConfig, c.options.listPath)
 }

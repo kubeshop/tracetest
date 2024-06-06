@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/davecgh/go-spew/spew"
+	"go.uber.org/zap"
 )
 
 const VerbDelete Verb = "delete"
@@ -28,10 +31,12 @@ func (c Client) Delete(ctx context.Context, id string, format Format) (string, e
 	}
 
 	resp, err := c.client.do(req)
+	c.logger.Debug("Resource Delete", zap.String("request", spew.Sdump(req)))
 	if err != nil {
 		return "", fmt.Errorf("cannot execute Delete request: %w", err)
 	}
 	defer resp.Body.Close()
+	c.logger.Debug("Resource Delete", zap.String("response.status", resp.Status))
 
 	if !isSuccessResponse(resp) {
 		err := parseRequestError(resp, format)
@@ -50,5 +55,6 @@ func (c Client) Delete(ctx context.Context, id string, format Format) (string, e
 		msg = fmt.Sprintf("%s successfully deleted", ucfirst)
 	}
 
+	c.logger.Debug("Resource Delete", zap.String("response.msg", msg))
 	return msg, nil
 }

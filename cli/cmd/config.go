@@ -130,7 +130,7 @@ func validateConfig(cmd *cobra.Command, args []string) {
 }
 
 func setupLogger(cmd *cobra.Command, args []string) {
-	cliLogger = cmdutil.GetLogger(cmdutil.WithVerbose(verbose))
+	*cliLogger = *cmdutil.GetLogger(cmdutil.WithVerbose(verbose))
 }
 
 func teardownCommand(cmd *cobra.Command, args []string) {
