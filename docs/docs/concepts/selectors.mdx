@@ -1381,3 +1381,18 @@ flowchart TD
     class F parentSpan
     class G selectedSpan
 ```
+
+## Supported comparisons
+
+In previous examples, It was always used the equality comparator (`=`), however, the selector language supports a number of comparisons:
+
+| Operation     | Description                                                      |
+| :------------ | :--------------------------------------------------------------- |
+| `=`           | both values are equal                                            |
+| `!=`          | both values are different                                        |
+| `<`           | value on the left is less than the value on the right            |
+| `<=`          | value on the left is less or equal to the value on the right     |
+| `>`           | value on the left is greater than the value on the right         |
+| `>=`          | value on the left is greater or equal to the value on the right  |
+| `contains`    | string on the left contains the string on the right              |
+| `not-contains`| string on the left does not contain the string on the right      |

@@ -39,6 +39,11 @@ func TestSimpleSelectorBuilder(t *testing.T) {
 			Expression:    "span.tracetest.span.type=\"http\"",
 			ShouldSucceed: false,
 		},
+		{
+			Name:          "Selector with invalid syntax",
+			Expression:    "span[attr.bool=true]",
+			ShouldSucceed: true,
+		},
 	}
 
 	for _, testCase := range testCases {
