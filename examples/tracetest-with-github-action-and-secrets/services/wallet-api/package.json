@@ -10,9 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@opentelemetry/auto-instrumentations-node": "^0.37.1",
+    "@opentelemetry/auto-instrumentations-node": "^0.46.1",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.40.0",
-    "@opentelemetry/sdk-node": "^0.40.0",
+    "@opentelemetry/sdk-node": "^0.51.1",
     "express": "^4.19.2"
   }
 }
