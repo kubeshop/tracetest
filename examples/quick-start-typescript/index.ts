@@ -5,12 +5,12 @@ import { deleteDefinition, importDefinition } from './definitions';
 
 config();
 
-const { TRACETEST_API_TOKEN = '', POKESHOP_DEMO_URL = 'http://api:8081' } = process.env;
+const { TRACETEST_API_TOKEN = '', POKESHOP_DEMO_URL = 'http://api:8081', ENVIRONMENT_ID = '' } = process.env;
 
 const baseUrl = `${POKESHOP_DEMO_URL}/pokemon`;
 
 const main = async () => {
-  const tracetest = await Tracetest(TRACETEST_API_TOKEN);
+  const tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN, environmentId: ENVIRONMENT_ID });
 
   const getLastPokemonId = async (): Promise<number> => {
     const response = await fetch(baseUrl);
@@ -35,12 +35,7 @@ const main = async () => {
     await Promise.all(
       new Array(5).fill(0).map(async (_, index) => {
         console.log(`ℹ Importing pokemon ${startId + index + 1}`);
-        const run = await tracetest.runTest(test, { variables: getVariables(`${startId + index + 1}`) });
-        const updatedRun = await run.wait();
-        const pokemonId = updatedRun.outputs?.find((output) => output.name === 'DATABASE_POKEMON_ID')?.value || '';
-
-        console.log(`ℹ Adding pokemon ${pokemonId} to the list`);
-        importedPokemonList.push(pokemonId);
+        await tracetest.runTest(test, { variables: getVariables(`${startId + index + 1}`) });
       })
     );
   };
@@ -52,7 +47,6 @@ const main = async () => {
       importedPokemonList.map(async (pokemonId) => {
         console.log(`ℹ Deleting pokemon ${pokemonId}`);
         const run = await tracetest.runTest(test, { variables: getVariables(pokemonId) });
-        run.wait();
       })
     );
   };
