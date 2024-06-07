@@ -13,18 +13,20 @@ services:
         condition: service_healthy
   tracetest-agent:
     environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-      TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
-      TRACETEST_SERVER_URL: ${TRACETEST_SERVER_URL}
+      TRACETEST_API_KEY: ${TRACETEST_API_TOKEN}
+      ENVIRONMENT_ID: ${ENVIRONMENT_ID}
     image: kubeshop/tracetest-agent:latest
+    command:
+      - '--environment'
+      - ${ENVIRONMENT_ID}
     networks:
       default: null
 
   # pokeshop demo services
   postgres:
     image: postgres:14
-    ports:
-      - 5434:5432
+    # ports:
+    #   - 5434:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -37,8 +39,8 @@ services:
 
   cache:
     image: redis:6
-    ports:
-      - 6379:6379
+    # ports:
+    #   - 6379:6379
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 1s
@@ -48,9 +50,9 @@ services:
   queue:
     image: rabbitmq:3.12
     restart: unless-stopped
-    ports:
-      - 5672:5672
-      - 15672:15672
+    # ports:
+    #   - 5672:5672
+    #   - 15672:15672
     healthcheck:
       test: rabbitmq-diagnostics -q check_running
       interval: 1s
@@ -59,10 +61,10 @@ services:
 
   jaeger:
     image: jaegertracing/all-in-one:latest
-    ports:
-      - 14250:14250
-      - 16685:16685
-      - 16686:16686
+    # ports:
+    #   - 14250:14250
+    #   - 16685:16685
+    #   - 16686:16686
     environment:
       - COLLECTOR_ZIPKIN_HOST_PORT=:9411
       - COLLECTOR_OTLP_ENABLED=true
@@ -77,11 +79,11 @@ services:
     restart: unless-stopped
     extra_hosts:
       - 'host.docker.internal:host-gateway'
-    ports:
-      - 55679:55679
-      - 8888:8888
-      - 4317:4317
-      - 4318:4318
+    # ports:
+    #   - 55679:55679
+    #   - 8888:8888
+    #   - 4317:4317
+    #   - 4318:4318
     command:
       - '--config'
       - '/otel-local-config.yaml'
