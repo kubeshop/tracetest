@@ -13,8 +13,8 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 This page showcases how to create and edit variable sets with the CLI.
 
-:::info
-For details on creating and editing variable sets in the Web UI, please visit [Web UI Creating Variable Sets](/web-ui/creating-variable-sets).
+:::info 
+For details on creating and editing variable sets in the Web UI, please visit Web UI Creating Variable Sets. 
 :::
 
 :::tip
@@ -23,7 +23,7 @@ For details on creating and editing variable sets in the Web UI, please visit [W
 
 Just like Data Stores, you can also manage your variable sets using the CLI and definition files.
 
-A definition  file looks like the following:
+A definition file looks like the following:
 
 ```yaml
 type: VariableSet
@@ -47,9 +47,9 @@ tracetest apply variableset -f <variableset.yaml>
 
 ## Using Secrets in Variable Sets
 
-A VariableSet with secret values can be registered via the CLI.
+A VariableSet with a secret values can be registered via the CLI like this:
 
-```yaml
+```
 type: VariableSet
 spec:
   id: test-1
@@ -62,10 +62,4 @@ spec:
   - key: NO_SO_SECRET
     value: aha!
     type: raw
-```
-
-Apply the configuration by running:
-
-```sh
-tracetest apply variableset -f <variableset.yaml>
 ```
