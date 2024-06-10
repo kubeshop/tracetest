@@ -8,6 +8,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/runner"
 	"github.com/spf13/cobra"
 
@@ -19,6 +20,8 @@ var (
 	runCmd    *cobra.Command
 )
 
+const ExitCodeResourceNotFound = 3
+
 func init() {
 	runCmd = &cobra.Command{
 		GroupID: cmdGroupResources.ID,
@@ -29,9 +32,7 @@ func init() {
 		Run: WithResourceMiddleware(func(ctx context.Context, _ *cobra.Command, args []string) (string, error) {
 			runParams.ResourceName = resourceParams.ResourceName
 			if cliConfig.Jwt != "" {
-				exitCode, err := cloudCmd.RunMultipleFiles(ctx, httpClient, runParams, &cliConfig, runnerRegistry, output)
-				ExitCLI(exitCode)
-				return "", err
+				return runMultipleFiles(ctx)
 			}
 
 			return runSingleFile(ctx)
@@ -71,6 +72,12 @@ func runSingleFile(ctx context.Context) (string, error) {
 	var definitionFile string
 	if len(runParams.DefinitionFiles) > 0 {
 		definitionFile = runParams.DefinitionFiles[0]
+
+		if !hasValidResourceFiles() {
+			cliLogger.Warn("Invalid definition file found, stopping execution")
+			ExitCLI(ExitCodeResourceNotFound)
+			return "", nil
+		}
 	}
 
 	ID := ""
@@ -94,6 +101,18 @@ func runSingleFile(ctx context.Context) (string, error) {
 	return "", err
 }
 
+func runMultipleFiles(ctx context.Context) (string, error) {
+	if !hasValidResourceFiles() {
+		cliLogger.Warn("Invalid definition files found, stopping execution")
+		ExitCLI(ExitCodeResourceNotFound)
+		return "", nil
+	}
+
+	exitCode, err := cloudCmd.RunMultipleFiles(ctx, httpClient, runParams, &cliConfig, runnerRegistry, output)
+	ExitCLI(exitCode)
+	return "", err
+}
+
 func validRequiredGatesMsg() string {
 	opts := make([]string, 0, len(openapi.AllowedSupportedGatesEnumValues))
 	for _, v := range openapi.AllowedSupportedGatesEnumValues {
@@ -101,4 +120,21 @@ func validRequiredGatesMsg() string {
 	}
 
 	return "valid options: " + strings.Join(opts, ", ")
+}
+
+func hasValidResourceFiles() bool {
+	if len(runParams.DefinitionFiles) == 0 {
+		return true
+	}
+
+	validResourceFiles := true
+
+	for _, file := range runParams.DefinitionFiles {
+		if !fileutil.IsExistingFile(file) {
+			cliLogger.Warn("Definition file does not exist: " + file)
+			validResourceFiles = false
+		}
+	}
+
+	return validResourceFiles
 }

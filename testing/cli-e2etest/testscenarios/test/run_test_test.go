@@ -221,3 +221,31 @@ func TestRunTestWithKafkaTrigger(t *testing.T) {
 		require.Contains(result.StdOut, "✔ A message was received from Kafka stream")
 	})
 }
+
+func TestRunTestWithInvalidArgs(t *testing.T) {
+	// setup isolated e2e environment
+	env := environment.CreateAndStart(t, environment.WithDataStoreEnabled())
+	defer env.Close(t)
+
+	cliConfig := env.GetCLIConfigPath(t)
+
+	t.Run("should return an error message", func(t *testing.T) {
+		// instantiate require with testing helper
+		require := require.New(t)
+
+		// Given I am a Tracetest CLI user
+		// And I have my server recently created
+		// And the datasource is already set
+
+		// When I try to run a test with an invalid file
+		// Then it should give an error message
+		testFile := "./invalid-file.yaml"
+
+		command := fmt.Sprintf("run test -f %s", testFile)
+		result := tracetestcli.Exec(t, command, tracetestcli.WithCLIConfig(cliConfig))
+		helpers.RequireExitCodeEqual(t, result, 3)
+
+		// checks if the error message is valid
+		require.Contains(result.StdOut, "Invalid definition file found, stopping execution")
+	})
+}
