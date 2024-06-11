@@ -1,6 +1,6 @@
 services:
   producer-api:
-    image: quick-start-producer-api
+    image: quick-start-grpc-stream-propagation-producer-api
     platform: linux/amd64
     build: ./producer-api
     extra_hosts:
@@ -8,44 +8,38 @@ services:
     ports:
       - 8080:8080
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
-      - OTEL_SERVICE_NAME=producer-api
-      - KAFKA_BROKER_URL=kafka:9092
-      - KAFKA_TOPIC=messaging
+      OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector:4317
+      OTEL_SERVICE_NAME: producer-api
+      PORT: 8080
     depends_on:
       otel-collector:
         condition: service_started
-      kafka:
-        condition: service_healthy
 
   consumer-worker:
-    image: quick-start-consumer-worker
+    image: quick-start-grpc-stream-propagation-consumer-worker
     platform: linux/amd64
     build: ./consumer-worker
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
-      - OTEL_SERVICE_NAME=consumer-worker
-      - KAFKA_BROKER_URL=kafka:9092
-      - KAFKA_TOPIC=messaging
+      OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector:4317
+      OTEL_SERVICE_NAME: consumer-worker
+      PRODUCER_API_ADDRESS: producer-api:8080
     depends_on:
       otel-collector:
         condition: service_started
-      kafka:
-        condition: service_healthy
       producer-api:
         condition: service_started
 
   # Cloud-based Managed Tracetest
-  tracetest-agent:
-    image: kubeshop/tracetest-agent:latest
-    environment:
-      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
-      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+  # tracetest-agent:
+  #   image: kubeshop/tracetest-agent:latest
+  #   environment:
+  #     # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+  #     - TRACETEST_API_KEY=${TRACETEST_API_KEY}
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.101.0
     command:
       - "--config"
       - "/otel-local-config.yaml"

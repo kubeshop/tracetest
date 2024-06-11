@@ -23,4 +23,5 @@ message ReceivePaymentResponse {
 message PaymentNotification {
     Payment payment = 1;
     bool highValuePayment = 2;
+    map<string, string> metadata = 3;
 }
