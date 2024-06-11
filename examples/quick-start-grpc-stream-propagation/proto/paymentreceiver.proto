@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package proto;
+option go_package = "github.com/kubeshop/tracetest/quick-start-grpc-stream-propagation/proto";
+
+service PaymentReceiver {
+    rpc ReceivePayment(Payment) returns (ReceivePaymentResponse) {}
+
+    rpc NotifyPayment(Empty) returns (stream PaymentNotification) {}
+}
+
+message Empty {}
+
+message Payment {
+    string customerId = 1;
+    float amount = 2;
+}
+
+message ReceivePaymentResponse {
+    bool received = 1;
+}
+
+message PaymentNotification {
+    Payment payment = 1;
+    bool highValuePayment = 2;
+}
