@@ -23,10 +23,11 @@ type paymentWithMetadata struct {
 	metadata map[string]string
 }
 
+// Guarantee that the serverImpl implements the PaymentReceiverServer interface
 var _ pb.PaymentReceiverServer = &serverImpl{}
-var (
-	paymentChannel = make(chan *paymentWithMetadata)
-)
+
+// Channel to store payments and used as a "in-memory" queue
+var paymentChannel = make(chan *paymentWithMetadata)
 
 func (s *serverImpl) ReceivePayment(ctx context.Context, payment *pb.Payment) (*pb.ReceivePaymentResponse, error) {
 	go func() {
