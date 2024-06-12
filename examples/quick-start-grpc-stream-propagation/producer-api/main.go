@@ -18,14 +18,14 @@ type serverImpl struct {
 	tracer trace.Tracer
 }
 
-type paymentWithContext struct {
-	payment *pb.Payment
-	ctx     context.Context
+type paymentWithMetadata struct {
+	payment  *pb.Payment
+	metadata map[string]string
 }
 
 var _ pb.PaymentReceiverServer = &serverImpl{}
 var (
-	paymentChannel = make(chan *paymentWithContext)
+	paymentChannel = make(chan *paymentWithMetadata)
 )
 
 func (s *serverImpl) ReceivePayment(ctx context.Context, payment *pb.Payment) (*pb.ReceivePaymentResponse, error) {
@@ -33,9 +33,9 @@ func (s *serverImpl) ReceivePayment(ctx context.Context, payment *pb.Payment) (*
 		ctx, span := s.tracer.Start(ctx, "EnqueuePayment")
 		defer span.End()
 
-		message := &paymentWithContext{
-			payment: payment,
-			ctx:     ctx,
+		message := &paymentWithMetadata{
+			payment:  payment,
+			metadata: extractMetadataFromContext(ctx),
 		}
 
 		// handle channel as in-memory queue
@@ -47,16 +47,15 @@ func (s *serverImpl) ReceivePayment(ctx context.Context, payment *pb.Payment) (*
 
 func (s *serverImpl) NotifyPayment(_ *pb.Empty, stream pb.PaymentReceiver_NotifyPaymentServer) error {
 	for {
-		paymentWithContext, ok := <-paymentChannel
+		message, ok := <-paymentChannel
 		if !ok {
 			return nil
 		}
 
-		ctx := paymentWithContext.ctx
+		ctx := injectMetadataIntoContext(context.Background(), message.metadata)
 		ctx, span := s.tracer.Start(ctx, "SendPaymentNotification")
-		defer span.End()
 
-		payment := paymentWithContext.payment
+		payment := message.payment
 		highValuePayment := payment.Amount > 10_000
 
 		notification := &pb.PaymentNotification{
@@ -70,6 +69,8 @@ func (s *serverImpl) NotifyPayment(_ *pb.Empty, stream pb.PaymentReceiver_Notify
 		if err := stream.Send(notification); err != nil {
 			return err
 		}
+
+		span.End()
 	}
 }
 

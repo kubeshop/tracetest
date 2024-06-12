@@ -32,11 +32,12 @@ services:
         condition: service_started
 
   # Cloud-based Managed Tracetest
-  # tracetest-agent:
-  #   image: kubeshop/tracetest-agent:latest
-  #   environment:
-  #     # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
-  #     - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
+      TRACETEST_API_KEY: ${TRACETEST_API_KEY}
+      TRACETEST_MODE: verbose
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.101.0
