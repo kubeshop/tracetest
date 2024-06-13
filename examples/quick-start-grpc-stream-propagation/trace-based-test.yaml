@@ -1,0 +1,37 @@
+type: Test
+spec:
+  id: pprDfSUSg
+  name: Test gRPC Stream Propagation
+  trigger:
+    type: grpc
+    grpc:
+      address: producer-api:8080
+      method: proto.PaymentReceiver.ReceivePayment
+      protobufFile: ./proto/paymentreceiver.proto
+      request: |
+        {
+          "customerId": "1234",
+          "amount": 50000
+        }
+  specs:
+  - selector: span[name="proto.PaymentReceiver/ReceivePayment"]
+    name: It should call ReceivePayment gRPC endpoint
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[name="EnqueuePayment"]
+    name: In should enqueue the payment to send it in a stream
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[name="SendPaymentNotification"]
+    name: It should send the a payment notification through a gRPC stream
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[name="ProcessPaymentNotification"]
+    name: It should receive a PaymentNotification through a stream and process it
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[name="proto.PaymentReceiver/ReceivePayment"] span[name="EnqueuePayment"] span[name="SendPaymentNotification"] span[name="ProcessPaymentNotification"]
+    name: The trace shape is correct
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+
