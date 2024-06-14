@@ -268,9 +268,9 @@ jobs:
           TEST_ENV="${{ matrix.test_env }}" \
           ./run.bash || (cat /tmp/docker-log; exit 1)
 
-  trace-testing-memory:
+  trace-testing:
     needs: [build-docker]
-    name: Tracetesting API Server (InMemory)
+    name: Tracetesting API Server
     runs-on: ubuntu-latest
 
     steps:
@@ -286,34 +286,12 @@ jobs:
         run: |
           docker load --input dist/image.tar
 
-      - name: Start services
-        run: |
-          ./run.sh down up
-          ./run.sh tracetest-logs > /tmp/docker-log &
-      - name: Run tests
-        run: |
-          chmod +x ./dist/tracetest ./dist/tracetest-server
-
-          ./scripts/wait-for-port.sh 11633
-          ./run.sh tracetests || (cat /tmp/docker-log; exit 1)
-
-  trace-testing-nats:
-    needs: [build-docker]
-    name: Tracetesting API Server (NATS)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - uses: actions/download-artifact@v3
+      - name: Configure Tracetest CLI
+        timeout-minutes: 5
+        uses: kubeshop/tracetest-github-action@39580262bc7ea7808a71a8d9147b0a96b4dfa950
         with:
-          name: tracetest-dist
-          path: dist/
-
-      - name: Import image
-        run: |
-          docker load --input dist/image.tar
+          token:  ${{secrets.TRACETEST_CLOUD_CI_TOKEN}}
+          apiKey: ${{secrets.TRACETEST_CLOUD_CI_API_KEY}}
 
       - name: Start services
         run: |
@@ -321,10 +299,18 @@ jobs:
           ./run.sh tracetest-logs > /tmp/docker-log &
       - name: Run tests
         run: |
-          chmod +x ./dist/tracetest ./dist/tracetest-server
-
           ./scripts/wait-for-port.sh 11633
-          NATS=true ./run.sh tracetests || (cat /tmp/docker-log; exit 1)
+
+          EXIT_STATUS=0
+
+          tracetest run testsuite --file ./testing/server-tracetesting/features/http_test/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "HTTP Test suite failed")
+          tracetest run testsuite --file ./testing/server-tracetesting/features/grpc_test/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "GRPC Test suite failed")
+          tracetest run testsuite --file ./testing/server-tracetesting/features/kafka_test/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "Kafka Test suite failed")
+          tracetest run testsuite --file ./testing/server-tracetesting/features/variableset/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "VariableSet Test suite failed")
+          tracetest run testsuite --file ./testing/server-tracetesting/features/testsuite/_test_suite.yml --vars tracetesting-vars || (EXIT_STATUS=$? && echo "TestSuite Test suite failed")
+
+          exit $EXIT_STATUS
+
 
   e2e-cli:
     name: CLI e2e tests

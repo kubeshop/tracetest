@@ -12,8 +12,12 @@ exporters:
   logging:
     loglevel: debug
 
-  otlp/1:
+  otlp/tracetest:
     endpoint: tracetest:4317
+    tls:
+      insecure: true
+  otlp/agent:
+    endpoint: host.docker.internal:4317
     tls:
       insecure: true
 
@@ -26,4 +30,4 @@ service:
     traces/1:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/1]
+      exporters: [otlp/tracetest, otlp/agent]
