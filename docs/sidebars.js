@@ -743,6 +743,11 @@ const sidebars = {
           id: "concepts/what-is-trace-based-testing",
           label: "What is Trace-based Testing",
         },
+        {
+          type: "doc",
+          id: "concepts/open-source-vs-commercial-features",
+          label: "Open Source vs Commercial Features",
+        },
         // {
         //   type: "doc",
         //   id: "concepts/what-is-tracing",
