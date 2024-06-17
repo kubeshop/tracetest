@@ -12,22 +12,21 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
-Tracetest offers an open-source version available on GitHub perfect for hobby usage and non-production workloads. The commercial version of Tracetest offers a cloud-based managed version and an on-prem enterprise version.
+Tracetest has two distinct feature sets:
 
-Tracetest Core (hobby open source) contains the core trace-based testing features.
-
-Commercial Tracetest, both the cloud-based managed and on-prem version contains features on top of Tracetest Core.
+- [Hobby Self-hosted Open-source Tracetest Core](https://github.com/kubeshop/tracetest): Free and available on GitHub. Contains the core trace-based testing features. Perfect for hobby usage and non-production workloads.
+- [Commercial Tracetest](https://app.tracetest.io/) (Cloud + On-Prem): The commercial versions of Tracetest include both a cloud-based managed version and an on-prem enterprise version. They contain more advanced features on top of Tracetest Core for larger organizations with platform and onbservability teams.
 
 | Feature                                                                                               | Open Source                     | Commercial |
 |-------------------------------------------------------------------------------------------------------|-------------------------|------------|
 |                                                                                                       |                         |            |
-| **Core Testing Features**                                                                             |                         |            |
+| **Core Trace-based Testing Features**                                                                 |                         |            |
 | Trace Analyzer                                                                                        | Yes                     | Yes        |
 | Assertion Engine                                                                                      | Yes                     | Yes        |
 | Run tests as part of CI/CD                                                                            | Yes                     | Yes        |
 | Github Action support                                                                                 | Yes                     | Yes        |
 |                                                                                                       |                         |            |
-| **Integrations**                                                                                          |                         |            |
+| **Integrations**                                                                                      |                         |            |
 | k6 support                                                                                            | Partial (no run groups) | Yes        |
 | Artillery support                                                                                     | No                      | Yes        |
 | Cypress support                                                                                       | No                      | Yes        |
@@ -36,16 +35,16 @@ Commercial Tracetest, both the cloud-based managed and on-prem version contains 
 | Cloudflare integration                                                                                | No                      | Yes        |
 | AWS Lambda integration                                                                                | No                      | Yes        |
 |                                                                                                       |                         |            |
-| **Enterprise & Advanced Features**                                                                        |                         |            |
+| **Enterprise & Advanced Features**                                                                    |                         |            |
 | Single Sign-on (SSO)                                                                                  | No                      | Yes        |
 | RBAC                                                                                                  | No                      | Yes        |
 | Runs view with filtering                                                                              | No                      | Yes        |
 | Run groups                                                                                            | No                      | Yes        |
 | Run tests or test suites in parallel                                                                  | No                      | Yes        |
-| Secret management                                                                                     | No                      | Yes        |
+| Secrets management                                                                                    | No                      | Yes        |
 | Support for multiple polling profiles (fast vs long running tests)                                    | No                      | Yes        |
 | TypeScript / JavaScript integration                                                                   | No                      | Yes        |
-| Run tests via the Cloud with public agent                                                             | No                      | Yes        |
+| Run tests via the cloud with Tracetest Cloud Agent (public access)                                    | No                      | Yes        |
 | Enterprise tools for handling Org creation, Org level tokens, scripting configuration of Environments | No                      | Yes        |
 | CLI resources for cloud management                                                                    | No                      | Yes        |
 | OTLP data stores test connection                                                                      | No                      | Yes        |
