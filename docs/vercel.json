@@ -127,6 +127,16 @@
       "statusCode": 301
     },
     {
+      "destination": "/examples-tutorials/videos",
+      "source": "/examples-tutorials/webinars/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/examples-tutorials/videos",
+      "source": "/examples-tutorials/webinars",
+      "statusCode": 301
+    },
+    {
       "destination": "/getting-started/installation",
       "source": "/getting-started/detailed-installation",
       "statusCode": 301

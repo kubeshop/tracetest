@@ -32,7 +32,7 @@ const ExamplesTutorialsOverview = [
     url: '/ci-cd-automation/overview',
     description: (
       <Translate >
-        Run Tracetest in a CI/CD pipeline!
+        Run and automate Tracetest in a CI/CD pipeline!
       </Translate>
     ),
     button: 'Automate',
@@ -42,31 +42,31 @@ const ExamplesTutorialsOverview = [
     url: '/examples-tutorials/videos',
     description: (
       <Translate>
-        Tracetest video guides and conference talks!
+        Tracetest videos, webinars, and conference talks!
       </Translate>
     ),
     button: 'Watch now',
   },
-  {
-    name: '🎙️ Webinars',
-    url: '/examples-tutorials/webinars',
-    description: (
-      <Translate >
-        Watch on-demand live streams and community calls!
-      </Translate>
-    ),
-    button: 'Watch now',
-  },
-  {
-    name: '👨‍💻 Blog Post Tutorials',
-    url: '/examples-tutorials/tutorials',
-    description: (
-      <Translate >
-        Check out blog posts with Tracetest-related content.
-      </Translate>
-    ),
-    button: 'Learn more',
-  },
+  // {
+  //   name: '🎙️ Webinars',
+  //   url: '/examples-tutorials/webinars',
+  //   description: (
+  //     <Translate >
+  //       Watch on-demand live streams and community calls!
+  //     </Translate>
+  //   ),
+  //   button: 'Watch now',
+  // },
+  // {
+  //   name: '👨‍💻 Blog Post Tutorials',
+  //   url: '/examples-tutorials/tutorials',
+  //   description: (
+  //     <Translate >
+  //       Check out blog posts with Tracetest-related content.
+  //     </Translate>
+  //   ),
+  //   button: 'Learn more',
+  // },
 ];
 
 interface Props {
