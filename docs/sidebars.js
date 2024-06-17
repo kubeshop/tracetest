@@ -470,11 +470,6 @@ const sidebars = {
     },
     {
       type: "doc",
-      id: "examples-tutorials/webinars",
-      label: "Webinars",
-    },
-    {
-      type: "doc",
       id: "examples-tutorials/tutorials",
       label: "Blog Post Tutorials",
     },
