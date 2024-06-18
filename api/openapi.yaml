@@ -1592,63 +1592,6 @@ paths:
         500:
           description: "problem getting the Run Group"
 
-  /runs:
-    get:
-      tags:
-        - api
-      summary: "Get all runs"
-      description: "Get all runs"
-      operationId: getRuns
-      parameters:
-        - $ref: "./parameters.yaml#/components/parameters/take"
-        - $ref: "./parameters.yaml#/components/parameters/skip"
-        - $ref: "./parameters.yaml#/components/parameters/runGroupIds"
-        - $ref: "./parameters.yaml#/components/parameters/testIds"
-        - $ref: "./parameters.yaml#/components/parameters/name"
-        - $ref: "./parameters.yaml#/components/parameters/startDate"
-        - $ref: "./parameters.yaml#/components/parameters/endDate"
-
-        - $ref: "./parameters.yaml#/components/parameters/group"
-        - $ref: "./parameters.yaml#/components/parameters/status"
-        - $ref: "./parameters.yaml#/components/parameters/source"
-        - $ref: "./parameters.yaml#/components/parameters/token"
-        - $ref: "./parameters.yaml#/components/parameters/branch"
-        - $ref: "./parameters.yaml#/components/parameters/commit"
-        - $ref: "./parameters.yaml#/components/parameters/userEmail"
-        - $ref: "./parameters.yaml#/components/parameters/isCi"
-        - $ref: "./parameters.yaml#/components/parameters/provider"
-        - $ref: "./parameters.yaml#/components/parameters/playwrightBrowser"
-        - $ref: "./parameters.yaml#/components/parameters/cypressBrowser"
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "./runs.yaml#/components/schemas/Run"
-        500:
-          description: "problem getting the runs"
-  /runs/filters:
-    get:
-      tags:
-        - api
-      summary: "Get values for run filters"
-      description: "Get all values for run filters"
-      operationId: getRunFilters
-      parameters:
-        - $ref: "./parameters.yaml#/components/parameters/filters"
-        - $ref: "./parameters.yaml#/components/parameters/runGroupIds"
-        - $ref: "./parameters.yaml#/components/parameters/testIds"
-      responses:
-        200:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "./runs.yaml#/components/schemas/RunFilters"
-        500:
-          description: "problem getting the filters runs"
-
   # monitors
   /monitors:
     get:
