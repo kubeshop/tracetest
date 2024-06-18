@@ -29,7 +29,7 @@ type Test struct {
 	Trigger   *Trigger   `json:"trigger,omitempty"`
 	// If true, the test will not collect a trace
 	SkipTraceCollection *bool `json:"skipTraceCollection,omitempty"`
-	// ID of the polling profile to be used for this test
+	// Id of the polling profile that will be used by all the runs of this test
 	PollingProfile *string `json:"pollingProfile,omitempty"`
 	// specification of assertions that are going to be made
 	Specs []TestSpec `json:"specs,omitempty"`

@@ -152,6 +152,14 @@ components:
       schema:
         type: string
 
+    monitorId:
+      in: path
+      name: monitorId
+      required: true
+      description: "ID of a monitor used on Tracetest"
+      schema:
+        type: string
+
     # Cloud parameters
     runGroupId:
       in: path
@@ -175,7 +183,6 @@ components:
       description: "ID for invite"
       schema:
         type: string
-
     tokenID:
       in: path
       name: tokenID
@@ -189,5 +196,101 @@ components:
       required: true
       name: environmentID
       description: "ID for environment"
+      schema:
+        type: string
+
+    filters:
+      in: query
+      name: filters
+      description: "name of filters"
+      schema:
+        type: string
+
+    testIds:
+      in: query
+      name: testIds
+      description: id of the tests
+      schema:
+        type: string
+
+    group:
+      in: query
+      name: group
+      description: group of the runs
+      schema:
+        type: string
+    source:
+      in: query
+      name: source
+      description: source of the runs
+      schema:
+        type: string
+    token:
+      in: query
+      name: token
+      description: token of the runs
+      schema:
+        type: string
+    branch:
+      in: query
+      name: branch
+      description: branch of the runs
+      schema:
+        type: string
+    commit:
+      in: query
+      name: commit
+      description: commit of the runs
+      schema:
+        type: string
+    userEmail:
+      in: query
+      name: userEmail
+      description: userEmail of the runs
+      schema:
+        type: string
+    isCi:
+      in: query
+      name: isCi
+      description: isCi of the runs
+      schema:
+        type: string
+    provider:
+      in: query
+      name: provider
+      description: provider of the runs
+      schema:
+        type: string
+    playwrightBrowser:
+      in: query
+      name: playwrightBrowser
+      description: playwrightBrowser of the runs
+      schema:
+        type: string
+    cypressBrowser:
+      in: query
+      name: cypressBrowser
+      description: cypressBrowser of the runs
+      schema:
+        type: string
+
+    startDate:
+      in: query
+      name: startDate
+      description: startDate of the runs
+      schema:
+        type: string
+
+    endDate:
+      in: query
+      name: endDate
+      description: end of the runs
+      schema:
+        type: string
+
+    name:
+      in: query
+      name: name
+      description: name of the tests
       schema:
         type: string

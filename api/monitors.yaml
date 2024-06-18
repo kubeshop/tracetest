@@ -1,0 +1,229 @@
+openapi: 3.0.0
+components:
+  schemas:
+    MonitorResourceList:
+      type: object
+      properties:
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonitorResource"
+
+    MonitorResource:
+      type: object
+      description: "Represents a Monitor structured into the Resources format."
+      properties:
+        type:
+          type: string
+          description: "Represents the type of this resource. It should always be set as 'Monitor'."
+          enum:
+            - Monitor
+        spec:
+          $ref: "#/components/schemas/Monitor"
+
+    Monitor:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        enabled:
+          type: boolean
+        tests:
+          type: array
+          description: list of steps of the Monitor containing just each test id
+          items:
+            type: string
+        testSuites:
+          type: array
+          description: list of steps of the Monitor containing just each test suite id
+          items:
+            type: string
+        fullTests:
+          type: array
+          description: list of steps of the Monitor containing the whole test object
+          items:
+            $ref: "./tests.yaml#/components/schemas/Test"
+        fullTestSuites:
+          type: array
+          description: list of steps of the Monitor containing the whole test suite object
+          items:
+            $ref: "./testsuites.yaml#/components/schemas/TestSuite"
+        variableSetId:
+          type: string
+        schedule:
+          $ref: "#/components/schemas/Schedule"
+        alerts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Alert"
+        summary:
+          $ref: "#/components/schemas/Summary"
+
+    Summary:
+      type: object
+      properties:
+        runs:
+          type: integer  
+        lastState:
+          type: string
+        lastRunTime:
+          type: string
+          format: date-time
+
+    Schedule:
+      type: object
+      properties:
+        cron:
+          type: string
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum:
+            - webhook
+        webhook:
+          $ref: "#/components/schemas/Webhook"
+        events:
+          type: array
+          items:
+            type: string
+            enum:
+              - FAILED
+
+    Webhook:
+      type: object
+      properties:
+        url:
+          type: string
+        body:
+          type: string
+        method:
+          type: string
+          enum:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - PATCH
+            - HEAD
+            - OPTIONS
+        headers:
+          type: array
+          items:
+            $ref: "./http.yaml#/components/schemas/HTTPHeader"
+        sslVerification:
+          type: boolean
+          default: false
+
+    MonitorRun:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        monitorId:
+          type: string
+        monitorVersion:
+          type: integer
+        runGroupId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        executionType:
+          type: string
+          default: SCHEDULED
+          enum:
+            - MANUAL
+            - SCHEDULED
+        state:
+          type: string
+          enum: [CREATED, EXECUTING, FINISHED, FAILED]
+        variableSet:
+          $ref: "./variableSets.yaml#/components/schemas/VariableSet"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+
+        # Counters for the expected amount of test runs and test suite runs
+        testRunsCount:
+          type: integer
+        testSuiteRunsCount:
+          type: integer
+
+        testRuns:
+          type: array
+          description: list of test runs of the Monitor Run
+          items:
+            $ref: "./tests.yaml#/components/schemas/TestRun"
+        testSuiteRuns:
+          type: array
+          description: list of test suite runs of the Monitor Run
+          items:
+            $ref: "./testsuites.yaml#/components/schemas/TestSuiteRun"
+
+        alerts:
+          type: array
+          items:
+            $ref: "#/components/schemas/AlertResult"
+
+    AlertResult:
+      type: object
+      properties:
+        alertId:
+          type: string
+        id:
+          type: string
+        webhook:
+          $ref: "#/components/schemas/WebhookResult"
+
+    WebhookResult:
+      type: object
+      properties:
+        request:
+          type: object
+          properties:
+            url:
+              type: string
+            headers:
+              type: array
+              items:
+                $ref: "./http.yaml#/components/schemas/HTTPHeader"
+            body:
+              type: string
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            body:
+              type: string
+            headers:
+              type: array
+              items:
+                $ref: "./http.yaml#/components/schemas/HTTPHeader"
+            error:
+              type: string

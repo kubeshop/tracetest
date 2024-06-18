@@ -872,6 +872,56 @@ paths:
                 $ref: "./config.yaml#/components/schemas/PollingProfileList"
         500:
           description: "problem getting the polling profile list"
+    post:
+      tags:
+        - resource-api
+      summary: "Create Polling Profile"
+      description: "Create Polling Profile configuration"
+      operationId: createPollingProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/PollingProfile"
+          text/yaml:
+            schema:
+              $ref: "./config.yaml#/components/schemas/PollingProfile"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+        500:
+          description: "problem creating the polling profile"
+    put:
+      tags:
+        - resource-api
+      summary: "Upsert new polling profile"
+      description: "Upsert new polling profile"
+      operationId: upsertPollingProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./config.yaml#/components/schemas/PollingProfile"
+          text/yaml:
+            schema:
+              $ref: "./config.yaml#/components/schemas/PollingProfile"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
+            text/yaml:
+              schema:
+                $ref: "./config.yaml#/components/schemas/PollingProfile"
   # Polling Profile
   /pollingprofiles/{pollingProfileId}:
     get:
@@ -928,6 +978,21 @@ paths:
           description: "polling profile not found"
         500:
           description: "problem updating a polling profile"
+    delete:
+      tags:
+        - resource-api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/pollingProfileId"
+      summary: "Delete Polling Profile"
+      description: "Delete a polling profile used on Tracetest."
+      operationId: deletePollingProfile
+      responses:
+        204:
+          description: successful operation
+        404:
+          description: "polling profile not found"
+        500:
+          description: "problem getting a polling profile"
 
   # Demo
   /demos:
@@ -1526,29 +1591,262 @@ paths:
           description: "Run Group not found"
         500:
           description: "problem getting the Run Group"
-  /runs:
+
+  # monitors
+  /monitors:
     get:
       tags:
-        - api
-      summary: "Get all runs from a run group"
-      description: "Get all runs from a run group"
-      operationId: getRunsFromRunGroup
-      parameters:
-        - $ref: "./parameters.yaml#/components/parameters/take"
-        - $ref: "./parameters.yaml#/components/parameters/skip"
-        - $ref: "./parameters.yaml#/components/parameters/runGroupIds"
+        - resource-api
+      summary: "List monitors"
+      description: "List the monitors"
+      operationId: listMonitors
       responses:
         200:
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: "./runGroups.yaml#/components/schemas/RunGroupRun"
+                $ref: "./monitors.yaml#/components/schemas/MonitorResourceList"
         404:
-          description: "Run Group not found"
+          description: "Monitors not found"
         500:
-          description: "problem getting the Run Group runs"
+          description: "problem getting the Monitor list"
+    put:
+      tags:
+        - resource-api
+      summary: "Upsert a Monitor"
+      description: "Upsert a Monitor used on Tracetest"
+      operationId: upsertMonitor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./monitors.yaml#/components/schemas/MonitorResource"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./monitors.yaml#/components/schemas/MonitorResource"
+        400:
+          description: "invalid Monitor, some data was sent in incorrect format."
+        404:
+          description: "Monitor not found"
+        500:
+          description: "problem upserting an Monitor"
+    post:
+      tags:
+        - resource-api
+      summary: "Create a Monitor"
+      description: "Create a Monitor used on Tracetest"
+      operationId: creteMonitor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./monitors.yaml#/components/schemas/MonitorResource"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./monitors.yaml#/components/schemas/MonitorResource"
+        400:
+          description: "invalid Monitor, some data was sent in incorrect format."
+        404:
+          description: "Monitor not found"
+        500:
+          description: "problem creating an Monitor"
+  /monitors/{monitorId}:
+    get:
+      tags:
+        - resource-api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/monitorId"
+      summary: "Get a Monitor"
+      description: "Get a Monitor"
+      operationId: getMonitor
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./monitors.yaml#/components/schemas/MonitorResource"
+        404:
+          description: "Monitor not found"
+        500:
+          description: "problem getting a Monitor"
+    put:
+      tags:
+        - resource-api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/monitorId"
+      summary: "Update a Monitor"
+      description: "Update a Monitor"
+      operationId: updateMonitor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./monitors.yaml#/components/schemas/MonitorResource"
+      responses:
+        204:
+          description: successful operation
+        400:
+          description: "invalid Monitor, some data was sent in incorrect format."
+        404:
+          description: "Monitor not found"
+        500:
+          description: "problem updating a Monitor"
+    delete:
+      tags:
+        - resource-api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/monitorId"
+      summary: "Delete a Monitor"
+      description: "Delete a Monitor"
+      operationId: deleteMonitor
+      responses:
+        204:
+          description: successful operation
+        400:
+          description: "invalid Monitor, some data was sent in incorrect format."
+        404:
+          description: "Monitor not found"
+        500:
+          description: "problem deleting a Monitor"
 
+  /monitors/{monitorId}/version/{version}:
+    get:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/monitorId"
+        - $ref: "./parameters.yaml#/components/parameters/version"
+      summary: "Get a Monitor with Version"
+      description: "Get a Monitor with Version"
+      operationId: getMonitorVersion
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./monitors.yaml#/components/schemas/Monitor"
+        404:
+          description: "Monitor not found"
+        500:
+          description: "problem getting a Monitor"
+
+  /monitors/{monitorId}/run:
+    post:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/monitorId"
+      summary: "run Monitor"
+      description: "run a particular Monitor"
+      operationId: runMonitor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "./tests.yaml#/components/schemas/RunInformation"
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./monitors.yaml#/components/schemas/MonitorRun"
+    get:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/monitorId"
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+      summary: "Get a Monitor runs"
+      description: "Get a Monitor runs"
+      operationId: getMonitorRuns
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "./monitors.yaml#/components/schemas/MonitorRun"
+                  count:
+                    type: integer
+        404:
+          description: "Monitor not found"
+        500:
+          description: "problem getting a Monitor runs"
+
+  /monitors/{monitorId}/run/{runId}:
+    get:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/monitorId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
+      summary: "Get a specific run from a particular Monitor"
+      description: "Get a specific run from a particular Monitor"
+      operationId: getMonitorRun
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./monitors.yaml#/components/schemas/MonitorRun"
+        404:
+          description: MonitorRun run not found
+    delete:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/monitorId"
+        - $ref: "./parameters.yaml#/components/parameters/runId"
+      summary: "Delete a Monitor"
+      description: "Delete a Monitor"
+      operationId: deleteMonitorRun
+      responses:
+        204:
+          description: successful operation
+        400:
+          description: "invalid Monitor, some data was sent in incorrect format."
+        404:
+          description: "Monitor not found"
+        500:
+          description: "problem deleting a Monitor"
+  /monitors/alerts:
+    post:
+      tags:
+        - api
+      summary: "Tests the alert trigger"
+      description: "Tests the alert trigger"
+      operationId: testAlert
+      requestBody:
+        content:
+          text/json:
+            schema:
+              $ref: "./monitors.yaml#/components/schemas/Alert"
+      responses:
+        201:
+          description: Test alert Result
+          content:
+            application/json:
+              schema:
+                $ref: "./monitors.yaml#/components/schemas/AlertResult"
   /invites:
     get:
       description: Lists pending invites
