@@ -15,11 +15,11 @@ import (
 	"time"
 )
 
-// checks if the RunGroupRun type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &RunGroupRun{}
+// checks if the Run type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &Run{}
 
-// RunGroupRun struct for RunGroupRun
-type RunGroupRun struct {
+// Run struct for Run
+type Run struct {
 	TestId              *string              `json:"testId,omitempty"`
 	TestVersion         *int32               `json:"testVersion,omitempty"`
 	Name                *string              `json:"name,omitempty"`
@@ -37,25 +37,25 @@ type RunGroupRun struct {
 	Result *AssertionResults `json:"result,omitempty"`
 }
 
-// NewRunGroupRun instantiates a new RunGroupRun object
+// NewRun instantiates a new Run object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRunGroupRun() *RunGroupRun {
-	this := RunGroupRun{}
+func NewRun() *Run {
+	this := Run{}
 	return &this
 }
 
-// NewRunGroupRunWithDefaults instantiates a new RunGroupRun object
+// NewRunWithDefaults instantiates a new Run object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewRunGroupRunWithDefaults() *RunGroupRun {
-	this := RunGroupRun{}
+func NewRunWithDefaults() *Run {
+	this := Run{}
 	return &this
 }
 
 // GetTestId returns the TestId field value if set, zero value otherwise.
-func (o *RunGroupRun) GetTestId() string {
+func (o *Run) GetTestId() string {
 	if o == nil || isNil(o.TestId) {
 		var ret string
 		return ret
@@ -65,7 +65,7 @@ func (o *RunGroupRun) GetTestId() string {
 
 // GetTestIdOk returns a tuple with the TestId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetTestIdOk() (*string, bool) {
+func (o *Run) GetTestIdOk() (*string, bool) {
 	if o == nil || isNil(o.TestId) {
 		return nil, false
 	}
@@ -73,7 +73,7 @@ func (o *RunGroupRun) GetTestIdOk() (*string, bool) {
 }
 
 // HasTestId returns a boolean if a field has been set.
-func (o *RunGroupRun) HasTestId() bool {
+func (o *Run) HasTestId() bool {
 	if o != nil && !isNil(o.TestId) {
 		return true
 	}
@@ -82,12 +82,12 @@ func (o *RunGroupRun) HasTestId() bool {
 }
 
 // SetTestId gets a reference to the given string and assigns it to the TestId field.
-func (o *RunGroupRun) SetTestId(v string) {
+func (o *Run) SetTestId(v string) {
 	o.TestId = &v
 }
 
 // GetTestVersion returns the TestVersion field value if set, zero value otherwise.
-func (o *RunGroupRun) GetTestVersion() int32 {
+func (o *Run) GetTestVersion() int32 {
 	if o == nil || isNil(o.TestVersion) {
 		var ret int32
 		return ret
@@ -97,7 +97,7 @@ func (o *RunGroupRun) GetTestVersion() int32 {
 
 // GetTestVersionOk returns a tuple with the TestVersion field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetTestVersionOk() (*int32, bool) {
+func (o *Run) GetTestVersionOk() (*int32, bool) {
 	if o == nil || isNil(o.TestVersion) {
 		return nil, false
 	}
@@ -105,7 +105,7 @@ func (o *RunGroupRun) GetTestVersionOk() (*int32, bool) {
 }
 
 // HasTestVersion returns a boolean if a field has been set.
-func (o *RunGroupRun) HasTestVersion() bool {
+func (o *Run) HasTestVersion() bool {
 	if o != nil && !isNil(o.TestVersion) {
 		return true
 	}
@@ -114,12 +114,12 @@ func (o *RunGroupRun) HasTestVersion() bool {
 }
 
 // SetTestVersion gets a reference to the given int32 and assigns it to the TestVersion field.
-func (o *RunGroupRun) SetTestVersion(v int32) {
+func (o *Run) SetTestVersion(v int32) {
 	o.TestVersion = &v
 }
 
 // GetName returns the Name field value if set, zero value otherwise.
-func (o *RunGroupRun) GetName() string {
+func (o *Run) GetName() string {
 	if o == nil || isNil(o.Name) {
 		var ret string
 		return ret
@@ -129,7 +129,7 @@ func (o *RunGroupRun) GetName() string {
 
 // GetNameOk returns a tuple with the Name field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetNameOk() (*string, bool) {
+func (o *Run) GetNameOk() (*string, bool) {
 	if o == nil || isNil(o.Name) {
 		return nil, false
 	}
@@ -137,7 +137,7 @@ func (o *RunGroupRun) GetNameOk() (*string, bool) {
 }
 
 // HasName returns a boolean if a field has been set.
-func (o *RunGroupRun) HasName() bool {
+func (o *Run) HasName() bool {
 	if o != nil && !isNil(o.Name) {
 		return true
 	}
@@ -146,12 +146,12 @@ func (o *RunGroupRun) HasName() bool {
 }
 
 // SetName gets a reference to the given string and assigns it to the Name field.
-func (o *RunGroupRun) SetName(v string) {
+func (o *Run) SetName(v string) {
 	o.Name = &v
 }
 
 // GetCreatedAt returns the CreatedAt field value if set, zero value otherwise.
-func (o *RunGroupRun) GetCreatedAt() time.Time {
+func (o *Run) GetCreatedAt() time.Time {
 	if o == nil || isNil(o.CreatedAt) {
 		var ret time.Time
 		return ret
@@ -161,7 +161,7 @@ func (o *RunGroupRun) GetCreatedAt() time.Time {
 
 // GetCreatedAtOk returns a tuple with the CreatedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetCreatedAtOk() (*time.Time, bool) {
+func (o *Run) GetCreatedAtOk() (*time.Time, bool) {
 	if o == nil || isNil(o.CreatedAt) {
 		return nil, false
 	}
@@ -169,7 +169,7 @@ func (o *RunGroupRun) GetCreatedAtOk() (*time.Time, bool) {
 }
 
 // HasCreatedAt returns a boolean if a field has been set.
-func (o *RunGroupRun) HasCreatedAt() bool {
+func (o *Run) HasCreatedAt() bool {
 	if o != nil && !isNil(o.CreatedAt) {
 		return true
 	}
@@ -178,12 +178,12 @@ func (o *RunGroupRun) HasCreatedAt() bool {
 }
 
 // SetCreatedAt gets a reference to the given time.Time and assigns it to the CreatedAt field.
-func (o *RunGroupRun) SetCreatedAt(v time.Time) {
+func (o *Run) SetCreatedAt(v time.Time) {
 	o.CreatedAt = &v
 }
 
 // GetCompletedAt returns the CompletedAt field value if set, zero value otherwise.
-func (o *RunGroupRun) GetCompletedAt() time.Time {
+func (o *Run) GetCompletedAt() time.Time {
 	if o == nil || isNil(o.CompletedAt) {
 		var ret time.Time
 		return ret
@@ -193,7 +193,7 @@ func (o *RunGroupRun) GetCompletedAt() time.Time {
 
 // GetCompletedAtOk returns a tuple with the CompletedAt field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetCompletedAtOk() (*time.Time, bool) {
+func (o *Run) GetCompletedAtOk() (*time.Time, bool) {
 	if o == nil || isNil(o.CompletedAt) {
 		return nil, false
 	}
@@ -201,7 +201,7 @@ func (o *RunGroupRun) GetCompletedAtOk() (*time.Time, bool) {
 }
 
 // HasCompletedAt returns a boolean if a field has been set.
-func (o *RunGroupRun) HasCompletedAt() bool {
+func (o *Run) HasCompletedAt() bool {
 	if o != nil && !isNil(o.CompletedAt) {
 		return true
 	}
@@ -210,12 +210,12 @@ func (o *RunGroupRun) HasCompletedAt() bool {
 }
 
 // SetCompletedAt gets a reference to the given time.Time and assigns it to the CompletedAt field.
-func (o *RunGroupRun) SetCompletedAt(v time.Time) {
+func (o *Run) SetCompletedAt(v time.Time) {
 	o.CompletedAt = &v
 }
 
 // GetLinter returns the Linter field value if set, zero value otherwise.
-func (o *RunGroupRun) GetLinter() LinterResult {
+func (o *Run) GetLinter() LinterResult {
 	if o == nil || isNil(o.Linter) {
 		var ret LinterResult
 		return ret
@@ -225,7 +225,7 @@ func (o *RunGroupRun) GetLinter() LinterResult {
 
 // GetLinterOk returns a tuple with the Linter field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetLinterOk() (*LinterResult, bool) {
+func (o *Run) GetLinterOk() (*LinterResult, bool) {
 	if o == nil || isNil(o.Linter) {
 		return nil, false
 	}
@@ -233,7 +233,7 @@ func (o *RunGroupRun) GetLinterOk() (*LinterResult, bool) {
 }
 
 // HasLinter returns a boolean if a field has been set.
-func (o *RunGroupRun) HasLinter() bool {
+func (o *Run) HasLinter() bool {
 	if o != nil && !isNil(o.Linter) {
 		return true
 	}
@@ -242,12 +242,12 @@ func (o *RunGroupRun) HasLinter() bool {
 }
 
 // SetLinter gets a reference to the given LinterResult and assigns it to the Linter field.
-func (o *RunGroupRun) SetLinter(v LinterResult) {
+func (o *Run) SetLinter(v LinterResult) {
 	o.Linter = &v
 }
 
 // GetRequiredGatesResult returns the RequiredGatesResult field value if set, zero value otherwise.
-func (o *RunGroupRun) GetRequiredGatesResult() RequiredGatesResult {
+func (o *Run) GetRequiredGatesResult() RequiredGatesResult {
 	if o == nil || isNil(o.RequiredGatesResult) {
 		var ret RequiredGatesResult
 		return ret
@@ -257,7 +257,7 @@ func (o *RunGroupRun) GetRequiredGatesResult() RequiredGatesResult {
 
 // GetRequiredGatesResultOk returns a tuple with the RequiredGatesResult field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetRequiredGatesResultOk() (*RequiredGatesResult, bool) {
+func (o *Run) GetRequiredGatesResultOk() (*RequiredGatesResult, bool) {
 	if o == nil || isNil(o.RequiredGatesResult) {
 		return nil, false
 	}
@@ -265,7 +265,7 @@ func (o *RunGroupRun) GetRequiredGatesResultOk() (*RequiredGatesResult, bool) {
 }
 
 // HasRequiredGatesResult returns a boolean if a field has been set.
-func (o *RunGroupRun) HasRequiredGatesResult() bool {
+func (o *Run) HasRequiredGatesResult() bool {
 	if o != nil && !isNil(o.RequiredGatesResult) {
 		return true
 	}
@@ -274,12 +274,12 @@ func (o *RunGroupRun) HasRequiredGatesResult() bool {
 }
 
 // SetRequiredGatesResult gets a reference to the given RequiredGatesResult and assigns it to the RequiredGatesResult field.
-func (o *RunGroupRun) SetRequiredGatesResult(v RequiredGatesResult) {
+func (o *Run) SetRequiredGatesResult(v RequiredGatesResult) {
 	o.RequiredGatesResult = &v
 }
 
 // GetMetadata returns the Metadata field value if set, zero value otherwise.
-func (o *RunGroupRun) GetMetadata() map[string]string {
+func (o *Run) GetMetadata() map[string]string {
 	if o == nil || isNil(o.Metadata) {
 		var ret map[string]string
 		return ret
@@ -289,7 +289,7 @@ func (o *RunGroupRun) GetMetadata() map[string]string {
 
 // GetMetadataOk returns a tuple with the Metadata field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetMetadataOk() (*map[string]string, bool) {
+func (o *Run) GetMetadataOk() (*map[string]string, bool) {
 	if o == nil || isNil(o.Metadata) {
 		return nil, false
 	}
@@ -297,7 +297,7 @@ func (o *RunGroupRun) GetMetadataOk() (*map[string]string, bool) {
 }
 
 // HasMetadata returns a boolean if a field has been set.
-func (o *RunGroupRun) HasMetadata() bool {
+func (o *Run) HasMetadata() bool {
 	if o != nil && !isNil(o.Metadata) {
 		return true
 	}
@@ -306,12 +306,12 @@ func (o *RunGroupRun) HasMetadata() bool {
 }
 
 // SetMetadata gets a reference to the given map[string]string and assigns it to the Metadata field.
-func (o *RunGroupRun) SetMetadata(v map[string]string) {
+func (o *Run) SetMetadata(v map[string]string) {
 	o.Metadata = &v
 }
 
 // GetExecutionTime returns the ExecutionTime field value if set, zero value otherwise.
-func (o *RunGroupRun) GetExecutionTime() int32 {
+func (o *Run) GetExecutionTime() int32 {
 	if o == nil || isNil(o.ExecutionTime) {
 		var ret int32
 		return ret
@@ -321,7 +321,7 @@ func (o *RunGroupRun) GetExecutionTime() int32 {
 
 // GetExecutionTimeOk returns a tuple with the ExecutionTime field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetExecutionTimeOk() (*int32, bool) {
+func (o *Run) GetExecutionTimeOk() (*int32, bool) {
 	if o == nil || isNil(o.ExecutionTime) {
 		return nil, false
 	}
@@ -329,7 +329,7 @@ func (o *RunGroupRun) GetExecutionTimeOk() (*int32, bool) {
 }
 
 // HasExecutionTime returns a boolean if a field has been set.
-func (o *RunGroupRun) HasExecutionTime() bool {
+func (o *Run) HasExecutionTime() bool {
 	if o != nil && !isNil(o.ExecutionTime) {
 		return true
 	}
@@ -338,12 +338,12 @@ func (o *RunGroupRun) HasExecutionTime() bool {
 }
 
 // SetExecutionTime gets a reference to the given int32 and assigns it to the ExecutionTime field.
-func (o *RunGroupRun) SetExecutionTime(v int32) {
+func (o *Run) SetExecutionTime(v int32) {
 	o.ExecutionTime = &v
 }
 
 // GetRunId returns the RunId field value if set, zero value otherwise.
-func (o *RunGroupRun) GetRunId() int32 {
+func (o *Run) GetRunId() int32 {
 	if o == nil || isNil(o.RunId) {
 		var ret int32
 		return ret
@@ -353,7 +353,7 @@ func (o *RunGroupRun) GetRunId() int32 {
 
 // GetRunIdOk returns a tuple with the RunId field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetRunIdOk() (*int32, bool) {
+func (o *Run) GetRunIdOk() (*int32, bool) {
 	if o == nil || isNil(o.RunId) {
 		return nil, false
 	}
@@ -361,7 +361,7 @@ func (o *RunGroupRun) GetRunIdOk() (*int32, bool) {
 }
 
 // HasRunId returns a boolean if a field has been set.
-func (o *RunGroupRun) HasRunId() bool {
+func (o *Run) HasRunId() bool {
 	if o != nil && !isNil(o.RunId) {
 		return true
 	}
@@ -370,12 +370,12 @@ func (o *RunGroupRun) HasRunId() bool {
 }
 
 // SetRunId gets a reference to the given int32 and assigns it to the RunId field.
-func (o *RunGroupRun) SetRunId(v int32) {
+func (o *Run) SetRunId(v int32) {
 	o.RunId = &v
 }
 
 // GetTrigger returns the Trigger field value if set, zero value otherwise.
-func (o *RunGroupRun) GetTrigger() Trigger {
+func (o *Run) GetTrigger() Trigger {
 	if o == nil || isNil(o.Trigger) {
 		var ret Trigger
 		return ret
@@ -385,7 +385,7 @@ func (o *RunGroupRun) GetTrigger() Trigger {
 
 // GetTriggerOk returns a tuple with the Trigger field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetTriggerOk() (*Trigger, bool) {
+func (o *Run) GetTriggerOk() (*Trigger, bool) {
 	if o == nil || isNil(o.Trigger) {
 		return nil, false
 	}
@@ -393,7 +393,7 @@ func (o *RunGroupRun) GetTriggerOk() (*Trigger, bool) {
 }
 
 // HasTrigger returns a boolean if a field has been set.
-func (o *RunGroupRun) HasTrigger() bool {
+func (o *Run) HasTrigger() bool {
 	if o != nil && !isNil(o.Trigger) {
 		return true
 	}
@@ -402,12 +402,12 @@ func (o *RunGroupRun) HasTrigger() bool {
 }
 
 // SetTrigger gets a reference to the given Trigger and assigns it to the Trigger field.
-func (o *RunGroupRun) SetTrigger(v Trigger) {
+func (o *Run) SetTrigger(v Trigger) {
 	o.Trigger = &v
 }
 
 // GetState returns the State field value if set, zero value otherwise.
-func (o *RunGroupRun) GetState() string {
+func (o *Run) GetState() string {
 	if o == nil || isNil(o.State) {
 		var ret string
 		return ret
@@ -417,7 +417,7 @@ func (o *RunGroupRun) GetState() string {
 
 // GetStateOk returns a tuple with the State field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetStateOk() (*string, bool) {
+func (o *Run) GetStateOk() (*string, bool) {
 	if o == nil || isNil(o.State) {
 		return nil, false
 	}
@@ -425,7 +425,7 @@ func (o *RunGroupRun) GetStateOk() (*string, bool) {
 }
 
 // HasState returns a boolean if a field has been set.
-func (o *RunGroupRun) HasState() bool {
+func (o *Run) HasState() bool {
 	if o != nil && !isNil(o.State) {
 		return true
 	}
@@ -434,12 +434,12 @@ func (o *RunGroupRun) HasState() bool {
 }
 
 // SetState gets a reference to the given string and assigns it to the State field.
-func (o *RunGroupRun) SetState(v string) {
+func (o *Run) SetState(v string) {
 	o.State = &v
 }
 
 // GetResult returns the Result field value if set, zero value otherwise.
-func (o *RunGroupRun) GetResult() AssertionResults {
+func (o *Run) GetResult() AssertionResults {
 	if o == nil || isNil(o.Result) {
 		var ret AssertionResults
 		return ret
@@ -449,7 +449,7 @@ func (o *RunGroupRun) GetResult() AssertionResults {
 
 // GetResultOk returns a tuple with the Result field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *RunGroupRun) GetResultOk() (*AssertionResults, bool) {
+func (o *Run) GetResultOk() (*AssertionResults, bool) {
 	if o == nil || isNil(o.Result) {
 		return nil, false
 	}
@@ -457,7 +457,7 @@ func (o *RunGroupRun) GetResultOk() (*AssertionResults, bool) {
 }
 
 // HasResult returns a boolean if a field has been set.
-func (o *RunGroupRun) HasResult() bool {
+func (o *Run) HasResult() bool {
 	if o != nil && !isNil(o.Result) {
 		return true
 	}
@@ -466,11 +466,11 @@ func (o *RunGroupRun) HasResult() bool {
 }
 
 // SetResult gets a reference to the given AssertionResults and assigns it to the Result field.
-func (o *RunGroupRun) SetResult(v AssertionResults) {
+func (o *Run) SetResult(v AssertionResults) {
 	o.Result = &v
 }
 
-func (o RunGroupRun) MarshalJSON() ([]byte, error) {
+func (o Run) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -478,7 +478,7 @@ func (o RunGroupRun) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o RunGroupRun) ToMap() (map[string]interface{}, error) {
+func (o Run) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.TestId) {
 		toSerialize["testId"] = o.TestId
@@ -522,38 +522,38 @@ func (o RunGroupRun) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-type NullableRunGroupRun struct {
-	value *RunGroupRun
+type NullableRun struct {
+	value *Run
 	isSet bool
 }
 
-func (v NullableRunGroupRun) Get() *RunGroupRun {
+func (v NullableRun) Get() *Run {
 	return v.value
 }
 
-func (v *NullableRunGroupRun) Set(val *RunGroupRun) {
+func (v *NullableRun) Set(val *Run) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableRunGroupRun) IsSet() bool {
+func (v NullableRun) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableRunGroupRun) Unset() {
+func (v *NullableRun) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableRunGroupRun(val *RunGroupRun) *NullableRunGroupRun {
-	return &NullableRunGroupRun{value: val, isSet: true}
+func NewNullableRun(val *Run) *NullableRun {
+	return &NullableRun{value: val, isSet: true}
 }
 
-func (v NullableRunGroupRun) MarshalJSON() ([]byte, error) {
+func (v NullableRun) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableRunGroupRun) UnmarshalJSON(src []byte) error {
+func (v *NullableRun) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }

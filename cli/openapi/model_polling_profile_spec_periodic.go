@@ -22,7 +22,8 @@ type PollingProfileSpecPeriodic struct {
 	// Time that the poller should wait until try to fetch more traces. It should be written in duration format (example: 1s, 30s, 1m).
 	RetryDelay *string `json:"retryDelay,omitempty"`
 	// Total time that the poller should try to continue to fetch traces. It should be written in duration format (example: 1s, 30s, 1m).
-	Timeout *string `json:"timeout,omitempty"`
+	Timeout              *string  `json:"timeout,omitempty"`
+	SelectorMatchRetries *float32 `json:"selectorMatchRetries,omitempty"`
 }
 
 // NewPollingProfileSpecPeriodic instantiates a new PollingProfileSpecPeriodic object
@@ -106,6 +107,38 @@ func (o *PollingProfileSpecPeriodic) SetTimeout(v string) {
 	o.Timeout = &v
 }
 
+// GetSelectorMatchRetries returns the SelectorMatchRetries field value if set, zero value otherwise.
+func (o *PollingProfileSpecPeriodic) GetSelectorMatchRetries() float32 {
+	if o == nil || isNil(o.SelectorMatchRetries) {
+		var ret float32
+		return ret
+	}
+	return *o.SelectorMatchRetries
+}
+
+// GetSelectorMatchRetriesOk returns a tuple with the SelectorMatchRetries field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PollingProfileSpecPeriodic) GetSelectorMatchRetriesOk() (*float32, bool) {
+	if o == nil || isNil(o.SelectorMatchRetries) {
+		return nil, false
+	}
+	return o.SelectorMatchRetries, true
+}
+
+// HasSelectorMatchRetries returns a boolean if a field has been set.
+func (o *PollingProfileSpecPeriodic) HasSelectorMatchRetries() bool {
+	if o != nil && !isNil(o.SelectorMatchRetries) {
+		return true
+	}
+
+	return false
+}
+
+// SetSelectorMatchRetries gets a reference to the given float32 and assigns it to the SelectorMatchRetries field.
+func (o *PollingProfileSpecPeriodic) SetSelectorMatchRetries(v float32) {
+	o.SelectorMatchRetries = &v
+}
+
 func (o PollingProfileSpecPeriodic) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -121,6 +154,9 @@ func (o PollingProfileSpecPeriodic) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Timeout) {
 		toSerialize["timeout"] = o.Timeout
+	}
+	if !isNil(o.SelectorMatchRetries) {
+		toSerialize["selectorMatchRetries"] = o.SelectorMatchRetries
 	}
 	return toSerialize, nil
 }

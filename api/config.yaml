@@ -109,6 +109,7 @@ components:
               description: "Name of the strategy that will be used on this profile."
               enum:
                 - periodic
+                - no-polling
             periodic:
               type: object
               description: "Configuration for the strategy 'periodic'. It only should be filled if the field strategy is equals to 'periodic'."
@@ -119,6 +120,8 @@ components:
                 timeout:
                   description: "Total time that the poller should try to continue to fetch traces. It should be written in duration format (example: 1s, 30s, 1m)."
                   type: string
+                selectorMatchRetries:
+                  type: number
           required:
             - id
             - name

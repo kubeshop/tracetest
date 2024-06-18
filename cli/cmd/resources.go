@@ -126,6 +126,59 @@ var (
 		return fileutil.New(input.AbsPath(), []byte(updated)), nil
 	})
 
+	testApplyFn = func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
+		updated, err := testClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
+		if err != nil {
+			return input, fmt.Errorf("cannot apply test: %w", err)
+		}
+
+		return fileutil.New(input.AbsPath(), []byte(updated)), nil
+	}
+
+	testSuiteApplyFn = func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
+		updated, err := testSuiteClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
+		if err != nil {
+			return input, fmt.Errorf("cannot apply suite: %w", err)
+		}
+
+		return fileutil.New(input.AbsPath(), []byte(updated)), nil
+	}
+
+	monitorPreprocessor = processor.Monitor(cliLogger, testSuiteApplyFn, testApplyFn)
+
+	monitorClient = resourcemanager.NewClient(
+		httpClient, cliLogger,
+		"monitor", "monitors",
+		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
+			Cells: []resourcemanager.TableCellConfig{
+				{Header: "ID", Path: "spec.id"},
+				{Header: "NAME", Path: "spec.name"},
+				{Header: "VERSION", Path: "spec.version"},
+				{Header: "RUNS", Path: "spec.summary.runs"},
+				{Header: "LAST RUN TIME", Path: "spec.summary.lastRunTime"},
+				{Header: "LAST RUN STATE", Path: "spec.summary.lastRunState"},
+				{Header: "URL", Path: "spec.url"},
+			},
+			ItemModifier: func(item *gabs.Container) error {
+				// set spec.summary.steps to the number of steps in the test suite
+				id, ok := item.Path("spec.id").Data().(string)
+				if !ok {
+					return fmt.Errorf("monitor id '%s' is not a string", id)
+				}
+
+				url := cliConfig.URL() + "/monitor/" + id
+				item.SetP(url, "spec.url")
+
+				if err := formatItemDate(item, "spec.summary.lastRunTime"); err != nil {
+					return err
+				}
+
+				return nil
+			},
+		}),
+		resourcemanager.WithApplyPreProcessor(testSuitePreprocessor.Preprocess),
+	)
+
 	testClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
 		"test", "tests",
@@ -161,14 +214,7 @@ var (
 		resourcemanager.WithApplyPreProcessor(testPreprocessor.Preprocess),
 	)
 
-	testSuitePreprocessor = processor.TestSuite(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
-		updated, err := testClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
-		if err != nil {
-			return input, fmt.Errorf("cannot apply test: %w", err)
-		}
-
-		return fileutil.New(input.AbsPath(), []byte(updated)), nil
-	})
+	testSuitePreprocessor = processor.TestSuite(cliLogger, testApplyFn)
 
 	testSuiteClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
@@ -240,6 +286,7 @@ var (
 				}),
 			),
 		).
+		Register(monitorClient).
 		Register(envTokensClient).
 		Register(orgInvitesClient).
 		Register(pollingProfileClient).
