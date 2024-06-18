@@ -51,33 +51,33 @@ func (m monitor) Preprocess(ctx context.Context, input fileutil.File) (fileutil.
 }
 
 func (m monitor) mapMonitorTests(ctx context.Context, input fileutil.File, monitor openapi.MonitorResource) (openapi.MonitorResource, error) {
-	for i, test := range monitor.Spec.GetTests() {
+	for i, testID := range monitor.Spec.GetTests() {
 		m.logger.Debug("mapping monitor test",
 			zap.Int("index", i),
-			zap.String("test", test),
+			zap.String("test", testID),
 		)
-		if !fileutil.LooksLikeFilePath(test) {
+		if !fileutil.LooksLikeFilePath(testID) {
 			m.logger.Debug("does not look like a file path",
 				zap.Int("index", i),
-				zap.String("test", test),
+				zap.String("test", testID),
 			)
 			continue
 		}
 
-		f, err := fileutil.Read(input.RelativeFile(test))
+		f, err := fileutil.Read(input.RelativeFile(testID))
 		if err != nil {
 			return openapi.MonitorResource{}, fmt.Errorf("cannot read test file: %w", err)
 		}
 
 		testFile, err := m.applyTestFn(ctx, f)
 		if err != nil {
-			return openapi.MonitorResource{}, fmt.Errorf("cannot apply test '%s': %w", test, err)
+			return openapi.MonitorResource{}, fmt.Errorf("cannot apply test '%s': %w", testID, err)
 		}
 
 		var test openapi.TestResource
 		err = yaml.Unmarshal(testFile.Contents(), &test)
 		if err != nil {
-			return openapi.MonitorResource{}, fmt.Errorf("cannot unmarshal updated test '%s': %w", test, err)
+			return openapi.MonitorResource{}, fmt.Errorf("cannot unmarshal updated test '%s': %w", testID, err)
 		}
 
 		m.logger.Debug("mapped monitor test",
@@ -92,33 +92,33 @@ func (m monitor) mapMonitorTests(ctx context.Context, input fileutil.File, monit
 }
 
 func (m monitor) mapMonitorTestSuites(ctx context.Context, input fileutil.File, monitor openapi.MonitorResource) (openapi.MonitorResource, error) {
-	for i, suite := range monitor.Spec.GetTestSuites() {
+	for i, suiteID := range monitor.Spec.GetTestSuites() {
 		m.logger.Debug("mapping monitor test suites",
 			zap.Int("index", i),
-			zap.String("suite", suite),
+			zap.String("suite", suiteID),
 		)
-		if !fileutil.LooksLikeFilePath(suite) {
+		if !fileutil.LooksLikeFilePath(suiteID) {
 			m.logger.Debug("does not look like a file path",
 				zap.Int("index", i),
-				zap.String("suite", suite),
+				zap.String("suite", suiteID),
 			)
 			continue
 		}
 
-		f, err := fileutil.Read(input.RelativeFile(suite))
+		f, err := fileutil.Read(input.RelativeFile(suiteID))
 		if err != nil {
 			return openapi.MonitorResource{}, fmt.Errorf("cannot read suite file: %w", err)
 		}
 
 		suiteFile, err := m.applyTestSuiteFn(ctx, f)
 		if err != nil {
-			return openapi.MonitorResource{}, fmt.Errorf("cannot apply suite '%s': %w", suite, err)
+			return openapi.MonitorResource{}, fmt.Errorf("cannot apply suite '%s': %w", suiteID, err)
 		}
 
 		var suite openapi.TestSuiteResource
 		err = yaml.Unmarshal(suiteFile.Contents(), &suite)
 		if err != nil {
-			return openapi.MonitorResource{}, fmt.Errorf("cannot unmarshal updated suite '%s': %w", suite, err)
+			return openapi.MonitorResource{}, fmt.Errorf("cannot unmarshal updated suite '%s': %w", suiteID, err)
 		}
 
 		m.logger.Debug("mapped monitor suite",

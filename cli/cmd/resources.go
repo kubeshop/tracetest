@@ -176,7 +176,7 @@ var (
 				return nil
 			},
 		}),
-		resourcemanager.WithApplyPreProcessor(testSuitePreprocessor.Preprocess),
+		resourcemanager.WithApplyPreProcessor(monitorPreprocessor.Preprocess),
 	)
 
 	testClient = resourcemanager.NewClient(
