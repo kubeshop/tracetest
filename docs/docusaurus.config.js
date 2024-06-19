@@ -122,8 +122,10 @@ const config = {
         //   '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/pricing">Tracetest Open Beta is Live. Try it! Give us feedback! 🙌</a>',
         // content:
         //   '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/observability-at-kubecon-cloudnativecon-europe-2024-in-paris">👉 Check out the "Observability 🔭 at KubeCon CloudNativeCon EU 2024 Paris" recap! 👈</a>',
+        // content:
+        //   '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/tracetest-celebrates-2nd-birthday-with-1-0-release">👉 Tracetest Celebrates 2nd Birthday with 1.0 Release! 👈</a>',
         content:
-          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/tracetest-celebrates-2nd-birthday-with-1-0-release">👉 Tracetest Celebrates 2nd Birthday with 1.0 Release! 👈</a>',
+          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/test-observability-for-teams-with-tracetest-v1-x-launch-week-recap">🎉 Test Observability for Platform & Observability Teams with Tracetest v1.3 is here! 🔥</a>',
         isCloseable: false,
       },  
       navbar: {

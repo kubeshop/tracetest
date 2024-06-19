@@ -6,12 +6,21 @@ import Link from '@docusaurus/Link';
 import Heading from '@theme/Heading';
 
 const WelcomeGuides = [
+  // { // Changed June 17 2024 to try redirecting users to recipes.
+  //   name: '👇 Getting Started',
+  //   url: './getting-started/overview',
+  //   description: (
+  //     <Translate >
+  //       Set up Tracetest and start trace-based testing your distributed system.
+  //     </Translate>
+  //   ),
+  // },
   {
-    name: '👇 Getting Started',
-    url: './getting-started/overview',
+    name: '👇 Getting Started Guides',
+    url: './examples-tutorials/recipes',
     description: (
       <Translate >
-        Set up Tracetest and start trace-based testing your distributed system.
+        Hit the ground running with these trace-based testing guides!
       </Translate>
     ),
   },

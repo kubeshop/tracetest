@@ -470,11 +470,6 @@ const sidebars = {
     },
     {
       type: "doc",
-      id: "examples-tutorials/webinars",
-      label: "Webinars",
-    },
-    {
-      type: "doc",
       id: "examples-tutorials/tutorials",
       label: "Blog Post Tutorials",
     },
@@ -742,6 +737,11 @@ const sidebars = {
           type: "doc",
           id: "concepts/what-is-trace-based-testing",
           label: "What is Trace-based Testing",
+        },
+        {
+          type: "doc",
+          id: "concepts/open-source-vs-commercial-features",
+          label: "Open Source vs Commercial Features",
         },
         // {
         //   type: "doc",
