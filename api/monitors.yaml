@@ -65,6 +65,8 @@ components:
             $ref: "./testsuites.yaml#/components/schemas/TestSuite"
         variableSetId:
           type: string
+        tokenId:
+          type: string
         schedule:
           $ref: "#/components/schemas/Schedule"
         alerts:
@@ -78,7 +80,7 @@ components:
       type: object
       properties:
         runs:
-          type: integer  
+          type: integer
         lastState:
           type: string
         lastRunTime:
@@ -89,6 +91,8 @@ components:
       type: object
       properties:
         cron:
+          type: string
+        timeZone:
           type: string
 
     Alert:
@@ -158,6 +162,8 @@ components:
           enum:
             - MANUAL
             - SCHEDULED
+        lastError:
+          type: string
         state:
           type: string
           enum: [CREATED, EXECUTING, FINISHED, FAILED]
@@ -199,6 +205,10 @@ components:
           type: string
         webhook:
           $ref: "#/components/schemas/WebhookResult"
+        type:
+          type: string
+          enum:
+            - webhook
 
     WebhookResult:
       type: object
@@ -214,11 +224,23 @@ components:
                 $ref: "./http.yaml#/components/schemas/HTTPHeader"
             body:
               type: string
+            method:
+              type: string
+              enum:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+                - PATCH
+                - HEAD
+                - OPTIONS
         response:
           type: object
           properties:
-            status:
+            statusCode:
               type: integer
+            status:
+              type: string
             body:
               type: string
             headers:
@@ -227,3 +249,23 @@ components:
                 $ref: "./http.yaml#/components/schemas/HTTPHeader"
             error:
               type: string
+
+    RunMonitorInformation:
+      type: object
+      properties:
+        metadata:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+        runGroupId:
+          type: string
+        runType:
+          type: string
+          enum:
+            - SCHEDULED
+            - MANUAL
+        variables:
+          type: array
+          items:
+            $ref: "./variableSets.yaml#/components/schemas/VariableSetValue"

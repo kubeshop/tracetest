@@ -22,6 +22,7 @@ type AlertResult struct {
 	AlertId *string        `json:"alertId,omitempty"`
 	Id      *string        `json:"id,omitempty"`
 	Webhook *WebhookResult `json:"webhook,omitempty"`
+	Type    *string        `json:"type,omitempty"`
 }
 
 // NewAlertResult instantiates a new AlertResult object
@@ -137,6 +138,38 @@ func (o *AlertResult) SetWebhook(v WebhookResult) {
 	o.Webhook = &v
 }
 
+// GetType returns the Type field value if set, zero value otherwise.
+func (o *AlertResult) GetType() string {
+	if o == nil || isNil(o.Type) {
+		var ret string
+		return ret
+	}
+	return *o.Type
+}
+
+// GetTypeOk returns a tuple with the Type field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AlertResult) GetTypeOk() (*string, bool) {
+	if o == nil || isNil(o.Type) {
+		return nil, false
+	}
+	return o.Type, true
+}
+
+// HasType returns a boolean if a field has been set.
+func (o *AlertResult) HasType() bool {
+	if o != nil && !isNil(o.Type) {
+		return true
+	}
+
+	return false
+}
+
+// SetType gets a reference to the given string and assigns it to the Type field.
+func (o *AlertResult) SetType(v string) {
+	o.Type = &v
+}
+
 func (o AlertResult) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -155,6 +188,9 @@ func (o AlertResult) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Webhook) {
 		toSerialize["webhook"] = o.Webhook
+	}
+	if !isNil(o.Type) {
+		toSerialize["type"] = o.Type
 	}
 	return toSerialize, nil
 }

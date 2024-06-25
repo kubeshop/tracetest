@@ -4497,14 +4497,14 @@ func (a *ApiApiService) ResetOTLPConnectionInformationExecute(r ApiResetOTLPConn
 }
 
 type ApiRunMonitorRequest struct {
-	ctx            context.Context
-	ApiService     *ApiApiService
-	monitorId      string
-	runInformation *RunInformation
+	ctx                   context.Context
+	ApiService            *ApiApiService
+	monitorId             string
+	runMonitorInformation *RunMonitorInformation
 }
 
-func (r ApiRunMonitorRequest) RunInformation(runInformation RunInformation) ApiRunMonitorRequest {
-	r.runInformation = &runInformation
+func (r ApiRunMonitorRequest) RunMonitorInformation(runMonitorInformation RunMonitorInformation) ApiRunMonitorRequest {
+	r.runMonitorInformation = &runMonitorInformation
 	return r
 }
 
@@ -4570,7 +4570,7 @@ func (a *ApiApiService) RunMonitorExecute(r ApiRunMonitorRequest) (*MonitorRun, 
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	// body params
-	localVarPostBody = r.runInformation
+	localVarPostBody = r.runMonitorInformation
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
