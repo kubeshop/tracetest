@@ -22,6 +22,7 @@ type WebhookResultRequest struct {
 	Url     *string      `json:"url,omitempty"`
 	Headers []HTTPHeader `json:"headers,omitempty"`
 	Body    *string      `json:"body,omitempty"`
+	Method  *string      `json:"method,omitempty"`
 }
 
 // NewWebhookResultRequest instantiates a new WebhookResultRequest object
@@ -137,6 +138,38 @@ func (o *WebhookResultRequest) SetBody(v string) {
 	o.Body = &v
 }
 
+// GetMethod returns the Method field value if set, zero value otherwise.
+func (o *WebhookResultRequest) GetMethod() string {
+	if o == nil || isNil(o.Method) {
+		var ret string
+		return ret
+	}
+	return *o.Method
+}
+
+// GetMethodOk returns a tuple with the Method field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WebhookResultRequest) GetMethodOk() (*string, bool) {
+	if o == nil || isNil(o.Method) {
+		return nil, false
+	}
+	return o.Method, true
+}
+
+// HasMethod returns a boolean if a field has been set.
+func (o *WebhookResultRequest) HasMethod() bool {
+	if o != nil && !isNil(o.Method) {
+		return true
+	}
+
+	return false
+}
+
+// SetMethod gets a reference to the given string and assigns it to the Method field.
+func (o *WebhookResultRequest) SetMethod(v string) {
+	o.Method = &v
+}
+
 func (o WebhookResultRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -155,6 +188,9 @@ func (o WebhookResultRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Body) {
 		toSerialize["body"] = o.Body
+	}
+	if !isNil(o.Method) {
+		toSerialize["method"] = o.Method
 	}
 	return toSerialize, nil
 }

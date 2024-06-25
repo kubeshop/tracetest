@@ -19,10 +19,11 @@ var _ MappedNullable = &WebhookResultResponse{}
 
 // WebhookResultResponse struct for WebhookResultResponse
 type WebhookResultResponse struct {
-	Status  *int32       `json:"status,omitempty"`
-	Body    *string      `json:"body,omitempty"`
-	Headers []HTTPHeader `json:"headers,omitempty"`
-	Error   *string      `json:"error,omitempty"`
+	StatusCode *int32       `json:"statusCode,omitempty"`
+	Status     *string      `json:"status,omitempty"`
+	Body       *string      `json:"body,omitempty"`
+	Headers    []HTTPHeader `json:"headers,omitempty"`
+	Error      *string      `json:"error,omitempty"`
 }
 
 // NewWebhookResultResponse instantiates a new WebhookResultResponse object
@@ -42,10 +43,42 @@ func NewWebhookResultResponseWithDefaults() *WebhookResultResponse {
 	return &this
 }
 
-// GetStatus returns the Status field value if set, zero value otherwise.
-func (o *WebhookResultResponse) GetStatus() int32 {
-	if o == nil || isNil(o.Status) {
+// GetStatusCode returns the StatusCode field value if set, zero value otherwise.
+func (o *WebhookResultResponse) GetStatusCode() int32 {
+	if o == nil || isNil(o.StatusCode) {
 		var ret int32
+		return ret
+	}
+	return *o.StatusCode
+}
+
+// GetStatusCodeOk returns a tuple with the StatusCode field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WebhookResultResponse) GetStatusCodeOk() (*int32, bool) {
+	if o == nil || isNil(o.StatusCode) {
+		return nil, false
+	}
+	return o.StatusCode, true
+}
+
+// HasStatusCode returns a boolean if a field has been set.
+func (o *WebhookResultResponse) HasStatusCode() bool {
+	if o != nil && !isNil(o.StatusCode) {
+		return true
+	}
+
+	return false
+}
+
+// SetStatusCode gets a reference to the given int32 and assigns it to the StatusCode field.
+func (o *WebhookResultResponse) SetStatusCode(v int32) {
+	o.StatusCode = &v
+}
+
+// GetStatus returns the Status field value if set, zero value otherwise.
+func (o *WebhookResultResponse) GetStatus() string {
+	if o == nil || isNil(o.Status) {
+		var ret string
 		return ret
 	}
 	return *o.Status
@@ -53,7 +86,7 @@ func (o *WebhookResultResponse) GetStatus() int32 {
 
 // GetStatusOk returns a tuple with the Status field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *WebhookResultResponse) GetStatusOk() (*int32, bool) {
+func (o *WebhookResultResponse) GetStatusOk() (*string, bool) {
 	if o == nil || isNil(o.Status) {
 		return nil, false
 	}
@@ -69,8 +102,8 @@ func (o *WebhookResultResponse) HasStatus() bool {
 	return false
 }
 
-// SetStatus gets a reference to the given int32 and assigns it to the Status field.
-func (o *WebhookResultResponse) SetStatus(v int32) {
+// SetStatus gets a reference to the given string and assigns it to the Status field.
+func (o *WebhookResultResponse) SetStatus(v string) {
 	o.Status = &v
 }
 
@@ -180,6 +213,9 @@ func (o WebhookResultResponse) MarshalJSON() ([]byte, error) {
 
 func (o WebhookResultResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
+	if !isNil(o.StatusCode) {
+		toSerialize["statusCode"] = o.StatusCode
+	}
 	if !isNil(o.Status) {
 		toSerialize["status"] = o.Status
 	}

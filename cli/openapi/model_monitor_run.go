@@ -27,6 +27,7 @@ type MonitorRun struct {
 	CreatedAt          *time.Time         `json:"createdAt,omitempty"`
 	CompletedAt        *time.Time         `json:"completedAt,omitempty"`
 	ExecutionType      *string            `json:"executionType,omitempty"`
+	LastError          *string            `json:"lastError,omitempty"`
 	State              *string            `json:"state,omitempty"`
 	VariableSet        *VariableSet       `json:"variableSet,omitempty"`
 	Metadata           *map[string]string `json:"metadata,omitempty"`
@@ -282,6 +283,38 @@ func (o *MonitorRun) HasExecutionType() bool {
 // SetExecutionType gets a reference to the given string and assigns it to the ExecutionType field.
 func (o *MonitorRun) SetExecutionType(v string) {
 	o.ExecutionType = &v
+}
+
+// GetLastError returns the LastError field value if set, zero value otherwise.
+func (o *MonitorRun) GetLastError() string {
+	if o == nil || isNil(o.LastError) {
+		var ret string
+		return ret
+	}
+	return *o.LastError
+}
+
+// GetLastErrorOk returns a tuple with the LastError field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *MonitorRun) GetLastErrorOk() (*string, bool) {
+	if o == nil || isNil(o.LastError) {
+		return nil, false
+	}
+	return o.LastError, true
+}
+
+// HasLastError returns a boolean if a field has been set.
+func (o *MonitorRun) HasLastError() bool {
+	if o != nil && !isNil(o.LastError) {
+		return true
+	}
+
+	return false
+}
+
+// SetLastError gets a reference to the given string and assigns it to the LastError field.
+func (o *MonitorRun) SetLastError(v string) {
+	o.LastError = &v
 }
 
 // GetState returns the State field value if set, zero value otherwise.
@@ -568,6 +601,9 @@ func (o MonitorRun) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.ExecutionType) {
 		toSerialize["executionType"] = o.ExecutionType
+	}
+	if !isNil(o.LastError) {
+		toSerialize["lastError"] = o.LastError
 	}
 	if !isNil(o.State) {
 		toSerialize["state"] = o.State

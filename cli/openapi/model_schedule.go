@@ -19,7 +19,8 @@ var _ MappedNullable = &Schedule{}
 
 // Schedule struct for Schedule
 type Schedule struct {
-	Cron *string `json:"cron,omitempty"`
+	Cron     *string `json:"cron,omitempty"`
+	TimeZone *string `json:"timeZone,omitempty"`
 }
 
 // NewSchedule instantiates a new Schedule object
@@ -71,6 +72,38 @@ func (o *Schedule) SetCron(v string) {
 	o.Cron = &v
 }
 
+// GetTimeZone returns the TimeZone field value if set, zero value otherwise.
+func (o *Schedule) GetTimeZone() string {
+	if o == nil || isNil(o.TimeZone) {
+		var ret string
+		return ret
+	}
+	return *o.TimeZone
+}
+
+// GetTimeZoneOk returns a tuple with the TimeZone field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Schedule) GetTimeZoneOk() (*string, bool) {
+	if o == nil || isNil(o.TimeZone) {
+		return nil, false
+	}
+	return o.TimeZone, true
+}
+
+// HasTimeZone returns a boolean if a field has been set.
+func (o *Schedule) HasTimeZone() bool {
+	if o != nil && !isNil(o.TimeZone) {
+		return true
+	}
+
+	return false
+}
+
+// SetTimeZone gets a reference to the given string and assigns it to the TimeZone field.
+func (o *Schedule) SetTimeZone(v string) {
+	o.TimeZone = &v
+}
+
 func (o Schedule) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -83,6 +116,9 @@ func (o Schedule) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Cron) {
 		toSerialize["cron"] = o.Cron
+	}
+	if !isNil(o.TimeZone) {
+		toSerialize["timeZone"] = o.TimeZone
 	}
 	return toSerialize, nil
 }

@@ -1754,7 +1754,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./tests.yaml#/components/schemas/RunInformation"
+              $ref: "./monitors.yaml#/components/schemas/RunMonitorInformation"
       responses:
         200:
           description: successful operation

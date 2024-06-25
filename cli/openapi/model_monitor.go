@@ -36,6 +36,7 @@ type Monitor struct {
 	// list of steps of the Monitor containing the whole test suite object
 	FullTestSuites []TestSuite `json:"fullTestSuites,omitempty"`
 	VariableSetId  *string     `json:"variableSetId,omitempty"`
+	TokenId        *string     `json:"tokenId,omitempty"`
 	Schedule       *Schedule   `json:"schedule,omitempty"`
 	Alerts         []Alert     `json:"alerts,omitempty"`
 	Summary        *Summary    `json:"summary,omitempty"`
@@ -442,6 +443,38 @@ func (o *Monitor) SetVariableSetId(v string) {
 	o.VariableSetId = &v
 }
 
+// GetTokenId returns the TokenId field value if set, zero value otherwise.
+func (o *Monitor) GetTokenId() string {
+	if o == nil || isNil(o.TokenId) {
+		var ret string
+		return ret
+	}
+	return *o.TokenId
+}
+
+// GetTokenIdOk returns a tuple with the TokenId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Monitor) GetTokenIdOk() (*string, bool) {
+	if o == nil || isNil(o.TokenId) {
+		return nil, false
+	}
+	return o.TokenId, true
+}
+
+// HasTokenId returns a boolean if a field has been set.
+func (o *Monitor) HasTokenId() bool {
+	if o != nil && !isNil(o.TokenId) {
+		return true
+	}
+
+	return false
+}
+
+// SetTokenId gets a reference to the given string and assigns it to the TokenId field.
+func (o *Monitor) SetTokenId(v string) {
+	o.TokenId = &v
+}
+
 // GetSchedule returns the Schedule field value if set, zero value otherwise.
 func (o *Monitor) GetSchedule() Schedule {
 	if o == nil || isNil(o.Schedule) {
@@ -583,6 +616,9 @@ func (o Monitor) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.VariableSetId) {
 		toSerialize["variableSetId"] = o.VariableSetId
+	}
+	if !isNil(o.TokenId) {
+		toSerialize["tokenId"] = o.TokenId
 	}
 	if !isNil(o.Schedule) {
 		toSerialize["schedule"] = o.Schedule
