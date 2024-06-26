@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
   schedule:
-  - cron: '*/15,30,45,0 * * * *' # every 15-minutes
+  - cron: '0 * * * *' # every hour
 
 jobs:
   pokeshop-trace-based-tests:
