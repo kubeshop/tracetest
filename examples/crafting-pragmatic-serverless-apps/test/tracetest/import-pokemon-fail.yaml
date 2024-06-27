@@ -1,0 +1,21 @@
+type: Test
+spec:
+  id: JaLTKdwIR
+  name: Import Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: https://crafting-pragmatic-serverless-apps.xxxx.workers.dev/api/pokemon?id=99999
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[name="fetchHandler POST"]
+    name: Validate that it does not contain an error.
+    assertions:
+    - attr:pokeapi.response.error = "false"
+  - selector: span[name="D1 Add Pokemon"]
+    name: Validate database span exists.
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
