@@ -1,0 +1,51 @@
+---
+id: monitors
+title: Monitors
+description: Tracetest has Monitors to execute multiple tests and test suites as a group and alert you if they fail.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - monitoring
+  - monitor
+  - synthetic monitoring
+  - synthetic testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+:::tip Commercial Feature
+[Feature available only in Cloud-based Managed Tracetest & Enterprise Self-hosted Tracetest.](https://tracetest.io/pricing)
+:::
+
+Tracetest Monitors is a framework for creating scheduled runs of tests and test suites and getting alerted when they fail. With native support for webhooks, you can choose how to integrate with your favorite alerting tools!
+
+## What is a Monitor?
+
+A Tracetest Monitor groups multiple tests and test suites to run as a group and alert you if they fail. Monitors give you the easiest way of automating test runs without needing external CI tools.
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1719399627/Blogposts/Tracetest-Monitors-Trace-based-testing-meets-Synthetic-Monitoring/app-stage.tracetest.io_organizations_ttorg_bbf2def23aec248a_environments_ttenv_ee3687f0d89536d7_monitor_8zfKNkQSR_run_353_overview_3_tly95w.png)
+
+## Alerts
+
+With native support for webhooks, you can choose how to integrate with your favorite alerting tools!
+
+![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1719399653/Blogposts/Tracetest-Monitors-Trace-based-testing-meets-Synthetic-Monitoring/app-stage.tracetest.io_organizations_ttorg_bbf2def23aec248a_environments_ttenv_ee3687f0d89536d7_monitor_8zfKNkQSR_run_353_overview_2_1_jqtuet.png)
+
+## Running a Monitor
+
+Create a Monitor to run tests and test suites on a schedule. Select from a few presets or use a cron expression. Get alerted via webhooks by integrating with your favorite alerting tools.
+
+![create monitor modal](https://res.cloudinary.com/djwdcmwdz/image/upload/v1719399711/Blogposts/Tracetest-Monitors-Trace-based-testing-meets-Synthetic-Monitoring/app-stage.tracetest.io_organizations_ttorg_bbf2def23aec248a_environments_ttenv_ee3687f0d89536d7_test_pokeshop-demo-import-pokemon-queue_run_277_automate_2_1_w3mwtw.png)
+
+Monitors leverage the existing [Runs](/concepts/runs) and [Run Groups](/concepts/run-groups) resources in Tracetest and build on top of it by enabling scheduling and alerting.
+
+Every Monitor you define will be presented as a Run Group with an additional tag using the specific name of the `Monitor`.  Here you can see a list of Run Groups that include two Run Groups labeled as a `Monitor`.
+
+![run groups with monitor labels](https://res.cloudinary.com/djwdcmwdz/image/upload/v1719399770/Blogposts/Tracetest-Monitors-Trace-based-testing-meets-Synthetic-Monitoring/app-stage.tracetest.io_organizations_ttorg_bbf2def23aec248a_environments_ttenv_ee3687f0d89536d7_runs_page_1_name_startDate_endDate_monitorName_Pokeshop_20Monitor_1_1_aspntd.png)
+
+Filtering Runs by the `Monitor` tag is also available in the Runs view.
+
+![filter runs by monitor name tag](https://res.cloudinary.com/djwdcmwdz/image/upload/v1719399825/Blogposts/Tracetest-Monitors-Trace-based-testing-meets-Synthetic-Monitoring/app-stage.tracetest.io_organizations_ttorg_bbf2def23aec248a_environments_ttenv_ee3687f0d89536d7_runs_page_1_name_startDate_endDate_monitorName_Pokeshop_20Monitor_3_qhdltm.png)
+

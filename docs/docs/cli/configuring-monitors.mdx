@@ -1,0 +1,73 @@
+---
+id: configuring-monitors
+title: Defining Monitors as Text Files
+description: Create and edit Monitors with the CLI. Just like other structures of Tracetest, you can also manage your Monitors using the CLI and definition files.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - monitoring
+  - monitor
+  - synthetic monitoring
+  - synthetic testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+This page showcases how to create and edit Monitors with the CLI.
+
+:::tip
+[To read more about Monitors, check out the Monitors concepts page.](/concepts/monitors)
+:::
+
+Just like other structures of Tracetest, you can also manage your Monitors using the CLI and definition files.
+
+A definition file for a Monitor looks like the following:
+
+```yaml
+type: Monitor
+spec:
+  id: "abcdef" # optional
+  name: Sample Monitor
+  enabled: true
+  variableSetId: ""
+  tests:
+    - ./tests/create-product.yaml
+    - ./tests/add-product-to-cart.yaml
+    - ./tests/complete-purchase.yaml
+    - testID # you can also reference tests by their ids instead of referencing the definition file
+  testSuites:
+    - ./tests/create-product-suite.yaml
+    - testSuiteID # you can also reference tests by their ids instead of referencing the definition file
+  schedule:
+    cron: "0 0 0 0 *"
+  alerts:
+    id: ""
+    type: webhook
+    webhook:
+      url: https://...
+      method: POST
+      body: '{"text": "Monitor {{ .Monitor.name }} failed."}'
+    events:
+      - FAILED
+```
+
+In order to apply this Monitor to your Tracetest instance, make sure to have your [CLI configured](/cli/configuring-your-cli) and run:
+
+```sh
+tracetest apply monitor -f <monitor.yaml>
+```
+
+> If the file contains the property `spec.id`, the operation will be considered a Monitor update.
+
+To return a list of Monitors, run:
+
+```sh
+tracetest list monitor
+
+[Output]
+ ID          NAME             VERSION   RUNS   LAST RUN TIME         LAST RUN STATE   URL
+----------- ---------------- --------- ------ --------------------- ---------------- --------------------------------------------
+ 123456789   Sample Monitor   1         120    2024-06-27 13:00:01                    https://api.tracetest.io/monitor/123456789
+```

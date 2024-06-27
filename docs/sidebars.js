@@ -815,6 +815,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/monitors",
+          label: "Monitors",
+        },
+        {
+          type: "doc",
           id: "concepts/selectors",
           label: "Selectors",
         },
@@ -1055,6 +1060,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "web-ui/creating-monitors",
+          label: "Creating Monitors",
+        },
+        {
+          type: "doc",
           id: "web-ui/black-box-testing",
           label: "Enabling Black-Box Testing",
         },
@@ -1160,6 +1170,11 @@ const sidebars = {
               label: "Running Test Suites",
             },
           ],
+        },
+        {
+          type: "doc",
+          id: "cli/configuring-monitors",
+          label: "Configuring Monitors",
         },
         {
           type: "doc",
