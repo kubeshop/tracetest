@@ -16,6 +16,7 @@ components:
               "playwright",
               "artillery",
               "k6",
+              "playwrightengine",
             ]
         httpRequest:
           $ref: "./http.yaml#/components/schemas/HTTPRequest"
@@ -25,6 +26,8 @@ components:
           $ref: "./traceid.yaml#/components/schemas/TRACEIDRequest"
         kafka:
           $ref: "./kafka.yaml#/components/schemas/KafkaRequest"
+        playwrightEngine:
+          $ref: "./playwrightengine.yaml#/components/schemas/PlaywrightEngineRequest"
 
     TriggerResult:
       type: object
@@ -53,6 +56,8 @@ components:
               $ref: "./traceid.yaml#/components/schemas/TRACEIDResponse"
             kafka:
               $ref: "./kafka.yaml#/components/schemas/KafkaResponse"
+            playwrightEngine:
+              $ref: "./playwrightengine.yaml#/components/schemas/PlaywrightEngineResponse"
             error:
               $ref: "#/components/schemas/TriggerError"
 

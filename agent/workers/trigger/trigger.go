@@ -17,20 +17,22 @@ func (t TriggerType) IsIntegration() bool {
 
 type (
 	Trigger struct {
-		Type    TriggerType     `json:"type"`
-		HTTP    *HTTPRequest    `json:"httpRequest,omitempty"`
-		GRPC    *GRPCRequest    `json:"grpc,omitempty"`
-		TraceID *TraceIDRequest `json:"traceid,omitempty"`
-		Kafka   *KafkaRequest   `json:"kafka,omitempty"`
+		Type             TriggerType              `json:"type"`
+		HTTP             *HTTPRequest             `json:"httpRequest,omitempty"`
+		GRPC             *GRPCRequest             `json:"grpc,omitempty"`
+		TraceID          *TraceIDRequest          `json:"traceid,omitempty"`
+		Kafka            *KafkaRequest            `json:"kafka,omitempty"`
+		PlaywrightEngine *PlaywrightEngineRequest `json:"playwrightEngine,omitempty"`
 	}
 
 	TriggerResult struct {
-		Type    TriggerType      `json:"type"`
-		HTTP    *HTTPResponse    `json:"http,omitempty"`
-		GRPC    *GRPCResponse    `json:"grpc,omitempty"`
-		TraceID *TraceIDResponse `json:"traceid,omitempty"`
-		Kafka   *KafkaResponse   `json:"kafka,omitempty"`
-		Error   *TriggerError    `json:"error,omitempty"`
+		Type             TriggerType               `json:"type"`
+		HTTP             *HTTPResponse             `json:"http,omitempty"`
+		GRPC             *GRPCResponse             `json:"grpc,omitempty"`
+		TraceID          *TraceIDResponse          `json:"traceid,omitempty"`
+		Kafka            *KafkaResponse            `json:"kafka,omitempty"`
+		PlaywrightEngine *PlaywrightEngineResponse `json:"playwrightEngine,omitempty"`
+		Error            *TriggerError             `json:"error,omitempty"`
 	}
 
 	TriggerError struct {

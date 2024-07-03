@@ -19,11 +19,12 @@ var _ MappedNullable = &TriggerResultTriggerResult{}
 
 // TriggerResultTriggerResult struct for TriggerResultTriggerResult
 type TriggerResultTriggerResult struct {
-	Http    *HTTPResponse    `json:"http,omitempty"`
-	Grpc    *GRPCResponse    `json:"grpc,omitempty"`
-	Traceid *TRACEIDResponse `json:"traceid,omitempty"`
-	Kafka   *KafkaResponse   `json:"kafka,omitempty"`
-	Error   *TriggerError    `json:"error,omitempty"`
+	Http             *HTTPResponse             `json:"http,omitempty"`
+	Grpc             *GRPCResponse             `json:"grpc,omitempty"`
+	Traceid          *TRACEIDResponse          `json:"traceid,omitempty"`
+	Kafka            *KafkaResponse            `json:"kafka,omitempty"`
+	PlaywrightEngine *PlaywrightEngineResponse `json:"playwrightEngine,omitempty"`
+	Error            *TriggerError             `json:"error,omitempty"`
 }
 
 // NewTriggerResultTriggerResult instantiates a new TriggerResultTriggerResult object
@@ -171,6 +172,38 @@ func (o *TriggerResultTriggerResult) SetKafka(v KafkaResponse) {
 	o.Kafka = &v
 }
 
+// GetPlaywrightEngine returns the PlaywrightEngine field value if set, zero value otherwise.
+func (o *TriggerResultTriggerResult) GetPlaywrightEngine() PlaywrightEngineResponse {
+	if o == nil || isNil(o.PlaywrightEngine) {
+		var ret PlaywrightEngineResponse
+		return ret
+	}
+	return *o.PlaywrightEngine
+}
+
+// GetPlaywrightEngineOk returns a tuple with the PlaywrightEngine field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TriggerResultTriggerResult) GetPlaywrightEngineOk() (*PlaywrightEngineResponse, bool) {
+	if o == nil || isNil(o.PlaywrightEngine) {
+		return nil, false
+	}
+	return o.PlaywrightEngine, true
+}
+
+// HasPlaywrightEngine returns a boolean if a field has been set.
+func (o *TriggerResultTriggerResult) HasPlaywrightEngine() bool {
+	if o != nil && !isNil(o.PlaywrightEngine) {
+		return true
+	}
+
+	return false
+}
+
+// SetPlaywrightEngine gets a reference to the given PlaywrightEngineResponse and assigns it to the PlaywrightEngine field.
+func (o *TriggerResultTriggerResult) SetPlaywrightEngine(v PlaywrightEngineResponse) {
+	o.PlaywrightEngine = &v
+}
+
 // GetError returns the Error field value if set, zero value otherwise.
 func (o *TriggerResultTriggerResult) GetError() TriggerError {
 	if o == nil || isNil(o.Error) {
@@ -224,6 +257,9 @@ func (o TriggerResultTriggerResult) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Kafka) {
 		toSerialize["kafka"] = o.Kafka
+	}
+	if !isNil(o.PlaywrightEngine) {
+		toSerialize["playwrightEngine"] = o.PlaywrightEngine
 	}
 	if !isNil(o.Error) {
 		toSerialize["error"] = o.Error

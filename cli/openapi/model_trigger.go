@@ -19,11 +19,12 @@ var _ MappedNullable = &Trigger{}
 
 // Trigger struct for Trigger
 type Trigger struct {
-	Type        *string         `json:"type,omitempty"`
-	HttpRequest *HTTPRequest    `json:"httpRequest,omitempty"`
-	Grpc        *GRPCRequest    `json:"grpc,omitempty"`
-	Traceid     *TRACEIDRequest `json:"traceid,omitempty"`
-	Kafka       *KafkaRequest   `json:"kafka,omitempty"`
+	Type             *string                  `json:"type,omitempty"`
+	HttpRequest      *HTTPRequest             `json:"httpRequest,omitempty"`
+	Grpc             *GRPCRequest             `json:"grpc,omitempty"`
+	Traceid          *TRACEIDRequest          `json:"traceid,omitempty"`
+	Kafka            *KafkaRequest            `json:"kafka,omitempty"`
+	PlaywrightEngine *PlaywrightEngineRequest `json:"playwrightEngine,omitempty"`
 }
 
 // NewTrigger instantiates a new Trigger object
@@ -203,6 +204,38 @@ func (o *Trigger) SetKafka(v KafkaRequest) {
 	o.Kafka = &v
 }
 
+// GetPlaywrightEngine returns the PlaywrightEngine field value if set, zero value otherwise.
+func (o *Trigger) GetPlaywrightEngine() PlaywrightEngineRequest {
+	if o == nil || isNil(o.PlaywrightEngine) {
+		var ret PlaywrightEngineRequest
+		return ret
+	}
+	return *o.PlaywrightEngine
+}
+
+// GetPlaywrightEngineOk returns a tuple with the PlaywrightEngine field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *Trigger) GetPlaywrightEngineOk() (*PlaywrightEngineRequest, bool) {
+	if o == nil || isNil(o.PlaywrightEngine) {
+		return nil, false
+	}
+	return o.PlaywrightEngine, true
+}
+
+// HasPlaywrightEngine returns a boolean if a field has been set.
+func (o *Trigger) HasPlaywrightEngine() bool {
+	if o != nil && !isNil(o.PlaywrightEngine) {
+		return true
+	}
+
+	return false
+}
+
+// SetPlaywrightEngine gets a reference to the given PlaywrightEngineRequest and assigns it to the PlaywrightEngine field.
+func (o *Trigger) SetPlaywrightEngine(v PlaywrightEngineRequest) {
+	o.PlaywrightEngine = &v
+}
+
 func (o Trigger) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -227,6 +260,9 @@ func (o Trigger) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.Kafka) {
 		toSerialize["kafka"] = o.Kafka
+	}
+	if !isNil(o.PlaywrightEngine) {
+		toSerialize["playwrightEngine"] = o.PlaywrightEngine
 	}
 	return toSerialize, nil
 }

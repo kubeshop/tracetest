@@ -42,6 +42,11 @@ func (t test) Preprocess(ctx context.Context, input fileutil.File) (fileutil.Fil
 		return input, fmt.Errorf("could not consolidate grpc file: %w", err)
 	}
 
+	test, err = t.consolidateScriptFile(input, test)
+	if err != nil {
+		return input, fmt.Errorf("could not consolidate playwrightengine script file: %w", err)
+	}
+
 	marshalled, err := yaml.Marshal(test)
 	if err != nil {
 		return input, fmt.Errorf("could not marshal test yaml: %w", err)
@@ -107,6 +112,32 @@ func (t test) consolidateGRPCFile(input fileutil.File, test openapi.TestResource
 	t.logger.Debug("protobuf file contents", zap.String("contents", string(pbFile.Contents())))
 
 	test.Spec.Trigger.Grpc.SetProtobufFile(string(pbFile.Contents()))
+
+	return test, nil
+}
+
+func (t test) consolidateScriptFile(input fileutil.File, test openapi.TestResource) (openapi.TestResource, error) {
+	if test.Spec.Trigger.GetType() != "playwrightengine" {
+		t.logger.Debug("test does not use playwrightengine", zap.String("triggerType", test.Spec.Trigger.GetType()))
+		return test, nil
+	}
+
+	definedScriptFile := test.Spec.Trigger.PlaywrightEngine.GetScript()
+	if !t.isValidGrpcFilePath(definedScriptFile, input.AbsDir()) {
+		t.logger.Debug("script file is not a file path", zap.String("protobufFile", definedScriptFile))
+		return test, nil
+	}
+
+	scriptFilePath := input.RelativeFile(definedScriptFile)
+	t.logger.Debug("script file", zap.String("path", scriptFilePath))
+
+	scriptFile, err := fileutil.Read(scriptFilePath)
+	if err != nil {
+		return test, fmt.Errorf(`cannot read script file: %w`, err)
+	}
+	t.logger.Debug("script file contents", zap.String("contents", string(scriptFile.Contents())))
+
+	test.Spec.Trigger.PlaywrightEngine.SetScript(string(scriptFile.Contents()))
 
 	return test, nil
 }

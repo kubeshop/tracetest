@@ -8,11 +8,12 @@ import (
 )
 
 type triggerJSONV3 struct {
-	Type    TriggerType     `json:"type"`
-	HTTP    *HTTPRequest    `json:"httpRequest,omitempty"`
-	GRPC    *GRPCRequest    `json:"grpc,omitempty"`
-	TraceID *TraceIDRequest `json:"traceid,omitempty"`
-	Kafka   *KafkaRequest   `json:"kafka,omitempty"`
+	Type             TriggerType              `json:"type"`
+	HTTP             *HTTPRequest             `json:"httpRequest,omitempty"`
+	GRPC             *GRPCRequest             `json:"grpc,omitempty"`
+	TraceID          *TraceIDRequest          `json:"traceid,omitempty"`
+	Kafka            *KafkaRequest            `json:"kafka,omitempty"`
+	PlaywrightEngine *PlaywrightEngineRequest `json:"playwrightengine,omitempty"`
 }
 
 func (v3 triggerJSONV3) valid() bool {
@@ -21,7 +22,7 @@ func (v3 triggerJSONV3) valid() bool {
 		(v3.HTTP != nil ||
 			v3.GRPC != nil ||
 			v3.TraceID != nil ||
-			v3.Kafka != nil)) || (v3.Type == TriggerTypeCypress || v3.Type == TriggerTypePlaywright || v3.Type == TriggerTypeArtillery || v3.Type == TriggerTypeK6)
+			v3.Kafka != nil) || v3.PlaywrightEngine != nil) || (v3.Type == TriggerTypeCypress || v3.Type == TriggerTypePlaywright || v3.Type == TriggerTypeArtillery || v3.Type == TriggerTypeK6)
 }
 
 type triggerJSONV2 struct {
@@ -115,16 +116,17 @@ type triggerResultV1 struct {
 }
 
 type triggerResultV2 struct {
-	Type    TriggerType      `json:"type"`
-	HTTP    *HTTPResponse    `json:"httpRequest,omitempty"`
-	GRPC    *GRPCResponse    `json:"grpc,omitempty"`
-	TraceID *TraceIDResponse `json:"traceid,omitempty"`
-	Kafka   *KafkaResponse   `json:"kafka,omitempty"`
-	Error   *TriggerError    `json:"error,omitempty"`
+	Type             TriggerType               `json:"type"`
+	HTTP             *HTTPResponse             `json:"httpRequest,omitempty"`
+	GRPC             *GRPCResponse             `json:"grpc,omitempty"`
+	TraceID          *TraceIDResponse          `json:"traceid,omitempty"`
+	Kafka            *KafkaResponse            `json:"kafka,omitempty"`
+	PlaywrightEngine *PlaywrightEngineResponse `json:"playwrightEngine,omitempty"`
+	Error            *TriggerError             `json:"error,omitempty"`
 }
 
 func (tr *triggerResultV2) valid() bool {
-	return tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil || tr.Kafka != nil || tr.Error != nil
+	return tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil || tr.Kafka != nil || tr.PlaywrightEngine != nil || tr.Error != nil
 }
 
 func (t *TriggerResult) UnmarshalJSON(data []byte) error {
@@ -137,6 +139,7 @@ func (t *TriggerResult) UnmarshalJSON(data []byte) error {
 		t.GRPC = v2.GRPC
 		t.TraceID = v2.TraceID
 		t.Kafka = v2.Kafka
+		t.PlaywrightEngine = v2.PlaywrightEngine
 		t.Error = v2.Error
 
 		return nil

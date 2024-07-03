@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/agent/telemetry"
 
 	"github.com/kubeshop/tracetest/agent/client"
@@ -94,6 +95,7 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 	registry.Add(trigger.GRPC())
 	registry.Add(trigger.TRACEID())
 	registry.Add(trigger.KAFKA())
+	registry.Add(trigger.PLAYWRIGHTENGINE())
 
 	// Assign registry into worker
 	worker.registry = registry
@@ -159,8 +161,10 @@ func (w *TriggerWorker) Trigger(ctx context.Context, request *proto.TriggerReque
 func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
 	triggerConfig := convertProtoToTrigger(triggerRequest.Trigger)
 	w.logger.Debug("Triggering test", zap.Any("triggerConfig", triggerConfig))
+	spew.Dump(triggerConfig.Type)
 	triggerer, err := w.registry.Get(triggerConfig.Type)
 	if err != nil {
+		spew.Dump(err)
 		w.logger.Error("Could not get triggerer", zap.Error(err))
 		return err
 	}
@@ -206,12 +210,15 @@ func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.Trigg
 }
 
 func convertProtoToTrigger(pt *proto.Trigger) trigger.Trigger {
+	spew.Dump(pt)
+
 	return trigger.Trigger{
-		Type:    trigger.TriggerType(pt.Type),
-		HTTP:    convertProtoHttpTriggerToHttpTrigger(pt.Http),
-		GRPC:    convertProtoGrpcTriggerToGrpcTrigger(pt.Grpc),
-		TraceID: convertProtoTraceIDTriggerToTraceIDTrigger(pt.TraceID),
-		Kafka:   convertProtoKafkaTriggerToKafkaTrigger(pt.Kafka),
+		Type:             trigger.TriggerType(pt.Type),
+		HTTP:             convertProtoHttpTriggerToHttpTrigger(pt.Http),
+		GRPC:             convertProtoGrpcTriggerToGrpcTrigger(pt.Grpc),
+		TraceID:          convertProtoTraceIDTriggerToTraceIDTrigger(pt.TraceID),
+		Kafka:            convertProtoKafkaTriggerToKafkaTrigger(pt.Kafka),
+		PlaywrightEngine: convertProtoPlaywrightEngineTriggerToPlaywrightEngineTrigger(pt.PlaywrightEngine),
 	}
 }
 
@@ -304,6 +311,18 @@ func convertProtoTraceIDTriggerToTraceIDTrigger(traceIDRequest *proto.TraceIDReq
 
 	return &trigger.TraceIDRequest{
 		ID: traceIDRequest.Id,
+	}
+}
+
+func convertProtoPlaywrightEngineTriggerToPlaywrightEngineTrigger(playwrightEngineRequest *proto.PlaywrightEngineRequest) *trigger.PlaywrightEngineRequest {
+	if playwrightEngineRequest == nil {
+		return nil
+	}
+
+	return &trigger.PlaywrightEngineRequest{
+		Script: playwrightEngineRequest.Script,
+		Target: playwrightEngineRequest.Target,
+		Method: playwrightEngineRequest.Method,
 	}
 }
 
