@@ -79,7 +79,6 @@ func start(traceId, spanId, url, method string) error {
 		return err
 	}
 
-	// npx playwright install
 	res, err := execCommand(
 		app,
 		"playwright",
