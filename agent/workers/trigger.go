@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/kubeshop/tracetest/agent/telemetry"
 
 	"github.com/kubeshop/tracetest/agent/client"
@@ -161,10 +160,8 @@ func (w *TriggerWorker) Trigger(ctx context.Context, request *proto.TriggerReque
 func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.TriggerRequest) error {
 	triggerConfig := convertProtoToTrigger(triggerRequest.Trigger)
 	w.logger.Debug("Triggering test", zap.Any("triggerConfig", triggerConfig))
-	spew.Dump(triggerConfig.Type)
 	triggerer, err := w.registry.Get(triggerConfig.Type)
 	if err != nil {
-		spew.Dump(err)
 		w.logger.Error("Could not get triggerer", zap.Error(err))
 		return err
 	}
@@ -210,8 +207,6 @@ func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.Trigg
 }
 
 func convertProtoToTrigger(pt *proto.Trigger) trigger.Trigger {
-	spew.Dump(pt)
-
 	return trigger.Trigger{
 		Type:             trigger.TriggerType(pt.Type),
 		HTTP:             convertProtoHttpTriggerToHttpTrigger(pt.Http),

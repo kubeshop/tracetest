@@ -109,7 +109,6 @@ func runMultipleFiles(ctx context.Context) (string, error) {
 	}
 
 	exitCode, err := cloudCmd.RunMultipleFiles(ctx, httpClient, runParams, &cliConfig, runnerRegistry, output)
-	fmt.Println("exitCode", exitCode, err)
 	ExitCLI(exitCode)
 	return "", err
 }

@@ -7,8 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -25,7 +23,6 @@ func PLAYWRIGHTENGINE() Triggerer {
 type playwrightTriggerer struct{}
 
 func (te *playwrightTriggerer) Trigger(ctx context.Context, triggerConfig Trigger, opts *Options) (Response, error) {
-	spew.Dump(triggerConfig, opts)
 	response := Response{
 		Result: TriggerResult{
 			Type: te.Type(),
