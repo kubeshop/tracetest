@@ -94,6 +94,7 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 	registry.Add(trigger.GRPC())
 	registry.Add(trigger.TRACEID())
 	registry.Add(trigger.KAFKA())
+	registry.Add(trigger.PLAYWRIGHTENGINE())
 
 	// Assign registry into worker
 	worker.registry = registry
@@ -207,11 +208,12 @@ func (w *TriggerWorker) trigger(ctx context.Context, triggerRequest *proto.Trigg
 
 func convertProtoToTrigger(pt *proto.Trigger) trigger.Trigger {
 	return trigger.Trigger{
-		Type:    trigger.TriggerType(pt.Type),
-		HTTP:    convertProtoHttpTriggerToHttpTrigger(pt.Http),
-		GRPC:    convertProtoGrpcTriggerToGrpcTrigger(pt.Grpc),
-		TraceID: convertProtoTraceIDTriggerToTraceIDTrigger(pt.TraceID),
-		Kafka:   convertProtoKafkaTriggerToKafkaTrigger(pt.Kafka),
+		Type:             trigger.TriggerType(pt.Type),
+		HTTP:             convertProtoHttpTriggerToHttpTrigger(pt.Http),
+		GRPC:             convertProtoGrpcTriggerToGrpcTrigger(pt.Grpc),
+		TraceID:          convertProtoTraceIDTriggerToTraceIDTrigger(pt.TraceID),
+		Kafka:            convertProtoKafkaTriggerToKafkaTrigger(pt.Kafka),
+		PlaywrightEngine: convertProtoPlaywrightEngineTriggerToPlaywrightEngineTrigger(pt.PlaywrightEngine),
 	}
 }
 
@@ -304,6 +306,18 @@ func convertProtoTraceIDTriggerToTraceIDTrigger(traceIDRequest *proto.TraceIDReq
 
 	return &trigger.TraceIDRequest{
 		ID: traceIDRequest.Id,
+	}
+}
+
+func convertProtoPlaywrightEngineTriggerToPlaywrightEngineTrigger(playwrightEngineRequest *proto.PlaywrightEngineRequest) *trigger.PlaywrightEngineRequest {
+	if playwrightEngineRequest == nil {
+		return nil
+	}
+
+	return &trigger.PlaywrightEngineRequest{
+		Script: playwrightEngineRequest.Script,
+		Target: playwrightEngineRequest.Target,
+		Method: playwrightEngineRequest.Method,
 	}
 }
 

@@ -107,6 +107,7 @@ message Trigger {
     GrpcRequest grpc = 3;
     TraceIDRequest traceID = 4;
     KafkaRequest kafka = 5;
+    PlaywrightEngineRequest playwrightEngine = 6;
 }
 
 message HttpRequest {
@@ -180,6 +181,7 @@ message TriggerResult {
     TraceIdResponse traceID = 4;
     KafkaResponse kafka = 5;
     Error error = 6;
+    PlaywrightEngineResponse playwrightEngine = 7;
 }
 
 message HttpResponse {
@@ -397,4 +399,14 @@ message KafkaPlainAuthentication {
 message KafkaResponse {
     string partition = 1;
     string offset = 2;
+}
+
+message PlaywrightEngineRequest {
+    string target = 1;
+    string method = 2;
+    string script = 3;
+}
+
+message PlaywrightEngineResponse {
+    bool success = 1;
 }
