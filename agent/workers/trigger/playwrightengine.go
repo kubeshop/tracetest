@@ -132,9 +132,9 @@ func execCommand(name string, args ...string) (string, error) {
 }
 
 type PlaywrightEngineRequest struct {
-	Target string `json:"target,omitempty"`
+	Target string `json:"target,omitempty"  expr_enabled:"true"`
 	Script string `json:"script,omitempty"`
-	Method string `json:"method,omitempty"`
+	Method string `json:"method,omitempty"  expr_enabled:"true"`
 }
 
 type PlaywrightEngineResponse struct {
