@@ -879,3 +879,95 @@ func (c *controller) GetRunGroups(_ context.Context, _ int32, _ int32, _ string,
 func (c *controller) GetRunsFromRunGroup(context.Context, int32, int32, string) (openapi.ImplResponse, error) {
 	return openapi.Response(http.StatusPaymentRequired, nil), nil
 }
+
+func (c *controller) CreateEnvironment(context.Context, openapi.EnvironmentResource) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) CreateInvite(context.Context, openapi.InviteResource) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) CreateToken(context.Context, openapi.Token) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) DeleteEnvironment(context.Context, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) DeleteInvite(context.Context, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) DeleteToken(context.Context, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) DeleteMonitorRun(context.Context, string, int32) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) GetEnvironment(context.Context, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) GetInvite(context.Context, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) GetMonitorRun(context.Context, string, int32) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) GetMonitorRuns(context.Context, string, int32, int32) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) GetMonitorVersion(context.Context, string, int32) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) ListEnvironments(context.Context, int32, int32, string, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) ListInvites(context.Context, int32, int32, string, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) ListTokens(context.Context, int32, int32, string, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) RunMonitor(context.Context, string, openapi.RunMonitorInformation) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) TestAlert(context.Context, openapi.Alert) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) UpdateEnvironment(context.Context, string, openapi.EnvironmentResource) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) UpdateInvite(context.Context, string, openapi.InviteResource) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) UpdateToken(context.Context, string) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) UpsertEnvironment(context.Context, openapi.EnvironmentResource) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) UpsertInvite(context.Context, openapi.InviteResource) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
+
+func (c *controller) UpsertToken(context.Context, openapi.Token) (openapi.ImplResponse, error) {
+	return openapi.Response(http.StatusPaymentRequired, nil), nil
+}
