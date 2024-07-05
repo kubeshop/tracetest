@@ -13,6 +13,8 @@ type VariableSetValue struct {
 	Key string `json:"key,omitempty"`
 
 	Value string `json:"value,omitempty"`
+
+	Type string `json:"type,omitempty"`
 }
 
 // AssertVariableSetValueRequired checks if the required fields are not zero-ed

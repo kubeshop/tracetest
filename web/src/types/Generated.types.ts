@@ -145,12 +145,18 @@ export interface paths {
   "/pollingprofiles": {
     /** List Polling Profile configuration */
     get: operations["listPollingProfile"];
+    /** Upsert new polling profile */
+    put: operations["upsertPollingProfile"];
+    /** Create Polling Profile configuration */
+    post: operations["createPollingProfile"];
   };
   "/pollingprofiles/{pollingProfileId}": {
     /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
     get: operations["getPollingProfile"];
     /** Update a polling profile used on Tracetest to configure how to fetch traces in a test. */
     put: operations["updatePollingProfile"];
+    /** Delete a polling profile used on Tracetest. */
+    delete: operations["deletePollingProfile"];
   };
   "/demos": {
     /** List demonstrations used on Tracetest as quick start examples. */
@@ -200,7 +206,7 @@ export interface paths {
     /** Create an Linter that can be used by tests and Linters */
     post: operations["createLinter"];
   };
-  "/linters/{LinterId}": {
+  "/linters/{linterId}": {
     /** Get one Linter by its id */
     get: operations["getLinter"];
     /** Update a Linter used on Tracetest */
@@ -213,6 +219,102 @@ export interface paths {
     get: operations["getWizard"];
     /** Update a Wizard used on Tracetest */
     put: operations["updateWizard"];
+  };
+  "/rungroups": {
+    /** Get all the run groups in the system */
+    get: operations["getRunGroups"];
+    /** Create a RunGroup used on Tracetest */
+    post: operations["createRunGroup"];
+  };
+  "/rungroups/{runGroupId}": {
+    /** Get a run groups in the system */
+    get: operations["getRunGroup"];
+    parameters: {};
+  };
+  "/monitors": {
+    /** List the monitors */
+    get: operations["listMonitors"];
+    /** Upsert a Monitor used on Tracetest */
+    put: operations["upsertMonitor"];
+    /** Create a Monitor used on Tracetest */
+    post: operations["creteMonitor"];
+  };
+  "/monitors/{monitorId}": {
+    /** Get a Monitor */
+    get: operations["getMonitor"];
+    /** Update a Monitor */
+    put: operations["updateMonitor"];
+    /** Delete a Monitor */
+    delete: operations["deleteMonitor"];
+  };
+  "/monitors/{monitorId}/version/{version}": {
+    /** Get a Monitor with Version */
+    get: operations["getMonitorVersion"];
+  };
+  "/monitors/{monitorId}/run": {
+    /** Get a Monitor runs */
+    get: operations["getMonitorRuns"];
+    /** run a particular Monitor */
+    post: operations["runMonitor"];
+  };
+  "/monitors/{monitorId}/run/{runId}": {
+    /** Get a specific run from a particular Monitor */
+    get: operations["getMonitorRun"];
+    /** Delete a Monitor */
+    delete: operations["deleteMonitorRun"];
+  };
+  "/monitors/alerts": {
+    /** Tests the alert trigger */
+    post: operations["testAlert"];
+  };
+  "/invites": {
+    /** Lists pending invites */
+    get: operations["listInvites"];
+    /** Upserts invite */
+    put: operations["upsertInvite"];
+    /** Creates pending email invite */
+    post: operations["createInvite"];
+  };
+  "/invites/{inviteID}": {
+    /** get invite */
+    get: operations["getInvite"];
+    /** Updates pending email invite */
+    put: operations["updateInvite"];
+    /** delete pending invite */
+    delete: operations["deleteInvite"];
+    parameters: {};
+  };
+  "/tokens": {
+    /** Lists tokens */
+    get: operations["listTokens"];
+    /** Upserts a new token */
+    put: operations["upsertToken"];
+    /** Creates a new token */
+    post: operations["createToken"];
+  };
+  "/tokens/{tokenID}": {
+    /** update token */
+    put: operations["updateToken"];
+    /** delete token */
+    delete: operations["deleteToken"];
+    parameters: {};
+  };
+  "/environments": {
+    /** List environments from an organization */
+    get: operations["listEnvironments"];
+    /** Upsert test environment */
+    put: operations["upsertEnvironment"];
+    /** Create test environment */
+    post: operations["createEnvironment"];
+  };
+  "/environments/{environmentID}": {
+    /** Get test environment by ID from CRD in kubernetes cluster */
+    get: operations["getEnvironment"];
+    /** Update environment with given request body */
+    put: operations["updateEnvironment"];
+    /** Deletes a test environment */
+    delete: operations["deleteEnvironment"];
+    parameters: {};
   };
 }
 
@@ -839,6 +941,44 @@ export interface operations {
       500: unknown;
     };
   };
+  /** Upsert new polling profile */
+  upsertPollingProfile: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+      };
+    };
+  };
+  /** Create Polling Profile configuration */
+  createPollingProfile: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+          "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        };
+      };
+      /** problem creating the polling profile */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+        "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
+      };
+    };
+  };
   /** Get a polling profile used on Tracetest to configure how to fetch traces in a test. */
   getPollingProfile: {
     parameters: {};
@@ -879,6 +1019,18 @@ export interface operations {
         "application/json": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
         "text/yaml": external["config.yaml"]["components"]["schemas"]["PollingProfile"];
       };
+    };
+  };
+  /** Delete a polling profile used on Tracetest. */
+  deletePollingProfile: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** polling profile not found */
+      404: unknown;
+      /** problem getting a polling profile */
+      500: unknown;
     };
   };
   /** List demonstrations used on Tracetest as quick start examples. */
@@ -1265,6 +1417,389 @@ export interface operations {
       };
     };
   };
+  /** Get all the run groups in the system */
+  getRunGroups: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        headers: {
+          /** Total records count */
+          "X-Total-Count"?: number;
+        };
+        content: {
+          "application/json": external["runGroups.yaml"]["components"]["schemas"]["RunGroupList"];
+        };
+      };
+      /** Run Groups not found */
+      404: unknown;
+      /** problem getting the Run Groups */
+      500: unknown;
+    };
+  };
+  /** Create a RunGroup used on Tracetest */
+  createRunGroup: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["runGroups.yaml"]["components"]["schemas"]["RunGroup"];
+        };
+      };
+      /** invalid RunGroup, some data was sent in incorrect format. */
+      400: unknown;
+      /** RunGroup not found */
+      404: unknown;
+      /** problem updating an RunGroup */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["runGroups.yaml"]["components"]["schemas"]["RunGroup"];
+      };
+    };
+  };
+  /** Get a run groups in the system */
+  getRunGroup: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["runGroups.yaml"]["components"]["schemas"]["RunGroup"];
+        };
+      };
+      /** Run Group not found */
+      404: unknown;
+      /** problem getting the Run Group */
+      500: unknown;
+    };
+  };
+  /** List the monitors */
+  listMonitors: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorResourceList"];
+        };
+      };
+      /** Monitors not found */
+      404: unknown;
+      /** problem getting the Monitor list */
+      500: unknown;
+    };
+  };
+  /** Upsert a Monitor used on Tracetest */
+  upsertMonitor: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorResource"];
+        };
+      };
+      /** invalid Monitor, some data was sent in incorrect format. */
+      400: unknown;
+      /** Monitor not found */
+      404: unknown;
+      /** problem upserting an Monitor */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorResource"];
+      };
+    };
+  };
+  /** Create a Monitor used on Tracetest */
+  creteMonitor: {
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorResource"];
+        };
+      };
+      /** invalid Monitor, some data was sent in incorrect format. */
+      400: unknown;
+      /** Monitor not found */
+      404: unknown;
+      /** problem creating an Monitor */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorResource"];
+      };
+    };
+  };
+  /** Get a Monitor */
+  getMonitor: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorResource"];
+        };
+      };
+      /** Monitor not found */
+      404: unknown;
+      /** problem getting a Monitor */
+      500: unknown;
+    };
+  };
+  /** Update a Monitor */
+  updateMonitor: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid Monitor, some data was sent in incorrect format. */
+      400: unknown;
+      /** Monitor not found */
+      404: unknown;
+      /** problem updating a Monitor */
+      500: unknown;
+    };
+    requestBody: {
+      content: {
+        "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorResource"];
+      };
+    };
+  };
+  /** Delete a Monitor */
+  deleteMonitor: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid Monitor, some data was sent in incorrect format. */
+      400: unknown;
+      /** Monitor not found */
+      404: unknown;
+      /** problem deleting a Monitor */
+      500: unknown;
+    };
+  };
+  /** Get a Monitor with Version */
+  getMonitorVersion: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["monitors.yaml"]["components"]["schemas"]["Monitor"];
+        };
+      };
+      /** Monitor not found */
+      404: unknown;
+      /** problem getting a Monitor */
+      500: unknown;
+    };
+  };
+  /** Get a Monitor runs */
+  getMonitorRuns: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": {
+            items?: external["monitors.yaml"]["components"]["schemas"]["MonitorRun"][];
+            count?: number;
+          };
+        };
+      };
+      /** Monitor not found */
+      404: unknown;
+      /** problem getting a Monitor runs */
+      500: unknown;
+    };
+  };
+  /** run a particular Monitor */
+  runMonitor: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      200: {
+        content: {
+          "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorRun"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": external["monitors.yaml"]["components"]["schemas"]["RunMonitorInformation"];
+      };
+    };
+  };
+  /** Get a specific run from a particular Monitor */
+  getMonitorRun: {
+    parameters: {};
+    responses: {
+      /** OK */
+      200: {
+        content: {
+          "application/json": external["monitors.yaml"]["components"]["schemas"]["MonitorRun"];
+        };
+      };
+      /** MonitorRun run not found */
+      404: unknown;
+    };
+  };
+  /** Delete a Monitor */
+  deleteMonitorRun: {
+    parameters: {};
+    responses: {
+      /** successful operation */
+      204: never;
+      /** invalid Monitor, some data was sent in incorrect format. */
+      400: unknown;
+      /** Monitor not found */
+      404: unknown;
+      /** problem deleting a Monitor */
+      500: unknown;
+    };
+  };
+  /** Tests the alert trigger */
+  testAlert: {
+    responses: {
+      /** Test alert Result */
+      201: {
+        content: {
+          "application/json": external["monitors.yaml"]["components"]["schemas"]["AlertResult"];
+        };
+      };
+    };
+    requestBody: {
+      content: {
+        "text/json": external["monitors.yaml"]["components"]["schemas"]["Alert"];
+      };
+    };
+  };
+  /** Lists pending invites */
+  listInvites: {
+    parameters: {};
+    responses: {
+      200: external["invites.yaml"]["components"]["responses"]["InviteResources"];
+    };
+  };
+  /** Upserts invite */
+  upsertInvite: {
+    responses: {
+      201: external["invites.yaml"]["components"]["responses"]["InviteResource"];
+    };
+    requestBody: external["invites.yaml"]["components"]["requestBodies"]["InviteResource"];
+  };
+  /** Creates pending email invite */
+  createInvite: {
+    responses: {
+      201: external["invites.yaml"]["components"]["responses"]["InviteResource"];
+    };
+    requestBody: external["invites.yaml"]["components"]["requestBodies"]["InviteResource"];
+  };
+  /** get invite */
+  getInvite: {
+    parameters: {};
+    responses: {
+      200: external["invites.yaml"]["components"]["responses"]["InviteResource"];
+    };
+  };
+  /** Updates pending email invite */
+  updateInvite: {
+    parameters: {};
+    responses: {
+      201: external["invites.yaml"]["components"]["responses"]["InviteResource"];
+    };
+    requestBody: external["invites.yaml"]["components"]["requestBodies"]["InviteResource"];
+  };
+  /** delete pending invite */
+  deleteInvite: {
+    parameters: {};
+    responses: {
+      201: external["invites.yaml"]["components"]["responses"]["InviteResource"];
+    };
+  };
+  /** Lists tokens */
+  listTokens: {
+    parameters: {};
+    responses: {
+      200: external["tokens.yaml"]["components"]["responses"]["Tokens"];
+    };
+  };
+  /** Upserts a new token */
+  upsertToken: {
+    responses: {
+      201: external["tokens.yaml"]["components"]["responses"]["Token"];
+    };
+    requestBody: external["tokens.yaml"]["components"]["requestBodies"]["Token"];
+  };
+  /** Creates a new token */
+  createToken: {
+    responses: {
+      201: external["tokens.yaml"]["components"]["responses"]["Token"];
+    };
+    requestBody: external["tokens.yaml"]["components"]["requestBodies"]["Token"];
+  };
+  /** update token */
+  updateToken: {
+    parameters: {};
+    responses: {
+      201: external["tokens.yaml"]["components"]["responses"]["Token"];
+    };
+  };
+  /** delete token */
+  deleteToken: {
+    parameters: {};
+    responses: {
+      201: external["tokens.yaml"]["components"]["responses"]["Token"];
+    };
+  };
+  /** List environments from an organization */
+  listEnvironments: {
+    parameters: {};
+    responses: {
+      200: external["environments.yaml"]["components"]["responses"]["EnvironmentResources"];
+    };
+  };
+  /** Upsert test environment */
+  upsertEnvironment: {
+    responses: {
+      200: external["environments.yaml"]["components"]["responses"]["EnvironmentResource"];
+    };
+    requestBody: external["environments.yaml"]["components"]["requestBodies"]["EnvironmentResource"];
+  };
+  /** Create test environment */
+  createEnvironment: {
+    responses: {
+      200: external["environments.yaml"]["components"]["responses"]["Environment"];
+    };
+    requestBody: external["environments.yaml"]["components"]["requestBodies"]["EnvironmentResource"];
+  };
+  /** Get test environment by ID from CRD in kubernetes cluster */
+  getEnvironment: {
+    parameters: {};
+    responses: {
+      200: external["environments.yaml"]["components"]["responses"]["EnvironmentResource"];
+    };
+  };
+  /** Update environment with given request body */
+  updateEnvironment: {
+    parameters: {};
+    responses: {
+      200: external["environments.yaml"]["components"]["responses"]["EnvironmentResource"];
+    };
+    requestBody: external["environments.yaml"]["components"]["requestBodies"]["EnvironmentResource"];
+  };
+  /** Deletes a test environment */
+  deleteEnvironment: {
+    parameters: {};
+    responses: {
+      204: external["environments.yaml"]["components"]["responses"]["EnvironmentResource"];
+    };
+  };
 }
 
 export interface external {
@@ -1339,13 +1874,14 @@ export interface external {
              * @description Name of the strategy that will be used on this profile.
              * @enum {string}
              */
-            strategy: "periodic";
+            strategy: "periodic" | "no-polling";
             /** @description Configuration for the strategy 'periodic'. It only should be filled if the field strategy is equals to 'periodic'. */
             periodic?: {
               /** @description Time that the poller should wait until try to fetch more traces. It should be written in duration format (example: 1s, 30s, 1m). */
               retryDelay?: string;
               /** @description Total time that the poller should try to continue to fetch traces. It should be written in duration format (example: 1s, 30s, 1m). */
               timeout?: string;
+              selectorMatchRetries?: number;
             };
           };
         };
@@ -1536,6 +2072,98 @@ export interface external {
     };
     operations: {};
   };
+  "environments.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        EnvironmentResources: {
+          items?: external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"][];
+          count?: number;
+        };
+        EnvironmentsMe: {
+          elements?: external["environments.yaml"]["components"]["schemas"]["Environment"][];
+          count?: number;
+        };
+        Environments: {
+          items?: external["environments.yaml"]["components"]["schemas"]["Environment"][];
+          count?: number;
+        };
+        EnvironmentResource: {
+          /** @enum {string} */
+          type?: "Environment";
+          spec?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
+        Environment: {
+          id?: string;
+          name?: string;
+          description?: string;
+          labels?: { [key: string]: string };
+          /** Format: date-time */
+          createdAt?: string;
+          /** Format: date-time */
+          updatedAt?: string;
+          isLocal?: boolean;
+          userID?: string;
+          /**
+           * @description organizationID
+           * @example 733420bd-7e56-461f-8431-6378759e60ae
+           */
+          organizationID?: string;
+          agentApiKey?: string;
+          resources?: string;
+        } & {
+          connected: unknown;
+        };
+      };
+      responses: {
+        /** successful operation for environment */
+        EnvironmentResource: {
+          content: {
+            "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          };
+        };
+        /** successful operation for environment */
+        Environment: {
+          content: {
+            "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+          };
+        };
+        /** successful operation for environment */
+        EnvironmentResources: {
+          content: {
+            "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResources"];
+          };
+        };
+        /** successful operation for environment */
+        Environments: {
+          content: {
+            "application/json": external["environments.yaml"]["components"]["schemas"]["Environments"];
+          };
+        };
+        /** successful operation for environment */
+        EnvironmentsMe: {
+          content: {
+            "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentsMe"];
+          };
+        };
+      };
+      requestBodies: {
+        /** environment details body */
+        Environment: {
+          content: {
+            "application/json": external["environments.yaml"]["components"]["schemas"]["Environment"];
+          };
+        };
+        /** environment resource details body */
+        EnvironmentResource: {
+          content: {
+            "application/json": external["environments.yaml"]["components"]["schemas"]["EnvironmentResource"];
+          };
+        };
+      };
+    };
+    operations: {};
+  };
   "expressions.yaml": {
     paths: {};
     components: {
@@ -1637,6 +2265,93 @@ export interface external {
           };
           bearer?: {
             token?: string;
+          };
+        };
+      };
+    };
+    operations: {};
+  };
+  "invites.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        InviteResource: {
+          /** @enum {string} */
+          type?: "Invite";
+          spec?: external["invites.yaml"]["components"]["schemas"]["Invite"];
+        };
+        Invite: {
+          id: string;
+          role: external["members.yaml"]["components"]["schemas"]["Role"];
+          to: string;
+          /** Format: date-time */
+          createdAt?: string;
+          /** Format: date-time */
+          sentAt?: string;
+          /**
+           * @default email
+           * @enum {string}
+           */
+          type?: "email" | "public";
+          /**
+           * @default pending
+           * @enum {string}
+           */
+          status?: "pending" | "accepted" | "revoked";
+          returnTo?: string;
+          environments?: external["invites.yaml"]["components"]["schemas"]["InviteEnvironment"][];
+        };
+        InviteEnvironment: {
+          id: string;
+          role: external["members.yaml"]["components"]["schemas"]["Role"];
+          environment?: external["environments.yaml"]["components"]["schemas"]["Environment"];
+        };
+        InviteResources: {
+          items?: external["invites.yaml"]["components"]["schemas"]["InviteResource"][];
+          count?: number;
+        };
+        Invites: {
+          items?: external["invites.yaml"]["components"]["schemas"]["Invite"][];
+          count?: number;
+        };
+      };
+      responses: {
+        /** successful operation for invites */
+        Invites: {
+          content: {
+            "application/json": external["invites.yaml"]["components"]["schemas"]["Invites"];
+          };
+        };
+        /** successful operation for invites */
+        InviteResources: {
+          content: {
+            "application/json": external["invites.yaml"]["components"]["schemas"]["InviteResources"];
+          };
+        };
+        /** successful operation for invites */
+        Invite: {
+          content: {
+            "application/json": external["invites.yaml"]["components"]["schemas"]["Invite"];
+          };
+        };
+        /** successful operation for invites */
+        InviteResource: {
+          content: {
+            "application/json": external["invites.yaml"]["components"]["schemas"]["InviteResource"];
+          };
+        };
+      };
+      requestBodies: {
+        /** invite details body */
+        Invite: {
+          content: {
+            "application/json": external["invites.yaml"]["components"]["schemas"]["Invite"];
+          };
+        };
+        /** invite resource details body */
+        InviteResource: {
+          content: {
+            "application/json": external["invites.yaml"]["components"]["schemas"]["InviteResource"];
           };
         };
       };
@@ -1753,26 +2468,222 @@ export interface external {
     };
     operations: {};
   };
+  "members.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        /** @enum {string} */
+        Role:
+          | "owners"
+          | "members"
+          | "admins"
+          | "billers"
+          | "engineers"
+          | "runners"
+          | "agent";
+        Member: {
+          id: string;
+          role: external["members.yaml"]["components"]["schemas"]["Role"];
+          user: external["users.yaml"]["components"]["schemas"]["User"];
+          invite?: external["invites.yaml"]["components"]["schemas"]["Invite"];
+        };
+        Members: {
+          elements?: external["members.yaml"]["components"]["schemas"]["Member"][];
+          nextToken?: string;
+        };
+      };
+      responses: {
+        /** successful operation for members */
+        Members: {
+          content: {
+            "application/json": external["members.yaml"]["components"]["schemas"]["Members"];
+          };
+        };
+        /** successful operation for members */
+        Member: {
+          content: {
+            "application/json": external["members.yaml"]["components"]["schemas"]["Member"];
+          };
+        };
+      };
+      requestBodies: {
+        /** member role update body */
+        MemberRole: {
+          content: {
+            "application/json": {
+              role: external["members.yaml"]["components"]["schemas"]["Role"];
+            };
+          };
+        };
+        /** member role update body */
+        AssignMember: {
+          content: {
+            "application/json": {
+              role: external["members.yaml"]["components"]["schemas"]["Role"];
+              id: string;
+            };
+          };
+        };
+      };
+    };
+    operations: {};
+  };
+  "monitors.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        MonitorResourceList: {
+          count?: number;
+          items?: external["monitors.yaml"]["components"]["schemas"]["MonitorResource"][];
+        };
+        /** @description Represents a Monitor structured into the Resources format. */
+        MonitorResource: {
+          /**
+           * @description Represents the type of this resource. It should always be set as 'Monitor'.
+           * @enum {string}
+           */
+          type?: "Monitor";
+          spec?: external["monitors.yaml"]["components"]["schemas"]["Monitor"];
+        };
+        Monitor: {
+          id?: string;
+          version?: number;
+          name?: string;
+          /** Format: date-time */
+          createdAt?: string;
+          /** Format: date-time */
+          deletedAt?: string;
+          /** Format: date-time */
+          updatedAt?: string;
+          enabled?: boolean;
+          /** @description list of steps of the Monitor containing just each test id */
+          tests?: string[];
+          /** @description list of steps of the Monitor containing just each test suite id */
+          testSuites?: string[];
+          /** @description list of steps of the Monitor containing the whole test object */
+          fullTests?: external["tests.yaml"]["components"]["schemas"]["Test"][];
+          /** @description list of steps of the Monitor containing the whole test suite object */
+          fullTestSuites?: external["testsuites.yaml"]["components"]["schemas"]["TestSuite"][];
+          variableSetId?: string;
+          tokenId?: string;
+          schedule?: external["monitors.yaml"]["components"]["schemas"]["Schedule"];
+          alerts?: external["monitors.yaml"]["components"]["schemas"]["Alert"][];
+          summary?: external["monitors.yaml"]["components"]["schemas"]["Summary"];
+        };
+        Summary: {
+          runs?: number;
+          lastState?: string;
+          /** Format: date-time */
+          lastRunTime?: string;
+        };
+        Schedule: {
+          cron?: string;
+          timeZone?: string;
+        };
+        Alert: {
+          id?: string;
+          /** @enum {string} */
+          type?: "webhook";
+          webhook?: external["monitors.yaml"]["components"]["schemas"]["Webhook"];
+          events?: "FAILED"[];
+        };
+        Webhook: {
+          url?: string;
+          body?: string;
+          /** @enum {string} */
+          method?:
+            | "GET"
+            | "POST"
+            | "PUT"
+            | "DELETE"
+            | "PATCH"
+            | "HEAD"
+            | "OPTIONS";
+          headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+          sslVerification?: boolean;
+        };
+        MonitorRun: {
+          id?: number;
+          monitorId?: string;
+          monitorVersion?: number;
+          runGroupId?: string;
+          /** Format: date-time */
+          createdAt?: string;
+          /** Format: date-time */
+          completedAt?: string;
+          /**
+           * @default SCHEDULED
+           * @enum {string}
+           */
+          executionType?: "MANUAL" | "SCHEDULED";
+          lastError?: string;
+          /** @enum {string} */
+          state?: "CREATED" | "EXECUTING" | "FINISHED" | "FAILED";
+          variableSet?: external["variableSets.yaml"]["components"]["schemas"]["VariableSet"];
+          metadata?: { [key: string]: string };
+          testRunsCount?: number;
+          testSuiteRunsCount?: number;
+          /** @description list of test runs of the Monitor Run */
+          testRuns?: external["tests.yaml"]["components"]["schemas"]["TestRun"][];
+          /** @description list of test suite runs of the Monitor Run */
+          testSuiteRuns?: external["testsuites.yaml"]["components"]["schemas"]["TestSuiteRun"][];
+          alerts?: external["monitors.yaml"]["components"]["schemas"]["AlertResult"][];
+        };
+        AlertResult: {
+          alertId?: string;
+          id?: string;
+          webhook?: external["monitors.yaml"]["components"]["schemas"]["WebhookResult"];
+          /** @enum {string} */
+          type?: "webhook";
+        };
+        WebhookResult: {
+          request?: {
+            url?: string;
+            headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+            body?: string;
+            /** @enum {string} */
+            method?:
+              | "GET"
+              | "POST"
+              | "PUT"
+              | "DELETE"
+              | "PATCH"
+              | "HEAD"
+              | "OPTIONS";
+          };
+          response?: {
+            statusCode?: number;
+            status?: string;
+            body?: string;
+            headers?: external["http.yaml"]["components"]["schemas"]["HTTPHeader"][];
+            error?: string;
+          };
+        };
+        RunMonitorInformation: {
+          metadata?: { [key: string]: string } | null;
+          runGroupId?: string;
+          /** @enum {string} */
+          runType?: "SCHEDULED" | "MANUAL";
+          variables?: external["variableSets.yaml"]["components"]["schemas"]["VariableSetValue"][];
+        };
+      };
+    };
+    operations: {};
+  };
   "parameters.yaml": {
     paths: {};
     components: {
       parameters: {
-        /** @description id of the test */
-        testId: string;
-        /** @description id of the run */
-        runId: number;
-        /** @description version of the test */
-        version: number;
-        /** @description id of the TestSuite */
-        testSuiteId: string;
         /** @description indicates how many resources can be returned by each page */
         take: number;
         /** @description indicates how many resources will be skipped when paginating */
         skip: number;
         /** @description query to search resources */
         query: string;
+        /** @description query to search resources by status */
+        status: string;
         /** @description indicates the sort field for the resources */
-        runnableResourceSortBy: "created" | "name" | "last_run";
+        runnableResourceSortBy: "created" | "name" | "status" | "last_run";
         /** @description indicates the sort field for the resources */
         sortBy: "created" | "name";
         /** @description indicates the sort field for the resources */
@@ -1790,8 +2701,74 @@ export interface external {
         /** @description ID of a VariableSet used on Tracetest to inject values into tests and TestSuites */
         variableSetId: string;
         /** @description ID of an Linter */
-        LinterId: string;
+        linterId: string;
         fileExtension: string;
+        /** @description id of the test */
+        testId: string;
+        /** @description id of the run */
+        runId: number;
+        /** @description version of the test */
+        version: number;
+        /** @description id of the TestSuite */
+        testSuiteId: string;
+        /** @description ID of a monitor used on Tracetest */
+        monitorId: string;
+        /** @description ID of an RunGroup */
+        runGroupId: string;
+        /** @description IDs for RunGroup */
+        runGroupIds: string;
+        /** @description ID for invite */
+        inviteID: string;
+        /** @description ID for token */
+        tokenID: string;
+        /** @description ID for environment */
+        environmentID: string;
+        /** @description name of filters */
+        filters: string;
+        /** @description id of the tests */
+        testIds: string;
+        /** @description group of the runs */
+        group: string;
+        /** @description source of the runs */
+        source: string;
+        /** @description token of the runs */
+        token: string;
+        /** @description branch of the runs */
+        branch: string;
+        /** @description commit of the runs */
+        commit: string;
+        /** @description userEmail of the runs */
+        userEmail: string;
+        /** @description isCi of the runs */
+        isCi: string;
+        /** @description provider of the runs */
+        provider: string;
+        /** @description playwrightBrowser of the runs */
+        playwrightBrowser: string;
+        /** @description cypressBrowser of the runs */
+        cypressBrowser: string;
+        /** @description startDate of the runs */
+        startDate: string;
+        /** @description end of the runs */
+        endDate: string;
+        /** @description name of the tests */
+        name: string;
+      };
+    };
+    operations: {};
+  };
+  "playwrightengine.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        PlaywrightEngineRequest: {
+          target?: string;
+          method?: string;
+          script?: string;
+        };
+        PlaywrightEngineResponse: {
+          success?: boolean;
+        };
       };
     };
     operations: {};
@@ -1803,6 +2780,30 @@ export interface external {
         Resource: {
           type: string;
           item: unknown;
+        };
+      };
+    };
+    operations: {};
+  };
+  "runGroups.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        RunGroupList: {
+          items?: external["runGroups.yaml"]["components"]["schemas"]["RunGroup"][];
+        };
+        RunGroup: {
+          id: string;
+          /** Format: date-time */
+          createdAt?: string;
+          /** @enum {string} */
+          status?: "created" | "inProgress" | "succeed" | "failed";
+          summary?: {
+            pending?: number;
+            succeed?: number;
+            failed?: number;
+          };
+          metadata?: { [key: string]: string };
         };
       };
     };
@@ -1906,6 +2907,8 @@ export interface external {
           trigger?: external["triggers.yaml"]["components"]["schemas"]["Trigger"];
           /** @description If true, the test will not collect a trace */
           skipTraceCollection?: boolean;
+          /** @description Id of the polling profile that will be used by all the runs of this test */
+          pollingProfile?: string;
           /** @description specification of assertions that are going to be made */
           specs?: external["tests.yaml"]["components"]["schemas"]["TestSpec"][];
           /**
@@ -1948,6 +2951,7 @@ export interface external {
           spanId?: string;
           /** @description Test version used when running this test run */
           testVersion?: number;
+          runGroupId?: string;
           /**
            * @description Current execution state
            * @enum {string}
@@ -1963,6 +2967,7 @@ export interface external {
             | "STOPPED"
             | "TRIGGER_FAILED"
             | "TRACE_FAILED"
+            | "FAILED"
             | "ASSERTION_FAILED";
           /** @description Details of the cause for the last `FAILED` state */
           lastErrorState?: string;
@@ -2000,6 +3005,7 @@ export interface external {
         RunInformation: {
           metadata?: { [key: string]: string } | null;
           variableSetId?: string;
+          runGroupId?: string;
           variables?: external["variableSets.yaml"]["components"]["schemas"]["VariableSetValue"][];
           requiredGates?:
             | external["testRunner.yaml"]["components"]["schemas"]["SupportedGates"][]
@@ -2095,6 +3101,7 @@ export interface external {
         TestSuiteRun: {
           id?: number;
           version?: number;
+          runGroupId?: string;
           /** Format: date-time */
           createdAt?: string;
           /** Format: date-time */
@@ -2107,6 +3114,86 @@ export interface external {
           pass?: number;
           fail?: number;
           allStepsRequiredGatesPassed?: boolean;
+        };
+      };
+    };
+    operations: {};
+  };
+  "tokens.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        TokenResource: {
+          /** @enum {string} */
+          type?: "Token";
+          spec?: external["tokens.yaml"]["components"]["schemas"]["Token"];
+        };
+        TokenResources: {
+          items?: external["tokens.yaml"]["components"]["schemas"]["Token"][];
+          count?: number;
+        };
+        Tokens: {
+          items?: external["tokens.yaml"]["components"]["schemas"]["Token"][];
+          count?: number;
+        };
+        Token: {
+          id: string;
+          /**
+           * @description token name
+           * @example my-token
+           */
+          name: string;
+          isRevoked?: boolean;
+          role: external["members.yaml"]["components"]["schemas"]["Role"];
+          userID?: string;
+          /**
+           * @description token duration in minutes
+           * @example 3600
+           */
+          duration?: number;
+          /** Format: date-time */
+          issuedAt?: string;
+          /** Format: date-time */
+          expiresAt?: string;
+          /** Format: date-time */
+          updatedAt?: string;
+        };
+        JWT: {
+          jwt: string;
+        };
+      };
+      responses: {
+        /** successful operation for tokens */
+        Tokens: {
+          content: {
+            "application/json": external["tokens.yaml"]["components"]["schemas"]["Tokens"];
+          };
+        };
+        /** successful operation for token */
+        Token: {
+          content: {
+            "application/json": external["tokens.yaml"]["components"]["schemas"]["Token"];
+          };
+        };
+        /** successful operation for jwt */
+        JWT: {
+          content: {
+            "application/json": external["tokens.yaml"]["components"]["schemas"]["JWT"];
+          };
+        };
+      };
+      requestBodies: {
+        /** invite details body */
+        Token: {
+          content: {
+            "application/json": external["tokens.yaml"]["components"]["schemas"]["Token"];
+          };
+        };
+        /** invite resource details body */
+        TokenResource: {
+          content: {
+            "application/json": external["tokens.yaml"]["components"]["schemas"]["TokenResource"];
+          };
         };
       };
     };
@@ -2180,11 +3267,15 @@ export interface external {
             | "traceid"
             | "kafka"
             | "cypress"
-            | "playwright";
+            | "playwright"
+            | "artillery"
+            | "k6"
+            | "playwrightengine";
           httpRequest?: external["http.yaml"]["components"]["schemas"]["HTTPRequest"];
           grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCRequest"];
           traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDRequest"];
           kafka?: external["kafka.yaml"]["components"]["schemas"]["KafkaRequest"];
+          playwrightEngine?: external["playwrightengine.yaml"]["components"]["schemas"]["PlaywrightEngineRequest"];
         };
         TriggerResult: {
           /** @enum {string} */
@@ -2194,12 +3285,15 @@ export interface external {
             | "traceid"
             | "kafka"
             | "cypress"
-            | "playwright";
+            | "playwright"
+            | "artillery"
+            | "k6";
           triggerResult?: {
             http?: external["http.yaml"]["components"]["schemas"]["HTTPResponse"];
             grpc?: external["grpc.yaml"]["components"]["schemas"]["GRPCResponse"];
             traceid?: external["traceid.yaml"]["components"]["schemas"]["TRACEIDResponse"];
             kafka?: external["kafka.yaml"]["components"]["schemas"]["KafkaResponse"];
+            playwrightEngine?: external["playwrightengine.yaml"]["components"]["schemas"]["PlaywrightEngineResponse"];
             error?: external["triggers.yaml"]["components"]["schemas"]["TriggerError"];
           };
         };
@@ -2208,6 +3302,32 @@ export interface external {
           runningOnContainer?: boolean;
           targetsLocalhost?: boolean;
           message?: string;
+        };
+      };
+    };
+    operations: {};
+  };
+  "users.yaml": {
+    paths: {};
+    components: {
+      schemas: {
+        AfterLogin: {
+          userId?: string;
+          email?: string;
+          name?: string;
+        };
+        User: {
+          id: string;
+          name: string;
+          emails: string[];
+        };
+      };
+      requestBodies: {
+        /** After login request */
+        AfterLogin: {
+          content: {
+            "application/json": external["users.yaml"]["components"]["schemas"]["AfterLogin"];
+          };
         };
       };
     };
@@ -2258,6 +3378,11 @@ export interface external {
         VariableSetValue: {
           key?: string;
           value?: string;
+          /**
+           * @default raw
+           * @enum {string}
+           */
+          type?: "raw" | "secret";
         };
       };
     };

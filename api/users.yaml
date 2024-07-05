@@ -1,0 +1,36 @@
+openapi: 3.0.1
+
+components:
+  requestBodies:
+    AfterLogin:
+      description: After login request
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AfterLogin"
+  schemas:
+    AfterLogin:
+      type: object
+      properties:
+        userId:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+    User:
+      required:
+        - id
+        - name
+        - emails
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        emails:
+          type: array
+          items:
+            type: string
