@@ -42,6 +42,7 @@ const TestSuiteRun = ({
     version,
     pass,
     fail,
+    runGroupId: '',
   };
 };
 

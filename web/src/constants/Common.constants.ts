@@ -76,4 +76,7 @@ export enum SupportedPlugins {
   TraceID = 'TraceID',
   Cypress = 'Cypress',
   Playwright = 'Playwright',
+  Artillery = 'Artillery', // TODO: think on how to remove this
+  K6 = 'K6',
+  PlaywrightEngine = 'PlaywrightEngine',
 }

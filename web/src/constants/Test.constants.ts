@@ -12,6 +12,9 @@ export enum TriggerTypes {
   kafka = 'kafka',
   cypress = 'cypress',
   playwright = 'playwright',
+  artillery = 'artillery',
+  k6 = 'k6',
+  playwrightengine = 'playwrightengine',
 }
 
 export enum ImportTypes {

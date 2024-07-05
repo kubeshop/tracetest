@@ -61,6 +61,25 @@ const EntryData = {
       method: 'Kafka',
     };
   },
+  // TODO: think on how to decouple this
+  [TriggerTypes.artillery](request: TRequest) {
+    return {
+      entryPoint: '',
+      method: '',
+    };
+  },
+  [TriggerTypes.k6](request: TRequest) {
+    return {
+      entryPoint: '',
+      method: '',
+    };
+  },
+  [TriggerTypes.playwrightengine](request: TRequest) {
+    return {
+      entryPoint: '',
+      method: '',
+    };
+  },
 };
 
 const Trigger = ({

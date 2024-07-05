@@ -11,6 +11,9 @@ const EntryPointFactoryMap = {
   [TriggerTypes.traceid]: TriggerHeaderBarTraceID,
   [TriggerTypes.cypress]: () => null,
   [TriggerTypes.playwright]: () => null,
+  [TriggerTypes.artillery]: () => null,
+  [TriggerTypes.k6]: () => null,
+  [TriggerTypes.playwrightengine]: () => null,
 };
 
 interface IProps {

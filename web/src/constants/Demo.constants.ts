@@ -231,5 +231,8 @@ export function getDemoByPluginMap(demos: Demo[]) {
     [SupportedPlugins.Cypress]: [],
     [SupportedPlugins.Playwright]: [],
     [SupportedPlugins.Kafka]: (pokeshopDemoMap && pokeshopDemoMap[SupportedPlugins.Kafka]) || [],
+    [SupportedPlugins.Artillery]: [],
+    [SupportedPlugins.K6]: [],
+    [SupportedPlugins.PlaywrightEngine]: [],
   };
 }

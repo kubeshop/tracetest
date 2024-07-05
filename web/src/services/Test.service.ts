@@ -37,6 +37,9 @@ const TriggerServiceMap = {
   [SupportedPlugins.TraceID]: TraceIDService,
   [SupportedPlugins.Cypress]: CypressService,
   [SupportedPlugins.Playwright]: CypressService,
+  [SupportedPlugins.Artillery]: CypressService,
+  [SupportedPlugins.K6]: CypressService,
+  [SupportedPlugins.PlaywrightEngine]: CypressService,
 } as const;
 
 const TriggerServiceByTypeMap = {
@@ -46,6 +49,9 @@ const TriggerServiceByTypeMap = {
   [TriggerTypes.cypress]: CypressService,
   [TriggerTypes.playwright]: CypressService,
   [TriggerTypes.kafka]: KafkaService,
+  [TriggerTypes.artillery]: CypressService,
+  [TriggerTypes.k6]: CypressService,
+  [TriggerTypes.playwrightengine]: CypressService,
 } as const;
 
 const TestService = () => ({

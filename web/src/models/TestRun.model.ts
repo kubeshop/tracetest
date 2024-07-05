@@ -149,6 +149,7 @@ const TestRun = ({
     testSuiteRunId: testSuiteRunId ? Number(testSuiteRunId) : 0,
     linter: LinterResult(linter),
     requiredGatesResult: RequiredGatesResult(requiredGatesResult),
+    runGroupId: ''
   };
 };
 
