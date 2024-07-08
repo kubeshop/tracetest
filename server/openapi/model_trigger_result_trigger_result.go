@@ -18,6 +18,8 @@ type TriggerResultTriggerResult struct {
 
 	Kafka KafkaResponse `json:"kafka,omitempty"`
 
+	PlaywrightEngine PlaywrightEngineResponse `json:"playwrightEngine,omitempty"`
+
 	Error TriggerError `json:"error,omitempty"`
 }
 
@@ -33,6 +35,9 @@ func AssertTriggerResultTriggerResultRequired(obj TriggerResultTriggerResult) er
 		return err
 	}
 	if err := AssertKafkaResponseRequired(obj.Kafka); err != nil {
+		return err
+	}
+	if err := AssertPlaywrightEngineResponseRequired(obj.PlaywrightEngine); err != nil {
 		return err
 	}
 	if err := AssertTriggerErrorRequired(obj.Error); err != nil {

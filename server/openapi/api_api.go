@@ -51,10 +51,46 @@ func NewApiApiController(s ApiApiServicer, opts ...ApiApiOption) Router {
 func (c *ApiApiController) Routes() Routes {
 	return Routes{
 		{
+			"CreateEnvironment",
+			strings.ToUpper("Post"),
+			"/api/environments",
+			c.CreateEnvironment,
+		},
+		{
+			"CreateInvite",
+			strings.ToUpper("Post"),
+			"/api/invites",
+			c.CreateInvite,
+		},
+		{
 			"CreateRunGroup",
 			strings.ToUpper("Post"),
 			"/api/rungroups",
 			c.CreateRunGroup,
+		},
+		{
+			"CreateToken",
+			strings.ToUpper("Post"),
+			"/api/tokens",
+			c.CreateToken,
+		},
+		{
+			"DeleteEnvironment",
+			strings.ToUpper("Delete"),
+			"/api/environments/{environmentID}",
+			c.DeleteEnvironment,
+		},
+		{
+			"DeleteInvite",
+			strings.ToUpper("Delete"),
+			"/api/invites/{inviteID}",
+			c.DeleteInvite,
+		},
+		{
+			"DeleteMonitorRun",
+			strings.ToUpper("Delete"),
+			"/api/monitors/{monitorId}/run/{runId}",
+			c.DeleteMonitorRun,
 		},
 		{
 			"DeleteTestRun",
@@ -67,6 +103,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/testsuites/{testSuiteId}/run/{runId}",
 			c.DeleteTestSuiteRun,
+		},
+		{
+			"DeleteToken",
+			strings.ToUpper("Delete"),
+			"/api/tokens/{tokenID}",
+			c.DeleteToken,
 		},
 		{
 			"DryRunAssertion",
@@ -85,6 +127,36 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Post"),
 			"/api/expressions/resolve",
 			c.ExpressionResolve,
+		},
+		{
+			"GetEnvironment",
+			strings.ToUpper("Get"),
+			"/api/environments/{environmentID}",
+			c.GetEnvironment,
+		},
+		{
+			"GetInvite",
+			strings.ToUpper("Get"),
+			"/api/invites/{inviteID}",
+			c.GetInvite,
+		},
+		{
+			"GetMonitorRun",
+			strings.ToUpper("Get"),
+			"/api/monitors/{monitorId}/run/{runId}",
+			c.GetMonitorRun,
+		},
+		{
+			"GetMonitorRuns",
+			strings.ToUpper("Get"),
+			"/api/monitors/{monitorId}/run",
+			c.GetMonitorRuns,
+		},
+		{
+			"GetMonitorVersion",
+			strings.ToUpper("Get"),
+			"/api/monitors/{monitorId}/version/{version}",
+			c.GetMonitorVersion,
 		},
 		{
 			"GetOTLPConnectionInformation",
@@ -115,12 +187,6 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/tests/{testId}/run/{runId}/junit.xml",
 			c.GetRunResultJUnit,
-		},
-		{
-			"GetRunsFromRunGroup",
-			strings.ToUpper("Get"),
-			"/api/runs",
-			c.GetRunsFromRunGroup,
 		},
 		{
 			"GetTestResultSelectedSpans",
@@ -195,6 +261,24 @@ func (c *ApiApiController) Routes() Routes {
 			c.ImportTestRun,
 		},
 		{
+			"ListEnvironments",
+			strings.ToUpper("Get"),
+			"/api/environments",
+			c.ListEnvironments,
+		},
+		{
+			"ListInvites",
+			strings.ToUpper("Get"),
+			"/api/invites",
+			c.ListInvites,
+		},
+		{
+			"ListTokens",
+			strings.ToUpper("Get"),
+			"/api/tokens",
+			c.ListTokens,
+		},
+		{
 			"RerunTestRun",
 			strings.ToUpper("Post"),
 			"/api/tests/{testId}/run/{runId}/rerun",
@@ -205,6 +289,12 @@ func (c *ApiApiController) Routes() Routes {
 			strings.ToUpper("Post"),
 			"/api/config/connection/otlp/reset",
 			c.ResetOTLPConnectionInformation,
+		},
+		{
+			"RunMonitor",
+			strings.ToUpper("Post"),
+			"/api/monitors/{monitorId}/run",
+			c.RunMonitor,
 		},
 		{
 			"RunTest",
@@ -237,10 +327,28 @@ func (c *ApiApiController) Routes() Routes {
 			c.StopTestRun,
 		},
 		{
+			"TestAlert",
+			strings.ToUpper("Post"),
+			"/api/monitors/alerts",
+			c.TestAlert,
+		},
+		{
 			"TestConnection",
 			strings.ToUpper("Post"),
 			"/api/config/connection",
 			c.TestConnection,
+		},
+		{
+			"UpdateEnvironment",
+			strings.ToUpper("Put"),
+			"/api/environments/{environmentID}",
+			c.UpdateEnvironment,
+		},
+		{
+			"UpdateInvite",
+			strings.ToUpper("Put"),
+			"/api/invites/{inviteID}",
+			c.UpdateInvite,
 		},
 		{
 			"UpdateTestRun",
@@ -249,12 +357,84 @@ func (c *ApiApiController) Routes() Routes {
 			c.UpdateTestRun,
 		},
 		{
+			"UpdateToken",
+			strings.ToUpper("Put"),
+			"/api/tokens/{tokenID}",
+			c.UpdateToken,
+		},
+		{
 			"UpdateWizard",
 			strings.ToUpper("Put"),
 			"/api/wizard",
 			c.UpdateWizard,
 		},
+		{
+			"UpsertEnvironment",
+			strings.ToUpper("Put"),
+			"/api/environments",
+			c.UpsertEnvironment,
+		},
+		{
+			"UpsertInvite",
+			strings.ToUpper("Put"),
+			"/api/invites",
+			c.UpsertInvite,
+		},
+		{
+			"UpsertToken",
+			strings.ToUpper("Put"),
+			"/api/tokens",
+			c.UpsertToken,
+		},
 	}
+}
+
+// CreateEnvironment - Create new environment
+func (c *ApiApiController) CreateEnvironment(w http.ResponseWriter, r *http.Request) {
+	environmentResourceParam := EnvironmentResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&environmentResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertEnvironmentResourceRequired(environmentResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateEnvironment(r.Context(), environmentResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// CreateInvite - Creates a pending invite
+func (c *ApiApiController) CreateInvite(w http.ResponseWriter, r *http.Request) {
+	inviteResourceParam := InviteResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&inviteResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertInviteResourceRequired(inviteResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateInvite(r.Context(), inviteResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
 }
 
 // CreateRunGroup - Create a RunGroup
@@ -271,6 +451,84 @@ func (c *ApiApiController) CreateRunGroup(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.CreateRunGroup(r.Context(), runGroupParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// CreateToken - Creates a new token
+func (c *ApiApiController) CreateToken(w http.ResponseWriter, r *http.Request) {
+	tokenParam := Token{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&tokenParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTokenRequired(tokenParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreateToken(r.Context(), tokenParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteEnvironment - Delete test environment
+func (c *ApiApiController) DeleteEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIDParam := params["environmentID"]
+
+	result, err := c.service.DeleteEnvironment(r.Context(), environmentIDParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteInvite - Delete pending invite
+func (c *ApiApiController) DeleteInvite(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	inviteIDParam := params["inviteID"]
+
+	result, err := c.service.DeleteInvite(r.Context(), inviteIDParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteMonitorRun - Delete a Monitor
+func (c *ApiApiController) DeleteMonitorRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	monitorIdParam := params["monitorId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.DeleteMonitorRun(r.Context(), monitorIdParam, runIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -315,6 +573,22 @@ func (c *ApiApiController) DeleteTestSuiteRun(w http.ResponseWriter, r *http.Req
 	}
 
 	result, err := c.service.DeleteTestSuiteRun(r.Context(), testSuiteIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteToken - Delete token for environment
+func (c *ApiApiController) DeleteToken(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	tokenIDParam := params["tokenID"]
+
+	result, err := c.service.DeleteToken(r.Context(), tokenIDParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -394,6 +668,109 @@ func (c *ApiApiController) ExpressionResolve(w http.ResponseWriter, r *http.Requ
 		return
 	}
 	result, err := c.service.ExpressionResolve(r.Context(), resolveRequestInfoParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetEnvironment - Get environment by ID
+func (c *ApiApiController) GetEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIDParam := params["environmentID"]
+
+	result, err := c.service.GetEnvironment(r.Context(), environmentIDParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetInvite - Get invite
+func (c *ApiApiController) GetInvite(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	inviteIDParam := params["inviteID"]
+
+	result, err := c.service.GetInvite(r.Context(), inviteIDParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetMonitorRun - Get a specific run from a particular Monitor
+func (c *ApiApiController) GetMonitorRun(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	monitorIdParam := params["monitorId"]
+
+	runIdParam, err := parseInt32Parameter(params["runId"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetMonitorRun(r.Context(), monitorIdParam, runIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetMonitorRuns - Get a Monitor runs
+func (c *ApiApiController) GetMonitorRuns(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	query := r.URL.Query()
+	monitorIdParam := params["monitorId"]
+
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	result, err := c.service.GetMonitorRuns(r.Context(), monitorIdParam, takeParam, skipParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetMonitorVersion - Get a Monitor with Version
+func (c *ApiApiController) GetMonitorVersion(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	monitorIdParam := params["monitorId"]
+
+	versionParam, err := parseInt32Parameter(params["version"], true)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+
+	result, err := c.service.GetMonitorVersion(r.Context(), monitorIdParam, versionParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -499,31 +876,6 @@ func (c *ApiApiController) GetRunResultJUnit(w http.ResponseWriter, r *http.Requ
 	}
 
 	result, err := c.service.GetRunResultJUnit(r.Context(), testIdParam, runIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
-
-}
-
-// GetRunsFromRunGroup - Get all runs from a run group
-func (c *ApiApiController) GetRunsFromRunGroup(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	takeParam, err := parseInt32Parameter(query.Get("take"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
-	if err != nil {
-		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
-		return
-	}
-	runGroupIdsParam := query.Get("runGroupIds")
-	result, err := c.service.GetRunsFromRunGroup(r.Context(), takeParam, skipParam, runGroupIdsParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -791,6 +1143,84 @@ func (c *ApiApiController) ImportTestRun(w http.ResponseWriter, r *http.Request)
 
 }
 
+// ListEnvironments - List environments
+func (c *ApiApiController) ListEnvironments(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListEnvironments(r.Context(), takeParam, skipParam, queryParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ListInvites - Lists all invites
+func (c *ApiApiController) ListInvites(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListInvites(r.Context(), takeParam, skipParam, queryParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// ListTokens - Lists all tokens
+func (c *ApiApiController) ListTokens(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	takeParam, err := parseInt32Parameter(query.Get("take"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	skipParam, err := parseInt32Parameter(query.Get("skip"), false)
+	if err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	queryParam := query.Get("query")
+	sortDirectionParam := query.Get("sortDirection")
+	result, err := c.service.ListTokens(r.Context(), takeParam, skipParam, queryParam, sortDirectionParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // RerunTestRun - rerun a test run
 func (c *ApiApiController) RerunTestRun(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -816,6 +1246,33 @@ func (c *ApiApiController) RerunTestRun(w http.ResponseWriter, r *http.Request) 
 // ResetOTLPConnectionInformation - reset the OTLP connection span count
 func (c *ApiApiController) ResetOTLPConnectionInformation(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.ResetOTLPConnectionInformation(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// RunMonitor - run Monitor
+func (c *ApiApiController) RunMonitor(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	monitorIdParam := params["monitorId"]
+
+	runMonitorInformationParam := RunMonitorInformation{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&runMonitorInformationParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertRunMonitorInformationRequired(runMonitorInformationParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.RunMonitor(r.Context(), monitorIdParam, runMonitorInformationParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -957,6 +1414,30 @@ func (c *ApiApiController) StopTestRun(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// TestAlert - Tests the alert trigger
+func (c *ApiApiController) TestAlert(w http.ResponseWriter, r *http.Request) {
+	alertParam := Alert{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&alertParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertAlertRequired(alertParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.TestAlert(r.Context(), alertParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // TestConnection - Tests the config data store/exporter connection
 func (c *ApiApiController) TestConnection(w http.ResponseWriter, r *http.Request) {
 	dataStoreParam := DataStore{}
@@ -971,6 +1452,60 @@ func (c *ApiApiController) TestConnection(w http.ResponseWriter, r *http.Request
 		return
 	}
 	result, err := c.service.TestConnection(r.Context(), dataStoreParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateEnvironment - Update environment
+func (c *ApiApiController) UpdateEnvironment(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	environmentIDParam := params["environmentID"]
+
+	environmentResourceParam := EnvironmentResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&environmentResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertEnvironmentResourceRequired(environmentResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateEnvironment(r.Context(), environmentIDParam, environmentResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpdateInvite - Updates a pending invite
+func (c *ApiApiController) UpdateInvite(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	inviteIDParam := params["inviteID"]
+
+	inviteResourceParam := InviteResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&inviteResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertInviteResourceRequired(inviteResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateInvite(r.Context(), inviteIDParam, inviteResourceParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -1014,6 +1549,22 @@ func (c *ApiApiController) UpdateTestRun(w http.ResponseWriter, r *http.Request)
 
 }
 
+// UpdateToken - Update token for environment
+func (c *ApiApiController) UpdateToken(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	tokenIDParam := params["tokenID"]
+
+	result, err := c.service.UpdateToken(r.Context(), tokenIDParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // UpdateWizard - Update a Wizard
 func (c *ApiApiController) UpdateWizard(w http.ResponseWriter, r *http.Request) {
 	wizardParam := Wizard{}
@@ -1028,6 +1579,78 @@ func (c *ApiApiController) UpdateWizard(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	result, err := c.service.UpdateWizard(r.Context(), wizardParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpsertEnvironment - Upsert new environment
+func (c *ApiApiController) UpsertEnvironment(w http.ResponseWriter, r *http.Request) {
+	environmentResourceParam := EnvironmentResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&environmentResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertEnvironmentResourceRequired(environmentResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpsertEnvironment(r.Context(), environmentResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpsertInvite - Upserts a pending invite
+func (c *ApiApiController) UpsertInvite(w http.ResponseWriter, r *http.Request) {
+	inviteResourceParam := InviteResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&inviteResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertInviteResourceRequired(inviteResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpsertInvite(r.Context(), inviteResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpsertToken - Upserts a new token
+func (c *ApiApiController) UpsertToken(w http.ResponseWriter, r *http.Request) {
+	tokenParam := Token{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&tokenParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertTokenRequired(tokenParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpsertToken(r.Context(), tokenParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

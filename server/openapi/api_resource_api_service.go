@@ -54,6 +54,20 @@ func (s *ResourceApiApiService) CreateLinter(ctx context.Context, linterResource
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateLinter method not implemented")
 }
 
+// CreatePollingProfile - Create Polling Profile
+func (s *ResourceApiApiService) CreatePollingProfile(ctx context.Context, pollingProfile PollingProfile) (ImplResponse, error) {
+	// TODO - update CreatePollingProfile with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, PollingProfile{}) or use other options such as http.Ok ...
+	//return Response(200, PollingProfile{}), nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("CreatePollingProfile method not implemented")
+}
+
 // CreateTest - Create new test
 func (s *ResourceApiApiService) CreateTest(ctx context.Context, testResource TestResource) (ImplResponse, error) {
 	// TODO - update CreateTest with the required logic for this service method.
@@ -99,6 +113,26 @@ func (s *ResourceApiApiService) CreateVariableSet(ctx context.Context, variableS
 	return Response(http.StatusNotImplemented, nil), errors.New("CreateVariableSet method not implemented")
 }
 
+// CreteMonitor - Create a Monitor
+func (s *ResourceApiApiService) CreteMonitor(ctx context.Context, monitorResource MonitorResource) (ImplResponse, error) {
+	// TODO - update CreteMonitor with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, MonitorResource{}) or use other options such as http.Ok ...
+	//return Response(200, MonitorResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("CreteMonitor method not implemented")
+}
+
 // DeleteDemo - Delete a Demonstration setting
 func (s *ResourceApiApiService) DeleteDemo(ctx context.Context, demoId string) (ImplResponse, error) {
 	// TODO - update DeleteDemo with the required logic for this service method.
@@ -137,6 +171,43 @@ func (s *ResourceApiApiService) DeleteLinter(ctx context.Context, linterId strin
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("DeleteLinter method not implemented")
+}
+
+// DeleteMonitor - Delete a Monitor
+func (s *ResourceApiApiService) DeleteMonitor(ctx context.Context, monitorId string) (ImplResponse, error) {
+	// TODO - update DeleteMonitor with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("DeleteMonitor method not implemented")
+}
+
+// DeletePollingProfile - Delete Polling Profile
+func (s *ResourceApiApiService) DeletePollingProfile(ctx context.Context, pollingProfileId string) (ImplResponse, error) {
+	// TODO - update DeletePollingProfile with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("DeletePollingProfile method not implemented")
 }
 
 // DeleteTest - delete a test
@@ -250,6 +321,23 @@ func (s *ResourceApiApiService) GetLinter(ctx context.Context, linterId string) 
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("GetLinter method not implemented")
+}
+
+// GetMonitor - Get a Monitor
+func (s *ResourceApiApiService) GetMonitor(ctx context.Context, monitorId string) (ImplResponse, error) {
+	// TODO - update GetMonitor with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, MonitorResource{}) or use other options such as http.Ok ...
+	//return Response(200, MonitorResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("GetMonitor method not implemented")
 }
 
 // GetPollingProfile - Get Polling Profile
@@ -413,6 +501,23 @@ func (s *ResourceApiApiService) ListLinters(ctx context.Context, take int32, ski
 	return Response(http.StatusNotImplemented, nil), errors.New("ListLinters method not implemented")
 }
 
+// ListMonitors - List monitors
+func (s *ResourceApiApiService) ListMonitors(ctx context.Context) (ImplResponse, error) {
+	// TODO - update ListMonitors with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, MonitorResourceList{}) or use other options such as http.Ok ...
+	//return Response(200, MonitorResourceList{}), nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("ListMonitors method not implemented")
+}
+
 // ListPollingProfile - List Polling Profile Configuration
 func (s *ResourceApiApiService) ListPollingProfile(ctx context.Context, take int32, skip int32, sortBy string, sortDirection string) (ImplResponse, error) {
 	// TODO - update ListPollingProfile with the required logic for this service method.
@@ -515,6 +620,26 @@ func (s *ResourceApiApiService) UpdateLinter(ctx context.Context, linterId strin
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdateLinter method not implemented")
 }
 
+// UpdateMonitor - Update a Monitor
+func (s *ResourceApiApiService) UpdateMonitor(ctx context.Context, monitorId string, monitorResource MonitorResource) (ImplResponse, error) {
+	// TODO - update UpdateMonitor with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
+	//return Response(204, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("UpdateMonitor method not implemented")
+}
+
 // UpdatePollingProfile - Update a Polling Profile
 func (s *ResourceApiApiService) UpdatePollingProfile(ctx context.Context, pollingProfileId string, pollingProfile PollingProfile) (ImplResponse, error) {
 	// TODO - update UpdatePollingProfile with the required logic for this service method.
@@ -587,6 +712,37 @@ func (s *ResourceApiApiService) UpdateVariableSet(ctx context.Context, variableS
 	//return Response(500, nil),nil
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdateVariableSet method not implemented")
+}
+
+// UpsertMonitor - Upsert a Monitor
+func (s *ResourceApiApiService) UpsertMonitor(ctx context.Context, monitorResource MonitorResource) (ImplResponse, error) {
+	// TODO - update UpsertMonitor with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, MonitorResource{}) or use other options such as http.Ok ...
+	//return Response(200, MonitorResource{}), nil
+
+	//TODO: Uncomment the next line to return response Response(400, {}) or use other options such as http.Ok ...
+	//return Response(400, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
+	//return Response(404, nil),nil
+
+	//TODO: Uncomment the next line to return response Response(500, {}) or use other options such as http.Ok ...
+	//return Response(500, nil),nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("UpsertMonitor method not implemented")
+}
+
+// UpsertPollingProfile - Upsert new polling profile
+func (s *ResourceApiApiService) UpsertPollingProfile(ctx context.Context, pollingProfile PollingProfile) (ImplResponse, error) {
+	// TODO - update UpsertPollingProfile with the required logic for this service method.
+	// Add api_resource_api_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+
+	//TODO: Uncomment the next line to return response Response(200, PollingProfile{}) or use other options such as http.Ok ...
+	//return Response(200, PollingProfile{}), nil
+
+	return Response(http.StatusNotImplemented, nil), errors.New("UpsertPollingProfile method not implemented")
 }
 
 // UpsertTest - Upsert new test

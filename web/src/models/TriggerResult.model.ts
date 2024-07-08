@@ -60,6 +60,28 @@ const ResponseData = {
       statusCode: 0,
     };
   },
+  // TODO: review this
+  [TriggerTypes.artillery](response: object) {
+    return {
+      body: get(response, 'id', ''),
+      headers: [],
+      statusCode: 200,
+    };
+  },
+  [TriggerTypes.k6](response: object) {
+    return {
+      body: get(response, 'id', ''),
+      headers: [],
+      statusCode: 200,
+    };
+  },
+  [TriggerTypes.playwrightengine](response: object) {
+    return {
+      body: get(response, 'id', ''),
+      headers: [],
+      statusCode: 200,
+    };
+  },
 };
 
 const TriggerResult = ({

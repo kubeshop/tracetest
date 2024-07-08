@@ -63,6 +63,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateLinter,
 		},
 		{
+			"CreatePollingProfile",
+			strings.ToUpper("Post"),
+			"/api/pollingprofiles",
+			c.CreatePollingProfile,
+		},
+		{
 			"CreateTest",
 			strings.ToUpper("Post"),
 			"/api/tests",
@@ -81,6 +87,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.CreateVariableSet,
 		},
 		{
+			"CreteMonitor",
+			strings.ToUpper("Post"),
+			"/api/monitors",
+			c.CreteMonitor,
+		},
+		{
 			"DeleteDemo",
 			strings.ToUpper("Delete"),
 			"/api/demos/{demoId}",
@@ -91,6 +103,18 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Delete"),
 			"/api/linters/{linterId}",
 			c.DeleteLinter,
+		},
+		{
+			"DeleteMonitor",
+			strings.ToUpper("Delete"),
+			"/api/monitors/{monitorId}",
+			c.DeleteMonitor,
+		},
+		{
+			"DeletePollingProfile",
+			strings.ToUpper("Delete"),
+			"/api/pollingprofiles/{pollingProfileId}",
+			c.DeletePollingProfile,
 		},
 		{
 			"DeleteTest",
@@ -133,6 +157,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Get"),
 			"/api/linters/{linterId}",
 			c.GetLinter,
+		},
+		{
+			"GetMonitor",
+			strings.ToUpper("Get"),
+			"/api/monitors/{monitorId}",
+			c.GetMonitor,
 		},
 		{
 			"GetPollingProfile",
@@ -195,6 +225,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.ListLinters,
 		},
 		{
+			"ListMonitors",
+			strings.ToUpper("Get"),
+			"/api/monitors",
+			c.ListMonitors,
+		},
+		{
 			"ListPollingProfile",
 			strings.ToUpper("Get"),
 			"/api/pollingprofiles",
@@ -231,6 +267,12 @@ func (c *ResourceApiApiController) Routes() Routes {
 			c.UpdateLinter,
 		},
 		{
+			"UpdateMonitor",
+			strings.ToUpper("Put"),
+			"/api/monitors/{monitorId}",
+			c.UpdateMonitor,
+		},
+		{
 			"UpdatePollingProfile",
 			strings.ToUpper("Put"),
 			"/api/pollingprofiles/{pollingProfileId}",
@@ -253,6 +295,18 @@ func (c *ResourceApiApiController) Routes() Routes {
 			strings.ToUpper("Put"),
 			"/api/variableSets/{variableSetId}",
 			c.UpdateVariableSet,
+		},
+		{
+			"UpsertMonitor",
+			strings.ToUpper("Put"),
+			"/api/monitors",
+			c.UpsertMonitor,
+		},
+		{
+			"UpsertPollingProfile",
+			strings.ToUpper("Put"),
+			"/api/pollingprofiles",
+			c.UpsertPollingProfile,
 		},
 		{
 			"UpsertTest",
@@ -301,6 +355,30 @@ func (c *ResourceApiApiController) CreateLinter(w http.ResponseWriter, r *http.R
 		return
 	}
 	result, err := c.service.CreateLinter(r.Context(), linterResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// CreatePollingProfile - Create Polling Profile
+func (c *ResourceApiApiController) CreatePollingProfile(w http.ResponseWriter, r *http.Request) {
+	pollingProfileParam := PollingProfile{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&pollingProfileParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertPollingProfileRequired(pollingProfileParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreatePollingProfile(r.Context(), pollingProfileParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -383,6 +461,30 @@ func (c *ResourceApiApiController) CreateVariableSet(w http.ResponseWriter, r *h
 
 }
 
+// CreteMonitor - Create a Monitor
+func (c *ResourceApiApiController) CreteMonitor(w http.ResponseWriter, r *http.Request) {
+	monitorResourceParam := MonitorResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&monitorResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertMonitorResourceRequired(monitorResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.CreteMonitor(r.Context(), monitorResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // DeleteDemo - Delete a Demonstration setting
 func (c *ResourceApiApiController) DeleteDemo(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -405,6 +507,38 @@ func (c *ResourceApiApiController) DeleteLinter(w http.ResponseWriter, r *http.R
 	linterIdParam := params["linterId"]
 
 	result, err := c.service.DeleteLinter(r.Context(), linterIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeleteMonitor - Delete a Monitor
+func (c *ResourceApiApiController) DeleteMonitor(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	monitorIdParam := params["monitorId"]
+
+	result, err := c.service.DeleteMonitor(r.Context(), monitorIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// DeletePollingProfile - Delete Polling Profile
+func (c *ResourceApiApiController) DeletePollingProfile(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	pollingProfileIdParam := params["pollingProfileId"]
+
+	result, err := c.service.DeletePollingProfile(r.Context(), pollingProfileIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -517,6 +651,22 @@ func (c *ResourceApiApiController) GetLinter(w http.ResponseWriter, r *http.Requ
 	linterIdParam := params["linterId"]
 
 	result, err := c.service.GetLinter(r.Context(), linterIdParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// GetMonitor - Get a Monitor
+func (c *ResourceApiApiController) GetMonitor(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	monitorIdParam := params["monitorId"]
+
+	result, err := c.service.GetMonitor(r.Context(), monitorIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -749,6 +899,19 @@ func (c *ResourceApiApiController) ListLinters(w http.ResponseWriter, r *http.Re
 
 }
 
+// ListMonitors - List monitors
+func (c *ResourceApiApiController) ListMonitors(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.ListMonitors(r.Context())
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // ListPollingProfile - List Polling Profile Configuration
 func (c *ResourceApiApiController) ListPollingProfile(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -909,6 +1072,33 @@ func (c *ResourceApiApiController) UpdateLinter(w http.ResponseWriter, r *http.R
 
 }
 
+// UpdateMonitor - Update a Monitor
+func (c *ResourceApiApiController) UpdateMonitor(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	monitorIdParam := params["monitorId"]
+
+	monitorResourceParam := MonitorResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&monitorResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertMonitorResourceRequired(monitorResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpdateMonitor(r.Context(), monitorIdParam, monitorResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
 // UpdatePollingProfile - Update a Polling Profile
 func (c *ResourceApiApiController) UpdatePollingProfile(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -1007,6 +1197,54 @@ func (c *ResourceApiApiController) UpdateVariableSet(w http.ResponseWriter, r *h
 		return
 	}
 	result, err := c.service.UpdateVariableSet(r.Context(), variableSetIdParam, variableSetResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpsertMonitor - Upsert a Monitor
+func (c *ResourceApiApiController) UpsertMonitor(w http.ResponseWriter, r *http.Request) {
+	monitorResourceParam := MonitorResource{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&monitorResourceParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertMonitorResourceRequired(monitorResourceParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpsertMonitor(r.Context(), monitorResourceParam)
+	// If an error occurred, encode the error with the status code
+	if err != nil {
+		c.errorHandler(w, r, err, &result)
+		return
+	}
+	// If no error, encode the body and the result code
+	EncodeJSONResponse(result.Body, &result.Code, w)
+
+}
+
+// UpsertPollingProfile - Upsert new polling profile
+func (c *ResourceApiApiController) UpsertPollingProfile(w http.ResponseWriter, r *http.Request) {
+	pollingProfileParam := PollingProfile{}
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&pollingProfileParam); err != nil {
+		c.errorHandler(w, r, &ParsingError{Err: err}, nil)
+		return
+	}
+	if err := AssertPollingProfileRequired(pollingProfileParam); err != nil {
+		c.errorHandler(w, r, err, nil)
+		return
+	}
+	result, err := c.service.UpsertPollingProfile(r.Context(), pollingProfileParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

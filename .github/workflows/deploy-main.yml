@@ -87,7 +87,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: v1.23.0
+          version: v2.0.1
           args: release --clean --split --nightly
         env:
           GOOS: ${{ matrix.GOOS }}
@@ -153,7 +153,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
-          version: v1.23.0
+          version: v2.0.1
           args: continue --merge
         env:
           VERSION: sha-${{ env.sha_short }}

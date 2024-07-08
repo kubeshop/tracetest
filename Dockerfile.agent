@@ -5,9 +5,13 @@ ENV TRACETEST_API_KEY ""
 
 WORKDIR /app
 
+# Setup Tracetest CLI
 COPY ./tracetest /app/tracetest
 COPY ./agent/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
+# Setup additional runtimes used by triggers
+RUN apk add nodejs npm
 
 ENTRYPOINT ["/app/entrypoint.sh"]
 

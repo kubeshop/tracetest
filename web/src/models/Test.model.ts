@@ -47,6 +47,7 @@ Test.FromRawTest = ({
     trigger: Trigger(rawTrigger || {}),
     summary: Summary(summary),
     outputs: outputs.map((rawOutput, index) => TestOutput(rawOutput, index)),
+    pollingProfile: '',
   };
 };
 

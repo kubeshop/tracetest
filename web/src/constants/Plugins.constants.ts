@@ -68,6 +68,15 @@ const Playwright: IPlugin = {
   requestType: TriggerTypes.traceid,
 };
 
+const NoOp: IPlugin = { // TODO: think on how to remove this
+  name: SupportedPlugins.Artillery,
+  title: 'NoOp',
+  description: 'NoOp',
+  isActive: false,
+  demoList: [],
+  type: TriggerTypes.traceid,
+};
+
 export const Plugins = {
   [SupportedPlugins.REST]: Rest,
   [SupportedPlugins.GRPC]: GRPC,
@@ -84,6 +93,9 @@ export const TriggerTypeToPlugin = {
   [TriggerTypes.traceid]: Plugins.TraceID,
   [TriggerTypes.cypress]: Plugins.Cypress,
   [TriggerTypes.playwright]: Plugins.Playwright,
+  [TriggerTypes.artillery]: NoOp,
+  [TriggerTypes.k6]: NoOp,
+  [TriggerTypes.playwrightengine]: NoOp,
 } as const;
 
 export const CreateTriggerTypeToPlugin = {

@@ -19,6 +19,8 @@ type Trigger struct {
 	Traceid TraceidRequest `json:"traceid,omitempty"`
 
 	Kafka KafkaRequest `json:"kafka,omitempty"`
+
+	PlaywrightEngine PlaywrightEngineRequest `json:"playwrightEngine,omitempty"`
 }
 
 // AssertTriggerRequired checks if the required fields are not zero-ed
@@ -33,6 +35,9 @@ func AssertTriggerRequired(obj Trigger) error {
 		return err
 	}
 	if err := AssertKafkaRequestRequired(obj.Kafka); err != nil {
+		return err
+	}
+	if err := AssertPlaywrightEngineRequestRequired(obj.PlaywrightEngine); err != nil {
 		return err
 	}
 	return nil

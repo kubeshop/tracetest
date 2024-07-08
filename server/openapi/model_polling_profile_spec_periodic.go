@@ -17,6 +17,8 @@ type PollingProfileSpecPeriodic struct {
 
 	// Total time that the poller should try to continue to fetch traces. It should be written in duration format (example: 1s, 30s, 1m).
 	Timeout string `json:"timeout,omitempty"`
+
+	SelectorMatchRetries float32 `json:"selectorMatchRetries,omitempty"`
 }
 
 // AssertPollingProfileSpecPeriodicRequired checks if the required fields are not zero-ed
