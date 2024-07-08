@@ -10,10 +10,10 @@ import (
 )
 
 var (
-	node    = "node"
-	app     = "npx"
-	libName = "../../tracetest-js/packages/tracetest-playwright-engine"
-	// libName    = "@tracetest/playwright-engine"
+	node = "node"
+	app  = "npx"
+	// libName = "../../tracetest-js/packages/tracetest-playwright-engine"
+	libName    = "@tracetest/playwright-engine"
 	scriptPath = "script.js"
 )
 
