@@ -81,6 +81,18 @@ func start(traceId, spanId, url, method string) (string, error) {
 		return "", err
 	}
 
+	if os.Getenv("PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD") != "1" {
+		res, err := execCommand(
+			app,
+			"playwright",
+			"install",
+		)
+
+		if err != nil {
+			return "", fmt.Errorf("error installing playwright: %s, %w", res, err)
+		}
+	}
+
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s", wd, scriptPath))
 	if err != nil {
 		return "", err
