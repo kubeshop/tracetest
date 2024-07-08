@@ -19,7 +19,8 @@ var _ MappedNullable = &PlaywrightEngineResponse{}
 
 // PlaywrightEngineResponse struct for PlaywrightEngineResponse
 type PlaywrightEngineResponse struct {
-	Success *bool `json:"success,omitempty"`
+	Success *bool   `json:"success,omitempty"`
+	Out     *string `json:"out,omitempty"`
 }
 
 // NewPlaywrightEngineResponse instantiates a new PlaywrightEngineResponse object
@@ -71,6 +72,38 @@ func (o *PlaywrightEngineResponse) SetSuccess(v bool) {
 	o.Success = &v
 }
 
+// GetOut returns the Out field value if set, zero value otherwise.
+func (o *PlaywrightEngineResponse) GetOut() string {
+	if o == nil || isNil(o.Out) {
+		var ret string
+		return ret
+	}
+	return *o.Out
+}
+
+// GetOutOk returns a tuple with the Out field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *PlaywrightEngineResponse) GetOutOk() (*string, bool) {
+	if o == nil || isNil(o.Out) {
+		return nil, false
+	}
+	return o.Out, true
+}
+
+// HasOut returns a boolean if a field has been set.
+func (o *PlaywrightEngineResponse) HasOut() bool {
+	if o != nil && !isNil(o.Out) {
+		return true
+	}
+
+	return false
+}
+
+// SetOut gets a reference to the given string and assigns it to the Out field.
+func (o *PlaywrightEngineResponse) SetOut(v string) {
+	o.Out = &v
+}
+
 func (o PlaywrightEngineResponse) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -83,6 +116,9 @@ func (o PlaywrightEngineResponse) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	if !isNil(o.Success) {
 		toSerialize["success"] = o.Success
+	}
+	if !isNil(o.Out) {
+		toSerialize["out"] = o.Out
 	}
 	return toSerialize, nil
 }

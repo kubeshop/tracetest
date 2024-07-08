@@ -409,4 +409,5 @@ message PlaywrightEngineRequest {
 
 message PlaywrightEngineResponse {
     bool success = 1;
+    string out = 2;
 }

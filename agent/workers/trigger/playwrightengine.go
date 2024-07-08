@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	node       = "node"
-	app        = "npx"
+	node = "node"
+	app  = "npx"
+	// libName = "../../tracetest-js/packages/tracetest-playwright-engine"
 	libName    = "@tracetest/playwright-engine"
 	scriptPath = "script.js"
 )
@@ -42,7 +43,7 @@ func (te *playwrightTriggerer) Trigger(ctx context.Context, triggerConfig Trigge
 		return response, err
 	}
 
-	err = start(opts.TraceID.String(), opts.SpanID.String(), triggerConfig.PlaywrightEngine.Target, triggerConfig.PlaywrightEngine.Method)
+	out, err := start(opts.TraceID.String(), opts.SpanID.String(), triggerConfig.PlaywrightEngine.Target, triggerConfig.PlaywrightEngine.Method)
 	if err != nil {
 		os.Remove(scriptPath)
 		return response, err
@@ -50,6 +51,7 @@ func (te *playwrightTriggerer) Trigger(ctx context.Context, triggerConfig Trigge
 
 	os.Remove(scriptPath)
 	response.Result.PlaywrightEngine.Success = true
+	response.Result.PlaywrightEngine.Out = out
 	return response, err
 }
 
@@ -73,10 +75,10 @@ func validate() error {
 	return nil
 }
 
-func start(traceId, spanId, url, method string) error {
+func start(traceId, spanId, url, method string) (string, error) {
 	wd, err := os.Getwd()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	res, err := execCommand(
@@ -86,12 +88,12 @@ func start(traceId, spanId, url, method string) error {
 	)
 
 	if err != nil {
-		return fmt.Errorf("error installing playwright: %s, %w", res, err)
+		return "", fmt.Errorf("error installing playwright: %s, %w", res, err)
 	}
 
 	path, err := filepath.Abs(fmt.Sprintf("%s/%s", wd, scriptPath))
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	res, err = execCommand(
@@ -109,10 +111,10 @@ func start(traceId, spanId, url, method string) error {
 		method)
 
 	if err != nil {
-		return fmt.Errorf("error executing playwright engine: %s, %w", res, err)
+		return "", fmt.Errorf("error executing playwright engine: %s, %w", res, err)
 	}
 
-	return nil
+	return res, nil
 }
 
 func execCommand(name string, args ...string) (string, error) {
@@ -138,5 +140,6 @@ type PlaywrightEngineRequest struct {
 }
 
 type PlaywrightEngineResponse struct {
-	Success bool `json:"success"`
+	Success bool   `json:"success"`
+	Out     string `json:"out"`
 }

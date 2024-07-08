@@ -362,11 +362,12 @@ func convertResponseToProtoResponse(request *proto.TriggerRequest, response trig
 		TestID: request.TestID,
 		RunID:  request.RunID,
 		TriggerResult: &proto.TriggerResult{
-			Type:    string(response.Result.Type),
-			Http:    convertHttpResponseToProto(response.Result.HTTP),
-			Grpc:    convertGrpcResponseToProto(response.Result.GRPC),
-			TraceID: convertTraceIDResponseToProto(response.Result.TraceID),
-			Kafka:   convertKafkaResponseToProto(response.Result.Kafka),
+			Type:             string(response.Result.Type),
+			Http:             convertHttpResponseToProto(response.Result.HTTP),
+			Grpc:             convertGrpcResponseToProto(response.Result.GRPC),
+			TraceID:          convertTraceIDResponseToProto(response.Result.TraceID),
+			Kafka:            convertKafkaResponseToProto(response.Result.Kafka),
+			PlaywrightEngine: convertPlaywrightEngineResponseToProto(response.Result.PlaywrightEngine),
 		},
 	}
 }
@@ -424,5 +425,16 @@ func convertKafkaResponseToProto(kafka *trigger.KafkaResponse) *proto.KafkaRespo
 	return &proto.KafkaResponse{
 		Partition: kafka.Partition,
 		Offset:    kafka.Offset,
+	}
+}
+
+func convertPlaywrightEngineResponseToProto(playwerightEngine *trigger.PlaywrightEngineResponse) *proto.PlaywrightEngineResponse {
+	if playwerightEngine == nil {
+		return nil
+	}
+
+	return &proto.PlaywrightEngineResponse{
+		Success: playwerightEngine.Success,
+		Out:     playwerightEngine.Out,
 	}
 }
