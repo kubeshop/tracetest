@@ -16,3 +16,5 @@ components:
       properties:
         success:
           type: boolean
+        out:
+          type: string
