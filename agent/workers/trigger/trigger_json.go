@@ -13,7 +13,7 @@ type triggerJSONV3 struct {
 	GRPC             *GRPCRequest             `json:"grpc,omitempty"`
 	TraceID          *TraceIDRequest          `json:"traceid,omitempty"`
 	Kafka            *KafkaRequest            `json:"kafka,omitempty"`
-	PlaywrightEngine *PlaywrightEngineRequest `json:"playwrightengine,omitempty"`
+	PlaywrightEngine *PlaywrightEngineRequest `json:"playwrightEngine,omitempty"`
 }
 
 func (v3 triggerJSONV3) valid() bool {
