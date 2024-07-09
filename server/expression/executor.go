@@ -211,7 +211,8 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 			strValue = fmt.Sprintf(term.Str.Text, stringArgs...)
 		}
 
-		return value.NewFromString(strValue), nil
+		str := value.NewFromString(strValue)
+		return value.NewFromString(str.UnescappedString()), nil
 	}
 
 	return value.Nil, fmt.Errorf("empty term")

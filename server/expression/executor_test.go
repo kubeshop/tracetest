@@ -58,6 +58,11 @@ func TestBasicExpressionExecution(t *testing.T) {
 			Query:      `100ms < 200 ms`,
 			ShouldPass: true,
 		},
+		{
+			Name:       "escaped_strings_must_be_equal_to_unescaped_strings",
+			Query:      `'This should be workin\'' = "This should be workin'"`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)
