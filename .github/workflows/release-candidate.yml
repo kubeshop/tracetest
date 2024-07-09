@@ -16,6 +16,7 @@ on:
     tags:
       # this pipeline supports RC pre releases
       - "v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+"
+
 jobs:
   build-web:
     name: build web
@@ -27,18 +28,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: npm
-          cache-dependency-path: web/package-lock.json
-      - name: Cache Build
-        id: cache-build
-        uses: actions/cache@v3
-        with:
-          path: web/build/
-          key: web-build-${{ hashFiles('web/*') }}
       - run: cd web; npm ci
-        if: steps.cache-build.outputs.cache-hit != 'true'
       - run: cd web; CI= npm run build
-        if: steps.cache-build.outputs.cache-hit != 'true'
       - name: Upload assets
         uses: actions/upload-artifact@v3
         with:
@@ -69,8 +60,6 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: "go.mod"
-          cache: true
-          cache-dependency-path: "go.mod"
 
       - uses: actions/download-artifact@v3
         with:
@@ -79,7 +68,6 @@ jobs:
 
       # release
       - uses: goreleaser/goreleaser-action@v4
-        if: steps.cache.outputs.cache-hit != 'true'
         with:
           distribution: goreleaser-pro
           version: v2.0.1
