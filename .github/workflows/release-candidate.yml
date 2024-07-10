@@ -85,7 +85,7 @@ jobs:
         with:
           push: true
           tags: kubeshop/tracetest-agent:${{ env.VERSION }}
-          file: agent/Dockerfile
+          file: ./Dockerfile.agent
           build-args: |
             TRACETEST_VERSION=${{ env.VERSION }}
         env:
