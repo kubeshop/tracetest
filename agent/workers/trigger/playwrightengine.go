@@ -46,7 +46,7 @@ func (te *playwrightTriggerer) Trigger(ctx context.Context, triggerConfig Trigge
 	}
 
 	out, err := start(opts.TraceID.String(), opts.SpanID.String(), triggerConfig.PlaywrightEngine.Target, triggerConfig.PlaywrightEngine.Method, scriptPath)
-	// os.Remove(scriptPath)
+	os.Remove(scriptPath)
 	if err != nil {
 		return response, err
 	}
