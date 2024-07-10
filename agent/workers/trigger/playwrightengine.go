@@ -13,8 +13,8 @@ var (
 	node = "node"
 	app  = "npx"
 	// libName = "../../tracetest-js/packages/tracetest-playwright-engine"
-	libName    = "@tracetest/playwright-engine"
-	scriptPath = "script.js"
+	libName        = "@tracetest/playwright-engine"
+	baseScriptPath = "script.js"
 )
 
 func PLAYWRIGHTENGINE() Triggerer {
@@ -38,18 +38,19 @@ func (te *playwrightTriggerer) Trigger(ctx context.Context, triggerConfig Trigge
 		return response, err
 	}
 
+	scriptPath := fmt.Sprintf("%s-%s", opts.TraceID, baseScriptPath)
+
 	err = os.WriteFile(scriptPath, []byte(triggerConfig.PlaywrightEngine.Script), 0644)
 	if err != nil {
 		return response, err
 	}
 
-	out, err := start(opts.TraceID.String(), opts.SpanID.String(), triggerConfig.PlaywrightEngine.Target, triggerConfig.PlaywrightEngine.Method)
+	out, err := start(opts.TraceID.String(), opts.SpanID.String(), triggerConfig.PlaywrightEngine.Target, triggerConfig.PlaywrightEngine.Method, scriptPath)
+	// os.Remove(scriptPath)
 	if err != nil {
-		os.Remove(scriptPath)
 		return response, err
 	}
 
-	os.Remove(scriptPath)
 	response.Result.PlaywrightEngine.Success = true
 	response.Result.PlaywrightEngine.Out = out
 	return response, err
@@ -75,7 +76,7 @@ func validate() error {
 	return nil
 }
 
-func start(traceId, spanId, url, method string) (string, error) {
+func start(traceId, spanId, url, method, scriptPath string) (string, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return "", err
