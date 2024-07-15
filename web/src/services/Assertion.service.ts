@@ -18,7 +18,7 @@ const AssertionService = () => ({
     if (!input) return input;
     const formatted = input.trim();
 
-    if (isJson(input)) return `'${input}'`;
+    if (isJson(input)) return `'${this.escapeString(input, `'`)}'`;
 
     if (Object.values(Attributes).includes(formatted)) return formatted;
     if (Object.values(Attributes).some(aa => formatted.includes(aa))) return formatted;
@@ -29,7 +29,28 @@ const AssertionService = () => ({
     return isQuoted ? formatted : this.quotedString(formatted);
   },
   quotedString(str: string): string {
-    return `\"${str}\"`;
+    return `\"${this.escapeString(str, `"`)}\"`;
+  },
+  escapeString(str: string, quoteCharacter: string): string {
+    // Couldn't find a regex to solve this problem :(
+    // Feel free to refactor this if you know how to escape quotes without
+    // double escaping already escaped quotes.
+    //
+    // Examples:
+    // ' ==> \\'
+    // \\' ==> \\'
+    let newString = '';
+    let lastCharacter = '';
+    for (let i = 0; i < str.length; i += 1) {
+      if (str[i] === quoteCharacter && lastCharacter !== '\\') {
+        newString += `\\${quoteCharacter}`;
+      } else {
+        newString += str[i];
+      }
+
+      lastCharacter = str[i];
+    }
+    return newString;
   },
   getSpanIds(resultList: TRawAssertionResult[]) {
     const spanIds = resultList
