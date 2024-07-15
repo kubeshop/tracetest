@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"time"
 )
 
 var (
@@ -45,7 +46,7 @@ func (te *playwrightTriggerer) Trigger(ctx context.Context, triggerConfig Trigge
 		return response, err
 	}
 
-	out, err := start(opts.TraceID.String(), opts.SpanID.String(), triggerConfig.PlaywrightEngine.Target, triggerConfig.PlaywrightEngine.Method, scriptPath)
+	out, err := start(ctx, opts.TraceID.String(), opts.SpanID.String(), triggerConfig.PlaywrightEngine.Target, triggerConfig.PlaywrightEngine.Method, scriptPath)
 	os.Remove(scriptPath)
 	if err != nil {
 		return response, err
@@ -76,7 +77,7 @@ func validate() error {
 	return nil
 }
 
-func start(traceId, spanId, url, method, scriptPath string) (string, error) {
+func start(ctx context.Context, traceId, spanId, url, method, scriptPath string) (string, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return "", err
@@ -84,6 +85,7 @@ func start(traceId, spanId, url, method, scriptPath string) (string, error) {
 
 	if os.Getenv("PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD") != "1" {
 		res, err := execCommand(
+			ctx,
 			app,
 			"playwright",
 			"install",
@@ -100,6 +102,7 @@ func start(traceId, spanId, url, method, scriptPath string) (string, error) {
 	}
 
 	res, err := execCommand(
+		ctx,
 		app,
 		"--yes",
 		libName,
@@ -121,17 +124,20 @@ func start(traceId, spanId, url, method, scriptPath string) (string, error) {
 	return res, nil
 }
 
-func execCommand(name string, args ...string) (string, error) {
-	cmd := exec.Command(name, args...)
+func execCommand(ctx context.Context, name string, args ...string) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, time.Minute*3) //3 minutes
+	defer cancel()
+	cmd := exec.CommandContext(ctx, name, args...)
 
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
-	err := cmd.Run()
 
+	err := cmd.Run()
 	if err != nil {
-		return fmt.Sprint(err) + ": " + stderr.String(), err
+		res := fmt.Sprint(err) + ": " + out.String() + stderr.String()
+		return res, err
 	}
 
 	return out.String(), nil
