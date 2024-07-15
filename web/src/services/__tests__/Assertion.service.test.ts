@@ -39,4 +39,17 @@ describe('AssertionService', () => {
       expect(result).toEqual([id1, id2, id3]);
     });
   });
+  describe('escapeString', () => {
+    it('should escape simple quotes', () => {
+      const {escapeString} = AssertionService
+      const escaped = escapeString(`'This should be escaped'`, `'`);
+      expect(escaped).toBe(`\\'This should be escaped\\'`);
+    })
+
+    it('should not escape already escaped string', () => {
+      const {escapeString} = AssertionService
+      const escaped = escapeString(`\\'This should be escaped\\'`, `'`);
+      expect(escaped).toBe(`\\'This should be escaped\\'`);
+    })
+  });
 });
