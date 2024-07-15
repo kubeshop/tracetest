@@ -41,15 +41,15 @@ describe('AssertionService', () => {
   });
   describe('escapeString', () => {
     it('should escape simple quotes', () => {
-      const {escapeString} = AssertionService
+      const {escapeString} = AssertionService;
       const escaped = escapeString(`'This should be escaped'`, `'`);
       expect(escaped).toBe(`\\'This should be escaped\\'`);
-    })
+    });
 
     it('should not escape already escaped string', () => {
-      const {escapeString} = AssertionService
+      const {escapeString} = AssertionService;
       const escaped = escapeString(`\\'This should be escaped\\'`, `'`);
       expect(escaped).toBe(`\\'This should be escaped\\'`);
-    })
+    });
   });
 });
