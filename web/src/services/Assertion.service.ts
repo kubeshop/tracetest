@@ -41,8 +41,8 @@ const AssertionService = () => ({
     // \\' ==> \\'
     let newString = '';
     let lastCharacter = '';
-    for (let i = 0; i < str.length; i++) {
-      if (str[i] == quoteCharacter && lastCharacter != '\\') {
+    for (let i = 0; i < str.length; i += 1) {
+      if (str[i] === quoteCharacter && lastCharacter !== '\\') {
         newString += `\\${quoteCharacter}`;
       } else {
         newString += str[i];
