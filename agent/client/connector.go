@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
+	"os"
 	"time"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -96,13 +97,17 @@ func getTransportCredentialsForEndpoint(endpoint string) (credentials.TransportC
 		return nil, fmt.Errorf("cannot parse endpoint: %w", err)
 	}
 
+	tlsCreds := credentials.NewTLS(&tls.Config{
+		InsecureSkipVerify: true,
+	})
+
+	if os.Getenv("TRACETEST_DEV_FORCE_URL") == "true" {
+		return tlsCreds, nil
+	}
+
 	switch port {
 	case "443":
-		tlsConfig := &tls.Config{
-			InsecureSkipVerify: true,
-		}
-		transportCredentials := credentials.NewTLS(tlsConfig)
-		return transportCredentials, nil
+		return tlsCreds, nil
 
 	default:
 		return insecure.NewCredentials(), nil
