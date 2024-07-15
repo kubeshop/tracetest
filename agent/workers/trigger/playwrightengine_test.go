@@ -64,7 +64,7 @@ var scriptFail = `
 	module.exports = { basicTest };
 `
 
-func TestTriggerFailure(t *testing.T) {
+func TestTriggerWithScriptFailure(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 
 		assert.Equal(t, "GET", req.Method)
@@ -87,7 +87,7 @@ func TestTriggerFailure(t *testing.T) {
 	ex := triggerer.PLAYWRIGHTENGINE()
 
 	resp, err := ex.Trigger(createContext(), triggerConfig, createOptions())
-	assert.NotNil(t, err)
-
-	assert.Equal(t, false, resp.Result.PlaywrightEngine.Success)
+	assert.Nil(t, err)
+	assert.Contains(t, resp.Result.PlaywrightEngine.Out, "<element(s) not found>")
+	assert.Equal(t, true, resp.Result.PlaywrightEngine.Success)
 }
