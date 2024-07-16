@@ -2,6 +2,10 @@
 
 This repository's objective is to show how you can configure trace-based tests using the Tracetest Playwright Engine Trigger.
 
+## Documentation Recipe
+
+This example is part of the official Tracetest docs and can be found by following this [link](https://docs.tracetest.io/examples-tutorials/recipes/running-tests-with-tracetest-playwright-engine).
+
 ## Steps
 
 1. Copy the `.env.template` file to `.env`.
