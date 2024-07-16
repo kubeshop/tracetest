@@ -1,0 +1,31 @@
+type: Test
+spec:
+  id: import-pokemon
+  name: Import Pokemon
+  trigger:
+    type: playwrightengine
+    playwrightEngine:
+      target: http://api:8081
+      script: ./script.js
+      method: importPokemon
+  specs:
+    - selector: span[tracetest.span.type="general" name="documentLoad"]
+      name: Document Load Should be fast
+      assertions:
+        - attr:tracetest.span.duration < 500ms
+    - selector: span[tracetest.span.type="http" http.scheme="http"]
+      name: All HTTP request should return 200
+      assertions:
+        - attr:http.status_code = 200
+    - selector:
+        span[tracetest.span.type="messaging" name="queue.synchronizePokemon
+        process" messaging.system="rabbitmq"
+        messaging.destination="queue.synchronizePokemon"
+        messaging.operation="process"]
+      name: The worker should be processed
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[tracetest.span.type="database"]
+      name: "All Database Spans: Processing time is less than 100ms"
+      assertions:
+        - attr:tracetest.span.duration  <  250ms
