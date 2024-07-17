@@ -243,7 +243,8 @@ func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 		return value.Nil, resolutionError(err)
 	}
 
-	return value.NewFromString(attributeValue), nil
+	str := value.NewFromString(attributeValue)
+	return value.NewFromString(str.UnescappedString()), nil
 }
 
 func (e Executor) resolveEnvironment(environment *Environment) (value.Value, error) {
