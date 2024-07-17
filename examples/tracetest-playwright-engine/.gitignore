@@ -1,0 +1,13 @@
+node_modules
+.vscode
+
+node_modules/
+api/.build/
+.idea/
+.DS_Store
+.env
+
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

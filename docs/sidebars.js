@@ -123,6 +123,17 @@ const sidebars = {
       items: [
         {
           type: "category",
+          label: "Tracetest Triggers",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tests-with-tracetest-playwright-engine",
+              label: "True End-To-End Trace-Based Tests with the Tracetest Playwright Engine",
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "Streams and Message Queues",
           items: [
             {
