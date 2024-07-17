@@ -63,6 +63,19 @@ func TestBasicExpressionExecution(t *testing.T) {
 			Query:      `'This should be workin\'' = "This should be workin'"`,
 			ShouldPass: true,
 		},
+		{
+			Name:       "escaped_strings_must_be_equal_to_unescaped_strings_when_escaping_is_not_required",
+			Query:      `attr:response = '"text \"quoted\" and another \"quote\"",'`,
+			ShouldPass: true,
+			AttributeDataStore: expression.AttributeDataStore{
+				Span: traces.Span{
+					ID: id.NewRandGenerator().SpanID(),
+					Attributes: traces.NewAttributes(map[string]string{
+						"response": `"text \"quoted\" and another \"quote\"",`,
+					}),
+				},
+			},
+		},
 	}
 
 	executeTestCases(t, testCases)
