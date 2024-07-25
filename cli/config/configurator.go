@@ -91,6 +91,9 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 		return err
 	}
 
+	cfg.AllowInsecure = c.flags.Insecure
+	cfg.SkipVerify = c.flags.SkipVerify
+
 	cfg, err, isOSS := c.populateConfigWithVersionInfo(ctx, cfg)
 	if err != nil {
 		c.logger.Error("Could not populate config with version info", zap.Error(err))
@@ -158,14 +161,9 @@ func (c Configurator) createConfig(serverURL string) (Config, error) {
 		return Config{}, err
 	}
 
-	if os.Getenv("TRACETEST_DEV_FORCE_URL") != "true" {
-		if strings.Contains(serverURL, DefaultCloudDomain) {
-			path = DefaultCloudPath
-		} else if !strings.HasSuffix(path, "/api") {
-			path = strings.TrimSuffix(path, "/") + "/api"
-		}
-	} else {
-		c.ui.Warning("Server path overwritten by TRACETEST_DEV_FORCE_URL")
+	if strings.Contains(serverURL, DefaultCloudDomain) {
+		endpoint = strings.TrimPrefix(endpoint, "app")
+		endpoint = "api" + endpoint
 	}
 
 	return Config{
@@ -190,7 +188,7 @@ func (e invalidServerErr) Render() {
 	e.ui.Error(msg)
 }
 
-func (c Configurator) populateConfigWithDevConfig(ctx context.Context, cfg *Config) {
+func (c Configurator) populateConfigWithDevConfig(_ context.Context, cfg *Config) {
 	cfg.AgentEndpoint = os.Getenv("TRACETEST_DEV_AGENT_ENDPOINT")
 	if cfg.AgentEndpoint == "" {
 		cfg.AgentEndpoint = "localhost:8091"
@@ -215,14 +213,14 @@ func (c Configurator) populateConfigWithDevConfig(ctx context.Context, cfg *Conf
 }
 
 func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Config) (_ Config, _ error, isOSS bool) {
-	useDevVersion := os.Getenv("TRACETEST_AGENT_DEV_CONFIG") == "true"
-	if useDevVersion && Version == "dev" {
-		c.populateConfigWithDevConfig(ctx, &cfg)
+	// useDevVersion := os.Getenv("TRACETEST_AGENT_DEV_CONFIG") == "true"
+	// if useDevVersion && Version == "dev" {
+	// 	c.populateConfigWithDevConfig(ctx, &cfg)
 
-		c.ui.Success("Configured Tracetest CLI in development mode")
+	// 	c.ui.Success("Configured Tracetest CLI in development mode")
 
-		return cfg, nil, false
-	}
+	// 	return cfg, nil, false
+	// }
 
 	client := GetAPIClient(cfg)
 	version, err := getVersionMetadata(ctx, client)
@@ -255,7 +253,7 @@ func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Con
 func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config) (Config, error) {
 	if prev != nil && cfg.UIEndpoint == prev.UIEndpoint {
 		c.logger.Debug("Using previous UI endpoint", zap.String("uiEndpoint", cfg.UIEndpoint))
-		if prev != nil && prev.Jwt != "" {
+		if prev.Jwt != "" {
 			c.logger.Debug("Using previous JWT")
 			cfg.Jwt = prev.Jwt
 			cfg.Token = prev.Token

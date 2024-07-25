@@ -88,7 +88,7 @@ Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces 
 
 func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 	if cfg.AgentApiKey != "" {
-		err := s.StartAgent(ctx, cfg.AgentEndpoint, cfg.AgentApiKey, cfg.UIEndpoint, cfg.EnvironmentID)
+		err := s.StartAgent(ctx, cfg, cfg.AgentApiKey, cfg.EnvironmentID)
 		if err != nil {
 			s.ui.Error(err.Error())
 		}
@@ -106,23 +106,27 @@ func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 		return
 	}
 
-	err = s.StartAgent(ctx, cfg.AgentEndpoint, agentToken, cfg.UIEndpoint, "")
+	err = s.StartAgent(ctx, cfg, agentToken, "")
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
 }
 
-func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoint, environmentID string) error {
+func (s *Runner) StartAgent(ctx context.Context, cliConfig config.Config, agentApiKey, environmentID string) error {
 	cfg, err := agentConfig.LoadConfig()
+
+	cfg.Insecure = cliConfig.AllowInsecure
+	cfg.SkipVerify = cliConfig.SkipVerify
+
 	s.logger.Debug("Loaded agent config", zap.Any("config", cfg))
 	if err != nil {
 		s.logger.Error("Could not load agent config", zap.Error(err))
 		return err
 	}
 
-	if endpoint != "" {
-		s.logger.Debug("Overriding agent endpoint", zap.String("endpoint", endpoint))
-		cfg.ServerURL = endpoint
+	if cliConfig.AgentEndpoint != "" {
+		s.logger.Debug("Overriding agent endpoint", zap.String("endpoint", cliConfig.AgentEndpoint))
+		cfg.ServerURL = cliConfig.AgentEndpoint
 	}
 	s.logger.Debug("Agent endpoint", zap.String("endpoint", cfg.ServerURL))
 
@@ -140,7 +144,7 @@ func (s *Runner) StartAgent(ctx context.Context, endpoint, agentApiKey, uiEndpoi
 
 	if s.mode == agentConfig.Mode_Desktop {
 		s.logger.Debug("Starting agent in desktop mode")
-		return s.RunDesktopStrategy(ctx, cfg, uiEndpoint)
+		return s.RunDesktopStrategy(ctx, cfg, cliConfig.UIEndpoint)
 	}
 
 	s.logger.Debug("Starting agent in verbose mode")

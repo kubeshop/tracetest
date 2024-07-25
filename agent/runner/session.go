@@ -117,11 +117,21 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 }
 
 func newControlPlaneClient(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger, tracer trace.Tracer, meter metric.Meter) (*client.Client, error) {
-	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
+	opts := []client.Option{
 		client.WithAPIKey(config.APIKey),
 		client.WithAgentName(config.Name),
 		client.WithEnvironmentID(config.EnvironmentID),
 		client.WithLogger(logger),
+	}
+	if config.Insecure {
+		opts = append(opts, client.WithInsecure())
+	}
+
+	if config.SkipVerify {
+		opts = append(opts, client.WithSkipVerify())
+	}
+	controlPlaneClient, err := client.Connect(ctx, config.ServerURL,
+		opts...,
 	)
 	if err != nil {
 		observer.Error(err)

@@ -44,3 +44,15 @@ func WithTracer(tracer trace.Tracer) Option {
 		c.tracer = tracer
 	}
 }
+
+func WithInsecure() Option {
+	return func(c *Client) {
+		c.insecure = true
+	}
+}
+
+func WithSkipVerify() Option {
+	return func(c *Client) {
+		c.skipVerify = true
+	}
+}

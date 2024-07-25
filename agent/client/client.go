@@ -40,6 +40,8 @@ type SessionConfig struct {
 type Client struct {
 	mutex         sync.Mutex
 	endpoint      string
+	insecure      bool
+	skipVerify    bool
 	conn          *grpc.ClientConn
 	config        Config
 	sessionConfig *SessionConfig

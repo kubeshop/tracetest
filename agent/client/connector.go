@@ -4,8 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"net"
-	"os"
 	"time"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
@@ -66,14 +64,7 @@ func (c *Client) connect(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	transportCredentials, err := getTransportCredentialsForEndpoint(c.endpoint)
-	if err != nil {
-		return fmt.Errorf("could not get transport credentials: %w", err)
-	}
-
-	conn, err := grpc.DialContext(
-		ctx, c.endpoint,
-		grpc.WithTransportCredentials(transportCredentials),
+	opts := []grpc.DialOption{
 		grpc.WithDefaultServiceConfig(retryPolicy),
 		grpc.WithIdleTimeout(0), // disable grpc idle timeout
 		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
@@ -82,6 +73,19 @@ func (c *Client) connect(ctx context.Context) error {
 				propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}),
 			),
 		)),
+	}
+
+	if c.insecure {
+		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	} else {
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+			InsecureSkipVerify: c.skipVerify,
+		})))
+	}
+
+	conn, err := grpc.DialContext(
+		ctx, c.endpoint,
+		opts...,
 	)
 	if err != nil {
 		return fmt.Errorf("could not connect to server: %w", err)
@@ -89,28 +93,4 @@ func (c *Client) connect(ctx context.Context) error {
 
 	c.conn = conn
 	return nil
-}
-
-func getTransportCredentialsForEndpoint(endpoint string) (credentials.TransportCredentials, error) {
-	_, port, err := net.SplitHostPort(endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse endpoint: %w", err)
-	}
-
-	tlsCreds := credentials.NewTLS(&tls.Config{
-		InsecureSkipVerify: true,
-	})
-
-	if os.Getenv("TRACETEST_DEV_FORCE_URL") == "true" {
-		return tlsCreds, nil
-	}
-
-	switch port {
-	case "443":
-		return tlsCreds, nil
-
-	default:
-		return insecure.NewCredentials(), nil
-	}
-
 }

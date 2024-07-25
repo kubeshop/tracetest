@@ -28,7 +28,7 @@ func TestConfigWithEnvs(t *testing.T) {
 	t.Cleanup(func() {
 		os.Unsetenv("TRACETEST_AGENT_NAME")
 		os.Unsetenv("TRACETEST_API_KEY")
-		os.Unsetenv("TRACETEST_DEV_MODE")
+		os.Unsetenv("TRACETEST_DEV")
 		os.Unsetenv("TRACETEST_SERVER_URL")
 		os.Unsetenv("TRACETEST_OTLP_SERVER_GRPC_PORT")
 		os.Unsetenv("TRACETEST_OTLP_SERVER_HTTP_PORT")
@@ -38,7 +38,7 @@ func TestConfigWithEnvs(t *testing.T) {
 	os.Setenv("TRACETEST_AGENT_NAME", "my-agent-name")
 	os.Setenv("TRACETEST_API_KEY", "my-agent-api-key")
 	os.Setenv("TRACETEST_ENVIRONMENT_ID", "123456")
-	os.Setenv("TRACETEST_DEV_MODE", "true")
+	os.Setenv("TRACETEST_DEV", "true")
 	os.Setenv("TRACETEST_SERVER_URL", "https://custom.server.com")
 	os.Setenv("TRACETEST_OTLP_SERVER_GRPC_PORT", "1234")
 	os.Setenv("TRACETEST_OTLP_SERVER_HTTP_PORT", "1235")

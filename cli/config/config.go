@@ -23,6 +23,8 @@ var (
 )
 
 type Config struct {
+	AllowInsecure     bool   `yaml:"allowInsecure,omitempty"`
+	SkipVerify        bool   `yaml:"skipVerify,omitempty"`
 	Scheme            string `yaml:"scheme"`
 	Endpoint          string `yaml:"endpoint"`
 	ServerPath        string `yaml:"serverPath,omitempty"`
