@@ -36,7 +36,7 @@ var startCmd = &cobra.Command{
 			LogLevel:          startParams.logLevel,
 			CollectorEndpoint: startParams.collectorEndpoint,
 			Insecure:          startParams.insecure,
-			SkipVerify:        startParams.skipVerify,
+			SkipVerify:        cliConfig.SkipVerify,
 		}
 
 		// override organization and environment id from context.
@@ -92,7 +92,6 @@ func init() {
 	startCmd.Flags().StringVarP(&startParams.logLevel, "log-level", "l", "debug", "set the agent log level")
 	startCmd.Flags().StringVarP(&startParams.collectorEndpoint, "collector-endpoint", "", "", "address of the OTel Collector endpoint")
 	startCmd.Flags().BoolVarP(&startParams.insecure, "insecure", "", false, "allow insecure connections to control plane")
-	startCmd.Flags().BoolVarP(&startParams.skipVerify, "skip-verify", "", false, "skip verification of the server certificate (allows self signed, for example)")
 
 	startCmd.Flags().MarkDeprecated("endpoint", "use --server-url instead")
 	startCmd.Flags().MarkShorthandDeprecated("e", "use --server-url instead")
@@ -109,5 +108,4 @@ type startParameters struct {
 	logLevel          string
 	collectorEndpoint string
 	insecure          bool
-	skipVerify        bool
 }
