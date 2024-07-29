@@ -25,7 +25,7 @@ var configureCmd = &cobra.Command{
 	Run: WithResultHandler(WithParamsHandler(configParams)(func(ctx context.Context, cmd *cobra.Command, _ []string) (string, error) {
 		flags := agentConfig.Flags{
 			CI:         configParams.CI,
-			SkipVerify: cliConfig.SkipVerify,
+			SkipVerify: skipVerify,
 		}
 
 		config, err := config.LoadConfig("")

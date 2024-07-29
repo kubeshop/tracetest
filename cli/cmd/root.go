@@ -73,12 +73,14 @@ var (
 	}
 )
 
+var skipVerify bool
+
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&output, "output", "o", "", fmt.Sprintf("output format [%s]", outputFormatsString))
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "config.yml", "config file will be used by the CLI")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "display debug information")
 	rootCmd.PersistentFlags().StringVarP(&overrideEndpoint, "server-url", "s", "", "server url")
-	rootCmd.PersistentFlags().BoolVarP(&cliConfig.SkipVerify, "skip-verify", "", false, "skip verification of the server certificate (allows self signed, for example)")
+	rootCmd.PersistentFlags().BoolVarP(&skipVerify, "skip-verify", "", false, "skip verification of the server certificate (allows self signed, for example)")
 
 	groups := []*cobra.Group{cmdGroupConfig, cmdGroupResources, cmdGroupMisc}
 

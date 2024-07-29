@@ -36,7 +36,7 @@ var startCmd = &cobra.Command{
 			LogLevel:          startParams.logLevel,
 			CollectorEndpoint: startParams.collectorEndpoint,
 			Insecure:          startParams.insecure,
-			SkipVerify:        cliConfig.SkipVerify,
+			SkipVerify:        skipVerify,
 		}
 
 		// override organization and environment id from context.

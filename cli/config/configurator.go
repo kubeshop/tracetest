@@ -411,7 +411,7 @@ func SetupHttpClient(cfg Config) *resourcemanager.HTTPClient {
 		extraHeaders.Set("x-environment-id", "default")
 	}
 
-	return resourcemanager.NewHTTPClient(fmt.Sprintf("%s%s", cfg.URL(), cfg.Path()), extraHeaders)
+	return resourcemanager.NewHTTPClient(fmt.Sprintf("%s%s", cfg.URL(), cfg.Path()), extraHeaders, cfg.SkipVerify)
 }
 
 func GetTokenClaims(tokenString string) (jwt.MapClaims, error) {

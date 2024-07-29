@@ -403,13 +403,20 @@ func setupResources() {
 	extraHeaders.Set("x-environment-id", cliConfig.EnvironmentID)
 	extraHeaders.Set("Authorization", fmt.Sprintf("Bearer %s", cliConfig.Jwt))
 
+	// if cliConfig has SkipVerify set to true, use that value.
+	// otherwise use the value from the flag
+	if cliConfig.SkipVerify {
+		skipVerify = true
+	}
+
 	// To avoid a ciruclar reference initialization when setting up the registry and its resources,
 	// we create the resources with a pointer to an unconfigured HTTPClient.
 	// When each command is run, this function is run in the PreRun stage, before any of the actual `Run` code is executed
 	// We take this chance to configure the HTTPClient with the correct URL and headers.
 	// To make this configuration propagate to all the resources, we need to replace the pointer to the HTTPClient.
 	// For more details, see https://github.com/kubeshop/tracetest/pull/2832#discussion_r1245616804
-	hc := resourcemanager.NewHTTPClient(fmt.Sprintf("%s%s", cliConfig.URL(), cliConfig.Path()), extraHeaders)
+
+	hc := resourcemanager.NewHTTPClient(fmt.Sprintf("%s%s", cliConfig.URL(), cliConfig.Path()), extraHeaders, skipVerify)
 	*httpClient = *hc
 }
 
