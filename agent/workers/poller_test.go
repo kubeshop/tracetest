@@ -23,7 +23,7 @@ func TestPollerWorker(t *testing.T) {
 	ctx := ContextWithTracingEnabled()
 	controlPlane := mocks.NewGrpcServer()
 
-	client, err := client.Connect(ctx, controlPlane.Addr())
+	client, err := client.Connect(ctx, controlPlane.Addr(), client.WithInsecure())
 	require.NoError(t, err)
 
 	pollerWorker := workers.NewPollerWorker(client, workers.WithPollerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess))
@@ -123,7 +123,7 @@ func TestPollerWorkerWithInmemoryDatastore(t *testing.T) {
 	ctx := context.Background()
 	controlPlane := mocks.NewGrpcServer()
 
-	client, err := client.Connect(ctx, controlPlane.Addr())
+	client, err := client.Connect(ctx, controlPlane.Addr(), client.WithInsecure())
 	require.NoError(t, err)
 
 	cache := collector.NewTraceCache()
@@ -186,7 +186,7 @@ func TestPollerWithInvalidDataStore(t *testing.T) {
 	ctx := context.Background()
 	controlPlane := mocks.NewGrpcServer()
 
-	client, err := client.Connect(ctx, controlPlane.Addr())
+	client, err := client.Connect(ctx, controlPlane.Addr(), client.WithInsecure())
 	require.NoError(t, err)
 
 	pollerWorker := workers.NewPollerWorker(client, workers.WithPollerStoppableProcessRunner(workers.NewProcessStopper().RunStoppableProcess))

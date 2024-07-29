@@ -213,14 +213,14 @@ func (c Configurator) populateConfigWithDevConfig(_ context.Context, cfg *Config
 }
 
 func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Config) (_ Config, _ error, isOSS bool) {
-	// useDevVersion := os.Getenv("TRACETEST_AGENT_DEV_CONFIG") == "true"
-	// if useDevVersion && Version == "dev" {
-	// 	c.populateConfigWithDevConfig(ctx, &cfg)
+	useDevVersion := os.Getenv("TRACETEST_AGENT_DEV_CONFIG") == "true"
+	if useDevVersion && Version == "dev" {
+		c.populateConfigWithDevConfig(ctx, &cfg)
 
-	// 	c.ui.Success("Configured Tracetest CLI in development mode")
+		c.ui.Success("Configured Tracetest CLI in development mode")
 
-	// 	return cfg, nil, false
-	// }
+		return cfg, nil, false
+	}
 
 	client := GetAPIClient(cfg)
 	version, err := getVersionMetadata(ctx, client)

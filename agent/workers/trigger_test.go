@@ -20,7 +20,7 @@ func setupTriggerWorker(t *testing.T) (*mocks.GrpcServerMock, collector.TraceCac
 	controlPlane := mocks.NewGrpcServer()
 	cache := collector.NewTraceCache()
 
-	client, err := client.Connect(context.Background(), controlPlane.Addr())
+	client, err := client.Connect(context.Background(), controlPlane.Addr(), client.WithInsecure())
 	require.NoError(t, err)
 
 	triggerWorker := workers.NewTriggerWorker(
