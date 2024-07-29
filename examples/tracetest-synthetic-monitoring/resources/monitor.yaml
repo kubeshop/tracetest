@@ -1,0 +1,24 @@
+type: Monitor
+spec:
+  id: playwright-monitor
+  name: Playwright Synthetic Monitor
+  enabled: true
+  # variableSetId: ""
+  # tokenId: ${TOKEN} # Replace with your token id
+  tests:
+  - import-pokemon
+  schedule:
+    cron: "*/5 * * * *"
+    timeZone: Etc/UTC
+  alerts:
+  - id: slack-webhook-message
+    type: webhook
+    webhook:
+      body: "{\n \"text\": \"Monitor ${.Monitor.Name} has failed, follow the link to find the <${.URL}|results>\"\n}"
+      method: POST
+      url: <your-webhook-url>
+      headers:
+      - key: Content-Type
+        value: application/json
+    events:
+    - FAILED

@@ -1,12 +1,149 @@
-version: '3'
+version: "3.5"
+name: tracetest-synthetic-monitoring-playwright-engine
+
 services:
-  app:
-    image: quick-start-go
+  tracetest-apply:
+    build: .
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_API_KEY: ${TRACETEST_API_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      api:
+        condition: service_healthy
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build: .
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_API_KEY: ${TRACETEST_API_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
+
+  tracetest-agent:
+    environment:
+      TRACETEST_API_KEY: ${TRACETEST_API_TOKEN}
+    image: kubeshop/tracetest-agent:latest
+    networks:
+      default: null
+
+  # pokeshop demo services
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  cache:
+    image: redis:6
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+
+  queue:
+    image: rabbitmq:3.12
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q check_running
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.59.0
+    restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    build: .
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
+
+  api:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      HTTP_COLLECTOR_ENDPOINT: http://otel-collector:4318/v1/traces
+      NPM_RUN_COMMAND: api
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:8081"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
     ports:
-      - "8080:8080"
+      - 8081:8081
     depends_on:
-      tracetest:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+      jaeger:
         condition: service_started
+      otel-collector:
+        condition: service_started
+      worker:
+        condition: service_started
+
+  worker:
+    image: kubeshop/demo-pokemon-api:latest
+    restart: unless-stopped
+    pull_policy: always
+    environment:
+      REDIS_URL: cache
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
+      RABBITMQ_HOST: queue
+      POKE_API_BASE_URL: https://pokeapi.co/api/v2
+      COLLECTOR_ENDPOINT: http://otel-collector:4317
+      NPM_RUN_COMMAND: worker
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+      queue:
+        condition: service_healthy
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - 14250:14250
+      - 16685:16685
+      - 16686:16686
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
