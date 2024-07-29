@@ -16,7 +16,7 @@ func TestOTLPConnectionResultTrace(t *testing.T) {
 	server := mocks.NewGrpcServer()
 	defer server.Stop()
 
-	client, err := client.Connect(context.Background(), server.Addr())
+	client, err := client.Connect(context.Background(), server.Addr(), client.WithInsecure())
 	require.NoError(t, err)
 
 	err = client.Start(context.Background())
