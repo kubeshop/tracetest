@@ -35,6 +35,8 @@ var startCmd = &cobra.Command{
 			Mode:              agentConfig.Mode(startParams.mode),
 			LogLevel:          startParams.logLevel,
 			CollectorEndpoint: startParams.collectorEndpoint,
+			Insecure:          startParams.insecure,
+			SkipVerify:        skipVerify,
 		}
 
 		// override organization and environment id from context.
@@ -89,6 +91,7 @@ func init() {
 	startCmd.Flags().StringVarP(&startParams.mode, "mode", "m", "desktop", "set how the agent will start")
 	startCmd.Flags().StringVarP(&startParams.logLevel, "log-level", "l", "debug", "set the agent log level")
 	startCmd.Flags().StringVarP(&startParams.collectorEndpoint, "collector-endpoint", "", "", "address of the OTel Collector endpoint")
+	startCmd.Flags().BoolVarP(&startParams.insecure, "insecure", "", false, "allow insecure connections to control plane")
 
 	startCmd.Flags().MarkDeprecated("endpoint", "use --server-url instead")
 	startCmd.Flags().MarkShorthandDeprecated("e", "use --server-url instead")
@@ -104,4 +107,5 @@ type startParameters struct {
 	mode              string
 	logLevel          string
 	collectorEndpoint string
+	insecure          bool
 }

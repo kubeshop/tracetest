@@ -17,7 +17,7 @@ func TestShutdownFlow(t *testing.T) {
 	server := mocks.NewGrpcServer()
 	defer server.Stop()
 
-	client, err := client.Connect(ctx, server.Addr())
+	client, err := client.Connect(ctx, server.Addr(), client.WithInsecure())
 	require.NoError(t, err)
 
 	var called bool = false

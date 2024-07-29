@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/kubeshop/tracetest/cli/analytics"
@@ -26,21 +25,8 @@ func GetAPIClient(cliConfig Config) *openapi.APIClient {
 	config.AddDefaultHeader("x-organization-id", cliConfig.OrganizationID)
 	config.AddDefaultHeader("x-environment-id", cliConfig.EnvironmentID)
 	config.AddDefaultHeader("Authorization", fmt.Sprintf("Bearer %s", cliConfig.Jwt))
-	if os.Getenv("TRACETEST_DEV_FORCE_URL") == "true" {
-		if config.HTTPClient == nil {
-			config.HTTPClient = http.DefaultClient
-		}
-		if config.HTTPClient.Transport == nil {
-			config.HTTPClient.Transport = http.DefaultTransport
-		}
-
-		if t, ok := config.HTTPClient.Transport.(*http.Transport); ok {
-			if t.TLSClientConfig == nil {
-				t.TLSClientConfig = &tls.Config{}
-			}
-
-			t.TLSClientConfig.InsecureSkipVerify = true
-		}
+	if cliConfig.SkipVerify {
+		setUnsecureClient(config)
 	}
 
 	config.Scheme = cliConfig.Scheme
@@ -52,4 +38,21 @@ func GetAPIClient(cliConfig Config) *openapi.APIClient {
 	}
 
 	return openapi.NewAPIClient(config)
+}
+
+func setUnsecureClient(config *openapi.Configuration) {
+	if config.HTTPClient == nil {
+		config.HTTPClient = http.DefaultClient
+	}
+	if config.HTTPClient.Transport == nil {
+		config.HTTPClient.Transport = http.DefaultTransport
+	}
+
+	if t, ok := config.HTTPClient.Transport.(*http.Transport); ok {
+		if t.TLSClientConfig == nil {
+			t.TLSClientConfig = &tls.Config{}
+		}
+
+		t.TLSClientConfig.InsecureSkipVerify = true
+	}
 }

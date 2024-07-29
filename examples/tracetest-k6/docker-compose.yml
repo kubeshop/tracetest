@@ -37,6 +37,8 @@ services:
       - ./collector.config.yaml:/otel-local-config.yaml
     depends_on:
       - jaeger
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   jaeger:
     image: jaegertracing/all-in-one:latest

@@ -13,10 +13,14 @@ exporters:
     endpoint: jaeger:14250
     tls:
       insecure: true
+  otlp/agent:
+    endpoint: host.docker.internal:4317
+    tls:
+      insecure: true
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [jaeger]
+      exporters: [jaeger, otlp/agent]

@@ -17,6 +17,8 @@ type Config struct {
 	ServerURL         string `mapstructure:"server_url"`
 	CollectorEndpoint string `mapstructure:"collector_endpoint"`
 	Mode              string `mapstructure:"mode"`
+	Insecure          bool   `mapstructure:"insecure"`
+	SkipVerify        bool   `mapstructure:"skip_verify"`
 
 	OTLPServer OtlpServer `mapstructure:"otlp_server"`
 }

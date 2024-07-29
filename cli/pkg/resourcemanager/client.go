@@ -2,6 +2,7 @@ package resourcemanager
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
@@ -32,7 +33,7 @@ type HTTPClient struct {
 	extraHeaders http.Header
 }
 
-func NewHTTPClient(baseURL string, extraHeaders http.Header) *HTTPClient {
+func NewHTTPClient(baseURL string, extraHeaders http.Header, skipVerify bool) *HTTPClient {
 	return &HTTPClient{
 		client: http.Client{
 			// this function avoids blindly followin redirects.
@@ -41,6 +42,11 @@ func NewHTTPClient(baseURL string, extraHeaders http.Header) *HTTPClient {
 			// will succeed, but the server will not receive the request that the user intended to send.
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
+			},
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: skipVerify,
+				},
 			},
 		},
 		baseURL:      baseURL,
