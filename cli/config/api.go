@@ -33,7 +33,7 @@ func GetAPIClient(cliConfig Config) *openapi.APIClient {
 	config.Host = strings.TrimSuffix(cliConfig.Endpoint, "/")
 	config.Servers = []openapi.ServerConfiguration{
 		{
-			URL: cliConfig.Path(),
+			URL: strings.TrimSuffix(cliConfig.Path(), "/"),
 		},
 	}
 
