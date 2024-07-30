@@ -134,6 +134,22 @@ const sidebars = {
         },
         {
           type: "category",
+          label: "Synthetic Monitoring",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/synthetic-monitoring-trace-based-api-tests",
+              label: "Synthetic Monitoring with Trace-based API Tests",
+            },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/synthetic-monitoring-trace-based-playwright-tests",
+              label: "Synthetic Monitoring with Trace-based Playwright Tests",
+            },
+          ],
+        },
+        {
+          type: "category",
           label: "Streams and Message Queues",
           items: [
             {

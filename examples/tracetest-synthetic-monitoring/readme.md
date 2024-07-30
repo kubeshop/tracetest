@@ -1,12 +1,15 @@
-# Synthetic monitoring with Tracetest and GitHub Actions
+# Tracetest Monitors - Synthetic Monitoring
 
-> [Read the detailed recipe for setting up OpenTelemetry Collector with Tractest in our documentation.](https://docs.tracetest.io/examples-tutorials/recipes/running-tracetest-without-a-trace-data-store)
+This repository's objective is to show how you can configure trace-based tests to run as synthetic monitors using Tracetest Monitors.
 
-This is a simple quick start on how to configure Tracetest and GitHub Actions to emulate synthetic monitoring using your existing Tracetest tests. The idea behind this example
-is to have a way of running a set of tests using Tracetest on a schedule and notify a Slack channel in case the test fails. This way, you can keep testing your application and
-identifying issues constantly.
+## Documentation Recipe
 
-This example is based on the [Golang quick-start example](https://github.com/kubeshop/tracetest/tree/main/examples/quick-start-go). All important information about
-how to run synthetic monitoring using Tracetest can be found in the [.github/workflows/synthetic-monitoring.yaml](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-synthetic-monitoring/.github/workflows/synthetic-monitoring.yaml) file.
+This example is part of the official Tracetest docs and can be found by following this [link](https://docs.tracetest.io/examples-tutorials/recipes/synthetic-monitoring-trace-based-playwright-tests).
 
-Feel free to check out the [docs](https://docs.tracetest.io/), and join our [Slack Community](https://dub.sh/tracetest-community) for more info!
+## Steps
+
+1. Copy the `.env.template` file to `.env`.
+2. Log into the [Tracetest app](https://app.tracetest.io/).
+3. Fill out the [TRACETEST_API_TOKEN](https://docs.tracetest.io/concepts/environment-tokens) with an admin role token and the [TRACETEST_ENVIRONMENT_ID](https://docs.tracetest.io/concepts/environments) with the id of your environment.
+4. Run `docker compose run tracetest-apply`.
+5. Follow the links in the log to view the created synthetic monitors.
