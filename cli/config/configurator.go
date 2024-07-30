@@ -163,6 +163,7 @@ func (c Configurator) createConfig(serverURL string) (Config, error) {
 
 	if strings.Contains(serverURL, DefaultCloudDomain) {
 		endpoint = strings.TrimPrefix(endpoint, "app")
+		endpoint = strings.TrimPrefix(endpoint, "api")
 		endpoint = "api" + endpoint
 	}
 
