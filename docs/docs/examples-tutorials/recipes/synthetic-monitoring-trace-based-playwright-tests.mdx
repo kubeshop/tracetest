@@ -136,6 +136,34 @@ spec:
         - attr:tracetest.span.duration  <  250ms
 ```
 
+### Playwright Synthetic Monitor
+
+```yaml title="resources/monitor.yaml"
+type: Monitor
+spec:
+  id: playwright-monitor
+  name: Playwright Synthetic Monitor
+  enabled: true
+  variableSetId: ""
+  tests:
+  - import-pokemon
+  schedule:
+    cron: "*/5 * * * *"
+    timeZone: Etc/UTC
+  alerts:
+  - id: slack-webhook-message
+    type: webhook
+    webhook:
+      body: "{\n \"text\": \"Monitor ${.Monitor.Name} has failed, follow the link to find the <${.URL}|results>\"\n}"
+      method: POST
+      url: <your-webhook-url>
+      headers:
+      - key: Content-Type
+        value: application/json
+    events:
+    - FAILED
+```
+
 ### Playwright Script
 
 ```javascript title="resources/script.js"
@@ -288,7 +316,6 @@ spec:
   name: Playwright Synthetic Monitor
   enabled: true
   variableSetId: ""
-  tokenId: ""
   tests:
   - import-pokemon
   schedule:
@@ -315,18 +342,9 @@ spec:
 ## Running Synthetic Monitoring
 
 1. Select `Monitors` in the [Tracetest](https://app.tracetest.io/) sidebar.
-2. You'll see the Monitor that was created in the `apply` script. Click "Run Now".
+2. You'll see the Monitor that was created in the `apply` script.
     ![apply script monitor](https://res.cloudinary.com/djwdcmwdz/image/upload/v1722252986/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_oazwzc.png)
-3. Select an access token for your Monitor and save the configuration.
-    ![select admin token](https://res.cloudinary.com/djwdcmwdz/image/upload/v1722253130/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_8_qg9pgv.png)
-    
-With this setup, your Monitor will trigger the Playwright test every 5 minutes.
-
-## What's Next?
-
-After running the test, you can click the run link, update the assertions, and run the scripts once more. This flow enables complete a trace-based TDD flow.
-
-![assertions](../img/playwright-engine.gif)
+3. It will start running based on the schedule you selected. With this setup, your Monitor will trigger the Playwright test every 5 minutes.
 
 ## Learn More
 

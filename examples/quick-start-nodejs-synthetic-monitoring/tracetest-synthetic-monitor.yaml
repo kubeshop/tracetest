@@ -4,7 +4,6 @@ spec:
   name: Quick Start Synthetic Monitor
   enabled: true
   variableSetId: ""
-  tokenId: ${TRACETEST_API_KEY}
   tests:
   - phAZcrT4B
   schedule:

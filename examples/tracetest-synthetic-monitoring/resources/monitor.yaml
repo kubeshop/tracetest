@@ -3,8 +3,7 @@ spec:
   id: playwright-monitor
   name: Playwright Synthetic Monitor
   enabled: true
-  # variableSetId: ""
-  # tokenId: ${TOKEN} # Replace with your token id
+  variableSetId: ""
   tests:
   - import-pokemon
   schedule:
