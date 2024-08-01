@@ -7,7 +7,7 @@ spec:
   tests:
   - phAZcrT4B
   schedule:
-    cron: "*/5 * * * *"
+    cron: "*/1 * * * *"
     timeZone: Etc/UTC
   alerts:
   - id: slack-webhook-message

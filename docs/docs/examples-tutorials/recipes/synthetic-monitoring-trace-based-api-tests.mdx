@@ -61,8 +61,8 @@ Follow these instructions to run the quick start:
 4. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
 5. Run `docker compose up -d`.
 6. Configure your CLI with `tracetest configure -t <YOUR_API_TOKEN>`.
-7. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) in the `tracetest-synthetic-monitor.yaml` file and apply the Tracetest Monitor with `tracetest apply monitor -f tracetest-synthetic-monitor.yaml`.
-8. Run tests from the CLI with `tracetest run test -f ./tracetest-test-api.yaml` or from the Tracetest Web UI by accessing the app with the URL `http://app:8080/books`.
+7. Apply the Tracetest Monitor with `tracetest apply monitor -f tracetest-synthetic-monitor.yaml`. This will start running the `./tracetest-test-api.yaml` test every minute.
+8. Run tests manually from the CLI with `tracetest run test -f ./tracetest-test-api.yaml` or from the Tracetest Web UI by accessing the app with the URL `http://app:8080/books`.
 
 Follow along with the sections below for a detailed breakdown of what the example you just ran did and how it works.
 
@@ -102,6 +102,16 @@ attr: books.list.count = 4
 It fails because `books.length` is equal to `3`.
 
 ## Run Synthetic Monitoring
+
+You can apply the Tracetest Monitor with the CLI.
+
+```bash
+tracetest apply monitor -f tracetest-synthetic-monitor.yaml
+```
+
+This will start running the `./tracetest-test-api.yaml` test every minute.
+
+With the Web UI follow these steps to create a monitor.
 
 1. Select `Monitors` in the [Tracetest](https://app.tracetest.io/) sidebar.
 2. Create a Monitor. Select a schedule and toggle the enable monitor switch.
