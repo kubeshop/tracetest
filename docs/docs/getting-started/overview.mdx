@@ -23,7 +23,7 @@ import {TracetestGettingStartedGuideCardsRow, TracetestCoreGettingStartedGuideCa
 Tracetest is a cloud-native application, designed to run in the cloud. Get started in three ways.
 
 - **[Cloud-based Managed Tracetest](https://app.tracetest.io/) (Free to get started!)**: Use managed infrastructure with collaboration for teams, and additional features on top of Tracetest Core.
-- **Enterprise Self-hosted Tracetest (Coming soon...)**: Same experience as with Cloud-based Managed Tracetest but self-hosted in your own infrastructure. **[Book a call](https://dub.sh/tracetest-demo) to get into early access.**
+- **Enterprise Self-hosted Tracetest**: Same experience as with Cloud-based Managed Tracetest but self-hosted in your own infrastructure. **[Request a demo](https://dub.sh/tracetest-demo) or [contact us](https://tracetest.io/contact) to get a quote!**
 - **[Hobby Self-hosted Open-source Tracetest Core](/core/getting-started/overview)**: Deploy a hobby instance in your own infrastructure with Docker or Kubernetes. Not suitable for production workloads.
 
 ## Cloud-based Managed Tracetest
@@ -36,7 +36,13 @@ Get started with the installation guide below, tailored for microservice and dis
 <TracetestGettingStartedGuideCardsRow />
 ```
 
-### Features Available in Cloud-based Managed Tracetest
+## Enterprise Self-hosted Tracetest
+
+If your organization requires you to keep data on-prem, you can use Enterprise Self-hosted Tracetest and deploy it in your own infrastructure. It contains the same features as Cloud-based Managed Tracetest.
+
+We recommend you try [Cloud-based Managed Tracetest](https://app.tracetest.io/) as a trial, and reach out to us to [request a demo](https://dub.sh/tracetest-demo) for Enterprise Self-hosted Tracetest.
+
+### Features Available in Cloud-based Managed Tracetest and Enterprise Self-hosted Tracetest
 
 #### All Tracetest Core features, plus...
 
@@ -46,7 +52,9 @@ Get started with the installation guide below, tailored for microservice and dis
 - Grouped test runs: Organize multiple tests into a single "test run group". These tests can then be executed simultaneously in parallel. The system will wait for all tests in the group to complete before delivering a consolidated "pass/fail" outcome. This functionality is particularly beneficial for halting CI/CD processes if any test in the group fails.
 - Test coverage overview: "Run" tab to monitor actively running tests with extensive meta tagging and filtering.
 - Public + private access, with Tracetest Agent or Tracetest Cloud Agent.
-- Secrets management (coming soon...)
+- Secrets management: Obfuscate values in variable sets.
+- Synthetic monitoring: Run your existing trace-based tests and test suites on a schedule and get alerted with your favorite alerting tools when they fail.
+- Playwright engine trigger: Run your existing Playwright tests as part of the Tracetest platform and enhance them with trace-based testing.
 
 ## Hobby Self-hosted Open-source Tracetest Core
 
