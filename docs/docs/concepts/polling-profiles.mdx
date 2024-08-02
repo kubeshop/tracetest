@@ -19,9 +19,15 @@ done running.
 
 This means that Tracetest needs to check periodically if the trace is complete or not. For this, a **Polling Profile** is used. This profile
 tells Tracetest how often and how long to wait for a trace to finish. Every Tracetest environment has one default polling profile, meaning that any
-test will use that profile when trying to fetch the trace from the tracing backend. Since version v1.0.0, users can now specify a different
+test will use that profile when trying to fetch the trace from the tracing backend.
+
+Since version v1.0.0, users can now specify a different
 polling profile per test. This makes more sense than having a single profile, due to some tests being pretty quick to run and others can take minutes
 to hours to finish executing.
+
+:::tip Commercial Feature
+[Using multiple polling profiles is available only in Cloud-based Managed Tracetest & Enterprise Self-hosted Tracetest.](https://tracetest.io/pricing)
+:::
 
 ## Adding a Polling Profile in the CLI
 
