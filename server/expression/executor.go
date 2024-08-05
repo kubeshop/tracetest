@@ -211,8 +211,7 @@ func (e Executor) resolveTerm(term *Term) (value.Value, error) {
 			strValue = fmt.Sprintf(term.Str.Text, stringArgs...)
 		}
 
-		str := value.NewFromString(strValue)
-		return value.NewFromString(str.UnescappedString()), nil
+		return value.NewFromString(strValue), nil
 	}
 
 	return value.Nil, fmt.Errorf("empty term")
@@ -243,8 +242,7 @@ func (e Executor) resolveAttribute(attribute *Attribute) (value.Value, error) {
 		return value.Nil, resolutionError(err)
 	}
 
-	str := value.NewFromString(attributeValue)
-	return value.NewFromString(str.UnescappedString()), nil
+	return value.NewFromString(attributeValue), nil
 }
 
 func (e Executor) resolveEnvironment(environment *Environment) (value.Value, error) {
