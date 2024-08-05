@@ -24,7 +24,7 @@ func compare(comparatorName string, leftValue, rightValue value.Value) error {
 		return compareArrayContains(leftValue, rightValue)
 	}
 
-	return comparatorFunction.Compare(rightValue.String(), leftValue.String())
+	return comparatorFunction.Compare(rightValue.UnescappedString(), leftValue.UnescappedString())
 }
 
 func compareArrayContains(array, expected value.Value) error {
@@ -34,7 +34,7 @@ func compareArrayContains(array, expected value.Value) error {
 	}
 
 	for _, item := range array.Items {
-		if err = equalComparator.Compare(item.Value, expected.String()); err == nil {
+		if err = equalComparator.Compare(item.Value, expected.UnescappedString()); err == nil {
 			return nil
 		}
 	}

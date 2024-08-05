@@ -40,6 +40,12 @@ func TestJSONPath(t *testing.T) {
 			Query:          `$.array[*]..['id', 'name']`,
 			ExpectedOutput: `[38, "Tracetest", 39, "Kusk"]`,
 		},
+		{
+			Name:           "escaped_json_should_work",
+			JSON:           `{ "message": "\"rails g model Ping user:references location:point\", then migrate." }`,
+			Query:          `$.message`,
+			ExpectedOutput: `"rails g model Ping user:references location:point", then migrate.`,
+		},
 	}
 
 	for _, testCase := range testCases {

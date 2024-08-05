@@ -76,6 +76,11 @@ func TestBasicExpressionExecution(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name:       "escaped_strings_in_json_must_work_with_json_path",
+			Query:      `'{ "message": "this should \"work\"", "anotherValue": 12 }' | json_path '$.message' = 'this should "work"'`,
+			ShouldPass: true,
+		},
 	}
 
 	executeTestCases(t, testCases)
