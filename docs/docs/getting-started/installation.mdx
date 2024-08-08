@@ -2,6 +2,7 @@
 id: installation
 title: Installing Tracetest
 description: Get started by installing Tracetest! Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+hide_table_of_contents: true
 keywords:
   - tracetest
   - trace-based testing
@@ -21,6 +22,10 @@ This page showcases getting started with [Tracetest](https://app.tracetest.io/) 
 ## Install the Tracetest CLI
 
 <GtagInstallCliTabs></GtagInstallCliTabs>
+
+
+<Tabs groupId="saas-onprem">
+<TabItem value="saas" label="Cloud-based Managed Tracetest" default>
 
 ## Install the Tracetest Agent
 
@@ -142,6 +147,46 @@ You can reach services running on your local machine using:
 - Linux (docker version < 20.10.0): `172.17.0.1:8080`
 - MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
 :::
+
+</TabItem>
+</Tabs>
+
+</TabItem>
+<TabItem value="on-prem" label="Enterprise Self-hosted Tracetest" default>
+
+## Install Tracetest On-Prem
+
+:::note
+This installation is meant for testing purposes only. It uses self signed certificates, so your browser will show a warning about it.
+:::
+
+1. Install [Helm](https://helm.sh/) and [kind](https://kind.sigs.k8s.io/) on your machine. Clone the official Tracetest Helm chart.
+
+```sh
+git clone https://github.com/kubeshop/tracetest-cloud-charts.git
+cd ./tracetest-cloud-charts
+```
+
+2. Request a **licence key, [here](https://tracetest.io/on-prem-installation)**.
+
+3. Run the setup script with a demo. Add your license key when you get prompted.
+
+```sh
+sh ./scripts/setup_kind_cluster.sh --install-demo
+```
+
+4. Add the following lines to your `/etc/hosts` file to access Tracetest.
+
+```sh
+sudo sh -c 'echo "127.0.0.1 tracetest.localdev" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 pokeshop.localdev" >> /etc/hosts'
+```
+
+This setup will configure a local kind cluster with Tracetest On-Prem and the [Pokeshop API demo](/live-examples/pokeshop/overview), with all networking and prerequisites configured to work locally. You can go to the following links:
+
+- [`https://tracetest.localdev:30000`](https://tracetest.localdev:30000) - Access the Tracetest Web UI. You get a user and an organization created for you.
+- [`https://pokeshop.localdev:30000`](https://pokeshop.localdev:30000) - Access the Pokeshop API demo to run tests.
+
 
 </TabItem>
 </Tabs>

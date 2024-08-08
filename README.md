@@ -153,7 +153,7 @@ Get the same experience as with the Cloud-based Managed Tracetest but self-hoste
 
 ## Hobby Self-hosted Open-source Tracetest Core
 
-[Deploy a hobby self-hosted instance of Tracetest Core](https://docs.tracetest.io/core/getting-started/installation) as a Docker container. It's not suitable for production, but a great way to start using Tracetest Core in local environments.
+[Deploy a hobby self-hosted instance of Tracetest Core](https://docs.tracetest.io/core/getting-started/overview) as a Docker container. It's not suitable for production, but a great way to start using Tracetest Core in local environments.
 
 ### 1️⃣ Install the Tracetest CLI
 

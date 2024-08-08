@@ -16,20 +16,20 @@ const WelcomeGuides = [
   //   ),
   // },
   {
-    name: '👇 Getting Started Guides',
-    url: './examples-tutorials/recipes',
+    name: '👉 Getting Started',
+    url: './getting-started/installation',
     description: (
-      <Translate >
-        Hit the ground running with these trace-based testing guides!
+      <Translate>
+        Check out guides and installation examples to get started quickly!
       </Translate>
     ),
   },
   {
-    name: '🤩 Open Source',
-    url: 'https://github.com/kubeshop/tracetest',
+    name: '👇 Examples & Guides',
+    url: './examples-tutorials/recipes',
     description: (
-      <Translate>
-        Check out the Tracetest GitHub repo! Please consider giving us a star! ⭐️
+      <Translate >
+        Hit the ground running with these trace-based testing guides!
       </Translate>
     ),
   },

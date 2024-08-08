@@ -21,7 +21,7 @@ const TracetestGettingStartedGuides = [
 const TracetestCoreGettingStartedGuides = [
   {
     name: 'Tracetest Core 🪨 ',
-    url: '/core/getting-started/installation',
+    url: '/core/getting-started/overview',
     description: (
       <Translate>
         Use the open-source Tracetest Core in your own infrastructure.
