@@ -329,7 +329,7 @@ func (a BasicAuthenticator) AuthenticateHTTP(req *http.Request) {
 }
 
 type BearerAuthenticator struct {
-	Bearer string `json:"bearer,omitempty" expr_enabled:"true"`
+	Bearer string `json:"token,omitempty" expr_enabled:"true"`
 }
 
 func (a BearerAuthenticator) AuthenticateGRPC() {}
