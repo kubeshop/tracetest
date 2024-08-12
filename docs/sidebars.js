@@ -316,6 +316,17 @@ const sidebars = {
             },
           ],
         },
+        {
+          type: "category",
+          label: "On Premises",
+          items: [
+            {
+              type: "doc",
+              id: "examples-tutorials/onprem/install-on-gke",
+              label: "Installing Tracetest on GKE",
+            },
+          ],
+        },
       ],
     },
     {
@@ -501,7 +512,7 @@ const sidebars = {
       ]
     },
   ],
-  
+
   tutorialSidebar: [
     {
       type: "doc",
