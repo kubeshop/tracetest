@@ -166,7 +166,7 @@ docker compose up -d
 
 This example is configured to use the Jaeger Tracing Backend. Ensure the environment you're using is configured to use the Jaeger Tracing Backend by clicking on Settings, Tracing Backend, Jaeger, `endpoint: jaeger:16685`, Save.
 
-Or, use [the CLI](/cli/cli-installation-reference) and [the `tracetest-tracing-backend.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-go-and-kafka/tracetest/tracing-backend.yaml) sets the tracing backend to Jaeger, and tells Tracetest Agent to poll for traces from Jaeger.
+Or, use [the CLI](/cli/cli-installation-reference) and [the `tracetest-tracing-backend.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-go-and-kafka/tracetest/tracetest-tracing-backend.yaml) sets the tracing backend to Jaeger, and tells Tracetest Agent to poll for traces from Jaeger.
 
 ```yaml title="./tracetest/tracetest-tracing-backend.yaml"
 ---
