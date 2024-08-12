@@ -84,7 +84,7 @@ if [ -n "$SERVER_URL" ]; then
 fi
 
 
-# kubectl create -n $NAMESPACE secret generic tracetest-agent-secret --from-literal=api-key=$API_KEY
+kubectl create -n $NAMESPACE secret generic tracetest-agent-secret --from-literal=api-key=$API_KEY
 curl $FILE_PATH \
   | sed "s/:TAG/:$AGENT_VERSION/g" \
   | sed "$(if [ ${#extraCmd[@]} -eq 0 ]; then echo '/EXTRA_CMD/d'; else echo "s|EXTRA_CMD|$(printf "\"%s\"," "${extraCmd[@]}" | sed 's/,$//')|g"; fi)" \
