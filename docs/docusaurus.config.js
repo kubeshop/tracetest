@@ -147,20 +147,8 @@ const config = {
           {
             type: 'docSidebar',
             position: 'left',
-            sidebarId: 'coreSidebar',
-            label: 'Core'
-          },
-          {
-            type: 'docSidebar',
-            position: 'left',
-            sidebarId: 'examplesTutorialsSidebar',
-            label: 'Examples & Tutorials'
-          },
-          {
-            type: 'docSidebar',
-            position: 'left',
-            sidebarId: 'liveExamplesSidebar',
-            label: 'Live Examples'
+            sidebarId: 'guidesSidebar',
+            label: 'Examples & Guides'
           },
           {
             type: 'dropdown',
