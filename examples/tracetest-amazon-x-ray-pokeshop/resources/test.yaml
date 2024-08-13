@@ -1,0 +1,27 @@
+type: Test
+spec:
+  id: -ao9stJVg
+  name: Pokeshop - Import
+  description: Import a Pokemon
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: http://demo-api:8081/pokemon/import
+      body: "{\"id\":6}"
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type="general" name="import pokemon"]
+    name: Import Pokemon Span Exists
+    assertions:
+    - attr:tracetest.selected_spans.count = 1
+  - selector: span[tracetest.span.type="general" name="postgres@postgres"]:first
+    name: Matching db result with the Pokemon Name
+    assertions:
+    - attr:aws.xray.metadata.default   contains    "charizard"
+  - selector: span[tracetest.span.type="http" name="pokeapi.co" http.method="GET"]
+    name: Uses Correct PokemonId
+    assertions:
+    - attr:http.url  =  "https://pokeapi.co/api/v2/pokemon/6"
