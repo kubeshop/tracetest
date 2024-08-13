@@ -46,7 +46,7 @@ services:
 
   # Grafana
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.100.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
