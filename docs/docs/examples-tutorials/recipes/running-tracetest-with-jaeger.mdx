@@ -114,7 +114,7 @@ You can follow the links in the output to view the run group and the test result
 
 Jaeger is started as a part of this recipe, and you can access Jaeger's UI at `http://localhost:16686/` and see any traces generated.
 
-The docker file exposes the underlying Node.js app at `http://localhost:8080/`.
+The Docker file exposes the underlying Node.js app at `http://localhost:8080/`.
 
 Open Tracetest and start creating tests using this environment! Make sure to use the `http://app:8080/` URL in your test creation, because your Node.js app and the Tracetest agent are in the same network. This simple Node.js application only supports a GET operation against `http://app:8080/` and should return the string 'Hello World'.
 
