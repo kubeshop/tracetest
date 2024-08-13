@@ -6,6 +6,9 @@ services:
       AWS_REGION: ${AWS_REGION}
     ports:
       - "3000:3000"
+    depends_on:
+      adot-collector:
+        condition: service_started
 
   adot-collector:
     image: amazon/aws-otel-collector:latest
