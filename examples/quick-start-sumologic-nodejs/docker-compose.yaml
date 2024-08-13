@@ -10,6 +10,9 @@ services:
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
       # HTTP
       # - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4318/v1/traces
+    depends_on:
+      otel-collector:
+          condition: service_started
 
   otel-collector:
     image: public.ecr.aws/sumologic/sumologic-otel-collector:0.75.0-sumo-0
@@ -23,5 +26,44 @@ services:
   tracetest-agent:
     image: kubeshop/tracetest-agent:latest
     environment:
-      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
-      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+  
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+      SUMO_LOGIC_ACCESS_ID: ${SUMO_LOGIC_ACCESS_ID}
+      SUMO_LOGIC_ACCESS_KEY: ${SUMO_LOGIC_ACCESS_KEY}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      app:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
