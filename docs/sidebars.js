@@ -498,10 +498,10 @@ const sidebars = {
             },
           ],
         },
-      ]
+      ],
     },
   ],
-  
+
   tutorialSidebar: [
     {
       type: "doc",
@@ -780,7 +780,7 @@ const sidebars = {
             },
             {
               type: "category",
-              label: "Connecting to Tracing Backends",
+              label: "Trace Ingestion",
               link: {
                 type: "doc",
                 id: "configuration/connecting-to-data-stores/overview",
@@ -902,7 +902,7 @@ const sidebars = {
             {
               type: "doc",
               id: "web-ui/creating-data-stores",
-              label: "Configuring Data Stores",
+              label: "Configuring Trace Ingestion",
             },
             {
               type: "category",
@@ -1045,7 +1045,7 @@ const sidebars = {
             {
               type: "doc",
               id: "cli/creating-data-stores",
-              label: "Configuring Data Stores",
+              label: "Configuring Trace Ingestion",
             },
             {
               type: "category",
@@ -1141,7 +1141,7 @@ const sidebars = {
             },
           ],
         },
-      ]
+      ],
     },
     {
       type: "link",
@@ -1202,7 +1202,7 @@ const sidebars = {
             },
           ],
         },
-      ]
+      ],
     },
   ],
 };
