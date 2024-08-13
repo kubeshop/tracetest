@@ -1,5 +1,0 @@
----
-type: DataStore
-spec:
-  name: otlp
-  type: otlp
