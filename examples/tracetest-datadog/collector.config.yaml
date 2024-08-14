@@ -42,8 +42,7 @@ processors:
 exporters:
   # OTLP for Tracetest
   otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest.
-                              # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest-agent:4317 
     tls:
       insecure: true
   # Datadog exporter
@@ -52,7 +51,7 @@ exporters:
   datadog:
     api:
       site: datadoghq.com
-      key: ${DATADOG_API_KEY} # Add here you API key for Datadog
+      key: ${env:DATADOG_API_KEY} # Add here you API key for Datadog
 
 service:
   pipelines:
