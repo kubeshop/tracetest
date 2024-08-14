@@ -1,42 +1,57 @@
 version: "3"
 services:
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
 
-  # Tracetest
-  tracetest:
-    image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
     volumes:
-      - type: bind
-        source: ./tracetest/tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest/tracetest-provision.yaml
-        target: /app/provision.yaml
-    command: --provisioning-file /app/provision.yaml
-    ports:
-      - 11633:11633
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
     depends_on:
-      postgres:
-        condition: service_healthy
       otel-collector:
         condition: service_started
-    healthcheck:
-      test: [ "CMD", "wget", "--spider", "localhost:11633" ]
-      interval: 1s
-      timeout: 3s
-      retries: 60
+      demo-api:
+        condition: service_healthy
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
     environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
 
   otel-collector:
-    image: otel/opentelemetry-collector:0.54.0
+    image: otel/opentelemetry-collector:0.101.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+      - ./collector.config.yaml:/otel-local-config.yaml
     ports:
       - 4317:4317
     depends_on:
@@ -70,7 +85,7 @@ services:
         max-size: 50m
         max-file: "3"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
+      test: ["CMD", "wget", "--spider", "-q", "0.0.0.0:8123/ping"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -155,7 +170,8 @@ services:
 
   signoz-otel-collector-metrics:
     image: signoz/signoz-otel-collector:${OTELCOL_TAG:-0.79.2}
-    command: ["--config=/etc/otel-collector-metrics-config.yaml", "--feature-gates=-pkg.translator.prometheus.NormalizeName"]
+    command:
+      ["--config=/etc/otel-collector-metrics-config.yaml", "--feature-gates=-pkg.translator.prometheus.NormalizeName"]
     volumes:
       - ./signoz/otel-collector-metrics-config.yaml:/etc/otel-collector-metrics-config.yaml
     restart: on-failure
@@ -215,6 +231,8 @@ services:
       timeout: 3s
       retries: 60
     depends_on:
+      demo-worker:
+        condition: service_started
       postgres:
         condition: service_healthy
       demo-cache:
