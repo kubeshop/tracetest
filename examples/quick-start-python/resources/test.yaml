@@ -11,7 +11,7 @@ spec:
       - key: Content-Type
         value: application/json
   specs:
-  - selector: span[tracetest.span.type="http" name="/automatic" http.target="/automatic" http.method="GET"]
+  - selector: span[tracetest.span.type="http" name="GET /automatic" http.target="/automatic" http.method="GET"]
     name: It should return status 200.
     assertions:
     - attr:http.status_code = 200
