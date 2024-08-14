@@ -1,0 +1,29 @@
+type: Test
+spec:
+  id: 4_IKfPlIg
+  name: Import Pokemon
+  trigger:
+    type: "playwrightengine"
+    playwrightEngine:
+      target: http://tyk-gateway:8080
+      script: script.js
+      method: importPokemon
+  specs:
+    - selector: span[tracetest.span.type="http" name="POST /pokemon/import"
+        http.method="POST"]
+      name: Import should return 200
+      assertions:
+        - attr:http.status_code = 200
+    - selector: span[tracetest.span.type="database"]
+      name: "All Database Spans: Processing time is less than 1s"
+      assertions:
+        - attr:tracetest.span.duration  <  1s
+    - selector: span[tracetest.span.type="general" name="import pokemon"]
+      name: Import Pokemon Span Should be Present
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - selector: span[tracetest.span.type="database" name="get pokemon_143"
+        db.system="redis" db.operation="get" db.redis.database_index="0"]
+      name: Redis should return in 20ms
+      assertions:
+        - attr:tracetest.span.duration  <  20ms
