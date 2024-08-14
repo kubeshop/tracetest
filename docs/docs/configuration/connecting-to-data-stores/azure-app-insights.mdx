@@ -25,9 +25,9 @@ Tracetest uses the Golang [Azure SDK](https://learn.microsoft.com/en-us/azure/de
 
 ### Tracetest Direct Connection to Azure App Insights with the Web UI
 
-In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, select (3) Azure App Insights.
+In the Web UI, (1) open Settings, and, on the (2) Trace Ingestion tab, select (3) Azure App Insights.
 
-![Azure App Insights Direct Connection Settings](../img/appinsights-direct.png)
+![Trace Ingestion Settings](../../img/08132024/app.tracetest.io_organizations_at4CxvjIg_environments_ttenv_172de56e3dcbba9b_settings_tab=dataStore_azure_1.png)
 
 From the configuration page, add your [App Insights API Access Token](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-azure-ad-api). Or if you are running Tracetest from a authorized container, you can use the default Active Directory Authentication.
 
@@ -70,9 +70,9 @@ Need help configuring the [OpenTelemetry Collector](https://github.com/open-tele
 
 ### Tracetest OpenTelemetry Collector connection to Azure App Insights with the Web UI
 
-In the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, select (3) Azure App Insights, (4) Select Open Telemetry Collector as Connection Type.
+In the Web UI, (1) open Settings, and, on the (2) Trace Ingestion tab, select (3) Azure App Insights, (4) Select Open Telemetry Collector as Connection Type.
 
-![Azure App Insights Otel Connection Settings](../img/appinsights-otel.png)
+![Trace Ingestion Settings OpenTelemetry Collector](../../img/08132024/app.tracetest.io_organizations_at4CxvjIg_environments_ttenv_172de56e3dcbba9b_settings_tab=dataStore_azure_2.png)
 
 From the configuration page, copy and customize the OpenTelemetry configuration YAML including the instrumentation key.
 
