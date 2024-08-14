@@ -26,7 +26,33 @@ This is a simple sample app on how to configure the [OpenTelemetry Demo `v1.3.0`
 
 ## Prerequisites
 
-You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this sample app! Additionally, you will need a Dynatrace account and an API token. Sign up for a [free Dynatrace trial](https://www.dynatrace.com/trial).
+**Tracetest Account**:
+
+- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
+- Have access to the environment's [agent API key](https://app.tracetest.io/retrieve-token).
+
+**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+## Run This Quckstart Example
+
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
+
+Clone the Tracetest project and go to the example folder:
+
+```bash
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/tracetest-dynatrace
+```
+
+Follow these instructions to run the quick start:
+
+1. Copy the `.env.template` file to `.env`.
+2. Fill out the [TRACETEST_TOKEN and ENVIRONMENT_ID](https://app.tracetest.io/retrieve-token) details by editing your `.env` file.
+3. Fill out the [DYNATRACE_SECRET](https://www.dynatrace.com/) details by editing your `.env` file.
+4. Run `docker compose run tracetest-run`.
+5. Follow the links in the output to view the test results.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
 ## Project Structure
 
@@ -39,8 +65,6 @@ The `docker-compose.yaml` file and `.env` file in the root directory are for the
 ### 2. Tracetest
 
 The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest-config.yaml` in the `tracetest` directory are for setting up Tracetest and the OpenTelemetry Collector.
-
-The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest, as well as routing all traces the OpenTelemetry Demo generates to Dynatrace.
 
 ### Docker Compose Network
 
@@ -63,156 +87,6 @@ docker compose up
 This will start the OpenTelemetry Demo. Open up `http://localhost:8084` to make sure it's working. But, you're not sending the traces anywhere.
 
 Let's fix this by configuring Tracetest and the OpenTelemetry Collector to forward trace data to both Dynatrace and Tracetest.
-
-## Tracetest
-
-The `docker-compose.yaml` in the `tracetest` directory is configured with three services.
-
-- **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running trace-based tests.
-- [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data. To support sending traces to Dynatrace, we are using the [`contrib` version](https://github.com/open-telemetry/opentelemetry-collector-contrib), which contains vendor-related code.
-- [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
-
-```yaml
-version: "3.9"
-
-networks:
-  default:
-    name: opentelemetry-demo
-    driver: bridge
-
-services:
-  tracetest:
-    restart: unless-stopped
-    image: kubeshop/tracetest:${TAG:-latest}
-    container_name: tracetest
-    platform: linux/amd64
-    ports:
-      - 11633:11633
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    volumes:
-      - type: bind
-        source: ./tracetest/tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest/tracetest-provision.yaml
-        target: /app/provisioning.yaml
-    command: --provisioning-file /app/provisioning.yaml
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-    depends_on:
-      tt-postgres:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-
-  tt-postgres:
-    image: postgres:14
-    container_name: tt-postgres
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.82.0
-    container_name: otel-collector
-    restart: unless-stopped
-    command:
-      - "--config"
-      - "/otel-local-config.yaml"
-    volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-```
-
-Tracetest depends on both Postgres and the OpenTelemetry Collector. Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
-
-To start both the OpenTelemetry Demo and Tracetest we will run this command:
-
-```bash
-docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up
-```
-
-The `tracetest-config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance and telemetry exporter. The exporter is set to the OpenTelemetry Collector.
-
-```yaml
-# tracetest-config.yaml
-
----
-postgres:
-  host: tt-postgres
-  user: postgres
-  password: postgres
-  port: 5432
-  dbname: postgres
-  params: sslmode=disable
-
-telemetry:
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
-
-server:
-  telemetry:
-    exporter: collector
-    applicationExporter: collector
-```
-
-The `tracetest-provision.yaml` file contains the setup of the demo APIs that Tracetest can use as an example for tests, the polling profiles that say how Tracetest should fetch traces from the data store and the configuration for the data store, in our case, Dynatrace.
-
-```yaml
----
-type: Demo
-spec:
-  name: "OpenTelemetry Shop"
-  enabled: true
-  type: otelstore
-  opentelemetryStore:
-    frontendEndpoint: http://frontend:8084
-    productCatalogEndpoint: productcatalogservice:3550
-    cartEndpoint: cartservice:7070
-    checkoutEndpoint: checkoutservice:5050
-
----
-type: PollingProfile
-spec:
-  name: Default
-  strategy: periodic
-  default: true
-  periodic:
-    retryDelay: 5s
-    timeout: 10m
-
----
-type: DataStore
-spec:
-  name: Dynatrace
-  type: dynatrace
-
----
-type: TestRunner
-spec:
-  id: current
-  name: default
-  requiredGates:
-    - analyzer-score
-    - test-specs
-
-```
 
 ### Sending Traces to Tracetest and Dynatrace
 
@@ -256,7 +130,7 @@ receivers:
         - targets: ['0.0.0.0:8888']
 
 processors:
-  batch: # this configuration is needed to guarantee that the data is sent correctly to Dynatrace
+  batch: # this configuration is needed to guarantee that the data is sent correctly to Datadog
     send_batch_max_size: 100
     send_batch_size: 10
     timeout: 10s
@@ -264,15 +138,14 @@ processors:
 exporters:
   # OTLP for Tracetest
   otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest.
-                              # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest-agent:4317 
     tls:
       insecure: true
   # OTLP for Dynatrace
   otlphttp/dynatrace:
     endpoint: https://abc12345.live.dynatrace.com/api/v2/otlp
     headers:
-      Authorization: "Api-Token dt0c01.sample.secret"  # Requires "openTelemetryTrace.ingest" permission
+      Authorization: "Api-Token ${DYNATRACE_SECRET}"  # Requires "openTelemetryTrace.ingest" permission
 
 service:
   pipelines:
@@ -290,54 +163,14 @@ service:
       exporters: [otlphttp/dynatrace]
 ```
 
-## Run Both the OpenTelemetry Demo App and Tracetest
+## Running the tests
 
-To start both OpenTelemetry and Tracetest, run this command:
+### The Test File
 
-```bash
-docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up
-```
-
-:::note Heads up!
-Please note starting the demo for the first time will take a few minutes.
-:::
-
-This will start your Tracetest instance on `http://localhost:11633/`.
-
-Open the URL and [start creating tests in the Web UI](https://docs.tracetest.io/web-ui/creating-tests)! Make sure to use the endpoints within your Docker network like `http://frontend:8084/` when creating tests.
-
-This is because your OpenTelemetry Demo and Tracetest are in the same network.
-
-> Note: View the `demo` section in the `tracetest.config.yaml` to see which endpoints from the OpenTelemetry Demo are available for running tests.
-
-Here's a sample of a failed test run, which happens if you add this assertion:
-
-```css
-attr:tracetest.span.duration  < 10ms
-```
-
-![](../img/dynatrace-failed-test.png)
-
-Increasing the duration to a more reasonable `500ms` will make the test pass.
-
-![](../img/dynatrace-successful-test.png)
-
-## Run Tracetest Tests with the Tracetest CLI
-
-First, [install the CLI](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-cli).
-Then, configure the CLI:
-
-```bash
-tracetest configure --server-url http://localhost:11633
-```
-
-Once configured, you can run a test against the Tracetest instance via the terminal.
-
-Check out the `http-test.yaml` file.
+Check out the `resources/test.yaml` file.
 
 ```yaml
-# http-test.yaml
-
+# resources/test.yaml
 type: Test
 spec:
   id: JBYAfKJ4R
@@ -365,12 +198,10 @@ spec:
     - attr:rpc.grpc.status_code = 0
 ```
 
-This file defines a test the same way you would through the Web UI.
-
 To run the test, run this command in the terminal:
 
 ```bash
-tracetest run test -f ./http-test.yaml
+docker compose run tracetest-run
 ```
 
 This test will fail just like the sample above due to the `attr:tracetest.span.duration  <  10ms` assertion.
