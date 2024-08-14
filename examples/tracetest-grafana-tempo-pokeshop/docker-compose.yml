@@ -1,29 +1,52 @@
 version: "3"
 services:
-
-  # Tracetest
-  tracetest:
-    image: kubeshop/tracetest:v0.14.3
-    volumes:
-      - ./tracetest.config.yaml:/app/tracetest.yaml
-      - ./tracetest.provision.yaml:/app/provisioning.yaml
-    ports:
-      - 11633:11633
-    command: --provisioning-file /app/provisioning.yaml
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
     environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      demo-api:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
   # Tracetest End
 
   # Grafana
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.100.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
@@ -33,15 +56,15 @@ services:
       - tempo
   tempo:
     image: grafana/tempo:latest
-    command: [ "-config.file=/etc/tempo.yaml" ]
+    command: ["-config.file=/etc/tempo.yaml"]
     volumes:
       - ./tempo.config.yaml:/etc/tempo.yaml
       - ./tempo-data:/tmp/tempo
     ports:
-      - "3200:3200"   # tempo http
-      - "9095:9095"   # tempo grpc
-      - "4317"  # otlp grpc
-      - "4318"  # otlp http
+      - "3200:3200" # tempo http
+      - "9095:9095" # tempo grpc
+      - "4317" # otlp grpc
+      - "4318" # otlp http
   grafana:
     image: grafana/grafana:9.4.3
     volumes:
@@ -106,6 +129,12 @@ services:
       timeout: 3s
       retries: 60
     depends_on:
+      demo-worker:
+        condition: service_started
+      grafana:
+        condition: service_started
+      otel-collector:
+        condition: service_started
       postgres:
         condition: service_healthy
       demo-cache:

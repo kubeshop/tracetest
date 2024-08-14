@@ -32,7 +32,32 @@ This is a simple quick start guide on how to configure a fully instrumented API 
 
 ## Prerequisites
 
-You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
+**Tracetest Account**:
+
+- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
+- Have access to the environment's [agent API key](https://app.tracetest.io/retrieve-token).
+
+**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
+
+## Run This Quckstart Example
+
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
+
+Clone the Tracetest project and go to the Grafana Tempo Node.js Quickstart:
+
+```bash
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/tracetest-grafana-tempo-pokeshop
+```
+
+Follow these instructions to run the quick start:
+
+1. Copy the `.env.template` file to `.env`.
+2. Fill out the [TRACETEST_TOKEN and ENVIRONMENT_ID](https://app.tracetest.io/retrieve-token) details by editing your `.env` file.
+3. Run `docker compose run tracetest-run`.
+4. Follow the links in the output to view the test results.
+
+Follow the sections below for a detailed breakdown of what the example you just ran did and how it works.
 
 ## Project Structure
 
@@ -40,7 +65,18 @@ The project is built with Docker Compose.
 
 ### 1. Tracetest
 
-The `collector.config.yaml` file, `tracetest.provision.yaml`, and `tracetest.config.yaml` in the root directory are for the configuring Tracetest and it's OpenTelemetry Collector.
+The project contains [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main), and a Node.js app.
+
+The `docker-compose.yaml` file in the root directory of the quick start runs the Node.js app and the [Tracetest Agent](/concepts/agent) setup.
+
+Configure the `.env` as shown below.
+
+```bash
+# Get the required information here: https://app.tracetest.io/retrieve-token
+
+TRACETEST_TOKEN="<YOUR_TRACETEST_TOKEN>"
+TRACETEST_ENVIRONMENT_ID="<YOUR_ENV_ID>"
+```
 
 ### 2. Grafana Tempo
 
@@ -48,7 +84,7 @@ The `grafana.config.yaml` and `tempo.config.yaml` in the root directory contains
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:4317` in the `tracetest/collector.config.yaml` will map to the `tracetest` service, where the port `4317` is the port where Tracetest accepts telemetry data.
+All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `tracetest:4317` in the `tracetest/collector.config.yaml` will map to the `tracetest-agent` service, where the port `4317` is the port where Tracetest accepts telemetry data.
 
 ## Pokeshop API
 
@@ -119,6 +155,7 @@ async function createTracer(): Promise<opentelemetry.Tracer> {
 
 The `docker-compose.yaml` file includes the definitions for all of the required services by the Pokeshop API, which includes:
 
+- [**OpenTelemetry Collector**)](https://opentelemetry.io/docs/collector/getting-started/) - Vendor-agnostic way to receive, process and export telemetry data.
 - **Postgres** - To save Pokemon information.
 - **Redis** - For in memory strage.
 - **RabbitMQ** - For async processing use cases.
@@ -240,53 +277,56 @@ services:
 
 ## Tracetest
 
-The `docker-compose.yaml` includes two services related to Tracetest. The Tracetest instance also connects to the `postgres` service.
-
-- **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
-- [**OpenTelemetry Collector**)](https://opentelemetry.io/docs/collector/getting-started/) - Vendor-agnostic way to receive, process and export telemetry data.
-- [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
+The `docker-compose.yaml` includes two services related to Tracetest.
 
 ```yaml
 version: "3"
-
-# ...
 services:
-
-  # ...
-
-  # Tracetest
-  tracetest:
-    image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
-    volumes:
-      - type: bind
-        source: ./tracetest/tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest/tracetest-provision.yaml
-        target: /app/provision.yaml
-    command: --provisioning-file /app/provision.yaml
-    ports:
-      - 11633:11633
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-    healthcheck:
-      test: [ "CMD", "wget", "--spider", "localhost:11633" ]
-      interval: 1s
-      timeout: 3s
-      retries: 60
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
     environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      demo-api:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
 
   # Tracetest End
 ```
-
-Tracetest depends on Postgres and the OpenTelemetry Collector. Tracetest requires config files to be loaded via a volume. The volumes are mapped from the `tracetest` directory into the `root` directory of the Tracetest container instance and the respective config files.
 
 The `collector.config.yaml` file contains the OpenTelemetry Collector configuration that enables routing traces from the Pokeshop API to Tempo.
 
@@ -317,64 +357,6 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [otlp/tempo]
-```
-
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance. It also enables forwarding Tracetest's internal telemetry to Grafana Tempo as well, with the `telemetry` and `server` config.
-
-```yaml
-# tracetest-config.yaml
-
-postgres:
-  host: postgres
-  user: postgres
-  password: postgres
-  port: 5432
-  dbname: postgres
-  params: sslmode=disable
-
-telemetry:
-  exporters:
-    collector:
-      serviceName: tracetest
-      sampling: 100
-      exporter:
-        type: collector
-        collector:
-          endpoint: otel-collector:4317
-
-server:
-  telemetry:
-    exporter: collector
-    applicationExporter: collector
-```
-
-The `tracetest.provision.yaml` file defines the trace data store, set to Grafana Tempo, meaning the traces will be forwarded via the OpenTelemetry Collector to Tempo where they are stored.
-
-```yaml
-# tracetest-provision.yaml
-
----
-type: DataStore
-spec:
-  name: Tempo
-  type: tempo
-  tempo:
-    type: grpc
-    grpc:
-      endpoint: tempo:9095
-      tls:
-        insecure: true
-
----
-type: Demo
-spec:
-  type: pokeshop
-  enabled: true
-  name: pokeshop
-  opentelemetryStore: {}
-  pokeshop:
-    httpEndpoint: http://demo-api:8081
-    grpcEndpoint: demo-rpc:8082
 ```
 
 How do traces reach Grafana Tempo?
@@ -436,28 +418,17 @@ services:
 To start all the services, run this command:
 
 ```bash
-docker-compose up -d
+docker compose run tracetest-run
 ```
-
-This will start your Tracetest instance on `http://localhost:11633/`. Open it and start creating tests!
 
 Make sure to use the `http://demo-api:8081/` URL in your test creation, because your Pokeshop API and Tracetest are in the same network.
 
-## Run Tracetest Tests with the Tracetest CLI
+## Trace-Based Tests
 
-First, [install the CLI](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-cli).
-Then, configure the CLI:
-
-```bash
-tracetest configure --server-url http://localhost:11633
-```
-
-Once configured, you can run a test against the Tracetest instance via the terminal.
-
-Check out the `tests/test.yaml` file.
+Check out the `resources/test.yaml` file.
 
 ```yaml
-# tests/test.yaml
+# resources/test.yaml
 
 type: Test
 spec:
@@ -492,24 +463,6 @@ spec:
     assertions:
     - attr:db.result contains "charizard"
 ```
-
-This file defines a test the same way you would through the Web UI.
-
-To run the test, run this command in the terminal:
-
-```bash
-tracetest run test -f ./tests/test.yaml
-```
-
-```bash title="Output:"
-✔ Pokeshop - Import (http://localhost:11633/test/ZVJwkpC4g/run/1/test) - trace id: 4eff1e124f67cf7a802b3c4fc51c19d4
-	✔ All HTTP Spans: Status  code is 200
-	✔ Validate that this span always exists after the message queue
-	✔ Validate that Redis is using Charizard.
-	✔ Validate that the Postgres has Charizard.
-```
-
-![tracetest web ui overview](https://res.cloudinary.com/djwdcmwdz/image/upload/v1692356467/Blogposts/Docs/screely-1692356427154_ewzduy.png)
 
 ## View Trace Spans Over Time in Grafana
 

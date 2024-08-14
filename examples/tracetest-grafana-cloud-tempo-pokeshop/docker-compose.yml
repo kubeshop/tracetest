@@ -1,25 +1,60 @@
 version: "3"
 services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.105.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    environment:
+      - GRAFANA_AUTH_WRITE_HASH
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
 
   # Cloud-based Managed Tracetest
   tracetest-agent:
     image: kubeshop/tracetest-agent:latest
-    command:
-      - "--mode=verbose"
     environment:
-      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
-      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
-  # Tracetest End
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
 
-  # OpenTelemetry
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.101.0
-    command:
-      - "--config"
-      - "/otel-local-config.yaml"
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
     volumes:
-      - ./collector.config.yaml:/otel-local-config.yaml
-  # OpenTelemetry End
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+      GRAFANA_AUTH_READ_HASH: ${GRAFANA_AUTH_READ_HASH}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      demo-api:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
+  # Tracetest end
 
   # Demo
   postgres:
@@ -72,6 +107,10 @@ services:
       timeout: 3s
       retries: 60
     depends_on:
+      otel-collector:
+        condition: service_started
+      demo-worker:
+        condition: service_started
       postgres:
         condition: service_healthy
       demo-cache:

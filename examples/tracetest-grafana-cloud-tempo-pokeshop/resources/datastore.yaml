@@ -1,0 +1,13 @@
+
+type: DataStore
+spec:
+  id: current
+  name: Grafana Tempo Cloud
+  type: tempo
+  tempo:
+    type: http
+    http:
+      url: https://tempo-us-central1.grafana.net/tempo
+      headers:
+        Authorization: Basic Mzc0OTIzOmdsY19leUp2SWpvaU56ZzROVEV3SWl3aWJpSTZJbk4wWVdOckxUVXlPVEF6TWkxb2RDMXlaV0ZrTFcxNUxYUnZhMlZ1SWl3aWF5STZJbmszUzFOSk0wZHBUREl4TmpkcE1FWkxORFphTUdsVGFpSXNJbTBpT25zaWNpSTZJblZ6SW4xOQ==
+

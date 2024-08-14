@@ -8,7 +8,7 @@ spec:
     httpRequest:
       method: POST
       url: http://demo-api:8081/pokemon/import
-      body: "{\"id\":837483}"
+      body: "{\"id\":6}"
       headers:
       - key: Content-Type
         value: application/json

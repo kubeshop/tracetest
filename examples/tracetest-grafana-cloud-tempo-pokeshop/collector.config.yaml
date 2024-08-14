@@ -2,18 +2,26 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: 0.0.0.0:4317
       http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 100ms
 
 exporters:
   logging:
-    verbosity: detailed
+    loglevel: debug
   otlp:
     endpoint: tempo-us-central1.grafana.net:443
     headers:
-      authorization: Basic <base64 encoded username:password>
+      authorization: Basic ${env:GRAFANA_AUTH_WRITE_HASH}
+      # https://grafana.com/blog/2021/04/13/how-to-send-traces-to-grafana-clouds-tempo-service-with-opentelemetry-collector/
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
+      processors: [batch]
       exporters: [logging, otlp]
