@@ -13,14 +13,14 @@ exporters:
     logLevel: debug
   # OTLP for Tracetest
   otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest. Read more in docs here:  https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest-agent:4317
     tls:
       insecure: true
   # OTLP for Lightstep
   otlp/lightstep:
     endpoint: ingest.lightstep.com:443
     headers:
-      "lightstep-access-token": "<lightstep_access_token>" # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start 
+      "lightstep-access-token": ${env:LIGHTSTEP_ACCESS_TOKEN} # Send traces to Lightstep. Read more in docs here: https://docs.lightstep.com/otel/otel-quick-start
 
 service:
   pipelines:
