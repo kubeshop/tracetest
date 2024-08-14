@@ -69,7 +69,7 @@ Follow along with the sections below for an in detail breakdown of what the exam
 
 The project contains [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), and a Node.js app.
 
-The `docker-compose.agent.yaml` file in the root directory of the quick start runs the Node.js app, [X-Ray Daemon](https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon.html), and the [Tracetest Agent](/concepts/agent) setup.
+The `docker-compose.yaml` file in the root directory of the quick start runs the Node.js app, [X-Ray Daemon](https://docs.aws.amazon.com/xray/latest/devguide/xray-daemon.html), and the [Tracetest Agent](/concepts/agent) setup.
 
 ## Configuring the Node.js App
 
@@ -93,9 +93,9 @@ The X-Ray tracing is contained in the `index.js` file. Traces will be sent to AW
 
 ## Run the Node.js App, X-Ray Daemon, and Tracetest Agent with Docker Compose
 
-The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray/docker-compose.agent.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray/Dockerfile) in the root directory contain the Node.js app.
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray/docker-compose.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray/Dockerfile) in the root directory contain the Node.js app.
 
-The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray/docker-compose.agent.yaml) also contains the Tracetest Agent and X-Ray Daemon.
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray/docker-compose.yaml) also contains the Tracetest Agent and X-Ray Daemon.
 
 ### Run Tracetest Tests
 
