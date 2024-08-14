@@ -1,23 +1,5 @@
 version: '3.3'
 services:
-  # Tracetest x Playwright
-  tracetest-e2e:
-    build: .
-    command: npm test
-    environment:
-      - POKESHOP_DEMO_URL=${POKESHOP_DEMO_URL}
-      - TRACETEST_API_TOKEN=${TRACETEST_API_TOKEN}
-      - TYK_AUTH_KEY=${TYK_AUTH_KEY}
-    depends_on:
-      tracetest-agent:
-        condition: service_started
-      api:
-        condition: service_healthy
-      worker:
-        condition: service_started
-      tyk-gateway:
-        condition: service_started
-
   # Cloud-based Managed Tracetest
   tracetest-agent:
     image: kubeshop/tracetest-agent:latest
