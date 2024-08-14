@@ -1,0 +1,5 @@
+type: DataStore
+spec:
+  id: current
+  name: Dynatrace
+  type: dynatrace

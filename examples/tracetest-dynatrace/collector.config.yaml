@@ -41,15 +41,14 @@ processors:
 exporters:
   # OTLP for Tracetest
   otlp/tracetest:
-    endpoint: tracetest:4317 # Send traces to Tracetest.
-                              # Read more in docs here: https://docs.tracetest.io/configuration/connecting-to-data-stores/opentelemetry-collector
+    endpoint: tracetest-agent:4317 
     tls:
       insecure: true
   # OTLP for Dynatrace
   otlphttp/dynatrace:
     endpoint: https://abc12345.live.dynatrace.com/api/v2/otlp
     headers:
-      Authorization: "Api-Token dt0c01.sample.secret"  # Requires "openTelemetryTrace.ingest" permission
+      Authorization: "Api-Token ${DYNATRACE_SECRET}"  # Requires "openTelemetryTrace.ingest" permission
 
 service:
   pipelines:
