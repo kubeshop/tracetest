@@ -241,7 +241,7 @@ services:
       retries: 60
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.68.0
+    image: otel/opentelemetry-collector-contrib:0.100.0
     restart: unless-stopped
     environment:
       - LIGHTSTEP_ACCESS_TOKEN

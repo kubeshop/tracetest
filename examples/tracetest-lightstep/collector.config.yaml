@@ -9,8 +9,6 @@ processors:
     timeout: 100ms
 
 exporters:
-  logging:
-    logLevel: debug
   # OTLP for Tracetest
   otlp/tracetest:
     endpoint: tracetest-agent:4317
@@ -31,4 +29,4 @@ service:
     traces/lightstep:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging, otlp/lightstep]
+      exporters: [otlp/lightstep]
