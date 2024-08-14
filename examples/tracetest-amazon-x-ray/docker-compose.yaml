@@ -6,47 +6,9 @@ services:
       AWS_REGION: ${AWS_REGION}
     ports:
       - "3000:3000"
-
-  tracetest:
-    image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
-    volumes:
-      - type: bind
-        source: ./tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest.provision.yaml
-        target: /app/provisioning.yaml
-    ports:
-      - 11633:11633
-    command: --provisioning-file /app/provisioning.yaml
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
-      postgres:
-        condition: service_healthy
       xray-daemon:
         condition: service_started
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
-    ports:
-      - 5432:5432
 
   xray-daemon:
     image: amazon/aws-xray-daemon:latest
@@ -57,3 +19,51 @@ services:
       AWS_REGION: ${AWS_REGION}
     ports:
       - 2000:2000
+
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      AWS_REGION: ${AWS_REGION}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      app:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully

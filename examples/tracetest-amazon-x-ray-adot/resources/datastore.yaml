@@ -1,5 +1,5 @@
----
 type: DataStore
 spec:
+  id: current
   name: otlp
   type: otlp
