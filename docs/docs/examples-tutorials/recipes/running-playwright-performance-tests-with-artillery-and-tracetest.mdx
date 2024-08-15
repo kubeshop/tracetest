@@ -65,9 +65,7 @@ The [`artillery-engine-playwright` npm package](https://www.npmjs.com/package/ar
 **Tracetest Account**:
 
 - Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
-- Create an [environment](/concepts/environments).
-- Create an [environment token](/concepts/environment-tokens).
-- Have access to the environment's [agent API key](/configuration/agent).
+- Have access to the environment's [agent API key](https://app.tracetest.io/retrieve-token).
 
 **Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
@@ -84,15 +82,10 @@ cd tracetest/examples/quick-start-artillery-playwright
 
 Follow these instructions to run the included demo app and TypeScript example:
 
-1. Log into the [Tracetest app](https://app.tracetest.io/).
-2. Copy the `.env.template` file to `.env`.
-3. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [agent API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
-4. Run `docker compose up -d`.
-5. This example is configured to use Jaeger. Ensure the environment you will be utilizing to run this example is also configured to use the Jaeger Tracing Backend by clicking on Settings, Tracing Backend, Jaeger, updating the url to `jaeger:16685`, Test Connection and Save.
-6. Run `npm i` to install the required dependencies.
-7. Run `npm run test` to run the example.
-8. The output will show the test results and the Tracetest URL for each test run.
-9. Follow the links in the log to view the test runs programmatically created by the Atillery execution using the Playwright engine.
+1. Copy the `.env.template` file to `.env`.
+2. Fill out the [TRACETEST_TOKEN and ENVIRONMENT_ID](https://app.tracetest.io/retrieve-token) details by editing your `.env` file.
+3. Run `docker compose run tracetest-run`.
+4. Follow the links in the output to view the test results.
 
 Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
@@ -106,16 +99,12 @@ The `docker-compose.yaml` file in the root directory of the quick start runs the
 
 The Artillery Plugin quick start has two primary files:
 
-- Playwright Test Script file `home.spec.ts` that includes the `@tracetest/playwright` npm package and the Tracetest test definition. To view the Tracetest test definition as a YAML file you can also see the `import-pokemon.yaml` file.
-- Artillery Playwright engine file `artillery-playwright.yaml` that defines that the Artillery test will use the Playwright engine.
+- Playwright Test Script file `resources/test.ts` that includes the `@tracetest/playwright` npm package and the Tracetest test definition. To view the Tracetest test definition as a YAML file you can also see the `import-pokemon.yaml` file.
+- Artillery Playwright engine file `resources/artillery-playwright.yaml` that defines that the Artillery test will use the Playwright engine.
 
-## The Playwright Setup
+### The `resources/test.ts` Test Script
 
-Before moving forward, run `npm i` in the root folder to install the dependencies.
-
-### The `home.spec.ts` Test Script
-
-The `home.spec.ts` test script contains one test based on the Pokeshop Demo UI features:
+The `resources/test.ts` test script contains one test based on the Pokeshop Demo UI features:
 
 - Import a Pokemon (using an async process)
 
@@ -127,15 +116,15 @@ The test script imports the package, grabs the Tracetest API token from the envi
 
 The complete test script looks like this:
 
-```typescript
+```typescript title=resources/test.ts
 import { Page } from 'playwright';
-import { expect } from '@playwright/test';
+import { expect, TestInfo } from '@playwright/test';
 import Tracetest from '@tracetest/playwright';
 import { config } from 'dotenv';
 
 config();
 
-const { TRACETEST_API_TOKEN = '' } = process.env;
+const { TRACETEST_TOKEN = '', TRACETEST_ENVIRONMENT_ID = '' } = process.env;
 
 const definition = `
 type: Test
@@ -163,7 +152,7 @@ spec:
 `;
 
 export async function importPokemon(page: Page) {
-  const tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN });
+  const tracetest = await Tracetest({ apiToken: TRACETEST_TOKEN, environmentId: TRACETEST_ENVIRONMENT_ID });
   const title = 'Artillery Playwright - Import Pokemon';
   const pokemonId = Math.floor(Math.random() * 101).toString();
   await page.goto('/');
@@ -182,7 +171,7 @@ export async function importPokemon(page: Page) {
     },
   });
 
-  await tracetest?.capture(title, page);
+  await tracetest?.capture(page, { title: 'Artillery Playwright - Import Pokemon', config: {} } as TestInfo);
 
   expect(await page.getByText('Pokeshop')).toBeTruthy();
 
@@ -197,17 +186,17 @@ export async function importPokemon(page: Page) {
 
 ## Creating the Artillery Test Script
 
-The `artilery-playwright.yaml` file contains the Artillery Test Script that will be used to trigger requests against the Pokeshop Demo and run trace-based tests. The steps executed by this script are the following:
+The `resources/artilery-playwright.yaml` file contains the Artillery Test Script that will be used to trigger requests against the Pokeshop Demo and run trace-based tests. The steps executed by this script are the following:
 
-1. Defines a scenario using the `playwright` engine running the `importPokemon` from `home.spec.ts` which is a Playwright test using the Tracetest integration using a random number as the Pokemon ID.
+1. Defines a scenario using the `playwright` engine running the `importPokemon` from `resources/test.ts` which is a Playwright test using the Tracetest integration using a random number as the Pokemon ID.
 2. Defines the target as the Pokeshop Demo App running on `http://localhost:8081`.
 
-```yaml title="artilery-playwright.yaml"
+```yaml title="resources/artilery-playwright.yaml"
 config:
   target: http://localhost:8081
   engines:
     playwright: {}
-  processor: home.spec.ts
+  processor: test.ts
 scenarios:
   - engine: playwright
     testFunction: importPokemon
@@ -215,24 +204,14 @@ scenarios:
 
 ## Setting the Environment Variables
 
-Copy the `.env.template` file to `.env` and add the Tracetest API token and agent tokens to the `TRACETEST_API_TOKEN` and `TRACETEST_AGENT_API_KEY` variables.
+Copy the `.env.template` file to `.env` and add the Tracetest API token and agent tokens to the `TRACETEST_TOKEN` and `TRACETEST_ENVIRONMENT_ID` variables.
 
 ## Running the Full Example
 
 To start the Pokeshop Demo App, run the following command from the root directory:
 
 ```bash
-docker compose up -d
-```
-
-This example is configured to use Jaeger. Ensure the environment you will be utilizing to run this example is also configured to use the Jaeger Tracing Backend.
-
-Go to your Tracetest account, click on Settings, Tracing Backend, Jaeger, update the URL to `jaeger:16685`, Test Connection and Save.
-
-Run the Artillery test. 
-
-```bash
-npm run test
+docker compose run tracetest-run
 ```
 
 ## Finding the Results
@@ -240,118 +219,170 @@ npm run test
 The output from the Tracetest Engine script should be visible in the console log after running the test command. This log will show links to Tracetest for each of the test runs invoked by the Artillery Testing Script. Click a link to launch Tracetest and view the test result.
 
 ```bash title=Output
+[+] Running 2/2
+ ✔ worker Pulled                                                                                                                                                                     0.9s
+ ✔ api Pulled                                                                                                                                                                        0.9s
+[+] Building 0.7s (10/10) FINISHED                                                                                                                                   docker:desktop-linux
+ => [tracetest-apply internal] load build definition from Dockerfile.tracetest                                                                                                       0.0s
+ => => transferring dockerfile: 336B                                                                                                                                                 0.0s
+ => [tracetest-apply internal] load metadata for docker.io/library/alpine:latest                                                                                                     0.6s
+ => [tracetest-apply auth] library/alpine:pull token for registry-1.docker.io                                                                                                        0.0s
+ => [tracetest-apply internal] load .dockerignore                                                                                                                                    0.0s
+ => => transferring context: 2B                                                                                                                                                      0.0s
+ => [tracetest-apply 1/5] FROM docker.io/library/alpine:latest@sha256:0a4eaa0eecf5f8c050e5bba433f58c052be7587ee8af3e8b3910ef9ab5fbe9f5                                               0.0s
+ => CACHED [tracetest-apply 2/5] WORKDIR /app                                                                                                                                        0.0s
+ => CACHED [tracetest-apply 3/5] RUN apk --update add bash jq curl                                                                                                                   0.0s
+ => CACHED [tracetest-apply 4/5] RUN curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s -- v1.4.0                                            0.0s
+ => CACHED [tracetest-apply 5/5] WORKDIR /resources                                                                                                                                  0.0s
+ => [tracetest-apply] exporting to image                                                                                                                                             0.0s
+ => => exporting layers                                                                                                                                                              0.0s
+ => => writing image sha256:746b8de43a912dc68c81345fd5b2a54740f3d8b0b73724dc79a31abea045d748                                                                                         0.0s
+ => => naming to docker.io/library/pokeshop-tracetest-apply                                                                                                                          0.0s
+[+] Creating 10/8
+ ✔ Network pokeshop_default              Created                                                                                                                                     0.0s
+ ✔ Container pokeshop-postgres-1         Created                                                                                                                                     0.2s
+ ✔ Container pokeshop-jaeger-1           Created                                                                                                                                     0.2s
+ ✔ Container pokeshop-queue-1            Created                                                                                                                                     0.2s
+ ✔ Container pokeshop-cache-1            Created                                                                                                                                     0.2s
+ ✔ Container pokeshop-otel-collector-1   Created                                                                                                                                     0.1s
+ ✔ Container pokeshop-worker-1           Created                                                                                                                                     0.1s
+ ✔ Container pokeshop-api-1              Created                                                                                                                                     0.0s
+ ✔ Container pokeshop-tracetest-agent-1  Created                                                                                                                                     0.0s
+ ✔ Container pokeshop-tracetest-apply-1  Created                                                                                                                                     0.1s
+[+] Running 9/9
+ ✔ Container pokeshop-queue-1            Healthy                                                                                                                                    12.2s
+ ✔ Container pokeshop-jaeger-1           Healthy                                                                                                                                     1.9s
+ ✔ Container pokeshop-cache-1            Healthy                                                                                                                                    12.2s
+ ✔ Container pokeshop-postgres-1         Healthy                                                                                                                                    12.2s
+ ✔ Container pokeshop-otel-collector-1   Started                                                                                                                                     0.4s
+ ✔ Container pokeshop-worker-1           Started                                                                                                                                     0.1s
+ ✔ Container pokeshop-api-1              Healthy                                                                                                                                     1.6s
+ ✔ Container pokeshop-tracetest-agent-1  Started                                                                                                                                     0.1s
+ ✔ Container pokeshop-tracetest-apply-1  Started                                                                                                                                     0.1s
+[+] Running 2/2
+ ✔ api Pulled                                                                                                                                                                        0.8s
+ ✔ worker Pulled                                                                                                                                                                     0.8s
+
 > quick-start-artillery-playwright@1.0.0 test
-> artillery run artillery-playwright.yaml
+> artillery run resources/artillery-playwright.yaml
 
-Test run id: tx4gt_gppedez5zrnwdc9f5yt7zaqcpkxgp_xjc9
-Bundled Typescript file into JS. New processor path: /Users/adnanrahic/Code/kubeshop/tracetest/examples/quick-start-artillery-playwright/dist/home.spec.js
-Phase started: unnamed (index: 0, duration: 1s) 17:37:50(+0100)
+Test run id: twmey_ngwbckeqpwm9ja9p99hqhfjtbhefp_bw8c
+Bundled Typescript file into JS. New processor path: /app/resources/dist/test.js
+Phase started: unnamed (index: 0, duration: 1s) 16:55:42(+0000)
 
-Phase completed: unnamed (index: 0, duration: 1s) 17:37:51(+0100)
+Phase completed: unnamed (index: 0, duration: 1s) 16:55:43(+0000)
 
 --------------------------------------
-Metrics for period to: 17:38:00(+0100) (width: 4.128s)
+Metrics for period to: 16:55:50(+0000) (width: 2.21s)
 --------------------------------------
 
-browser.http_requests: ......................................................... 32
-browser.page.FCP.http://localhost:8081/:
-  min: ......................................................................... 307.5
-  max: ......................................................................... 307.5
-  mean: ........................................................................ 307.5
-  median: ...................................................................... 308
-  p95: ......................................................................... 308
-  p99: ......................................................................... 308
-browser.page.FID.http://localhost:8081/:
-  min: ......................................................................... 4.9
-  max: ......................................................................... 4.9
-  mean: ........................................................................ 4.9
-  median: ...................................................................... 4.9
-  p95: ......................................................................... 4.9
-  p99: ......................................................................... 4.9
-browser.page.LCP.http://localhost:8081/:
-  min: ......................................................................... 335.2
-  max: ......................................................................... 335.2
-  mean: ........................................................................ 335.2
-  median: ...................................................................... 333.7
-  p95: ......................................................................... 333.7
-  p99: ......................................................................... 333.7
-browser.page.TTFB.http://localhost:8081/:
-  min: ......................................................................... 17.8
-  max: ......................................................................... 17.8
-  mean: ........................................................................ 17.8
-  median: ...................................................................... 17.6
-  p95: ......................................................................... 17.6
-  p99: ......................................................................... 17.6
-browser.page.codes.200: ........................................................ 32
+browser.http_requests: ......................................................... 10
+browser.page.FCP.http://api:8081/:
+  min: ......................................................................... 175.3
+  max: ......................................................................... 175.3
+  mean: ........................................................................ 175.3
+  median: ...................................................................... 175.9
+  p95: ......................................................................... 175.9
+  p99: ......................................................................... 175.9
+browser.page.FID.http://api:8081/:
+  min: ......................................................................... 1.6
+  max: ......................................................................... 1.6
+  mean: ........................................................................ 1.6
+  median: ...................................................................... 1.6
+  p95: ......................................................................... 1.6
+  p99: ......................................................................... 1.6
+browser.page.LCP.http://api:8081/:
+  min: ......................................................................... 193.4
+  max: ......................................................................... 193.4
+  mean: ........................................................................ 193.4
+  median: ...................................................................... 194.4
+  p95: ......................................................................... 194.4
+  p99: ......................................................................... 194.4
+browser.page.TTFB.http://api:8081/:
+  min: ......................................................................... 14.9
+  max: ......................................................................... 14.9
+  mean: ........................................................................ 14.9
+  median: ...................................................................... 15
+  p95: ......................................................................... 15
+  p99: ......................................................................... 15
+browser.page.codes.200: ........................................................ 10
 vusers.created: ................................................................ 1
 vusers.created_by_name.0: ...................................................... 1
 
 
-⠧
-✔ Artillery Playwright - Import Pokemon (https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/environments/ttenv_231b49e808c29e6a/test/artillery-plugin-import-pokemon/run/31219?selectedSpan=7ea712d1a054e09a) - trace id: bf18cbd2fdbc0be765e1a44ecee738ad
+⠴ Run Group: #e2fae28c-ac06-4001-8dc1-2328eee32e5a (https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments//run/e2fae28c-ac06-4001-8dc1-2328eee32e5a)
+Failed: 0
+Succeed: 1
+Pending: 0
+
+
+
+Runs:
+
+✔ Artillery Playwright - Import Pokemon (https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments//test/artillery-playwight-import-pokemon/run/7) - trace id: 1b3ba6a22f595dbfad1c5d32120aad20
 
 --------------------------------------
-Metrics for period to: 17:38:10(+0100) (width: 0s)
+Metrics for period to: 16:56:00(+0000) (width: 0s)
 --------------------------------------
 
 vusers.completed: .............................................................. 1
 vusers.failed: ................................................................. 0
 vusers.session_length:
-  min: ......................................................................... 16943.4
-  max: ......................................................................... 16943.4
-  mean: ........................................................................ 16943.4
-  median: ...................................................................... 16819.2
-  p95: ......................................................................... 16819.2
-  p99: ......................................................................... 16819.2
+  min: ......................................................................... 15189.2
+  max: ......................................................................... 15189.2
+  mean: ........................................................................ 15189.2
+  median: ...................................................................... 15218.6
+  p95: ......................................................................... 15218.6
+  p99: ......................................................................... 15218.6
 
 
-All VUs finished. Total time: 18 seconds
+All VUs finished. Total time: 16 seconds
 
 --------------------------------
-Summary report @ 17:38:09(+0100)
+Summary report @ 16:56:00(+0000)
 --------------------------------
 
-browser.http_requests: ......................................................... 32
-browser.page.FCP.http://localhost:8081/:
-  min: ......................................................................... 307.5
-  max: ......................................................................... 307.5
-  mean: ........................................................................ 307.5
-  median: ...................................................................... 308
-  p95: ......................................................................... 308
-  p99: ......................................................................... 308
-browser.page.FID.http://localhost:8081/:
-  min: ......................................................................... 4.9
-  max: ......................................................................... 4.9
-  mean: ........................................................................ 4.9
-  median: ...................................................................... 4.9
-  p95: ......................................................................... 4.9
-  p99: ......................................................................... 4.9
-browser.page.LCP.http://localhost:8081/:
-  min: ......................................................................... 335.2
-  max: ......................................................................... 335.2
-  mean: ........................................................................ 335.2
-  median: ...................................................................... 333.7
-  p95: ......................................................................... 333.7
-  p99: ......................................................................... 333.7
-browser.page.TTFB.http://localhost:8081/:
-  min: ......................................................................... 17.8
-  max: ......................................................................... 17.8
-  mean: ........................................................................ 17.8
-  median: ...................................................................... 17.6
-  p95: ......................................................................... 17.6
-  p99: ......................................................................... 17.6
-browser.page.codes.200: ........................................................ 32
+browser.http_requests: ......................................................... 10
+browser.page.FCP.http://api:8081/:
+  min: ......................................................................... 175.3
+  max: ......................................................................... 175.3
+  mean: ........................................................................ 175.3
+  median: ...................................................................... 175.9
+  p95: ......................................................................... 175.9
+  p99: ......................................................................... 175.9
+browser.page.FID.http://api:8081/:
+  min: ......................................................................... 1.6
+  max: ......................................................................... 1.6
+  mean: ........................................................................ 1.6
+  median: ...................................................................... 1.6
+  p95: ......................................................................... 1.6
+  p99: ......................................................................... 1.6
+browser.page.LCP.http://api:8081/:
+  min: ......................................................................... 193.4
+  max: ......................................................................... 193.4
+  mean: ........................................................................ 193.4
+  median: ...................................................................... 194.4
+  p95: ......................................................................... 194.4
+  p99: ......................................................................... 194.4
+browser.page.TTFB.http://api:8081/:
+  min: ......................................................................... 14.9
+  max: ......................................................................... 14.9
+  mean: ........................................................................ 14.9
+  median: ...................................................................... 15
+  p95: ......................................................................... 15
+  p99: ......................................................................... 15
+browser.page.codes.200: ........................................................ 10
 vusers.completed: .............................................................. 1
 vusers.created: ................................................................ 1
 vusers.created_by_name.0: ...................................................... 1
 vusers.failed: ................................................................. 0
 vusers.session_length:
-  min: ......................................................................... 16943.4
-  max: ......................................................................... 16943.4
-  mean: ........................................................................ 16943.4
-  median: ...................................................................... 16819.2
-  p95: ......................................................................... 16819.2
-  p99: ......................................................................... 16819.2
+  min: ......................................................................... 15189.2
+  max: ......................................................................... 15189.2
+  mean: ........................................................................ 15189.2
+  median: ...................................................................... 15218.6
+  p95: ......................................................................... 15218.6
+  p99: ......................................................................... 15218.6
 ```
 
 ## What's Next?
