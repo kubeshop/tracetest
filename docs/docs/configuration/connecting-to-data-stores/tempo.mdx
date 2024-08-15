@@ -79,7 +79,7 @@ Need help configuring the OpenTelemetry Collector so send trace data from your a
 
 ## Connect Tracetest to Tempo with the Web UI
 
-IIn the Web UI, (1) open Settings, and, on the (2) Configure Data Store tab, (3) select Tempo. Then, select either `gRPC` or `HTTP`.
+In the Web UI, (1) open Settings, and, on the (2) Trace Ingestion tab, (3) select Tempo. Then, select either `gRPC` or `HTTP`.
 
 If you are using Docker and the `gRPC` endpoint like in the screenshot below, use the service name as the hostname with port `9095` like this:
 
@@ -87,7 +87,7 @@ If you are using Docker and the `gRPC` endpoint like in the screenshot below, us
 tempo:9095
 ```
 
-![tempo grpc](https://res.cloudinary.com/djwdcmwdz/image/upload/v1710422510/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ad034a744607c050_settings_tab_agent_1_fc2ccz.png)
+![Trace Ingestion Settings](../../img/08132024/app.tracetest.io_organizations_at4CxvjIg_environments_ttenv_172de56e3dcbba9b_settings_tab=dataStore_tempo.png)
 
 If you are using Docker and the `HTTP` URL like in the screenshot below, use the service name as the hostname with port `80` or no specified port like this:
 
@@ -95,7 +95,7 @@ If you are using Docker and the `HTTP` URL like in the screenshot below, use the
 http://tempo
 ```
 
-![Tempo http](https://res.cloudinary.com/djwdcmwdz/image/upload/v1710422502/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ad034a744607c050_settings_tab_agent_gqqnjy.png)
+![Trace Ingestion Settings](../../img/08132024/app.tracetest.io_organizations_at4CxvjIg_environments_ttenv_172de56e3dcbba9b_settings_tab=dataStore_tempo_1.png)
 
 ## Connect Tracetest to Tempo with the CLI
 

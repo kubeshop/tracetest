@@ -1,29 +1,48 @@
 version: '3.3'
 services:
-  # Tracetest x Playwright
-  tracetest-e2e:
-    build: .
-    command: npm test
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
     environment:
-      - POKESHOP_DEMO_URL=${POKESHOP_DEMO_URL}
-      - TRACETEST_API_TOKEN=${TRACETEST_API_TOKEN}
-      - TYK_AUTH_KEY=${TYK_AUTH_KEY}
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+  
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
     depends_on:
+      api:
+        condition: service_started
       tracetest-agent:
         condition: service_started
-      api:
-        condition: service_healthy
-      worker:
-        condition: service_started
-      tyk-gateway:
-        condition: service_started
 
-  tracetest-agent:
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
     environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-      TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
-      TRACETEST_SERVER_URL: ${TRACETEST_SERVER_URL}
-    image: kubeshop/tracetest-agent:latest
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
 
   # Tyk Gateway
   tyk-gateway:
@@ -96,6 +115,10 @@ services:
     ports:
       - 8081:8081
     depends_on:
+      tyk-gateway:
+        condition: service_started
+      worker:
+        condition: service_started
       postgres:
         condition: service_healthy
       cache:
@@ -126,9 +149,9 @@ services:
 
   # Collector
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.100.0
     volumes:
-      - ./deployments/otel-collector/otel-collector.yml:/etc/otel-collector.yml
+      - ./otel-collector.yml:/etc/otel-collector.yml
     command: ['--config=/etc/otel-collector.yml']
     ports:
       - 4318:4318
