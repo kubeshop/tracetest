@@ -31,7 +31,12 @@ This is a simple quick start on how to configure a Node.js app to use OpenTeleme
 
 ## Prerequisites
 
-You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
+**Tracetest Account**:
+
+- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
+- Have access to the environment's [agent API key](https://app.tracetest.io/retrieve-token).
+
+**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
 ## Project Structure
 
@@ -40,12 +45,6 @@ The project is built with Docker Compose. It contains two distinct `docker-compo
 ### 1. Node.js App
 
 The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
-
-### 2. Tracetest
-
-The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.yaml`, and `tracetest-config.yaml` in the `tracetest` directory are for the setting up Tracetest, OpenSearch and the OpenTelemetry Collector.
-
-The `tracetest` directory is self-contained and will run all the prerequisites for enabling OpenTelemetry traces and trace-based testing with Tracetest.
 
 ### Docker Compose Network
 
@@ -126,170 +125,6 @@ services:
       - "8080:8080"
 ```
 
-To start it, run this command:
-
-```bash
-docker compose build # optional if you haven't already built the image
-docker compose up
-```
-
-This will start the Node.js app. But, you're not sending the traces anywhere.
-
-Let's fix this by configuring Tracetest and OpenTelemetry Collector.
-
-## Tracetest
-
-The `docker-compose.yaml` in the `tracetest` directory is configured with four services.
-
-- **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
-- [**OpenTelemetry Collector**](https://opentelemetry.io/docs/collector/) - A vendor-agnostic implementation of how to receive, process and export telemetry data.
-- [**OpenSearch**](https://opensearch.org/) - Data store and search engine.
-- [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
-
-They will start in this order:
-
-1. Postgres
-2. OpenSearch
-3. Data Prepper
-4. OpenTelemetry Collector
-5. Tracetest
-
-```yaml
-version: "3"
-services:
-  tracetest:
-    image: kubeshop/tracetest
-    platform: linux/amd64
-    volumes:
-      - type: bind
-        source: ./tracetest/tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest/tracetest-provision.yaml
-        target: /app/provisioning.yaml
-    ports:
-      - 11633:11633
-    command: --provisioning-file /app/provisioning.yaml
-    depends_on:
-      postgres:
-        condition: service_healthy
-      otel-collector:
-        condition: service_started
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
-    command:
-      - "--config"
-      - "/otel-local-config.yaml"
-    volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
-    depends_on:
-      data-prepper:
-        condition: service_started
-
-  data-prepper:
-    restart: unless-stopped
-    image: opensearchproject/data-prepper:1.5.1
-    volumes:
-      - ./tracetest/opensearch/opensearch-analytics.yaml:/usr/share/data-prepper/pipelines.yaml
-      - ./tracetest/opensearch/opensearch-data-prepper-config.yaml:/usr/share/data-prepper/data-prepper-config.yaml
-    depends_on:
-      opensearch:
-        condition: service_healthy
-
-  opensearch:
-    image: opensearchproject/opensearch:2.3.0
-    environment:
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
-    volumes:
-      - ./tracetest/opensearch/opensearch.yaml:/usr/share/opensearch/config/opensearch.yml
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-      nofile:
-        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
-        hard: 65536
-    healthcheck:
-      test: curl -s http://localhost:9200 >/dev/null || exit 1
-      interval: 5s
-      timeout: 10s
-      retries: 5
-
-```
-
-Tracetest depends on Postgres and the OpenTelemetry Collector. The OpenTelemetry Collector depends on the Data Prepper that then depends on OpenSearch.
-
-Both Tracetest and the OpenTelemetry Collector require config files to be loaded via a volume. The volumes are mapped from the root directory into the `tracetest` directory and the respective config files.
-
-OpenSearch and Data Prepper require config files to be loaded via a volume as well. The volumes are mapped from the root directory into the `tracetest/opensearch` directory and the respective config files. Data Prepper will receive trace data from OpenTelemetry Collector and send them along to OpenSearch.
-
-To start both the Node.js app and Tracetest, run this command:
-
-```bash
-docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
-```
-
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance.
-
-```yaml
-postgres:
-  host: postgres
-  user: postgres
-  password: postgres
-  port: 5432
-  dbname: postgres
-  params: sslmode=disable
-
-```
-
-How does Tracetest fetch traces?
-
-The `tracetest-provision.yaml` file contains the data store setup, which is set to OpenSearch, meaning the traces will be stored in OpenSearch and Tracetest will fetch them from OpenSearch when running tests.
-
-```yaml
----
-type: PollingProfile
-spec:
-  name: Default
-  strategy: periodic
-  default: true
-  periodic:
-    retryDelay: 5s
-    timeout: 10m
-
----
-type: DataStore
-spec:
-  name: OpenSearch
-  type: opensearch
-  opensearch:
-    addresses:
-      - http://opensearch:9200
-    index: traces
-
-```
-
 How do traces reach OpenSearch?
 
 The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then it exports them to the Data Prepper that will parse the trace data and send it to OpenSearch. Data Prepper uses the endpoint `data-prepper:21890`.
@@ -323,17 +158,46 @@ service:
 
 ```
 
-## Run Both the Node.js App and Tracetest
+## Running the Tests
 
-To start both the Node.js app and Tracetest, run this command:
+### The Test File
 
-```bash
-docker-compose -f docker-compose.yaml -f tracetest/docker-compose.yaml up # add --build if the images are not built already
+Check out the `resources/test.yaml` file.
+
+```yaml
+# resources/test.yaml
+type: Test
+spec:
+  id: W656Q0c4g
+  name: Test API
+  description: Test the App.
+  pollingProfile: jBPzxDCSg
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080
+      method: GET
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+      assertions:
+        - attr:http.status_code  =  200
+        - attr:tracetest.span.duration  <  500ms
 ```
 
-This will start your Tracetest instance on `http://localhost:11633/`.
+To run the test, run this command in the terminal:
 
-Open the URL and start creating tests! Make sure to use the `http://app:8080/` URL in your test creation, because your Node.js app and Tracetest are in the same network.
+```bash
+docker compose run tracetest-run
+```
+
+This will:
+1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Signoz.
+2. Start the Tracetest Agent.
+3. Configure the tracing backend and create tests in your environment.
+4. Run the tests.
 
 ## Learn More
 
