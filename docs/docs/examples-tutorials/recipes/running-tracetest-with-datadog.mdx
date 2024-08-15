@@ -52,7 +52,7 @@ Follow these instructions to run the quick start:
 4. Run `docker compose run tracetest-run`.
 5. Follow the links in the output to view the test results.
 
-Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
+Follow the sections below for a detailed breakdown of what the example you just ran did and how it works.
 
 ## Project Structure
 
@@ -64,7 +64,7 @@ The `docker-compose.yaml` file and `.env` file in the root directory are for the
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network, defined by the `networks` section on each file, and will be reachable by hostname from within other services. E.g. `tracetest:4317` in the `collector.config.yaml` will map to the `tracetest` service, where port `4317` is the port where Tracetest accepts traces.
+All `services` in the `docker-compose.yaml` are on the same network, defined by the `networks` section on each file, and will be reachable by hostname from within other services. E.g. `tracetest-agent:4317` in the `collector.config.yaml` will map to the `tracetest-agent` service, where port `4317` is the port where Tracetest Agent accepts traces.
 
 ## OpenTelemetry Demo
 
@@ -162,7 +162,7 @@ service:
       exporters: [datadog]
 ```
 
-## Running the tests
+## Running the Tests
 
 ### The Test File
 

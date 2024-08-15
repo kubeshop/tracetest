@@ -52,7 +52,7 @@ Follow these instructions to run the quick start:
 4. Run `docker compose run tracetest-run`.
 5. Follow the links in the output to view the test results.
 
-Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
+Follow the sections below for a detailed breakdown of what the example you just ran did and how it works.
 
 ## Project Structure
 
@@ -68,7 +68,7 @@ The `docker-compose.yaml` file, `collector.config.yaml`, `tracetest-provision.ya
 
 ### Docker Compose Network
 
-All `services` in the `docker-compose.yaml` are on the same network, defined by the `networks` section on each file, and will be reachable by hostname from within other services. E.g. `tracetest:4317` in the `collector.config.yaml` will map to the `tracetest` service, where port `4317` is the port where Tracetest accepts traces.
+All `services` in the `docker-compose.yaml` are on the same network, defined by the `networks` section on each file, and will be reachable by hostname from within other services. E.g. `tracetest-agent:4317` in the `collector.config.yaml` will map to the `tracetest-agent` service, where port `4317` is the port where Tracetest Agent accepts traces.
 
 ## OpenTelemetry Demo
 
@@ -90,7 +90,7 @@ Let's fix this by configuring Tracetest and the OpenTelemetry Collector to forwa
 
 ### Sending Traces to Tracetest and Dynatrace
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest's OTLP endpoint `tracetest:4317` in one pipeline, and to Dynatrace in another.
+The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then, exports them to Tracetest Agent's OTLP endpoint `tracetest-agent:4317` in one pipeline, and to Dynatrace in another.
 
 Make sure to add your Dynatrace API Key to the `otlp` exporter (needs the `openTelemetryTrace.ingest` permission).
 
@@ -130,7 +130,7 @@ receivers:
         - targets: ['0.0.0.0:8888']
 
 processors:
-  batch: # this configuration is needed to guarantee that the data is sent correctly to Datadog
+  batch: # this configuration is needed to guarantee that the data is sent correctly to Dynatrace
     send_batch_max_size: 100
     send_batch_size: 10
     timeout: 10s
@@ -163,7 +163,7 @@ service:
       exporters: [otlphttp/dynatrace]
 ```
 
-## Running the tests
+## Running the Tests
 
 ### The Test File
 
