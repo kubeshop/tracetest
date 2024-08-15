@@ -18,3 +18,4 @@ spec:
     name: It processed a message from Kafka
     assertions:
     - attr:tracetest.selected_spans.count = 1
+
