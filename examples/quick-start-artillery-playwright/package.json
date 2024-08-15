@@ -4,14 +4,14 @@
   "description": "> [Read the detailed recipe for setting up Tracetest + Artillery in our documentation.](https://docs.tracetest.io/tools-and-integrations/artillery)",
   "main": "index.js",
   "scripts": {
-    "test": "artillery run artillery-playwright.yaml"
+    "test": "artillery run resources/artillery-playwright.yaml"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@playwright/test": "^1.42.1",
-    "@tracetest/playwright": "^0.0.37",
-    "artillery": "^2.0.7",
-    "playwright": "^1.42.1"
+    "@playwright/test": "1.44.1",
+    "@tracetest/playwright": "0.1.33",
+    "artillery": "2.0.19",
+    "playwright": "1.44.1"
   }
 }

@@ -1,13 +1,48 @@
-version: "3.5"
+version: '3.5'
 name: pokeshop
 
 services:
+  tracetest-run:
+    build: .
+    volumes:
+      - ./resources:/app/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    depends_on:
+      tracetest-agent:
+        condition: service_started
+      tracetest-apply:
+        condition: service_completed_successfully
+    command: npm test
+
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-agent:
+        condition: service_started
+
   tracetest-agent:
     environment:
-      TRACETEST_API_KEY: ${TRACETEST_AGENT_API_KEY}
+      TRACETEST_API_KEY: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
     image: kubeshop/tracetest-agent:latest
     networks:
       default: null
+    depends_on:
+      api:
+        condition: service_healthy
 
   # pokeshop demo services
   postgres:
@@ -19,7 +54,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 1s
       timeout: 5s
       retries: 60
@@ -29,7 +64,7 @@ services:
     ports:
       - 6379:6379
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 1s
       timeout: 3s
       retries: 60
@@ -47,20 +82,18 @@ services:
       retries: 60
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.100.0
     restart: unless-stopped
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     ports:
       - 4317:4317
       - 4318:4318
     command:
-      - "--config"
-      - "/otel-local-config.yaml"
+      - '--config'
+      - '/otel-local-config.yaml'
     volumes:
       - ./collector.config.yaml:/otel-local-config.yaml
-    environment:
-      - JAEGER_ENDPOINT=jaeger:14250
     depends_on:
       jaeger:
         condition: service_healthy
@@ -78,13 +111,17 @@ services:
       HTTP_COLLECTOR_ENDPOINT: http://localhost:4318/v1/traces
       NPM_RUN_COMMAND: api
     healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:8081"]
+      test: ['CMD', 'wget', '--spider', 'localhost:8081']
       interval: 1s
       timeout: 3s
       retries: 60
     ports:
       - 8081:8081
     depends_on:
+      otel-collector:
+        condition: service_started
+      worker:
+        condition: service_started
       postgres:
         condition: service_healthy
       cache:
@@ -123,7 +160,7 @@ services:
       COLLECTOR_ENDPOINT: http://otel-collector:4317
       NPM_RUN_COMMAND: rpc
     healthcheck:
-      test: ["CMD", "lsof", "-i", "8082"]
+      test: ['CMD', 'lsof', '-i', '8082']
       interval: 1s
       timeout: 3s
       retries: 60
@@ -140,7 +177,7 @@ services:
     ports:
       - 16686:16686
     healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:16686"]
+      test: ['CMD', 'wget', '--spider', 'localhost:16686']
       interval: 1s
       timeout: 3s
       retries: 60

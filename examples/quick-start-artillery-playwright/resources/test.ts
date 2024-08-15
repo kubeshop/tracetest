@@ -1,11 +1,11 @@
 import { Page } from 'playwright';
-import { expect } from '@playwright/test';
+import { expect, TestInfo } from '@playwright/test';
 import Tracetest from '@tracetest/playwright';
 import { config } from 'dotenv';
 
 config();
 
-const { TRACETEST_API_TOKEN = '' } = process.env;
+const { TRACETEST_TOKEN = '', TRACETEST_ENVIRONMENT_ID = '' } = process.env;
 
 const definition = `
 type: Test
@@ -33,7 +33,7 @@ spec:
 `;
 
 export async function importPokemon(page: Page) {
-  const tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN });
+  const tracetest = await Tracetest({ apiToken: TRACETEST_TOKEN, environmentId: TRACETEST_ENVIRONMENT_ID });
   const title = 'Artillery Playwright - Import Pokemon';
   const pokemonId = Math.floor(Math.random() * 101).toString();
   await page.goto('/');
@@ -52,7 +52,7 @@ export async function importPokemon(page: Page) {
     },
   });
 
-  await tracetest?.capture(title, page);
+  await tracetest?.capture(page, { title: 'Artillery Playwright - Import Pokemon', config: {} } as TestInfo);
 
   expect(await page.getByText('Pokeshop')).toBeTruthy();
 
