@@ -16,7 +16,7 @@
 # to disable the metrics and rely on OTel collector container
 # defined on ./tracetest/docker-compose.yaml
 
-version: '3.9'
+version: "3.9"
 x-default-logging: &logging
   driver: "json-file"
   options:
@@ -29,6 +29,50 @@ networks:
     driver: bridge
 
 services:
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      frontend:
+        condition: service_healthy
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
+
   # ******************
   # Core Demo Services
   # ******************
@@ -164,7 +208,7 @@ services:
     environment:
       - CURRENCY_SERVICE_PORT
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES},service.name=currencyservice   # The C++ SDK does not support OTEL_SERVICE_NAME
+      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES},service.name=currencyservice # The C++ SDK does not support OTEL_SERVICE_NAME
     depends_on:
       - otel-collector
     logging: *logging
@@ -202,8 +246,8 @@ services:
           memory: 200M
     restart: unless-stopped
     ports:
-      - "${FEATURE_FLAG_SERVICE_PORT}"                                  # Feature Flag Service UI
-      - "${FEATURE_FLAG_GRPC_SERVICE_PORT}"                             # Feature Flag Service gRPC API
+      - "${FEATURE_FLAG_SERVICE_PORT}" # Feature Flag Service UI
+      - "${FEATURE_FLAG_GRPC_SERVICE_PORT}" # Feature Flag Service gRPC API
     environment:
       - FEATURE_FLAG_SERVICE_PORT
       - FEATURE_FLAG_GRPC_SERVICE_PORT
@@ -213,7 +257,8 @@ services:
       - DATABASE_URL=ecto://ffs:ffs@ffs_postgres:5432/ffs
       - FEATURE_FLAG_SERVICE_PATH_ROOT="/feature"
     healthcheck:
-      test: ["CMD", "curl", "-H", "baggage: synthetic_request=true", "-f", "http://localhost:${FEATURE_FLAG_SERVICE_PORT}"]
+      test:
+        ["CMD", "curl", "-H", "baggage: synthetic_request=true", "-f", "http://localhost:${FEATURE_FLAG_SERVICE_PORT}"]
     depends_on:
       ffs_postgres:
         condition: service_healthy
@@ -281,6 +326,11 @@ services:
       - recommendationservice
       - shippingservice
     logging: *logging
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:8084"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
 
   # Payment service
   paymentservice:
@@ -359,7 +409,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 500M               # This is high to enable supporting the recommendationCache feature flag use case
+          memory: 500M # This is high to enable supporting the recommendationCache feature flag use case
     restart: unless-stopped
     ports:
       - "${RECOMMENDATION_SERVICE_PORT}"
@@ -465,3 +515,15 @@ services:
     ports:
       - "${REDIS_PORT}"
     logging: *logging
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.100.0
+    container_name: otel-collector
+    restart: unless-stopped
+    environment:
+      - DATADOG_API_KEY
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml

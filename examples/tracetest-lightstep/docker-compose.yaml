@@ -1,8 +1,52 @@
-# OpenTelemetry Demo 
+# OpenTelemetry Demo
 # https://github.com/open-telemetry/opentelemetry-demo
 
 version: "3.2"
 services:
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      otel-frontend:
+        condition: service_healthy
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
+
   cache:
     image: redis:6
     restart: unless-stopped
@@ -114,6 +158,11 @@ services:
       - otel-recommendationservice
       - otel-shippingservice
       - otel-collector
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "localhost:8084"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
 
   # PaymentService
   otel-paymentservice:
@@ -179,3 +228,25 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 1s
+      timeout: 5s
+      retries: 60
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.100.0
+    restart: unless-stopped
+    environment:
+      - LIGHTSTEP_ACCESS_TOKEN
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml

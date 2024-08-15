@@ -7,49 +7,60 @@ services:
     build: .
     ports:
       - "8080:8080"
-  tracetest:
-    image: kubeshop/tracetest:latest
-    platform: linux/amd64
-    volumes:
-      - type: bind
-        source: ./tracetest-config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest-provision.yaml
-        target: /app/provisioning.yaml
-    ports:
-      - 11633:11633
-    command: --provisioning-file /app/provisioning.yaml
     depends_on:
-      postgres:
-        condition: service_healthy
       otel-collector:
         condition: service_started
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
 
-  postgres:
-    image: postgres:14
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
-    ports:
-      - 5432:5432
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      app:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
 
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.82.0
+    image: otel/opentelemetry-collector-contrib:0.101.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
+    environment:
+      - HONEYCOMB_API_KEY
     volumes:
       - ./collector.config.yaml:/otel-local-config.yaml
