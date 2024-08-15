@@ -10,7 +10,7 @@ run() {
   tracetest configure --token $TOKEN --environment $ENVIRONMENT_ID
 
   echo "Running Trace-Based Tests..."
-  tracetest run test -f /resources/import-pokemon.yaml
+  tracetest run test -f /resources/test.yaml
 }
 
 run

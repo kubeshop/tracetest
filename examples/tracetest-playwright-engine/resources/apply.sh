@@ -11,7 +11,7 @@ apply() {
 
   echo "Applying Resources"
   tracetest apply datastore -f /resources/datastore.yaml
-  tracetest apply test -f /resources/import-pokemon.yaml
+  tracetest apply test -f /resources/test.yaml
 }
 
 apply
