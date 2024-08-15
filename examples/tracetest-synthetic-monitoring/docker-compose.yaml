@@ -7,7 +7,7 @@ services:
     volumes:
       - ./resources:/resources
     environment:
-      TRACETEST_API_KEY: ${TRACETEST_API_TOKEN}
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
       TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
     entrypoint:
       - bash
@@ -25,7 +25,7 @@ services:
     volumes:
       - ./resources:/resources
     environment:
-      TRACETEST_API_KEY: ${TRACETEST_API_TOKEN}
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
       TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
     entrypoint:
       - bash
@@ -38,7 +38,8 @@ services:
 
   tracetest-agent:
     environment:
-      TRACETEST_API_KEY: ${TRACETEST_API_TOKEN}
+      TRACETEST_API_KEY: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
     image: kubeshop/tracetest-agent:latest
     networks:
       default: null
