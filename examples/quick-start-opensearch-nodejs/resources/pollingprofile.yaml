@@ -1,0 +1,9 @@
+---
+type: PollingProfile
+spec:
+  id: jBPzxDCSg
+  name: opensearch
+  strategy: periodic
+  periodic:
+    retryDelay: 4s
+    timeout: 10m
