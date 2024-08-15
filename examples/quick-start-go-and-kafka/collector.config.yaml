@@ -21,4 +21,4 @@ service:
     traces/1:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/jaeger]
+      exporters: [logging, otlp/jaeger]
