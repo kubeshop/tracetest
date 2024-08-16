@@ -4,20 +4,63 @@ services:
     build: .
     ports:
       - "8080:8080"
+    depends_on:
+      otel-collector:
+        condition: service_started
+
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:0.100.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
       - ./collector.config.yaml:/otel-local-config.yaml
     environment:
-      INSTRUMENTATION_KEY: ${INSTRUMENTATION_KEY}
+      INSTRUMENTATION_KEY: ${APP_INSIGHTS_INSTRUMENTATION_STRING}
     ports:
       - 4317:4317
+
   # Cloud-based Managed Tracetest
   tracetest-agent:
     image: kubeshop/tracetest-agent:latest
     environment:
-      # Find the Agent API Key here: https://docs.tracetest.io/configuration/agent
-      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      app:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
+

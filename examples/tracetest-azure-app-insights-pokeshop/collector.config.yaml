@@ -5,11 +5,13 @@ receivers:
       http:
 
 exporters:
+  logging:
+    loglevel: debug
   azuremonitor:
-    instrumentation_key: ${INSTRUMENTATION_KEY}
+    connection_string: ${env:INSTRUMENTATION_KEY}
 
 service:
   pipelines:
     traces/appinsights:
       receivers: [otlp]
-      exporters: [azuremonitor]
+      exporters: [logging, azuremonitor]

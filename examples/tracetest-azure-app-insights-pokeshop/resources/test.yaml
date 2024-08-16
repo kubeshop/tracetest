@@ -3,6 +3,7 @@ spec:
   id: -ao9stJVg
   name: Pokeshop - Import
   description: Import a Pokemon
+  pollingProfile: azure
   trigger:
     type: http
     httpRequest:
