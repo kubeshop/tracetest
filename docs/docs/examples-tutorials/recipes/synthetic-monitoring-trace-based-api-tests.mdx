@@ -36,9 +36,7 @@ To view the full guide on how to configure the Node.js app, view [this recipe](/
 **Tracetest Account**:
 
 - Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
-- Create an [environment](/concepts/environments).
-- Create an [environment token](/concepts/environment-tokens).
-- Have access to the environment's [agent API key](/configuration/agent).
+- Have access to the environment's [agent API key](https://app.tracetest.io/retrieve-token).
 
 **Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
@@ -56,76 +54,55 @@ cd tracetest/examples/quick-start-nodejs-synthetic-monitoring
 Follow these instructions to run the quick start:
 
 1. Copy the `.env.template` file to `.env`.
-2. Log into the [Tracetest app](https://app.tracetest.io/).
-3. This example is configured to use the OpenTelemetry Tracing Backend. Ensure the environment you will be utilizing to run this example is also configured to use the OpenTelemetry Tracing Backend by clicking on Settings, Tracing Backend, OpenTelemetry, Save.
-4. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
-5. Run `docker compose up -d`.
-6. Configure your CLI with `tracetest configure -t <YOUR_API_TOKEN>`.
-7. Apply the Tracetest Monitor with `tracetest apply monitor -f tracetest-synthetic-monitor.yaml`. This will start running the `./tracetest-test-api.yaml` test every minute.
-8. Run tests manually from the CLI with `tracetest run test -f ./tracetest-test-api.yaml` or from the Tracetest Web UI by accessing the app with the URL `http://app:8080/books`.
+2. Fill out the [TRACETEST_TOKEN and ENVIRONMENT_ID](https://app.tracetest.io/retrieve-token) details by editing your `.env` file.
+3. Run `docker compose run tracetest-run`.
+4. Follow the links in the output to view the test results.
 
-Follow along with the sections below for a detailed breakdown of what the example you just ran did and how it works.
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
 ## Running the Node.js App
 
 To start the full setup, run the following command:
 
 ```bash
-docker compose up -d
+docker compose run tracetest-run
 ```
 
 ## Run Tracetest Tests
 
-1. Open [Tracetest](https://app.tracetest.io/)
-2. Start creating tests! Make sure to use the `http://app:8080/books` URL in your test creation. 
-3. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
+This will:
+1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Tempo.
+2. Start the Tracetest Agent.
+3. Configure the tracing backend and create the monitor and tests in your environment.
+4. Run the tests.
 
-```bash
-tracetest configure -t <YOUR_API_TOKEN>
-tracetest run test -f ./tracetest-test-api.yaml
-```
-
-Here's a sample of a failed test run, which happens if you use this selector and assertion pair.
-
-Selector:
-```
-span[tracetest.span.type="general" name="Books List"]
-```
-
-Assertion:
-```
-attr: books.list.count = 4
-```
-
-![assertion](https://res.cloudinary.com/djwdcmwdz/image/upload/v1715607148/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_56b66bc6e1a1cbbd_test_e9CCQuLSg_run_3_selectedAssertion_0_selectedSpan_d0c03aa5d02b9975_uqhhwl.png)
-
-It fails because `books.length` is equal to `3`.
+Open the URL and start creating tests! Make sure to use the `http://app:8080/` URL in your test creation, because your Node.js app and Tracetest are in the same network.
 
 ## Run Synthetic Monitoring
 
-You can apply the Tracetest Monitor with the CLI.
+The monitor will be automatically applied when running this example. You can find the Tracetest Monitor Definition and apply it directly yourself using the CLI.
 
 ```bash
-tracetest apply monitor -f tracetest-synthetic-monitor.yaml
+tracetest apply monitor -f ./resources/monitor.yaml
 ```
 
-This will start running the `./tracetest-test-api.yaml` test every minute.
+This will start running the `./resources/monitor.yaml` test every minute.
 
 With the Web UI follow these steps to create a monitor.
 
 1. Select `Monitors` in the [Tracetest](https://app.tracetest.io/) sidebar.
 2. Create a Monitor. Select a schedule and toggle the enable monitor switch.
-    ![create a monitor](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921382/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_guf2id.png)
+   ![create a monitor](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921382/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_guf2id.png)
 3. Select the test you want to add to the Monitor.
-    ![select tests for monitor](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921383/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_1_dsbb1k.png)
+   ![select tests for monitor](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921383/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_1_dsbb1k.png)
 4. Select the webhook you want to notify.
-    ![select webhook](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921382/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_2_rzz5vm.png)
+   ![select webhook](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921382/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_2_rzz5vm.png)
 5. Click `Create` and you will see the Monitor run.
-    ![monitor run overview](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921382/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_3_pktmr0.png)
+   ![monitor run overview](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921382/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_3_pktmr0.png)
 6. To view the YAML definition for the Monitor, click `Automate`.
-    ![monitor automate overview](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921383/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_4_ysjbnx.png)
+   ![monitor automate overview](https://res.cloudinary.com/djwdcmwdz/image/upload/v1721921383/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_page_1_4_ysjbnx.png)
 
-With this setup, your Monitor will trigger the `Books list with availability` test, defined in `./tracetest-test-api.yaml`, every 5 minutes.
+With this setup, your Monitor will trigger the `Books list with availability` test, defined in `./resources/test.yaml`, every 5 minutes.
 
 ## Learn More
 

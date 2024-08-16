@@ -1,0 +1,23 @@
+type: Monitor
+spec:
+  id: JtFYYc9SR
+  name: Quick Start Synthetic Monitor
+  enabled: true
+  variableSetId: ""
+  tests:
+    - phAZcrT4B
+  schedule:
+    cron: "*/1 * * * *"
+    timeZone: Etc/UTC
+  alerts:
+    - id: slack-webhook-message
+      type: webhook
+      webhook:
+        body: "{\n \"text\": \"Monitor ${.Monitor.Name} has failed, follow the link to find the <${.URL}|results>\"\n}"
+        method: POST
+        url: <your-webhook-url>
+        headers:
+          - key: Content-Type
+            value: application/json
+      events:
+        - FAILED

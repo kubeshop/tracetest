@@ -48,9 +48,7 @@ Benefits of using traces as test specs alongside synthetic monitoring:
 **Tracetest Account**:
 
 - Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
-- Create an [environment](/concepts/environments).
-- Create an [environment token](/concepts/environment-tokens) with **admin role**.
-- Copy the environment id to your clipboard.
+- Have access to the environment's [agent API key](https://app.tracetest.io/retrieve-token).
 
 **Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
@@ -67,13 +65,12 @@ git clone https://github.com/kubeshop/tracetest
 cd tracetest/examples/tracetest-synthetic-monitoring
 ```
 
-Follow these instructions to run the example:
+Follow these instructions to run the quick start:
 
-1. Log into the [Tracetest app](https://app.tracetest.io/).
-2. Copy the `.env.template` file to `.env`.
-3. Fill out the [TRACETEST_API_TOKEN](/concepts/environment-tokens) and [TRACETEST_ENVIRONMENT_ID](/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
-4. Run `docker compose run tracetest-apply`.
-5. Follow the link in the terminal with the results to view the Monitor run.
+1. Copy the `.env.template` file to `.env`.
+2. Fill out the [TRACETEST_TOKEN and ENVIRONMENT_ID](https://app.tracetest.io/retrieve-token) details by editing your `.env` file.
+3. Run `docker compose run tracetest-run`.
+4. Follow the links in the output to view the test results.
 
 ## Project Structure
 
@@ -88,8 +85,9 @@ docker-compose.yaml
 /resources
   apply.sh
   datastore.yaml
-  import-pokemon.yaml
+  test.yaml
   script.js
+  monitor.yaml
 ```
 
 The [Pokeshop Demo App](/live-examples/pokeshop/overview) is a complete example of a distributed application using different back-end and front-end services. We will be launching it and running tests against it as part of this example.
@@ -103,7 +101,7 @@ The example provisions the following resources:
 
 ### Import Pokemon Test
 
-```yaml title="resources/import-pokemon.yaml"
+```yaml title="resources/test.yaml"
 type: Test
 spec:
   id: import-pokemon
@@ -227,122 +225,88 @@ apply() {
 apply
 ```
 
+```bash title="resources/run.sh"
+#!/bin/sh
+
+set -e
+
+TOKEN=$TRACETEST_TOKEN
+ENVIRONMENT_ID=$TRACETEST_ENVIRONMENT_ID
+
+run() {
+  echo "Configuring Tracetest"
+  tracetest configure --token $TOKEN --environment $ENVIRONMENT_ID
+
+  echo "Running Trace-Based Tests..."
+  tracetest run test -f /resources/test.yaml
+  tracetest list monitor
+}
+
+run
+```
+
 ## Setting the Environment Variables
 
-Copy the `.env.template` file to `.env` and add the Tracetest API token and environment id to the `TRACETEST_API_TOKEN` and `TRACETEST_ENVIRONMENT_ID` variables.
+Copy the `.env.template` file to `.env` and add the Tracetest API token and environment id to the `TRACETEST_TOKEN` and `TRACETEST_ENVIRONMENT_ID` variables.
 
 ## Running the Full Example
 
-Creating the resources is automated for you. You only need to run the following command:
+Creating the resources and running the tests is automated for you. You only need to run the following command:
 
 ```bash
-docker compose run tracetest-apply
+docker compose run tracetest-run
 ```
-
-This command will run the `apply.sh` script to provision the resources and create a synthetic monitor.
 
 ## Viewing the Created Resources
 
-The output from the Tracetest resource apply script should be visible in the console log after running the `apply` command.
+The output from the Tracetest resource run script should be visible in the console log after running the `run` command.
 
 ```bash title="Output"
+WARN[0000] /Users/oscar/Documents/kubeshop/t/examples/tracetest-synthetic-monitoring/docker-compose.yaml: `version` is obsolete
 [+] Running 2/2
- ✔ api Pulled                                                                                                                                         2.4s
- ✔ worker Pulled                                                                                                                                      2.6s
-[+] Creating 8/0
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-queue-1            Running                                                              0.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-postgres-1         Running                                                              0.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-cache-1            Running                                                              0.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-otel-collector-1   Running                                                              0.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-jaeger-1           Running                                                              0.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-tracetest-agent-1  Running                                                              0.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-worker-1           Running                                                              0.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-api-1              Running                                                              0.0s
-[+] Running 3/3
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-queue-1     Hea...                                                                      1.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-postgres-1  Healthy                                                                     1.0s
- ✔ Container tracetest-synthetic-monitoring-playwright-engine-cache-1     Hea...                                                                      1.0s
+ ✔ api Pulled                                                                                                                                                                        0.8s
+ ✔ worker Pulled                                                                                                                                                                     1.1s
+[+] Creating 9/9
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-otel-collector-1   Running                                                                                             0.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-queue-1            Running                                                                                             0.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-postgres-1         Running                                                                                             0.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-jaeger-1           Running                                                                                             0.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-cache-1            Running                                                                                             0.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-worker-1           Running                                                                                             0.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-tracetest-agent-1  Recreated                                                                                           0.1s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-api-1              Running                                                                                             0.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-tracetest-apply-1  Recreated                                                                                           0.1s
+[+] Running 6/6
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-tracetest-agent-1  Started                                                                                             0.3s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-queue-1            Healthy                                                                                             1.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-postgres-1         Healthy                                                                                             1.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-cache-1            Healthy                                                                                             1.0s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-api-1              Healthy                                                                                             0.5s
+ ✔ Container tracetest-synthetic-monitoring-playwright-engine-tracetest-apply-1  Started                                                                                             0.1s
 [+] Running 2/2
- ✔ api Pulled                                                                                                                                         1.8s
- ✔ worker Pulled                                                                                                                                      1.9s
+ ✔ worker Pulled                                                                                                                                                                     1.0s
+ ✔ api Pulled                                                                                                                                                                        0.9s
 Configuring Tracetest
  SUCCESS  Successfully configured Tracetest CLI
-Applying Resources
-type: DataStore
-spec:
-  id: current
-  name: jaeger
-  type: jaeger
-  default: true
-  createdAt: 2024-05-13T14:22:27.325353Z
-  jaeger:
-    endpoint: jaeger:16685
-    headers:
-      "": ""
-    tls:
-      insecure: true
+Running Trace-Based Tests...
+✔ RunGroup: #2c3uThCSg (https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/run/2c3uThCSg)
+ Summary: 1 passed, 0 failed, 0 pending
+  ✔ Import Pokemon (https://app.tracetest.io/organizations/ttorg_ced62e34638d965e/environments/ttenv_b42fa137465c6e04/test/import-pokemon/run/66/test) - trace id: f09a1370ec7a6178aa9ba398f05c2f0f
+	✔ Document Load Should be fast
+	✔ All HTTP request should return 200
+	✔ The worker should be processed
+	✔ All Database Spans: Processing time is less than 100ms
 
-type: Test
-spec:
-  id: import-pokemon
-  name: Import Pokemon
-  trigger:
-    type: playwrightengine
-    playwrightEngine:
-      target: http://api:8081
-      script: "const { expect } = require(\"@playwright/test\");\n\nasync function addPokemon(page) {\n  expect(await page.getByText(\"Pokeshop\")).toBeTruthy();\n\n  await page.click(\"text=Add\");\n\n  await page.getByLabel(\"Name\").fill(\"Charizard\");\n  await page.getByLabel(\"Type\").fill(\"Flying\");\n  await page\n    .getByLabel(\"Image URL\")\n    .fill(\"https://upload.wikimedia.org/wikipedia/en/1/1f/Pok%C3%A9mon_Charizard_art.png\");\n  await page.getByRole(\"button\", { name: \"OK\", exact: true }).click();\n}\n\nasync function deletePokemon(page) {\n  expect(await page.getByText(\"Pokeshop\")).toBeTruthy();\n\n  await page.locator('[data-cy=\"pokemon-list\"]');\n  await page.locator('[data-cy=\"pokemon-card\"]').first().click();\n  await page.locator('[data-cy=\"pokemon-card\"] [data-cy=\"delete-pokemon-button\"]').first().click();\n}\n\nasync function importPokemon(page) {\n  expect(await page.getByText(\"Pokeshop\")).toBeTruthy();\n\n  await page.click(\"text=Import\");\n  await page.getByLabel(\"ID\").fill(\"143\");\n\n  await Promise.all([\n    page.waitForResponse((resp) => resp.url().includes(\"/pokemon/import\") && resp.status() === 200),\n    page.getByRole(\"button\", { name: \"OK\", exact: true }).click(),\n  ]);\n}\n\nmodule.exports = { addPokemon, deletePokemon, importPokemon };\n"
-      method: importPokemon
-  specs:
-  - selector: span[tracetest.span.type="general" name="documentLoad"]
-    name: Document Load Should be fast
-    assertions:
-    - attr:tracetest.span.duration < 500ms
-  - selector: span[tracetest.span.type="http" http.scheme="http"]
-    name: All HTTP request should return 200
-    assertions:
-    - attr:http.status_code = 200
-  - selector: span[tracetest.span.type="messaging" name="queue.synchronizePokemon process" messaging.system="rabbitmq" messaging.destination="queue.synchronizePokemon" messaging.operation="process"]
-    name: The worker should be processed
-    assertions:
-    - attr:tracetest.selected_spans.count = 1
-  - selector: span[tracetest.span.type="database"]
-    name: "All Database Spans: Processing time is less than 100ms"
-    assertions:
-    - attr:tracetest.span.duration  <  250ms
-
-type: Monitor
-spec:
-  id: playwright-monitor
-  name: Playwright Synthetic Monitor
-  enabled: true
-  variableSetId: ""
-  tests:
-  - import-pokemon
-  schedule:
-    cron: "*/5 * * * *"
-    timeZone: Etc/UTC
-  alerts:
-  - id: slack-webhook-message
-    type: webhook
-    webhook:
-      body: "{\n \"text\": \"Monitor ${.Monitor.Name} has failed, follow the link to find the <${.URL}|results>\"\n}"
-      method: POST
-      url: <your-webhook-url>
-      headers:
-      - key: Content-Type
-        value: application/json
-    events:
-    - FAILED
-
- ID                     NAME                              VERSION   RUNS   LAST RUN TIME         LAST RUN STATE   URL                                      
----------------------- --------------------------------- --------- ------ --------------------- ---------------- -------------------------------------------------------
- playwright-monitor   Playwright Synthetic Monitor    1         0                                             https://api.tracetest.io/monitor/playwright-monitor-3
+ ID                   NAME                            VERSION   RUNS   LAST RUN TIME         LAST RUN STATE   URL
+-------------------- ------------------------------- --------- ------ --------------------- ---------------- -----------------------------------------------------
+ playwright-monitor   Playwright Synthetic Monitor    1         0                                             https://api.tracetest.io/monitor/playwright-monitor
+ JtFYYc9SR            Quick Start Synthetic Monitor   4         6      2024-08-15 19:01:53                    https://api.tracetest.io/monitor/JtFYYc9SR
 ```
 
 ## Running Synthetic Monitoring
 
 1. Select `Monitors` in the [Tracetest](https://app.tracetest.io/) sidebar.
-2. You'll see the Monitor that was created in the `apply` script.
+2. You'll see the Monitor that was created in the `run` script.
     ![apply script monitor](https://res.cloudinary.com/djwdcmwdz/image/upload/v1722252986/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_8fca16a31b8b6e24_monitors_oazwzc.png)
 3. It will start running based on the schedule you selected. With this setup, your Monitor will trigger the Playwright test every 5 minutes.
 
