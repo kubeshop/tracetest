@@ -1,0 +1,9 @@
+---
+type: PollingProfile
+spec:
+  id: azure
+  name: azure
+  strategy: periodic
+  periodic:
+    retryDelay: 4s
+    timeout: 10m

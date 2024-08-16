@@ -10,10 +10,6 @@ processors:
 exporters:
   azuremonitor:
     instrumentation_key: ${INSTRUMENTATION_KEY}
-  otlp/tracetest:
-    endpoint: tracetest:4317
-    tls:
-      insecure: true
   otlp/tracetest-agent:
     endpoint: tracetest-agent:4317
     tls:

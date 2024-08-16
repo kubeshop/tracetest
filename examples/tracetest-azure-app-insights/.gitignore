@@ -1,3 +1,4 @@
 config.yaml
 node_modules
 .env
+resources/datastore.yaml
