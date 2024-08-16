@@ -9,7 +9,7 @@ processors:
 
 exporters:
   azuremonitor:
-    instrumentation_key: ${INSTRUMENTATION_KEY}
+    instrumentation_key: ${env:INSTRUMENTATION_KEY}
   otlp/tracetest-agent:
     endpoint: tracetest-agent:4317
     tls:
@@ -20,7 +20,7 @@ service:
     traces/tracetest:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/tracetest, otlp/tracetest-agent]
+      exporters: [otlp/tracetest-agent]
     traces/appinsights:
       receivers: [otlp]
       exporters: [azuremonitor]
