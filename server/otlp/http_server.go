@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"go.uber.org/zap"
 
 	"go.opentelemetry.io/collector/pdata/ptrace/ptraceotlp"
@@ -51,9 +52,21 @@ func (s *httpServer) Start() error {
 	r := mux.NewRouter()
 	r.HandleFunc("/v1/traces", s.Export).Methods("POST")
 
+	h := decompressBodyHandler(
+		s.logger,
+		handlers.ContentTypeHandler(r, protoBufContentType, jsonContentType),
+	)
+	h = handlers.CompressHandler(h)
+	h = cors.New(cors.Options{
+		AllowOriginFunc: func(origin string) bool {
+			return true
+		},
+		AllowCredentials: true,
+	}).Handler(h)
+
 	s.hServer = &http.Server{
 		Addr:    s.addr,
-		Handler: handlers.CompressHandler(decompressBodyHandler(s.logger, handlers.ContentTypeHandler(r, protoBufContentType, jsonContentType))),
+		Handler: h,
 	}
 	listener, err := net.Listen("tcp", s.addr)
 	if err != nil {

@@ -52,6 +52,7 @@ require (
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
 	github.com/pterm/pterm v0.12.69
 	github.com/rivo/tview v0.0.0-20240122063236-8526c9fe1b54
+	github.com/rs/cors v1.8.0
 	github.com/segmentio/analytics-go/v3 v3.2.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
