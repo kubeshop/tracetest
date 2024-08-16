@@ -1,14 +1,14 @@
 version: "3"
 services:
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
+    image: otel/opentelemetry-collector-contrib:0.100.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
       - ./collector.config.yaml:/otel-local-config.yaml
     environment:
-      INSTRUMENTATION_KEY: ${INSTRUMENTATION_KEY}
+      INSTRUMENTATION_KEY: ${APP_INSIGHTS_INSTRUMENTATION_STRING}
     ports:
       - 4317:4317
   cache:
@@ -48,6 +48,10 @@ services:
       timeout: 3s
       retries: 60
     depends_on:
+      otel-collector:
+        condition: service_started
+      demo-worker:
+        condition: service_started
       postgres:
         condition: service_healthy
       cache:
@@ -99,3 +103,69 @@ services:
         condition: service_healthy
       queue:
         condition: service_healthy
+
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+      APP_INSIGHTS_ACCESS_TOKEN: ${APP_INSIGHTS_ACCESS_TOKEN}
+      APP_INSIGHTS_ARM_ID: ${APP_INSIGHTS_ARM_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      demo-api:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
+
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      timeout: 5s
+      interval: 1s
+      retries: 60
+    image: postgres:14
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: 5432
+        protocol: tcp
