@@ -18,10 +18,6 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-import CodeBlock from '@theme/CodeBlock';
-
 :::note
 [Check out the source code on GitHub here.](https://github.com/kubeshop/tracetest/tree/main/examples/tracetest-azure-app-insights)
 :::
@@ -37,19 +33,12 @@ import CodeBlock from '@theme/CodeBlock';
 
 This is a simple quick start guide on how to configure a Node.js app to use instrumentation with traces and Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use Azure App Insights as the trace data store and a Node.js app to generate the telemetry data.
 
-```mdx-code-block
-<Tabs groupId="running-tracetest-without-a-trace-data-store">
-  <TabItem value="Tracetest" label="Cloud-based Managed Tracetest" default>
-```
-
 ## Prerequisites
 
 **Tracetest Account**:
 
 - Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
-- Create an [environment](/concepts/environments).
-- Create an [environment token](/concepts/environment-tokens).
-- Have access to the environment's [agent API key](/configuration/agent).
+- Have access to the environment's [agent API key](https://app.tracetest.io/retrieve-token).
 
 **Azure Account**:
 
@@ -74,12 +63,10 @@ cd tracetest/examples/tracetest-azure-app-insights
 Follow these instructions to run the quick start:
 
 1. Copy the `.env.template` file to `.env`.
-2. Log into the [Tracetest app](https://app.tracetest.io/).
-3. Fill out the [token](https://docs.tracetest.io/concepts/environment-tokens) and [API key](https://docs.tracetest.io/concepts/agent) details by editing your `.env` file. You can find these values in the Settings area for your environment.
-4. Run `docker compose up -d`.
-5. Fill out the `resourceArmId: <your-arm-id>` and `accessToken: <your-access-token>` in the `tracetest-tracing-backend.yaml`.
-6. This example is configured to use the Azure Application Insights Tracing Backend. Ensure the environment you're using to run this example is configured to use the Application Insights Tracing Backend by clicking on Settings, Tracing Backend, Azure Application Insights, Save. Or, use the CLI as explained below.
-7. Run tests from the Tracetest Web UI by accessing the app with the URL `http://app:8080/`.
+2. Fill out the [TRACETEST_TOKEN and ENVIRONMENT_ID](https://app.tracetest.io/retrieve-token) details by editing your `.env` file.
+3. Fill out the [APP_INSIGHTS_ACCESS_TOKEN, APP_INSIGHTS_ARM_ID and APP_INSIGHTS_INSTRUMENTATION_STRING](https://learn.microsoft.com/en-us/azure/azure-monitor/app/sdk-connection-string?tabs=dotnet5#find-your-connection-string) details by editing your `.env` file.
+4. Run `docker compose run tracetest-run`.
+5. Follow the links in the output to view the test results.
 
 Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
@@ -96,8 +83,15 @@ The Node.js app is a simple Express app, contained in [the `app.js` file](https:
 Configure the `.env` like shown below.
 
 ```bash
-CONNECTION_STRING="<YOUR_APP_INSIGHTS_CONNECTION_STRING>"
-TRACETEST_API_KEY="<YOUR_TRACETEST_API_KEY>"
+# Get the required information here: https://app.tracetest.io/retrieve-token
+
+TRACETEST_TOKEN="<YOUR_TRACETEST_TOKEN>"
+TRACETEST_ENVIRONMENT_ID="<YOUR_ENV_ID>"
+
+# Azure
+APP_INSIGHTS_ACCESS_TOKEN=""
+APP_INSIGHTS_ARM_ID="/subscriptions/<id>/resourceGroups/app-insights-1/providers/microsoft.insights/components/<name>"
+APP_INSIGHTS_INSTRUMENTATION_STRING=""
 ```
 
 The OpenTelemetry tracing is contained in the `tracing.js` file. Traces will be sent to Azure Application Insights.
@@ -112,254 +106,46 @@ Enabling the tracer is done by preloading the trace file. As seen in the `packag
 },
 ```
 
-## Configuring Azure Application Insights
+## Running the Tests
 
-Create an Application Insights resource in your Azure account. The Resource ID is the `resourceArmId` you need.
+### The Test File
 
-![](https://res.cloudinary.com/djwdcmwdz/image/upload/v1716403759/docs/portal.azure.com__quickstart_true_xfnk5t.png)
+Check out the `resources/test.yaml` file.
 
-Get the `accessToken` by [following this guide](https://learn.microsoft.com/en-us/azure/azure-monitor/app/azure-ad-authentication?tabs=net). Or if you are running Tracetest from a authorized container, you can use the default Active Directory Authentication.
-
-:::note
-[Read the Azure Application Insights tracing backend configuration guide to learn more.](/configuration/connecting-to-data-stores/azure-app-insights)
-:::
-
-Configure Azure Application Insights as a Tracing Backend in Tracetest:
-
-```yaml title="tracetest-tracing-backend.yaml"
----
-type: DataStore
+```yaml
+# resources/test.yaml
+type: Test
 spec:
-  name: azureappinsights
-  type: azureappinsights
-  azureappinsights:
-    connectionType: direct
-    resourceArmId: <your-arm-id>
-    accessToken: <your-access-token>
-    useAzureActiveDirectoryAuth: false
+  id: W656Q0c4g
+  name: Test API
+  description: Test the App.
+  pollingProfile: azure
+  trigger:
+    type: http
+    httpRequest:
+      url: http://app:8080
+      method: GET
+      headers:
+        - key: Content-Type
+          value: application/json
+  specs:
+    - selector: span[tracetest.span.type="http" name="GET /"]
+      assertions:
+        - attr:http.response.status_code  =  200
+        - attr:tracetest.span.duration  <  500ms
 ```
+
+To run the test, run this command in the terminal:
 
 ```bash
-tracetest config -t <YOUR_API_TOKEN>
-tracetest apply datastore -f ./tracetest-tracing-backend.yaml
+docker compose run tracetest-run
 ```
 
-## Run the Node.js App and OpenTelemetry Collector with Docker Compose
-
-The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/docker-compose.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/Dockerfile) in the root directory contain the Node.js app.
-
-The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/docker-compose.yaml) also contains the Tracetest Agent.
-
-To start it, run this command:
-
-```bash
-docker compose up -d
-```
-
-This will start the Node.js app and Tracetest Agent.
-
-## Run Tracetest Tests
-
-1. Open [Tracetest](https://app.tracetest.io/).
-2. [Configure Azure Application Insights as a tracing backend](/configuration/connecting-to-data-stores/azure-app-insights) if you have not already as explained above.
-3. Start creating tests! Make sure to use the `http://app:8080/` URL in your test creation. 
-4. To trigger tests in the CLI, first [install the CLI](/cli/cli-installation-reference), [configure it](/cli/configuring-your-cli), and [run a test](/cli/running-tests). From the root of the quick start directory, run:
-
-```bash
-tracetest configure -t <YOUR_API_TOKEN>
-tracetest run test -f ./test-api.yaml
-```
-
-```mdx-code-block
-  </TabItem>
-  <TabItem value="Tracetest Core" label="Hobby Open-Source Tracetest Core">
-```
-
-## Prerequisites
-
-You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
-
-You will also need an [App Insights API Access Key](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-azure-ad-api) and the resource ARM ID for your App Insights instance.
-
-## Project Structure
-
-The project is built with Docker Compose.
-
-### 1. Node.js App
-
-The `Dockerfile` in the root directory is for the Node.js app.
-
-### 2. Tracetest
-
-The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest-config.yaml` in the `root` directory are for the setting up the Node.js App and Tracetest.
-
-### Docker Compose Network
-
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services.
-
-## Node.js App
-
-The Node.js app is a simple Express app, contained in the `src/index.js` file.
-
-It is instrumented using the [applicationinsights SDK](https://www.npmjs.com/package/applicationinsights) wrapping the application code to send telemetry data directly to the Azure cloud.
-
-The following is the code instrumentation section from the `src/tracing.js` file.
-
-```js
-const {
-  ApplicationInsightsClient,
-  ApplicationInsightsConfig,
-} = require("applicationinsights");
-const {
-  ExpressInstrumentation,
-} = require("@opentelemetry/instrumentation-express");
-const { HttpInstrumentation } = require("@opentelemetry/instrumentation-http");
-
-const config = new ApplicationInsightsConfig();
-config.azureMonitorExporterConfig.connectionString = process.env.CONNECTION_STRING;
-
-const appInsights = new ApplicationInsightsClient(config);
-
-const traceHandler = appInsights.getTraceHandler();
-traceHandler.addInstrumentation(new ExpressInstrumentation());
-traceHandler.addInstrumentation(new HttpInstrumentation());
-```
-
-To start the server, run this command:
-
-```bash
-npm start
-```
-
-As you can see the `Dockerfile` uses the command above.
-
-```Dockerfile
-FROM node:slim
-WORKDIR /usr/src/app
-
-COPY ./src/package*.json ./
-
-RUN npm install
-COPY ./src .
-
-EXPOSE 3000
-CMD [ "npm", "start" ]
-```
-
-## Tracetest
-
-The `docker-compose.yaml` includes two other services.
-
-- **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
-- [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
-
-```yaml
-services:
-  postgres:
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      timeout: 5s
-      interval: 1s
-      retries: 60
-    image: postgres:14
-    networks:
-      default: null
-  tracetest:
-    command: --provisioning-file /app/provision.yaml
-    platform: linux/amd64
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      TRACETEST_DEV: ${TRACETEST_DEV}
-    extra_hosts:
-      host.docker.internal: host-gateway
-    healthcheck:
-      test:
-        - CMD
-        - wget
-        - --spider
-        - localhost:11633
-      timeout: 3s
-      interval: 1s
-      retries: 60
-    image: kubeshop/tracetest:${TAG:-latest}
-    networks:
-      default: null
-    ports:
-      - mode: ingress
-        target: 11633
-        published: 11633
-        protocol: tcp
-    volumes:
-      - type: bind
-        source: tracetest/tracetest.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: tracetest/tracetest-provision.yaml
-        target: /app/provision.yaml
-networks:
-  default:
-    name: _default
-```
-
-Tracetest depends on Postgres and requires config files to be loaded via a volume. The volumes are mapped from the root directory into the `root` directory and the respective config files.
-
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance.
-
-```yaml
-postgres:
-  host: postgres
-  user: postgres
-  password: postgres
-  port: 5432
-  dbname: postgres
-  params: sslmode=disable
-```
-
-The `tracetest.provision.yaml` file defines the trace data store, set to Azure App Insights, meaning the traces will be stored in App Insights and Tracetest will fetch them from when running tests.
-
-But how does Tracetest fetch traces?
-
-Tracetest uses the Golang [Azure SDK](https://learn.microsoft.com/en-us/azure/developer/go/) library to pull to fetch trace data.
-
-```yaml
-type: DataStore
-spec:
-  name: AzureAppInsights
-  type: azureappinsights
-  default: true
-  azureappinsights:
-    connectionType: direct
-    resourceArmId: <your-arm-id>
-    accessToken: <your-access-token>
-    useAzureActiveDirectoryAuth: false
-```
-
-How do traces reach Azure App Insights?
-
-The application code in the `src/tracing.js` file uses the native App Insights library which sends telemetry straight to the Azure Cloud.
-
-## Run Both the Node.js App and Tracetest
-
-To start both the Node.js app and Tracetest, run this command:
-
-```bash
-docker compose -f ./docker-compose.yaml -f ./tracetest/docker-compose.yaml up -d
-```
-
-This will start your Tracetest instance on `http://localhost:11633/`. Open it and start creating tests!
-Make sure to use the `http://app:3000/` URL in your test creation because your Node.js app and Tracetest are in the same network.
-
-```mdx-code-block
-  </TabItem>
-</Tabs>
-```
+This will:
+1. Start the Node.js app and send the traces to Azure App Insights.
+2. Start the Tracetest Agent.
+3. Configure the tracing backend and create tests in your environment.
+4. Run the tests.
 
 ## Learn More
 

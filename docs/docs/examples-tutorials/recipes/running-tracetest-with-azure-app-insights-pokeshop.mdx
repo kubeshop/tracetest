@@ -39,25 +39,39 @@ This is a simple quick start guide on how to configure a fully instrumented API 
 
 ## Prerequisites
 
-You will need [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine to run this quick start app!
+**Tracetest Account**:
 
-You will also need an [App Insights API Access Key](https://learn.microsoft.com/en-us/azure/azure-monitor/app/app-insights-azure-ad-api) and the resource ARM ID for your App Insights instance.
+- Sign up to [`app.tracetest.io`](https://app.tracetest.io) or follow the [get started](/getting-started/installation) docs.
+- Have access to the environment's [agent API key](https://app.tracetest.io/retrieve-token).
 
-## Project Structure
+**Azure Account**:
 
-The project is built with Docker Compose.
+- Sign up to [Azure](https://azure.microsoft.com/en-us).
+- Install [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli).
+- Create an Application Insights app and get a [Instrumentation Key](https://learn.microsoft.com/en-us/azure/bot-service/bot-service-resources-app-insights-keys?view=azure-bot-service-4.0).
 
-### 1. Pokeshop API
+**Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
-The Pokeshop API is a fully instrumented REST API that makes use of different services to mimic a real life scenario. Learn more about it, [here](/live-examples/pokeshop/overview).
+## Run This Quckstart Example
 
-### 2. Tracetest
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
 
-The `docker-compose.yaml` file, `tracetest.provision.yaml`, and `tracetest.config.yaml` in the `tracetest` directory are for the setting up the Pokeshop API, Tracetest and OpenTelemetry Collector.
+Clone the Tracetest project and go to the Azure Node.js Quickstart:
 
-### Docker Compose Network
+```bash
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/tracetest-azure-app-insights-pokeshop
+```
 
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `otel-collector:4317` in the `src/index.js` will map to the `otel-collector` service.
+Follow these instructions to run the quick start:
+
+1. Copy the `.env.template` file to `.env`.
+2. Fill out the [TRACETEST_TOKEN and ENVIRONMENT_ID](https://app.tracetest.io/retrieve-token) details by editing your `.env` file.
+3. Fill out the [APP_INSIGHTS_ACCESS_TOKEN, APP_INSIGHTS_ARM_ID and APP_INSIGHTS_INSTRUMENTATION_STRING](https://learn.microsoft.com/en-us/azure/azure-monitor/app/sdk-connection-string?tabs=dotnet5#find-your-connection-string) details by editing your `.env` file.
+4. Run `docker compose run tracetest-run`.
+5. Follow the links in the output to view the test results.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
 ## Pokeshop API
 
@@ -66,23 +80,23 @@ The Pokeshop API is instrumented using the [OpenTelemetry standards for Node.js]
 This is a fragment from the main tracing file from the [Pokeshop API repo.](https://github.com/kubeshop/pokeshop)
 
 ```typescript
-import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
-import * as opentelemetry from '@opentelemetry/api';
-import { api, NodeSDK } from '@opentelemetry/sdk-node';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
-import { Resource } from '@opentelemetry/resources';
-import * as dotenv from 'dotenv';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis';
-import { PgInstrumentation } from '@opentelemetry/instrumentation-pg';
-import { AmqplibInstrumentation } from '@opentelemetry/instrumentation-amqplib';
-import { SpanStatusCode } from '@opentelemetry/api';
-import { B3Propagator } from '@opentelemetry/propagator-b3';
+import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import * as opentelemetry from "@opentelemetry/api";
+import { api, NodeSDK } from "@opentelemetry/sdk-node";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
+import { Resource } from "@opentelemetry/resources";
+import * as dotenv from "dotenv";
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { IORedisInstrumentation } from "@opentelemetry/instrumentation-ioredis";
+import { PgInstrumentation } from "@opentelemetry/instrumentation-pg";
+import { AmqplibInstrumentation } from "@opentelemetry/instrumentation-amqplib";
+import { SpanStatusCode } from "@opentelemetry/api";
+import { B3Propagator } from "@opentelemetry/propagator-b3";
 
 dotenv.config();
 api.propagation.setGlobalPropagator(new B3Propagator());
 
-const { COLLECTOR_ENDPOINT = '', SERVICE_NAME = 'pokeshop' } = process.env;
+const { COLLECTOR_ENDPOINT = "", SERVICE_NAME = "pokeshop" } = process.env;
 
 let globalTracer: opentelemetry.Tracer | null = null;
 
@@ -106,12 +120,12 @@ async function createTracer(): Promise<opentelemetry.Tracer> {
   );
 
   await sdk.start();
-  process.on('SIGTERM', () => {
+  process.on("SIGTERM", () => {
     sdk
       .shutdown()
       .then(
-        () => console.log('SDK shut down successfully'),
-        err => console.log('Error shutting down SDK', err)
+        () => console.log("SDK shut down successfully"),
+        (err) => console.log("Error shutting down SDK", err)
       )
       .finally(() => process.exit(0));
   });
@@ -226,116 +240,74 @@ services:
         condition: service_healthy
 ```
 
-## Tracetest
+## Configuring the Node.js App
 
-The `docker-compose.yaml` includes three other services.
+The Node.js app is a simple Express app, contained in [the `app.js` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/src/app.js).
 
-- **Postgres** - Postgres is a prerequisite for Tracetest to work. It stores trace data when running the trace-based tests.
-- [**OpenTelemetry Collector Contrib**](https://github.com/open-telemetry/opentelemetry-collector-contrib) - The official Open Telemetry Distribution for packages outside of the core collector.
-- [**Tracetest**](https://tracetest.io/) - Trace-based testing that generates end-to-end tests automatically from traces.
-
-```yaml
-version: "3"
-services:
-  tracetest:
-    image: kubeshop/tracetest:${TAG:-latest}
-    platform: linux/amd64
-    volumes:
-      - type: bind
-        source: ./tracetest.config.yaml
-        target: /app/tracetest.yaml
-      - type: bind
-        source: ./tracetest.provision.yaml
-        target: /app/provisioning.yaml
-    ports:
-      - 11633:11633
-    command: --provisioning-file /app/provisioning.yaml
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      adot-collector:
-        condition: service_started
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:11633"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-
-  postgres:
-    image: postgres:14
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-    healthcheck:
-      test: pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
-      interval: 1s
-      timeout: 5s
-      retries: 60
-    ports:
-      - 5432:5432
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:latest
-    command:
-      - "--config"
-      - "/otel-local-config.yaml"
-    volumes:
-      - ./collector.config.yaml:/otel-local-config.yaml
-    environment:
-      INSTRUMENTATION_KEY: ${INSTRUMENTATION_KEY}
-    ports:
-      - 4317:4317
-```
-
-Tracetest depends on Postgres and the OpenTelemetry collector. Tracetest requires config files to be loaded via a volume. The volumes are mapped from the root directory into the `root` directory and the respective config files.
-
-The `tracetest.config.yaml` file contains the basic setup of connecting Tracetest to the Postgres instance.
-
-```yaml
-postgres:
-  host: postgres
-  user: postgres
-  password: postgres
-  port: 5432
-  dbname: postgres
-  params: sslmode=disable
-```
-
-The `tracetest.provision.yaml` file defines the trace data store, set to Azure App Insights using the collector connection, meaning the traces will be sent to the OpenTelemetry collector to be processed and routed to the Azure cloud. Then, Tracetest will fetch them from the App Insights instance to execute tests.
-
-But how does Tracetest fetch traces?
-
-Tracetest uses the Golang [Azure SDK](https://learn.microsoft.com/en-us/azure/developer/go/) library to pull to fetch trace data.
-
-```yaml
-type: DataStore
-spec:
-  name: AzureAppInsights
-  type: azureappinsights
-  default: true
-  azureappinsights:
-    connectionType: direct
-    resourceArmId: <your-arm-id>
-    accessToken: <your-access-token>
-    useAzureActiveDirectoryAuth: false
-```
-
-How do traces reach Azure App Insights?
-
-The Pokeshop API code uses the native Node.js OpenTelemetry modules which sends information to the OpenTelemetry Collector to be processed and then sent to the configured Azure App Insights instance.
-
-## Run Both the Pokeshop API and Tracetest
-
-To start both the Pokeshop API and Tracetest, run this command:
+Configure the `.env` like shown below.
 
 ```bash
-docker compose -f ./docker-compose.yaml -f ./tracetest/docker-compose.yaml up -d
+# Get the required information here: https://app.tracetest.io/retrieve-token
+
+TRACETEST_TOKEN="<YOUR_TRACETEST_TOKEN>"
+TRACETEST_ENVIRONMENT_ID="<YOUR_ENV_ID>"
+
+# Azure
+APP_INSIGHTS_ACCESS_TOKEN=""
+APP_INSIGHTS_ARM_ID="/subscriptions/<id>/resourceGroups/app-insights-1/providers/microsoft.insights/components/<name>"
+APP_INSIGHTS_INSTRUMENTATION_STRING=""
 ```
 
-This will start your Tracetest instance on `http://localhost:11633/`. Open it and start creating tests!
-Make sure to use the `http://demo-api:8081/` url in your test creation, because your Pokeshop API and Tracetest are in the same network.
+## Running the Tests
+
+### The Test File
+
+Check out the `resources/test.yaml` file.
+
+```yaml
+# resources/test.yaml
+type: Test
+spec:
+  id: -ao9stJVg
+  name: Pokeshop - Import
+  description: Import a Pokemon
+  pollingProfile: azure
+  trigger:
+    type: http
+    httpRequest:
+      url: http://demo-api:8081/pokemon/import
+      method: POST
+      headers:
+        - key: Content-Type
+          value: application/json
+      body: '{"id":6}'
+  specs:
+    - name: Import Pokemon Span Exists
+      selector: span[tracetest.span.type="general" name="import pokemon"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - name: Uses Correct PokemonId
+      selector: span[tracetest.span.type="http" name="GET /pokemon/6" http.method="GET"]
+      assertions:
+        - attr:http.url  =  "https://pokeapi.co/api/v2/pokemon/6"
+    - name: Matching db result with the Pokemon Name
+      selector: span[tracetest.span.type="database" name="create pokeshop.pokemon"]:first
+      assertions:
+        - attr:db.result  contains      "charizard"
+```
+
+To run the test, run this command in the terminal:
+
+```bash
+docker compose run tracetest-run
+```
+
+This will:
+
+1. Start the Node.js app and send the traces to Azure App Insights.
+2. Start the Tracetest Agent.
+3. Configure the tracing backend and create tests in your environment.
+4. Run the tests.
 
 ## Learn More
 
