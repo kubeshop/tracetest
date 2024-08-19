@@ -11,13 +11,13 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
-Installation and deployment instructions for using Helm to deploy Enterprise self-hosted Tracetest in GCP (GKE) and use the On-Prem Tracetest Control Plane / Dashboard.
+Installation and deployment instructions for using Helm to deploy Enterprise self-hosted Tracetest in GCP (GKE) and use the On-Prem Tracetest Control Plane/Dashboard.
 
 ## Prerequisites
 
-- A Kubernetes cluster running on GKE ([installation instructions](https://cloud.google.com/kubernetes-engine/docs/how-to/creating-an-autopilot-cluster))
-- Traefik installed in your cluster ([installation instructions](https://doc.traefik.io/traefik/getting-started/install-traefik/))
-- Cert Manager installed in your cluster ([installation instructions](https://cert-manager.io/docs/installation/kubernetes/))
+- A Kubernetes cluster running on GKE ([installation instructions](https://cloud.google.com/kubernetes-engine/docs/how-to/creating-an-autopilot-cluster)).
+- Traefik installed in your cluster ([installation instructions](https://doc.traefik.io/traefik/getting-started/install-traefik/)).
+- A Cert Manager installed in your cluster ([installation instructions](https://cert-manager.io/docs/installation/kubernetes/)).
 - A Tracetest license key. If you don't have one, you can request a trial license key [here](https://tracetest.io/on-prem-installation).
 - Install [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl).
 - Install [Helm](https://helm.sh/).
@@ -47,7 +47,7 @@ helm install cert-manager jetstack/cert-manager      \
 
 ### Traefik
 
-Also, you will need to have a Traefik proxy, that will handle all connections to the Tracetest services. You can install Traefik, by creating a `values-traefik.yaml` file with the following content:
+Also, you will need to have a Traefik proxy, that will handle all connections to the Tracetest services. You can install Traefik by creating a `values-traefik.yaml` file with the following content:
 
 ```yaml title="values-traefik.yaml"
 dnsNames:

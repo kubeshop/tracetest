@@ -17,7 +17,7 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
 
-This guide explain how to configure Cloud-based managed Tracetest with the Tracetest CLI, and install a Tracetest Agent in your local development environment. This deployment uses the Cloud-based managed Tracetest Control Plane and Dashboard.
+This guide explains how to configure Cloud-based managed Tracetest with the Tracetest CLI and install a Tracetest Agent in your local development environment. This deployment uses the Cloud-based managed Tracetest Control Plane and Dashboard.
 
 ## Prerequisites
 
@@ -54,7 +54,7 @@ You can:
   Stop this agent
 ```
 
-Tracetest Agent runs tests and ingests traces. It exposes OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion. In this example you can trigger tests against apps running in your local environment on `localhost`, and export traces from your local apps to `localhost` as well.
+Tracetest Agent runs tests and ingests traces. It exposes OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion. In this example you can trigger tests against apps running in your local environment on `localhost` and export traces from your local apps to `localhost` as well.
 
 To ingest traces in this example with Tracetest Agent use these URLs:
 

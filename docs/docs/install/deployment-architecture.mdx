@@ -21,7 +21,7 @@ You can deploy Tracetest in two ways.
 - Deploy Tracetest Agent and use the Cloud-based managed Control Plane.
 - Deploy both Tracetest Agent and Control Plane On-Prem.
 
-## Enterprise self-hosted Tracetest
+## Enterprise Self-hosted Tracetest
 
 With Enterprise self-hosted Tracetest you deploy both the control plane and agent in your own infrastructure.
 
@@ -31,7 +31,7 @@ To deploy Enterprise self-hosted Tracetest follow the [installing with Helm guid
 
 Enterprise self-hosted Tracetest is composed of multiple services:
 
-- **Frontend**: WebUI used to interact with the Tracetest, allowing users to [create and manage tests](https://docs.tracetest.io/web-ui/creating-tests).
+- **Frontend**: the WebUI used to interact with Tracetest, allowing users to [create and manage tests](https://docs.tracetest.io/web-ui/creating-tests).
 - **Cloud/Core API**: APIs that are called directly by the Frontend, the Tracetest CLI and the Tracetest Agent to perform operations on the systems, like creating and running tests.
 - **Ory Ecosystem**: Tracetest relies on the [Ory Ecosystem](https://www.ory.sh/) for authentication and authorization. This includes [Ory Kratos](https://www.ory.sh/kratos/docs/), [Ory Keto](https://www.ory.sh/keto/docs/), and [Ory Oathkeeper](https://www.ory.sh/oathkeeper/docs/).
 - **Tracetest Workers**: A set of workers that manage the test execution.
@@ -110,7 +110,7 @@ Your main domain is `tracetest.mydomain.com`. You need to setup `tracetest.mydom
 
 ### Cert Manager
 
-Tracetest uses cert-manager to create sign certificates for JWT tokens, and SSL certificates for Ingress.
+Tracetest uses cert-manager to create sign certificates for JWT tokens and SSL certificates for Ingress.
 
 ```bash title="Terminal"
 helm repo add jetstack https://charts.jetstack.io --force-update
@@ -190,7 +190,7 @@ global:
 
 ### SSO
 
-This chart comes with an **EXTREMELY INSECURE** default GitHub OAuth App. It is used for demo purposes only, and should not under any circumstances be used in any real environment.
+This chart comes with an **EXTREMELY INSECURE** default GitHub OAuth App. It is used for demo purposes only and should not, under any circumstances, be used in any real environment.
 
 You can enable GitHub and Google SSO by creating corresponding Apps and setting the credentials in `values.yaml`:
 
@@ -205,11 +205,11 @@ global:
       clientSecret: "clientSecret"
 ```
 
-## Cloud-based managed Tracetest
+## Cloud-based Managed Tracetest
 
 With Cloud-based managed Tracetest you only deploy an agent in your infrastructure.
 
-To deploy Tracetest Agent follow the [installing guide](/install/cli).
+To deploy Tracetest Agent follow the [installation guide](/install/cli).
 
 ## Architecture
 
