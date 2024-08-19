@@ -15,11 +15,11 @@ keywords:
 image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
 ---
 
-This guide explain how to install a Tracetest Agent in your Kubernetes environment. This deployment uses the Cloud-based managed Tracetest Control Plane and Dashboard.
+This guide explains how to install a Tracetest Agent in your Kubernetes environment. This deployment uses the Cloud-based managed Tracetest Control Plane and Dashboard.
 
 ## Prerequisites
 
-- Have a running Kubernetes cluster.
+- A running Kubernetes cluster.
 - Install [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl).
 - [Sign in to Tracetest](https://app.tracetest.io/) and retrieve your [Tracetest Organization API Key/Token and Environment ID](https://app.tracetest.io/retrieve-token).
 
@@ -43,8 +43,8 @@ Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracet
 
 To run tests against apps running on your local machine you have two options:
 
-1. Run Tracetest Agent locally with the `tracetest start` command.
-2. Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+1. Run the Tracetest Agent locally with the `tracetest start` command.
+2. Add the Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
 
 You can reach services running on your local machine using:
 
