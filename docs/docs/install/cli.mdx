@@ -1,0 +1,62 @@
+---
+id: cli
+title: Install with CLI
+description: Installation and deployment instructions for using the Tracetest CLI to deploy a Tracetest Agent and use the Cloud-based managed Tracetest Control Plane / Dashboard.
+hide_table_of_contents: true
+keywords:
+  - tracetest
+  - tracetest cli install
+  - tracetest cloud install
+  - tracetest agent install
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
+
+This guide explains how to configure Cloud-based managed Tracetest with the Tracetest CLI and install a Tracetest Agent in your local development environment. This deployment uses the Cloud-based managed Tracetest Control Plane and Dashboard.
+
+## Prerequisites
+
+- [Sign in to Tracetest](https://app.tracetest.io/) and retrieve your [Tracetest Organization API Key/Token and Environment ID](https://app.tracetest.io/retrieve-token).
+
+## Install the Tracetest CLI
+
+<GtagInstallCliTabs></GtagInstallCliTabs>
+
+Configure the CLI to access your Cloud-based managed Tracetest account.
+
+```bash title="Terminal"
+tracetest configure -t <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_ID>
+```
+
+## Install the Tracetest Agent Locally
+
+[Tracetest Agent](/concepts/agent) runs as a standalone process.
+
+```bash title="Terminal"
+tracetest start --api-key <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_ID>
+```
+
+```bash title="Expected Output"
+Tracetest start launches a lightweight agent. It enables you to run tests and collect traces with Tracetest.
+Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.
+
+ INFO  Running in desktop mode...
+ INFO  Starting Agent with name...
+Agent is started! Leave the terminal open so tests can be run and traces gathered from this environment.
+You can:
+> Open Tracetest in a browser to this environment
+  (Experimental) Open Dashboard
+  Stop this agent
+```
+
+Tracetest Agent runs tests and ingests traces. It exposes OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion. In this example you can trigger tests against apps running in your local environment on `localhost` and export traces from your local apps to `localhost` as well.
+
+To ingest traces in this example with Tracetest Agent use these URLs:
+
+- gRPC: `http://localhost:4317`
+- HTTP: `http://localhost:4318/v1/traces`

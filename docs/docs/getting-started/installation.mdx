@@ -30,9 +30,8 @@ You can configure Cloud-based Managed Tracetest by using the Tracetest CLI and T
 
 1. [Sign in to Tracetest](https://app.tracetest.io/).
 2. Create an [Organization](/concepts/organizations) and [Environment](/concepts/environments).
-3. Copy the default [Tracetest Organization API Key/Token](/concepts/organization-tokens) from your Tracetest Organization Tokens page. (Or create a new token.)
-4. Copy the Environment ID from your Tracetest Environment Settings page.
-5. Configure the CLI with your Organization API Key/Token and Environment ID.
+3. Copy your [Tracetest Organization API Key/Token and Environment ID](https://app.tracetest.io/retrieve-token).
+4. Configure the CLI with your Organization API Key/Token and Environment ID.
 
 ```bash title="Terminal"
 tracetest configure -t <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_ID>
@@ -60,7 +59,7 @@ tracetest configure -t <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_
 Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.
 
  INFO  Running in desktop mode...
- INFO  Starting Agent with name Adnans-Air...
+ INFO  Starting Agent with name...
 Agent is started! Leave the terminal open so tests can be run and traces gathered from this environment.
 You can:
 > Open Tracetest in a browser to this environment
@@ -113,8 +112,6 @@ You can reach services running on your local machine using:
 >
 {`tracetest-agent:
   image: kubeshop/tracetest-agent
-  command:
-    - "--mode=verbose"
   environment:
     - TRACETEST_API_KEY=<TRACETEST_API_KEY>
     - TRACETEST_ENVIRONMENT_ID=<TRACETEST_ENVIRONMENT_ID>
@@ -125,9 +122,9 @@ You can reach services running on your local machine using:
 
 The Tracetest Agent is running in Docker and ready to accept traces.
 
-gRPC: `http://<service-name>:4317`
+gRPC: `http://tracetest-agent:4317`
 
-HTTP: `http://<service-name>:4318/v1/traces`
+HTTP: `http://tracetest-agent:4318/v1/traces`
 
 :::note Docker Network
 Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
@@ -150,7 +147,7 @@ You can reach services running on your local machine using:
     language="text"
     title="Terminal"
 >
-{`curl https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/agent/deploy-agent.sh | bash -s -- default <TRACETEST_API_KEY>`}
+{`curl https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/agent/deploy-agent.sh | bash -s -- default <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_ID>`}
 </CodeBlock>
 
 The Tracetest Agent is running in Kubernetes and ready to accept traces.
@@ -235,10 +232,15 @@ flowchart TD
 
 ## Install Tracetest On-Prem
 
-:::tip For Development Environment
+:::note For Development Environment
 This installation is meant for testing purposes only. It uses self signed certificates, so your browser will show a warning about it.
+:::
 
-For the Production-ready installation, [view the official Helm chart readme](https://github.com/kubeshop/tracetest-cloud-charts/blob/main/README.md).
+:::tip For Production
+For the Production-ready installation:
+
+- [View the official Helm chart readme](https://github.com/kubeshop/tracetest-cloud-charts/blob/main/README.md).
+- [View the official installation docs](/install/helm).
 :::
 
 1. Install [Helm](https://helm.sh/) and [kind](https://kind.sigs.k8s.io/) on your machine. Clone the official Tracetest Helm chart.
@@ -248,7 +250,7 @@ git clone https://github.com/kubeshop/tracetest-cloud-charts.git
 cd ./tracetest-cloud-charts
 ```
 
-2. Request a **licence key, [here](https://tracetest.io/on-prem-installation)**.
+2. Request a **license key, [here](https://tracetest.io/on-prem-installation)**.
 
 3. Run the setup script with a demo. Add your license key when you get prompted.
 
