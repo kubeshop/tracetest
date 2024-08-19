@@ -17,7 +17,7 @@ import (
 var (
 	Version              = "dev"
 	Env                  = "dev"
-	DefaultCloudEndpoint = "http://app.tracetest.io"
+	DefaultCloudEndpoint = "https://app.tracetest.io"
 	DefaultCloudDomain   = "tracetest.io"
 	DefaultCloudPath     = "/"
 )
