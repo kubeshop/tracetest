@@ -539,6 +539,62 @@ const sidebars = {
       ],
     },
     {
+      type: "html",
+      value: "<hr />",
+    },
+    {
+      type: "category",
+      label: "Installing",
+      link: {
+        type: "doc",
+        id: "install/overview",
+      },
+      items: [
+        {
+          type: "category",
+          label: "Cloud-based managed",
+          items: [
+            {
+              type: "doc",
+              id: "install/cli",
+              label: "Install with CLI",
+            },
+            {
+              type: "doc",
+              id: "install/docker",
+              label: "Install with Docker",
+            },
+            {
+              type: "doc",
+              id: "install/kubernetes",
+              label: "Install with Kubernetes",
+            },
+          ],
+        },
+        {
+          type: "category",
+          label: "Enterprise self-hosted",
+          items: [
+            {
+              type: "doc",
+              id: "install/helm",
+              label: "Install with Helm",
+            },
+            {
+              type: "doc",
+              id: "install/gcp",
+              label: "Install in GCP",
+            },
+          ],
+        },
+        {
+          type: "doc",
+          id: "install/deployment-architecture",
+          label: "Deployment Architecture",
+        },
+      ],
+    },
+    {
       type: "category",
       label: "Concepts",
       items: [
@@ -552,11 +608,6 @@ const sidebars = {
           id: "concepts/open-source-vs-commercial-features",
           label: "Open Source vs Commercial Features",
         },
-        // {
-        //   type: "doc",
-        //   id: "concepts/what-is-tracing",
-        //   label: "What is tracing",
-        // },
         {
           type: "doc",
           id: "concepts/agent",
@@ -751,7 +802,6 @@ const sidebars = {
         },
       ],
     },
-
     {
       type: "category",
       label: "Using Tracetest",

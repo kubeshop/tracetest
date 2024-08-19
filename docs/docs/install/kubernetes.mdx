@@ -1,0 +1,53 @@
+---
+id: kubernetes
+title: Install with Kubernetes
+description: Installation and deployment instructions for using Kubernetes deploy a Tracetest Agent and use the Cloud-based managed Tracetest Control Plane / Dashboard.
+hide_table_of_contents: true
+keywords:
+  - tracetest
+  - tracetest cli install
+  - tracetest cloud install
+  - tracetest agent install
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+This guide explain how to install a Tracetest Agent in your Kubernetes environment. This deployment uses the Cloud-based managed Tracetest Control Plane and Dashboard.
+
+## Prerequisites
+
+- Have a running Kubernetes cluster.
+- Install [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl).
+- [Sign in to Tracetest](https://app.tracetest.io/) and retrieve your [Tracetest Organization API Key/Token and Environment ID](https://app.tracetest.io/retrieve-token).
+
+
+## Install the Tracetest Agent with Kubernetes
+
+[Tracetest Agent](/concepts/agent) runs as a Kubernetes Daemonset.
+
+```bash title="Terminal"
+curl https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/agent/deploy-agent.sh | bash -s -- default <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_ID>
+```
+
+The Tracetest Agent is running in Kubernetes and ready to accept traces.
+
+gRPC: `http://<service-name>:4317`
+
+HTTP: `http://<service-name>:4318/v1/traces`
+
+:::note K8s Network
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+
+To run tests against apps running on your local machine you have two options:
+
+1. Run Tracetest Agent locally with the `tracetest start` command.
+2. Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+
+You can reach services running on your local machine using:
+
+- Linux (docker version < 20.10.0): `172.17.0.1:8080`
+- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
+:::
