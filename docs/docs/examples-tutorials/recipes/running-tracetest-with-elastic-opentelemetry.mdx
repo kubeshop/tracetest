@@ -2,7 +2,7 @@
 id: running-tracetest-with-elastic-opentelemetry
 title: Node.js, Elasticsearch and OpenTelemetry
 description: Quick start on how to configure a Node.js app to use Elasticsearch and OpenTelemetry Collector with traces and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -119,13 +119,11 @@ Enabling the tracer is done by preloading the trace file. As seen in the `packag
 },
 ```
 
-## Run the Node.js App, Elasticsearch, Elastic APM, and OpenTelemetry Collector with Docker Compose
+## Run the Node.js App, Elasticsearch, Elastic APM, OpenTelemetry Collector and Tracetest
 
 The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-elasticapm-with-otel/docker-compose.yaml) also contains the Tracetest Agent, OpenTelemetry Collector, Elasticsearch, Kibana, and Elastic APM server.
 
-## Run Tracetest Tests
-
-To execute the tests, run this command:
+To run everything including Tracetest tests, run this command:
 
 ```bash
 docker compose run tracetest-run
@@ -134,7 +132,7 @@ docker compose run tracetest-run
 This will:
 1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Elastic APM.
 2. Start the Tracetest Agent.
-3. Configure the tracing backend and create tests in your environment.
+3. Configure the Elastic tracing backend and create tests in your environment.
 4. Run the tests.
 
 ## Learn More

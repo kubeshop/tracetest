@@ -60,7 +60,7 @@ Follow these instructions to run the quick start:
 
 Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
 
-## Running the Node.js App
+## Running the Node.js App and Tracetest
 
 To start the full setup, run the following command:
 
@@ -68,15 +68,51 @@ To start the full setup, run the following command:
 docker compose run tracetest-run
 ```
 
-## Run Tracetest Tests
-
 This will:
 1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Tempo.
 2. Start the Tracetest Agent.
 3. Configure the tracing backend and create the monitor and tests in your environment.
 4. Run the tests.
 
-Open the URL and start creating tests! Make sure to use the `http://app:8080/` URL in your test creation, because your Node.js app and Tracetest are in the same network.
+The output of the test will look similar to this:
+
+```bash
+Configuring Tracetest
+ SUCCESS  Successfully configured Tracetest CLI
+Running Trace-Based Tests...
+✘ RunGroup: #BakgyljIg (https://app.tracetest.io/organizations/xxx/environments/xxx/run/BakgyljIg)
+ Summary: 0 passed, 1 failed, 0 pending
+  ✘ Books list with availability (https://app.tracetest.io/organizations/xxx/environments/xxx/test/phAZcrT4B/run/4/test) - trace id: 27aea5374b4d0caa8cb5b986eb0b1762
+	✔ span[tracetest.span.type="http" name="GET /books" http.target="/books" http.method="GET"]
+		✔ #27186220b79017aa
+			✔ attr:tracetest.span.duration  < 500ms (25ms)
+	✔ span[tracetest.span.type="general" name="Books List"]
+		✔ #48fcfad5fe4b70bb
+			✔ attr:books.list.count = 3 (3)
+	✔ span[tracetest.span.type="http" name="GET /availability/:bookId" http.method="GET"]
+		✔ #ce6374a67450375c
+			✔ attr:http.host = "availability:8080" (availability:8080)
+		✔ #f470512997599d36
+			✔ attr:http.host = "availability:8080" (availability:8080)
+		✔ #2f9e722285ed8cdb
+			✔ attr:http.host = "availability:8080" (availability:8080)
+	✘ span[tracetest.span.type="general" name="Availablity check"]
+		✔ #f93af70cc7f4383b
+			✔ attr:isAvailable = "true" (true)
+		✔ #89095118143dd135
+			✔ attr:isAvailable = "true" (true)
+		✘ #55b3371b8a9e8c59
+			✘ attr:isAvailable = "true" (false) (https://app.tracetest.io/organizations/xxx/environments/xxx/test/phAZcrT4B/run/4/test?selectedAssertion=3&selectedSpan=55b3371b8a9e8c59)
+
+	✘ Required gates
+		✘ test-specs
+```
+
+Follow the links in the output to view the run group and the test result on Tracetest.
+
+The Docker file exposes the underlying Node.js app at `http://localhost:8080/`.
+
+Open Tracetest and start creating tests using this environment! Make sure to use the `http://app:8080/` URL in your test creation, because your Node.js app and the Tracetest agent are in the same network. This simple Node.js application only supports a GET operation against `http://app:8080/` and should return the string 'Hello World'.
 
 ## Run Synthetic Monitoring
 

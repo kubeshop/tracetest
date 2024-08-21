@@ -75,174 +75,13 @@ Follow the sections below for a detailed breakdown of what the example you just 
 
 ## Pokeshop API
 
-The Pokeshop API is instrumented using the [OpenTelemetry standards for Node.js](https://opentelemetry.io/docs/instrumentation/js/getting-started/nodejs/), sending the data to the OpenTelemetry collector that will be pushing the telemetry information to the Azure cloud.
+The Pokeshop API is instrumented using the [OpenTelemetry standards for Node.js](https://opentelemetry.io/docs/instrumentation/js/getting-started/nodejs/), sending the data to the OpenTelemetry collector that will be pushing the telemetry information to the Azure Cloud.
 
-This is a fragment from the main tracing file from the [Pokeshop API repo.](https://github.com/kubeshop/pokeshop)
+:::note Pokeshop Demo API Architecture
+[View the full system architecture of the Pokeshop Demo API, here.](/live-examples/pokeshop/overview)
+:::
 
-```typescript
-import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
-import * as opentelemetry from "@opentelemetry/api";
-import { api, NodeSDK } from "@opentelemetry/sdk-node";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-grpc";
-import { Resource } from "@opentelemetry/resources";
-import * as dotenv from "dotenv";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
-import { IORedisInstrumentation } from "@opentelemetry/instrumentation-ioredis";
-import { PgInstrumentation } from "@opentelemetry/instrumentation-pg";
-import { AmqplibInstrumentation } from "@opentelemetry/instrumentation-amqplib";
-import { SpanStatusCode } from "@opentelemetry/api";
-import { B3Propagator } from "@opentelemetry/propagator-b3";
-
-dotenv.config();
-api.propagation.setGlobalPropagator(new B3Propagator());
-
-const { COLLECTOR_ENDPOINT = "", SERVICE_NAME = "pokeshop" } = process.env;
-
-let globalTracer: opentelemetry.Tracer | null = null;
-
-async function createTracer(): Promise<opentelemetry.Tracer> {
-  const collectorExporter = new OTLPTraceExporter({
-    url: COLLECTOR_ENDPOINT,
-  });
-
-  const spanProcessor = new BatchSpanProcessor(collectorExporter);
-  const sdk = new NodeSDK({
-    traceExporter: collectorExporter,
-    // @ts-ignore
-    instrumentations: [new IORedisInstrumentation(), new PgInstrumentation(), new AmqplibInstrumentation()],
-  });
-
-  sdk.configureTracerProvider({}, spanProcessor);
-  sdk.addResource(
-    new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: SERVICE_NAME,
-    })
-  );
-
-  await sdk.start();
-  process.on("SIGTERM", () => {
-    sdk
-      .shutdown()
-      .then(
-        () => console.log("SDK shut down successfully"),
-        (err) => console.log("Error shutting down SDK", err)
-      )
-      .finally(() => process.exit(0));
-  });
-
-  const tracer = opentelemetry.trace.getTracer(SERVICE_NAME);
-
-  globalTracer = tracer;
-
-  return globalTracer;
-}
-```
-
-The `docker-compose.yaml` file includes the definitions for all of the required services by the Pokeshop API, which includes:
-
-- **Postgres** - To save Pokemon information.
-- **Redis** - For in memory storage.
-- **RabbitMQ** - For async processing use cases.
-- **API** - The Pokeshop API main container.
-- **Worker** - The Pokeshop worker instance.
-
-```yaml
-version: "3"
-
-services:
-  cache:
-    image: redis:6
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-
-  queue:
-    image: rabbitmq:3.8-management
-    restart: unless-stopped
-    healthcheck:
-      test: rabbitmq-diagnostics -q check_running
-      interval: 1s
-      timeout: 5s
-      retries: 60
-
-  demo-api:
-    image: kubeshop/demo-pokemon-api:latest
-    restart: unless-stopped
-    pull_policy: always
-    environment:
-      REDIS_URL: cache
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
-      RABBITMQ_HOST: queue
-      POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      COLLECTOR_ENDPOINT: http://adot-collector:4317
-      NPM_RUN_COMMAND: api
-    ports:
-      - "8081:8081"
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "localhost:8081"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-    depends_on:
-      postgres:
-        condition: service_healthy
-      cache:
-        condition: service_healthy
-      queue:
-        condition: service_healthy
-
-  demo-worker:
-    image: kubeshop/demo-pokemon-api:latest
-    restart: unless-stopped
-    pull_policy: always
-    environment:
-      REDIS_URL: cache
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
-      RABBITMQ_HOST: queue
-      POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      COLLECTOR_ENDPOINT: http://adot-collector:4317
-      NPM_RUN_COMMAND: worker
-    depends_on:
-      postgres:
-        condition: service_healthy
-      cache:
-        condition: service_healthy
-      queue:
-        condition: service_healthy
-
-  demo-rpc:
-    image: kubeshop/demo-pokemon-api:latest
-    restart: unless-stopped
-    pull_policy: always
-    environment:
-      REDIS_URL: cache
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?schema=public
-      RABBITMQ_HOST: queue
-      POKE_API_BASE_URL: https://pokeapi.co/api/v2
-      COLLECTOR_ENDPOINT: http://adot-collector:4317
-      NPM_RUN_COMMAND: rpc
-    ports:
-      - 8082:8082
-    healthcheck:
-      test: ["CMD", "lsof", "-i", "8082"]
-      interval: 1s
-      timeout: 3s
-      retries: 60
-    depends_on:
-      postgres:
-        condition: service_healthy
-      cache:
-        condition: service_healthy
-      queue:
-        condition: service_healthy
-```
-
-## Configuring the Node.js App
-
-The Node.js app is a simple Express app, contained in [the `app.js` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/src/app.js).
+## Configuring the Pokeshop Demo API
 
 Configure the `.env` like shown below.
 
@@ -258,7 +97,21 @@ APP_INSIGHTS_ARM_ID="/subscriptions/<id>/resourceGroups/app-insights-1/providers
 APP_INSIGHTS_INSTRUMENTATION_STRING=""
 ```
 
-## Running the Tests
+## Running the Pokeshop Demo API, OpenTelemetry Collector, and Tracetest
+
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights-pokeshop/docker-compose.yaml) in the root directory contains the Node.js app, OpenTelemetry Collector and Tracetest Agent.
+
+To run everything including Tracetest tests, run this command:
+
+```bash
+docker compose run tracetest-run
+```
+
+This will:
+1. Start the Node.js app and send the traces to Azure App Insights.
+2. Start the Tracetest Agent.
+3. Configure the Azure App Insights tracing backend and create tests in your environment.
+4. Run the tests.
 
 ### The Test File
 
@@ -295,19 +148,6 @@ spec:
       assertions:
         - attr:db.result  contains      "charizard"
 ```
-
-To run the test, run this command in the terminal:
-
-```bash
-docker compose run tracetest-run
-```
-
-This will:
-
-1. Start the Node.js app and send the traces to Azure App Insights.
-2. Start the Tracetest Agent.
-3. Configure the tracing backend and create tests in your environment.
-4. Run the tests.
 
 ## Learn More
 

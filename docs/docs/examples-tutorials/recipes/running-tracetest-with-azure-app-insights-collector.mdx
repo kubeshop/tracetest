@@ -2,7 +2,7 @@
 id: running-tracetest-with-azure-app-insights-collector
 title: Node.js and Azure Application Insights with OpenTelemetry Collector
 description: Quick start on how to configure a Node.js app with OpenTelemetry traces, Azure Application Insights as a trace data store, including the OpenTelemetry Collector, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -81,7 +81,7 @@ The `docker-compose.yaml` file in the root directory of the quick start runs the
 
 ## Configuring the Node.js App
 
-The Node.js app is a simple Express app, contained in [the `app.js` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/src/app.js).
+The Node.js app is a simple Express app, contained in [the `app.js` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights-collector/src/app.js).
 
 Configure the `.env` like shown below.
 
@@ -124,6 +124,20 @@ APP_INSIGHTS_INSTRUMENTATION_STRING="InstrumentationKey=14f0532a-aad4-4cb1-9bdb-
 
 ## Running the Tests
 
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights-collector/docker-compose.yaml) in the root directory contains the Node.js app, OpenTelemetry Collector and Tracetest Agent.
+
+To run everything including Tracetest tests, run this command:
+
+```bash
+docker compose run tracetest-run
+```
+
+This will:
+1. Start the Node.js app and send the traces to Azure App Insights.
+2. Start the Tracetest Agent.
+3. Configure the Azure App Insights tracing backend and create tests in your environment.
+4. Run the tests.
+
 ### The Test File
 
 Check out the `resources/test.yaml` file.
@@ -149,19 +163,6 @@ spec:
         - attr:http.status_code  =  200
         - attr:tracetest.span.duration  <  500ms
 ```
-
-To run the test, run this command in the terminal:
-
-```bash
-docker compose run tracetest-run
-```
-
-This will:
-
-1. Start the Node.js app, the OpenTelemetry Collector and send the traces to both Azure App Insights and the Tracetest Agent.
-2. Start the Tracetest Agent.
-3. Configure the tracing backend and create tests in your environment.
-4. Run the tests.
 
 ## Learn More
 

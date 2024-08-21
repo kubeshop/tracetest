@@ -13,6 +13,24 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 **Trace-based testing** is a means of conducting deep integration or system tests by utilizing the rich data contained in a distributed system trace.
 
+## Why Trace-based Testing?
+
+In traditional testing, the focus is primarily on verifying that inputs and outputs match an expected result. While this approach is useful, it often overlooks critical issues such as race conditions, performance bottlenecks, failing interactions between services, broken 3rd party services, an many other issues.
+
+Trace-based testing validates entire application flows and transactions. It ensures that each step in the process is executed as intended as well as the final result. This is particularly important in microservices architectures, where complex interdependencies can make it difficult to detect and diagnose issues.
+
+| Traditional Testing                                                    | Trace-based Testing                                                                  |
+|------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| Validates outputs                                                      | Validates entire transactions                                                        |
+| Limited to input/output validation                                     | Detailed insight into each step in the transaction                                   |
+| Can miss race conditions, bottlenecks, service-to-service interactions | Identifies race conditions, bottlenecks, etc.                                        |
+| Only suited for testing isolated components and functions              | Ideal for testing full transactions in complex distributed systems and microservices |
+
+| Manual correlation of issues across components                         | Contextually links issues in a transaction                                           |
+| Cannot find issues caused by service dependencies                      | Finds and validates issues between services                                          |
+| Cannot find performance bottlenecks unless specifically tested         | Validates trace span duration and performance                                        |
+
+
 ## What is a Distributed Trace?
 
 A Distributed Trace, more commonly known as a Trace, records the paths taken by requests (made by an application or end-user) take as they propagate through multi-service architectures, like microservice and serverless applications. [Source - OpenTelemetry.io](https://opentelemetry.io/docs/concepts/observability-primer/)

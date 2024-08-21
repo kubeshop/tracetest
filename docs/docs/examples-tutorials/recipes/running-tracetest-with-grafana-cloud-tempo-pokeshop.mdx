@@ -2,7 +2,7 @@
 id: running-tracetest-with-grafana-cloud-tempo-pokeshop
 title: Pokeshop and Grafana Cloud Tempo
 description: Quick start on how to configure the Pokeshop Demo app with OpenTelemetry traces, Grafana Tempo as a trace data store, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -101,15 +101,17 @@ GRAFANA_AUTH_WRITE_HASH="<YOUR_GRAFANA_AUTH_WRITE_HASH>"
 The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-grafana-cloud-tempo-pokeshop/docker-compose.yml) in the root directory contains the Pokeshop Demo app services.
 The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-grafana-cloud-tempo-pokeshop/docker-compose.yml) also contains the Tracetest Agent and OpenTelemetry Collector.
 
+[The `collector.config.yaml` configures the OpenTelemetry Collector](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-grafana-cloud-tempo-pokeshop/collector.config.yaml). It receives traces via either `grpc` or `http`. Then, exports them to Grafana Cloud Tempo via the OTLP `exporter`.
 
-### Run Tracetest Tests
+To start all the services, run this command:
 
 ```bash
 docker compose run tracetest-run
 ```
 
 This will:
-1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Tempo.
+
+1. Start the Pokeshop Demo app, the OpenTelemetry Collector, and send the traces to Grafana Cloud Tempo.
 2. Start the Tracetest Agent.
 3. Configure the tracing backend and create tests in your environment.
 4. Run the tests.

@@ -2,7 +2,7 @@
 id: running-tracetest-with-sumologic
 title: Node.js and Sumo Logic
 description: Quick start on how to configure a Node.js app with OpenTelemetry traces, Sumo Logic as a trace data store, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -71,7 +71,7 @@ Follow along with the sections below for an in detail breakdown of what the exam
 
 The project contains [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main), and a Node.js app.
 
-The `docker-compose.yaml` file in the root directory of the quick start runs the Node.js app and the [Tracetest Agent](/concepts/agent) setup.
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-sumologic-nodejs/docker-compose.yaml) in the root directory of the quick start runs the Node.js app and the [Tracetest Agent](/concepts/agent) setup.
 
 ## Configuring the Node.js App
 
@@ -106,7 +106,7 @@ Enabling the tracer is done by preloading the trace file. As seen in the `packag
 },
 ```
 
-## Run the Node.js App and Sumo Logic OpenTelemetry Collector with Docker Compose
+## Run the Node.js App, Sumo Logic OpenTelemetry Collector, and Tracetest
 
 The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-sumologic-nodejs/docker-compose.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-sumologic-nodejs/Dockerfile) in the root directory are for the Node.js app.
 
@@ -114,18 +114,14 @@ And, the `docker-compose.yaml` contains one service for the Node.js app, one ser
 
 [The `collector.config.yaml` configures the OpenTelemetry Collector](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-sumologic-nodejs/collector.config.yaml). It receives traces via either `grpc` or `http`. Then, exports them to Sumo Logic via the Sumo Logic `extension` and an `installation_token`.
 
-To start it, run this command:
+To start all the services and run Tracetest tests, run this command:
 
 ```bash
 docker compose run tracetest-run
 ```
 
-This will start the Node.js app and Sumo Logic OpenTelemetry Collector and send the traces to Sumo Logic.
-
-## Run Tracetest Tests
-
 This will:
-1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Sumo Logic.
+1. This will start the Node.js app and Sumo Logic OpenTelemetry Collector and send the traces to Sumo Logic.
 2. Start the Tracetest Agent.
 3. Configure the tracing backend and create tests in your environment.
 4. Run the tests.

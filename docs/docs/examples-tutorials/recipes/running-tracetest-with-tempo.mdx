@@ -2,7 +2,7 @@
 id: running-tracetest-with-tempo
 title: Node.js and Grafana Tempo
 description: Quick start on how to configure a Node.js app with OpenTelemetry traces, Grafana Tempo as a trace data store, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -101,12 +101,9 @@ To start it, run this command:
 docker compose run tracetest-run
 ```
 
-This will start the Node.js app the OpenTelemetry Collector and send the traces to Grafana Tempo.
-
-## Run Tracetest Tests
-
 This will:
-1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Tempo.
+
+1. This will start the Node.js app the OpenTelemetry Collector and send the traces to Grafana Tempo.
 2. Start the Tracetest Agent.
 3. Configure the tracing backend and create tests in your environment.
 4. Run the tests.

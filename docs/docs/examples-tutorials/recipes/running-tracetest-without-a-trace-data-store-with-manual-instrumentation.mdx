@@ -2,7 +2,7 @@
 id: running-tracetest-without-a-trace-data-store-with-manual-instrumentation
 title: Node.js and OpenTelemetry Manual Instrumentation
 description: Quick start how to configure a Node.js app to use OpenTelemetry manual instrumentation with traces, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -93,9 +93,7 @@ Enabling the tracer is done by preloading the trace file. As seen in the `packag
 },
 ```
 
-## Running the Node.js App
-
-### Run Tracetest Tests
+## Running the Node.js App and Tracetest
 
 To execute the tests, run this command:
 
@@ -108,6 +106,40 @@ This will:
 2. Start the Tracetest Agent.
 3. Configure the tracing backend and create tests in your environment.
 4. Run the tests.
+
+The output of the test will look similar to this:
+
+```bash
+Configuring Tracetest
+ SUCCESS  Successfully configured Tracetest CLI
+Running Trace-Based Tests...
+✘ RunGroup: #gcMqU_jIR (https://app.tracetest.io/organizations/xxx/environments/xxx/run/gcMqU_jIR)
+ Summary: 0 passed, 1 failed, 0 pending
+  ✘ Books list with availability (https://app.tracetest.io/organizations/xxx/environments/xxx/test/phAZcrT4B/run/10/test) - trace id: 7b92f5f6633218bbaacf0b79fe9c8904
+	✔ span[tracetest.span.type="http" name="GET /books" http.target="/books" http.method="GET"]
+		✔ #b0dfd9d58a43a950
+			✔ attr:tracetest.span.duration  < 500ms (30ms)
+	✔ span[tracetest.span.type="general" name="Books List"]
+		✔ #8155143d27cbb3ab
+			✔ attr:books.list.count = 3 (3)
+	✔ span[tracetest.span.type="http" name="GET /availability/:bookId" http.method="GET"]
+		✔ #1e2fcb5cefc171b5
+			✔ attr:http.host = "availability:8080" (availability:8080)
+		✔ #3e1fc86271bf1192
+			✔ attr:http.host = "availability:8080" (availability:8080)
+		✔ #9f29960c92ca268a
+			✔ attr:http.host = "availability:8080" (availability:8080)
+	✘ span[tracetest.span.type="general" name="Availablity check"]
+		✔ #d191cefe48e65c74
+			✔ attr:isAvailable = "true" (true)
+		✔ #27989492723fd49a
+			✔ attr:isAvailable = "true" (true)
+		✘ #89e0d3b186bc7f0d
+			✘ attr:isAvailable = "true" (false) (https://app.tracetest.io/organizations/xxx/environments/xxx/test/phAZcrT4B/run/10/test?selectedAssertion=3&selectedSpan=89e0d3b186bc7f0d)
+
+	✘ Required gates
+		✘ test-specs
+```
 
 ![assertion](https://res.cloudinary.com/djwdcmwdz/image/upload/v1715607148/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_56b66bc6e1a1cbbd_test_e9CCQuLSg_run_3_selectedAssertion_0_selectedSpan_d0c03aa5d02b9975_uqhhwl.png)
 

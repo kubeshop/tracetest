@@ -2,7 +2,7 @@
 id: running-tracetest-with-grafana-cloud-tempo
 title: Node.js and Grafana Cloud Tempo
 description: Quick start on how to configure a Node.js app with OpenTelemetry traces, Grafana Tempo as a trace data store, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -50,7 +50,7 @@ This is a simple quick start on how to configure a Node.js app to use OpenTeleme
 
 The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
 
-Clone the Tracetest project and go to the Grafana Tempo Node.js Quickstart:
+Clone the Tracetest project and go to the Grafana Cloud Tempo Node.js Quickstart:
 
 ```bash
 git clone https://github.com/kubeshop/tracetest
@@ -105,22 +105,19 @@ Enabling the tracer is done by preloading the trace file. As seen in the `packag
 
 ## Run the Node.js App, OpenTelemetry Collector, and Tracetest Agent with Docker Compose
 
-The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-tempo-nodejs/docker-compose.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-tempo-nodejs/Dockerfile) in the root directory are for the Node.js app. The `docker-compose.yaml` contains one service for the Node.js app, as well as the Tracetest Agent, Tempo, and OpenTelemetry Collector.
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-grafana-cloud-tempo-nodejs/docker-compose.yaml) and [`Dockerfile`](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-grafana-cloud-tempo-nodejs/Dockerfile) in the root directory are for the Node.js app. The `docker-compose.yaml` contains one service for the Node.js app, as well as the Tracetest Agent, Tempo, and OpenTelemetry Collector.
 
-[The `collector.config.yaml` configures the OpenTelemetry Collector](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-tempo-nodejs/collector.config.yaml). It receives traces via either `grpc` or `http`. Then, exports them to Tempo via the OTLP `exporter`.
+[The `collector.config.yaml` configures the OpenTelemetry Collector](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-grafana-cloud-tempo-nodejs/collector.config.yaml). It receives traces via either `grpc` or `http`. Then, exports them to Grafana Cloud Tempo via the OTLP `exporter`.
 
-To start it, run this command:
+To start all the services, run this command:
 
 ```bash
 docker compose run tracetest-run
 ```
 
-This will start the Node.js app the OpenTelemetry Collector and send the traces to Grafana Tempo.
-
-## Run Tracetest Tests
-
 This will:
-1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Tempo.
+
+1. This will start the Node.js app the OpenTelemetry Collector and send the traces to Grafana Tempo.
 2. Start the Tracetest Agent.
 3. Configure the tracing backend and create tests in your environment.
 4. Run the tests.
