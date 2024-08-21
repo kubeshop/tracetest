@@ -2,7 +2,7 @@
 id: running-tracetest-with-honeycomb
 title: Node.js and Honeycomb
 description: Quick start how to configure the OpenTelemetry Demo to use Tracetest for enhancing your E2E and integration tests with trace-based testing with Honeycomb as a trace data store.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -93,7 +93,7 @@ Enabling the tracer is done by preloading the trace file. As seen in the `packag
 },
 ```
 
-### Run Tracetest Tests
+## Run the Node.js App and Tracetest
 
 To execute the tests, run this command:
 
@@ -106,6 +106,30 @@ This will:
 2. Start the Tracetest Agent.
 3. Configure the tracing backend and create tests in your environment.
 4. Run the tests.
+
+The output of the test will look similar to this:
+
+```bash
+Configuring Tracetest
+ SUCCESS  Successfully configured Tracetest CLI
+Running Trace-Based Tests...
+✘ RunGroup: #VnMxUljSg (https://app.tracetest.io/organizations/xxx/environments/xxx/run/VnMxUljSg)
+ Summary: 0 passed, 1 failed, 0 pending
+  ✘ Test API (https://app.tracetest.io/organizations/xxx/environments/xxx/test/W656Q0c4g/run/1/test) - trace id: 9d33bbecf956d66b3b277d12e9ca4d3c
+	✘ span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+		✘ #94880e7cd465bd33
+			✔ attr:http.status_code  =  200 (200)
+			✘ attr:tracetest.span.duration  <  500ms (1s) (https://app.tracetest.io/organizations/xxx/environments/xxx/test/W656Q0c4g/run/1/test?selectedAssertion=0&selectedSpan=94880e7cd465bd33)
+
+	✘ Required gates
+		✘ test-specs
+```
+
+## View Trace Spans Over Time in Honeycomb
+
+To access a historical overview of all the trace spans the Node.js app generates, jump over to your Honeycomb account. With Honeycomb and Tracetest, you get the best of both worlds. You can run trace-based tests and automate running E2E and integration tests against real trace data. And, use Honeycomb to get a historical overview of all traces your distributed application generates.
+
+![honeycomb](https://res.cloudinary.com/djwdcmwdz/image/upload/v1683813827/Blogposts/tracetest-honeycomb/screely-1683813821587_jxe64c.png)
 
 ## Learn More
 

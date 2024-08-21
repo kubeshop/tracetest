@@ -2,7 +2,7 @@
 id: running-tracetest-with-aws-x-ray-adot
 title: Node.js with AWS X-Ray (Node.js SDK) and AWS Distro for OpenTelemetry
 description: Quick start on how to configure a Node.js app with OpenTelemetry traces, AWS X-Ray as a trace data store, including AWS Distro for OpenTelemetry, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -101,9 +101,7 @@ The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main
 
 The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-amazon-x-ray-adot/docker-compose.yaml) also contains the Tracetest Agent and ADOT.
 
-### Run Tracetest Tests
-
-To execute the tests, run this command:
+To run everything including Tracetest tests, run this command:
 
 ```bash
 docker compose run tracetest-run

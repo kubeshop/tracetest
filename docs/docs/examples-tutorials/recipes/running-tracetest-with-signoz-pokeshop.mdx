@@ -2,7 +2,7 @@
 id: running-tracetest-with-signoz-pokeshop
 title: Pokeshop API and SigNoz
 description: Quick start how to configure the Pokeshop API Demo to use Tracetest for enhancing your E2E and integration tests with trace-based testing with SigNoz as a trace data store.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -83,24 +83,7 @@ TRACETEST_TOKEN="<YOUR_TRACETEST_TOKEN>"
 TRACETEST_ENVIRONMENT_ID="<YOUR_ENV_ID>"
 ```
 
-## Configuring SigNoz
-
-Configure [SigNoz as a Tracing Backend](/configuration/connecting-to-data-stores/signoz) in Tracetest.
-
-```yaml title="tracetest-tracing-backend.yaml"
----
-type: DataStore
-spec:
-  name: Signoz
-  type: signoz
-```
-
-```bash
-tracetest config -t <YOUR_API_TOKEN>
-tracetest apply datastore -f ./tracetest/tracetest-tracing-backend.yaml
-```
-
-### Run Tracetest Tests
+## Run Pokeshop, SigNoz, and Tracetest
 
 To execute the tests, run this command:
 
@@ -111,8 +94,29 @@ docker compose run tracetest-run
 This will:
 1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Signoz.
 2. Start the Tracetest Agent.
-3. Configure the tracing backend and create tests in your environment.
+3. Configure the SigNoz tracing backend and create tests in your environment.
 4. Run the tests.
+
+The output of the test will look similar to this:
+
+```bash
+Configuring Tracetest
+ SUCCESS  Successfully configured Tracetest CLI
+Running Trace-Based Tests...
+✔ RunGroup: #RLG4_lCSR (https://app.tracetest.io/organizations/ttorg_e66318ba6544b856/environments/ttenv_4b0e8945dbe5045a/run/RLG4_lCSR)
+ Summary: 1 passed, 0 failed, 0 pending
+  ✔ Pokeshop - Import (https://app.tracetest.io/organizations/ttorg_e66318ba6544b856/environments/ttenv_4b0e8945dbe5045a/test/ZVJwkpC4g/run/1/test) - trace id: 538981f2be22430a3ec260772ed00c83
+	✔ All HTTP Spans: Status  code is 200
+	✔ Validate that this span always exists after the message queue
+	✔ Validate that Redis is using Charizard.
+	✔ Validate that the Postgres has Charizard.
+```
+
+## View Trace Spans Over Time in SigNoz
+
+To access a historical overview of all the trace spans the Pokeshop Demo app generates, jump over to SigNoz. With SigNoz and Tracetest, you get the best of both worlds. You can run trace-based tests and automate running E2E and integration tests against real trace data. And, use SigNoz to get a historical overview of all traces your distributed application generates.
+
+![honeycomb](https://res.cloudinary.com/djwdcmwdz/image/upload/v1697715807/Blogposts/signoz-integration/new/image_53_ms9rcw.webp)
 
 ## Learn More
 

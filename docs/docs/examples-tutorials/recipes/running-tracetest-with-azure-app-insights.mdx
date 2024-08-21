@@ -2,7 +2,7 @@
 id: running-tracetest-with-azure-app-insights
 title: Node.js and Azure Application Insights (Node.js SDK)
 description: Quick start on how to configure a Node.js app with OpenTelemetry traces, Azure Application Insights as a trace data store, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -74,7 +74,7 @@ Follow along with the sections below for an in detail breakdown of what the exam
 
 The project contains [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), and a Node.js app.
 
-The `docker-compose.yaml` file in the root directory of the quick start runs the Node.js app, Elasticsearch, Elastic APM server, OpenTelemetry Collector, and the [Tracetest Agent](/concepts/agent) setup.
+The `docker-compose.yaml` file in the root directory of the quick start runs the Node.js app, and the [Tracetest Agent](/concepts/agent) setup.
 
 ## Configuring the Node.js App
 
@@ -106,7 +106,21 @@ Enabling the tracer is done by preloading the trace file. As seen in the `packag
 },
 ```
 
-## Running the Tests
+## Running the Node.js App and Tracetest
+
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/tracetest-azure-app-insights/docker-compose.yaml) in the root directory contains the Node.js app and Tracetest Agent.
+
+To run everything including Tracetest tests, run this command:
+
+```bash
+docker compose run tracetest-run
+```
+
+This will:
+1. Start the Node.js app and send the traces to Azure App Insights.
+2. Start the Tracetest Agent.
+3. Configure the Azure App Insights tracing backend and create tests in your environment.
+4. Run the tests.
 
 ### The Test File
 
@@ -134,18 +148,6 @@ spec:
         - attr:http.response.status_code  =  200
         - attr:tracetest.span.duration  <  500ms
 ```
-
-To run the test, run this command in the terminal:
-
-```bash
-docker compose run tracetest-run
-```
-
-This will:
-1. Start the Node.js app and send the traces to Azure App Insights.
-2. Start the Tracetest Agent.
-3. Configure the tracing backend and create tests in your environment.
-4. Run the tests.
 
 ## Learn More
 

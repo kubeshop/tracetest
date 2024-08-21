@@ -25,7 +25,7 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 
 [OpenSearch](https://opensearch.org/) is a scalable, flexible, and extensible open-source software suite for search, analytics, and observability applications licensed under Apache 2.0. OpenSearch started in 2021 as a fork of Elasticsearch and Kibana, with development led by AWS.
 
-## Sample Node.js App with OpenSearch, OpenTelemetry and Tracetest
+## Node.js App with OpenSearch, OpenTelemetry and Tracetest
 
 This is a simple quick start on how to configure a Node.js app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your E2E and integration tests with trace-based testing. The infrastructure will use OpenSearch as the trace data store and OpenTelemetry Collector to receive traces from the Node.js app and send them to OpenSearch.
 
@@ -38,127 +38,76 @@ This is a simple quick start on how to configure a Node.js app to use OpenTeleme
 
 **Docker**: Have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
 
-## Project Structure
+## Run This Quckstart Example
 
-The project is built with Docker Compose. It contains two distinct `docker-compose.yaml` files.
+The example below is provided as part of the Tracetest project. You can download and run the example by following these steps:
 
-### 1. Node.js App
-
-The `docker-compose.yaml` file and `Dockerfile` in the root directory are for the Node.js app.
-
-### Docker Compose Network
-
-All `services` in the `docker-compose.yaml` are on the same network and will be reachable by hostname from within other services. E.g. `data-prepper:21890` in the `collector.config.yaml` will map to the `data-prepper` service, where the port `21890` is the port where the Data Prepper accepts traces. And, `http://opensearch:9200` in the `tracetest-provision.yaml` will map to the `opensearch` service and port `9200` where Tracetest will fetch trace data from OpenSearch.
-
-## Node.js App
-
-The Node.js app is a simple Express app, contained in the `app.js` file.
-
-The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files, respectively.
-Traces will be sent to the OpenTelemetry Collector.
-
-Here's the content of the `tracing.otel.grpc.js` file:
-
-```js
-const opentelemetry = require('@opentelemetry/sdk-node')
-const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node')
-const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-grpc');
-
-const sdk = new opentelemetry.NodeSDK({
-  traceExporter: new OTLPTraceExporter({ url: 'http://otel-collector:4317' }),
-  instrumentations: [getNodeAutoInstrumentations()],
-})
-sdk.start()
-```
-
-Depending on which of these you choose, traces will be sent to either the `grpc` or `http` endpoint.
-
-The hostnames and ports for these are:
-
-- GRPC: `http://otel-collector:4317`
-- HTTP: `http://otel-collector:4318/v1/traces`
-
-Enabling the tracer is done by preloading the trace file.
+Clone the Tracetest project and go to the OpenSearch Node.js Quickstart:
 
 ```bash
-node -r ./tracing.otel.grpc.js app.js
+git clone https://github.com/kubeshop/tracetest
+cd tracetest/examples/quick-start-opensearch-nodejs
 ```
 
-In the `package.json` you will see two npm scripts for running the respective tracers alongside the `app.js`.
+Follow these instructions to run the quick start:
+
+1. Copy the `.env.template` file to `.env`.
+2. Fill out the [TRACETEST_TOKEN and ENVIRONMENT_ID](https://app.tracetest.io/retrieve-token) details by editing your `.env` file.
+3. Run `docker compose run tracetest-run`.
+4. Follow the links in the output to view the test results.
+
+Follow along with the sections below for an in detail breakdown of what the example you just ran did and how it works.
+
+## Project Structure
+
+The project contains [Tracetest Agent](/getting-started/installation#install-the-tracetest-agent), [OpenSearch](https://github.com/opensearch-project/OpenSearch), [Data Prepper](https://github.com/opensearch-project/data-prepper), [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector-contrib), and a Node.js app.
+
+The `docker-compose.yaml` file in the root directory of the quick start runs the Node.js app, OpenSearch, Data Prepper, OpenTelemetry Collector, and the [Tracetest Agent](/concepts/agent).
+
+## Configuring the Node.js App
+
+The Node.js app is a simple Express app, contained in [the `app.js` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-opensearch-nodejs/app.js).
+
+Configure the `.env` like shown below.
+
+```bash
+# Get the required information here: https://app.tracetest.io/retrieve-token
+
+TRACETEST_TOKEN="<YOUR_TRACETEST_TOKEN>"
+TRACETEST_ENVIRONMENT_ID="<YOUR_ENV_ID>"
+```
+
+The OpenTelemetry tracing is contained in the `tracing.otel.grpc.js` or `tracing.otel.http.js` files. Traces will be sent to OpenTelemetry Collector and forwarded from there to Elastic.
+
+Choosing [the `tracing.otel.grpc.js` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-opensearch-nodejs/tracing.otel.grpc.js) will send traces to OpenTelemetry Collector's `GRPC` endpoint.
+
+Enabling the tracer is done by preloading the trace file. As seen in the `package.json`.
 
 ```json
 "scripts": {
-  "with-grpc-tracer":"node -r ./tracing.otel.grpc.js app.js",
-  "with-http-tracer":"node -r ./tracing.otel.http.js app.js"
+  "app-with-grpc-tracer": "node -r ./tracing.otel.grpc.js app.js",
 },
-```
-
-To start the server, run this command:
-
-```bash
-npm run with-grpc-tracer
-# or
-npm run with-http-tracer
-```
-
-As you can see the `Dockerfile` uses the command above.
-
-```Dockerfile
-FROM node:slim
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 8080
-CMD [ "npm", "run", "with-grpc-tracer" ]
-```
-
-And, the `docker-compose.yaml` contains just one service for the Node.js app.
-
-```yaml
-version: '3'
-services:
-  app:
-    image: quick-start-nodejs
-    build: .
-    ports:
-      - "8080:8080"
 ```
 
 How do traces reach OpenSearch?
 
-The `collector.config.yaml` explains that. It receives traces via either `grpc` or `http`. Then it exports them to the Data Prepper that will parse the trace data and send it to OpenSearch. Data Prepper uses the endpoint `data-prepper:21890`.
+The [`collector.config.yaml`](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-opensearch-nodejs/collector.config.yaml) explains that. It receives traces via either `grpc` or `http`. Then it exports them to the Data Prepper that will parse the trace data and send it to OpenSearch. Data Prepper uses the endpoint `data-prepper:21890`.
 
-```yaml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
+## Run the Node.js App, OpenSearch, Data Prepper, and OpenTelemetry Collector and Tracetest
 
-processors:
-  batch:
-    timeout: 100ms
+The [`docker-compose.yaml` file](https://github.com/kubeshop/tracetest/blob/main/examples/quick-start-opensearch-nodejs/docker-compose.yaml) also contains the Tracetest Agent, OpenTelemetry Collector, OpenSearch, and Data Prepper.
 
-exporters:
-  logging:
-    loglevel: debug
-  otlp/2:
-    endpoint: data-prepper:21890
-    tls:
-      insecure: true
-      insecure_skip_verify: true
+To run everything including Tracetest tests, run this command:
 
-service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp/2]
-
+```bash
+docker compose run tracetest-run
 ```
 
-## Running the Tests
+This will:
+1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to OpenSearch.
+2. Start the Tracetest Agent.
+3. Configure the OpenSearch tracing backend and create tests in your environment.
+4. Run the tests.
 
 ### The Test File
 
@@ -186,18 +135,6 @@ spec:
         - attr:http.status_code  =  200
         - attr:tracetest.span.duration  <  500ms
 ```
-
-To run the test, run this command in the terminal:
-
-```bash
-docker compose run tracetest-run
-```
-
-This will:
-1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to Signoz.
-2. Start the Tracetest Agent.
-3. Configure the tracing backend and create tests in your environment.
-4. Run the tests.
 
 ## Learn More
 

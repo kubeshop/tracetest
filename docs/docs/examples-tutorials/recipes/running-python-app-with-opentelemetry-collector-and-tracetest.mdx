@@ -2,7 +2,7 @@
 id: running-python-app-with-opentelemetry-collector-and-tracetest
 title: Python with OpenTelemetry manual instrumention
 description: Quick start how to configure a Python app to use OpenTelemetry instrumentation with traces, and Tracetest for enhancing your e2e and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -124,14 +124,6 @@ trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 ```
 
-## Running the Python App
-
-To start the full setup, run the following command:
-
-```bash
-docker compose up -d
-```
-
 There are 3 endpoints in the Flask app. To see manual instrumentation, trigger the `"/manual"` endpoint. To see the automatic instrumentation, trigger the `"/automatic"` endpoint respectively.
 
 ```python
@@ -154,7 +146,7 @@ def home():
     return "App works."
 ```
 
-## Run Tracetest Tests
+## Running the Python App and Tracetest
 
 To execute the tests, run this command:
 
@@ -163,12 +155,24 @@ docker compose run tracetest-run
 ```
 
 This will:
-1. Start the Node.js app, the OpenTelemetry Collector, and send the traces to the Tracetest Agent.
+1. Start the Python app, the OpenTelemetry Collector, and send the traces to the Tracetest Agent.
 2. Start the Tracetest Agent.
 3. Configure the tracing backend and create tests in your environment.
 4. Run the tests.
 
-Here's a sample of a failed test run, which happens if you use this selector and assertion pair.
+The output of the test will look similar to this:
+
+```bash
+Configuring Tracetest
+ SUCCESS  Successfully configured Tracetest CLI
+Running Trace-Based Tests...
+✔ RunGroup: #E1qhw_jIg (https://app.tracetest.io/organizations/xxx/environments/xxx/run/E1qhw_jIg)
+ Summary: 1 passed, 0 failed, 0 pending
+  ✔ Python API (https://app.tracetest.io/organizations/xxx/environments/xxx/test/W656Q0c4g/run/2/test) - trace id: c0eaebfe3ab66360a98d5cd443760a3c
+	✔ It should return status 200.
+```
+
+Here's what that looks like in the WebUI.
 
 Selector:
 

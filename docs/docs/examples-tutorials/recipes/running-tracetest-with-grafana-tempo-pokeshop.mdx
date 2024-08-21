@@ -2,7 +2,7 @@
 id: running-tracetest-with-grafana-tempo-pokeshop
 title: Pokeshop and Grafana Tempo
 description: Quick start on how to configure the Pokeshop Demo app with OpenTelemetry traces, Grafana Tempo as a trace data store, and Tracetest for enhancing your E2E and integration tests with trace-based testing.
-hide_table_of_contents: true
+hide_table_of_contents: false
 keywords:
   - tracetest
   - trace-based testing
@@ -415,7 +415,7 @@ services:
 
 ## Run the Pokeshop API, Grafana and Tracetest
 
-To start all the services, run this command:
+To start all the services, and run the Tracetest tests, run this command:
 
 ```bash
 docker compose run tracetest-run
