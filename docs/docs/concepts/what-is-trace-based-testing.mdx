@@ -24,7 +24,8 @@ Trace-based testing validates entire application flows and transactions. It ensu
 | Validates outputs                                                      | Validates entire transactions                                                        |
 | Limited to input/output validation                                     | Detailed insight into each step in the transaction                                   |
 | Can miss race conditions, bottlenecks, service-to-service interactions | Identifies race conditions, bottlenecks, etc.                                        |
-| Only sutied for testing isolated components and functions              | Ideal for testing full transactions in complex distributed systems and microservices |
+| Only suited for testing isolated components and functions              | Ideal for testing full transactions in complex distributed systems and microservices |
+
 | Manual correlation of issues across components                         | Contextually links issues in a transaction                                           |
 | Cannot find issues caused by service dependencies                      | Finds and validates issues between services                                          |
 | Cannot find performance bottlenecks unless specifically tested         | Validates trace span duration and performance                                        |
