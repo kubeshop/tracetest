@@ -189,9 +189,9 @@ test.beforeAll(async () => {
 Then, during the `beforeEach` hook, the script **captures** the document to inject the `traceparent` to the meta tag.
 
 ```typescript
-test.beforeEach(async ({ page }, { title }) => {
+test.beforeEach(async ({ page }, info) => {
   await page.goto("/");
-  await tracetest?.capture(title, page);
+  await tracetest?.capture(page, info);
 });
 ```
 
@@ -209,21 +209,22 @@ The rest of the test script is the Playwright test definitions for the test case
 ```typescript
 import { test, expect } from "@playwright/test";
 import Tracetest, { Types } from "@tracetest/playwright";
-const { TRACETEST_API_TOKEN = "" } = process.env;
+
+const { TRACETEST_API_TOKEN = "", TRACETEST_SERVER_URL = "https://app.tracetest.io" } = process.env;
 
 let tracetest: Types.TracetestPlaywright | undefined = undefined;
 
 test.describe.configure({ mode: "serial" });
 
 const definition = `
-  type: Test
-  spec:
-    id: UGxheXdyaWdodDogaW1wb3J0cyBhIHBva2Vtb24=
-    name: "Playwright: imports a pokemon"
-    trigger:
-      type: playwright
-    specs:
-    - selector: span[tracetest.span.type="http"] span[tracetest.span.type="http"]
+type: Test
+spec:
+  id: UGxheXdyaWdodDogaW1wb3J0cyBhIHBva2Vtb24=
+  name: "Playwright: imports a pokemon"
+  trigger:
+    type: playwright
+  specs:
+    - selector: span[tracetest.span.type="http"]
       name: "All HTTP Spans: Status  code is 200"
       assertions:
       - attr:http.status_code   =   200
@@ -231,29 +232,30 @@ const definition = `
       name: "All Database Spans: Processing time is less than 100ms"
       assertions:
       - attr:tracetest.span.duration < 2s
-    outputs:
+  outputs:
     - name: MY_OUTPUT
       selector: span[tracetest.span.type="general" name="Tracetest trigger"]
       value: attr:name
-    `;
+`;
 
 test.beforeAll(async () => {
-  tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN });
-  tracetest.setOptions({
+  tracetest = await Tracetest({ apiToken: TRACETEST_API_TOKEN, serverUrl: TRACETEST_SERVER_URL, serverPath: "" });
+
+  await tracetest.setOptions({
     "Playwright: imports a pokemon": {
       definition,
     },
   });
 });
 
-test.beforeEach(async ({ page }, { title }) => {
+test.beforeEach(async ({ page }, info) => {
   await page.goto("/");
-  await tracetest?.capture(title, page);
+  await tracetest?.capture(page, info);
 });
 
 // optional step to break the playwright script in case a Tracetest test fails
 test.afterAll(async ({}, testInfo) => {
-  testInfo.setTimeout(60000);
+  testInfo.setTimeout(80000);
   await tracetest?.summary();
 });
 
@@ -275,8 +277,12 @@ test("Playwright: imports a pokemon", async ({ page }) => {
 
   await page.click("text=Import");
 
-  await page.getByLabel("ID").fill(Math.floor(Math.random() * 101).toString());
-  await page.getByRole("button", { name: "OK", exact: true }).click();
+  await page.getByLabel("ID").fill("143");
+
+  await Promise.all([
+    page.waitForResponse((resp) => resp.url().includes("/pokemon/import") && resp.status() === 200),
+    page.getByRole("button", { name: "OK", exact: true }).click(),
+  ]);
 });
 
 test("Playwright: deletes a pokemon", async ({ page }) => {
