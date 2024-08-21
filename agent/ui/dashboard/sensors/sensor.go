@@ -68,7 +68,7 @@ func (r *sensor) On(eventName string, cb func(Event)) {
 
 func (r *sensor) Emit(eventName string, event interface{}) {
 	r.mutex.Lock()
-	r.mutex.Unlock()
+	defer r.mutex.Unlock()
 
 	listeners := r.listeners[eventName]
 	e := Event{
