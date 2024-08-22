@@ -1,13 +1,11 @@
-version: '3'
-
 services:
-  your-api:
-    build: ./your-api
+  gateway-api:
+    build: ./gateway-api
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - YOUR_API_PORT=10013
-      - OTEL_SERVICE_NAME=your-api
+      - API_PORT=10013
+      - OTEL_SERVICE_NAME=gateway-api
       - OTEL_EXPORTER_GRPC_URL=http://otel-collector:4317
       - WALLET_API_ENDPOINT=http://wallet:10010/wallet
       - PAYMENT_EXECUTOR_API_ENDPOINT=http://payment-executor:10012/payment/execute
@@ -77,7 +75,7 @@ services:
         condition: service_healthy
       otel-collector:
         condition: service_started
-      your-api:
+      gateway-api:
         condition: service_started
     healthcheck:
       test: ["CMD", "wget", "--spider", "localhost:11633"]
