@@ -72,11 +72,11 @@ curl --location 'http://localhost:10013/executePaymentOrder' \
 There are two tests that you can do to check how these APIs are working, one is the `test-with-error`, that calls `your-api` passing the `yearsAsACustomer` field as zero, causing a error propagation into the API calls:
 
 ```sh
-tracetest run test -f ./tracetest/tests/test-with-error.yaml
+tracetest run test -f ./tracetest/tests/test-with-error.yaml --server-url=http://localhost:11633
 ```
 
 The second one is `test-with-success`, with the field `yearsAsACustomer` greater than 0, causing the services to behave normally:
 
 ```sh
-tracetest run test -f ./tracetest/tests/test-with-success.yaml
+tracetest run test -f ./tracetest/tests/test-with-success.yaml --server-url=http://localhost:11633
 ```
