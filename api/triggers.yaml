@@ -17,6 +17,7 @@ components:
               "artillery",
               "k6",
               "playwrightengine",
+              "graphql",
             ]
         httpRequest:
           $ref: "./http.yaml#/components/schemas/HTTPRequest"
@@ -27,7 +28,9 @@ components:
         kafka:
           $ref: "./kafka.yaml#/components/schemas/KafkaRequest"
         playwrightEngine:
-          $ref: "./playwrightengine.yaml#/components/schemas/PlaywrightEngineRequest"
+          $ref: "./playwrightEngine.yaml#/components/schemas/PlaywrightEngineRequest"
+        graphql:
+          $ref: "./graphql.yaml#/components/schemas/GraphqlRequest"
 
     TriggerResult:
       type: object
@@ -44,6 +47,8 @@ components:
               "playwright",
               "artillery",
               "k6",
+              "playwrightengine",
+              "graphql",
             ]
         triggerResult:
           type: object
@@ -57,7 +62,9 @@ components:
             kafka:
               $ref: "./kafka.yaml#/components/schemas/KafkaResponse"
             playwrightEngine:
-              $ref: "./playwrightengine.yaml#/components/schemas/PlaywrightEngineResponse"
+              $ref: "./playwrightEngine.yaml#/components/schemas/PlaywrightEngineResponse"
+            graphql:
+              $ref: "./graphql.yaml#/components/schemas/GraphqlResponse"
             error:
               $ref: "#/components/schemas/TriggerError"
 

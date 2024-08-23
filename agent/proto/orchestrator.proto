@@ -114,6 +114,7 @@ message Trigger {
     TraceIDRequest traceID = 4;
     KafkaRequest kafka = 5;
     PlaywrightEngineRequest playwrightEngine = 6;
+    GraphqlRequest graphql = 7;
 }
 
 message HttpRequest {
@@ -123,6 +124,15 @@ message HttpRequest {
     repeated HttpHeader headers = 4;
     HttpAuthentication authentication = 5;
     bool SSLVerification = 6;
+}
+
+message GraphqlRequest {
+    string url = 1;
+    string body = 2;
+    repeated HttpHeader headers = 3;
+    HttpAuthentication authentication = 4;
+    bool SSLVerification = 5;
+    string schema = 6;
 }
 
 message HttpHeader {
@@ -188,6 +198,7 @@ message TriggerResult {
     KafkaResponse kafka = 5;
     Error error = 6;
     PlaywrightEngineResponse playwrightEngine = 7;
+    HttpResponse graphql = 8;
 }
 
 message HttpResponse {
