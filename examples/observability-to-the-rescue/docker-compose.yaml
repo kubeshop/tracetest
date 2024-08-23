@@ -57,6 +57,10 @@ services:
     depends_on:
       - otel-collector
 
+  #################################################################################################
+  # Trace-driven tests stack
+  #################################################################################################
+
   tracetest:
     image: kubeshop/tracetest:latest
     platform: linux/amd64
@@ -96,15 +100,20 @@ services:
       timeout: 5s
       retries: 60
 
+  #################################################################################################
+  # Observability stack
+  #################################################################################################
+
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
+    image: otel/opentelemetry-collector-contrib:0.107.0
     command:
       - "--config"
       - "/otel-local-config.yaml"
     volumes:
-      - ./tracetest/collector.config.yaml:/otel-local-config.yaml
+      - ./observability/otelcollector.config.yaml:/otel-local-config.yaml
     depends_on:
       - jaeger
+      - prometheus
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -118,3 +127,33 @@ services:
       interval: 1s
       timeout: 3s
       retries: 60
+
+  prometheus:
+    image: prom/prometheus:v2.49.1
+    command:
+      - --config.file=/etc/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+    volumes:
+      - type: bind
+        source: ./observability/prometheus.config.yaml
+        target: /etc/prometheus.yaml
+
+  grafana:
+    image: grafana/grafana:11.1.4
+    user: "472"
+    depends_on:
+      - prometheus
+      - jaeger
+      - otel-collector
+    ports:
+      - 33000:33000
+    environment:
+      - GF_SERVER_HTTP_PORT=33000
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - type: bind
+        source: ./observability/grafana.datasource.yaml
+        target: /etc/grafana/provisioning/datasources/datasources.yaml
