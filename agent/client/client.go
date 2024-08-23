@@ -50,12 +50,13 @@ type Client struct {
 	logger *zap.Logger
 	tracer trace.Tracer
 
-	stopListener                func(context.Context, *proto.StopRequest) error
-	triggerListener             func(context.Context, *proto.TriggerRequest) error
-	pollListener                func(context.Context, *proto.PollingRequest) error
-	shutdownListener            func(context.Context, *proto.ShutdownRequest) error
-	dataStoreConnectionListener func(context.Context, *proto.DataStoreConnectionTestRequest) error
-	otlpConnectionTestListener  func(context.Context, *proto.OTLPConnectionTestRequest) error
+	stopListener                 func(context.Context, *proto.StopRequest) error
+	triggerListener              func(context.Context, *proto.TriggerRequest) error
+	pollListener                 func(context.Context, *proto.PollingRequest) error
+	graphqlIntrospectionListener func(context.Context, *proto.GraphqlIntrospectRequest) error
+	shutdownListener             func(context.Context, *proto.ShutdownRequest) error
+	dataStoreConnectionListener  func(context.Context, *proto.DataStoreConnectionTestRequest) error
+	otlpConnectionTestListener   func(context.Context, *proto.OTLPConnectionTestRequest) error
 }
 
 func (c *Client) Start(ctx context.Context) error {
@@ -104,6 +105,12 @@ func (c *Client) Start(ctx context.Context) error {
 	err = c.startDataStoreConnectionTestListener(ctx)
 	if err != nil {
 		c.logger.Error("Failed to start data store connection test listener", zap.Error(err))
+		return err
+	}
+
+	err = c.startGraphqlIntrospectionListener(ctx)
+	if err != nil {
+		c.logger.Error("Failed to start graphql introspection listener", zap.Error(err))
 		return err
 	}
 
@@ -156,6 +163,10 @@ func (c *Client) OnDataStoreTestConnectionRequest(listener func(context.Context,
 
 func (c *Client) OnPollingRequest(listener func(context.Context, *proto.PollingRequest) error) {
 	c.pollListener = listener
+}
+
+func (c *Client) OnGraphqlIntrospectionRequest(listener func(context.Context, *proto.GraphqlIntrospectRequest) error) {
+	c.graphqlIntrospectionListener = listener
 }
 
 func (c *Client) OnOTLPConnectionTest(listener func(context.Context, *proto.OTLPConnectionTestRequest) error) {

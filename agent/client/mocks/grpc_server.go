@@ -15,17 +15,19 @@ import (
 
 type GrpcServerMock struct {
 	proto.UnimplementedOrchestratorServer
-	port                      int
-	triggerChannel            chan Message[*proto.TriggerRequest]
-	pollingChannel            chan Message[*proto.PollingRequest]
-	otlpConnectionTestChannel chan Message[*proto.OTLPConnectionTestRequest]
-	terminationChannel        chan Message[*proto.ShutdownRequest]
-	dataStoreTestChannel      chan Message[*proto.DataStoreConnectionTestRequest]
+	port                        int
+	triggerChannel              chan Message[*proto.TriggerRequest]
+	pollingChannel              chan Message[*proto.PollingRequest]
+	otlpConnectionTestChannel   chan Message[*proto.OTLPConnectionTestRequest]
+	terminationChannel          chan Message[*proto.ShutdownRequest]
+	dataStoreTestChannel        chan Message[*proto.DataStoreConnectionTestRequest]
+	graphqlIntrospectionChannel chan Message[*proto.GraphqlIntrospectRequest]
 
-	lastTriggerResponse             Message[*proto.TriggerResponse]
-	lastPollingResponse             Message[*proto.PollingResponse]
-	lastOtlpConnectionResponse      Message[*proto.OTLPConnectionTestResponse]
-	lastDataStoreConnectionResponse Message[*proto.DataStoreConnectionTestResponse]
+	lastTriggerResponse              Message[*proto.TriggerResponse]
+	lastPollingResponse              Message[*proto.PollingResponse]
+	lastOtlpConnectionResponse       Message[*proto.OTLPConnectionTestResponse]
+	lastDataStoreConnectionResponse  Message[*proto.DataStoreConnectionTestResponse]
+	lastGraphqlIntrospectionResponse Message[*proto.GraphqlIntrospectResponse]
 
 	server *grpc.Server
 }
@@ -37,11 +39,12 @@ type Message[T any] struct {
 
 func NewGrpcServer() *GrpcServerMock {
 	server := &GrpcServerMock{
-		triggerChannel:            make(chan Message[*proto.TriggerRequest]),
-		pollingChannel:            make(chan Message[*proto.PollingRequest]),
-		terminationChannel:        make(chan Message[*proto.ShutdownRequest]),
-		dataStoreTestChannel:      make(chan Message[*proto.DataStoreConnectionTestRequest]),
-		otlpConnectionTestChannel: make(chan Message[*proto.OTLPConnectionTestRequest]),
+		triggerChannel:              make(chan Message[*proto.TriggerRequest]),
+		pollingChannel:              make(chan Message[*proto.PollingRequest]),
+		terminationChannel:          make(chan Message[*proto.ShutdownRequest]),
+		dataStoreTestChannel:        make(chan Message[*proto.DataStoreConnectionTestRequest]),
+		otlpConnectionTestChannel:   make(chan Message[*proto.OTLPConnectionTestRequest]),
+		graphqlIntrospectionChannel: make(chan Message[*proto.GraphqlIntrospectRequest]),
 	}
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -159,6 +162,21 @@ func (s *GrpcServerMock) RegisterDataStoreConnectionTestAgent(id *proto.AgentIde
 	}
 }
 
+func (s *GrpcServerMock) RegisterGraphqlIntrospectListener(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterGraphqlIntrospectListenerServer) error {
+	if id.Token != "token" {
+		return fmt.Errorf("could not validate token")
+	}
+
+	for {
+		graphqlRequest := <-s.graphqlIntrospectionChannel
+
+		err := stream.Send(graphqlRequest.Data)
+		if err != nil {
+			log.Println("could not send polling request to agent: %w", err)
+		}
+	}
+}
+
 func (s *GrpcServerMock) RegisterOTLPConnectionTestListener(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterOTLPConnectionTestListenerServer) error {
 	if id.Token != "token" {
 		return fmt.Errorf("could not validate token")
@@ -201,6 +219,15 @@ func (s *GrpcServerMock) SendPolledSpans(ctx context.Context, result *proto.Poll
 	return &proto.Empty{}, nil
 }
 
+func (s *GrpcServerMock) SendGraphqlIntrospectResult(ctx context.Context, result *proto.GraphqlIntrospectResponse) (*proto.Empty, error) {
+	if result.AgentIdentification == nil || result.AgentIdentification.Token != "token" {
+		return nil, fmt.Errorf("could not validate token")
+	}
+
+	s.lastGraphqlIntrospectionResponse = Message[*proto.GraphqlIntrospectResponse]{Data: result, Context: ctx}
+	return &proto.Empty{}, nil
+}
+
 func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.AgentIdentification, stream proto.Orchestrator_RegisterShutdownListenerServer) error {
 	for {
 		shutdownRequest := <-s.terminationChannel
@@ -226,6 +253,10 @@ func (s *GrpcServerMock) SendDataStoreConnectionTestRequest(ctx context.Context,
 	s.dataStoreTestChannel <- Message[*proto.DataStoreConnectionTestRequest]{Context: ctx, Data: request}
 }
 
+func (s *GrpcServerMock) SendGraphqlIntrospectionRequest(ctx context.Context, request *proto.GraphqlIntrospectRequest) {
+	s.graphqlIntrospectionChannel <- Message[*proto.GraphqlIntrospectRequest]{Context: ctx, Data: request}
+}
+
 func (s *GrpcServerMock) SendOTLPConnectionTestRequest(ctx context.Context, request *proto.OTLPConnectionTestRequest) {
 	s.otlpConnectionTestChannel <- Message[*proto.OTLPConnectionTestRequest]{Context: ctx, Data: request}
 }
@@ -244,6 +275,10 @@ func (s *GrpcServerMock) GetLastOTLPConnectionResponse() Message[*proto.OTLPConn
 
 func (s *GrpcServerMock) GetLastDataStoreConnectionResponse() Message[*proto.DataStoreConnectionTestResponse] {
 	return s.lastDataStoreConnectionResponse
+}
+
+func (s *GrpcServerMock) GetLastGraphqlIntrospectionResponse() Message[*proto.GraphqlIntrospectResponse] {
+	return s.lastGraphqlIntrospectionResponse
 }
 
 func (s *GrpcServerMock) TerminateConnection(ctx context.Context, reason string) {

@@ -48,6 +48,10 @@ type OrchestratorClient interface {
 	RegisterDataStoreConnectionTestAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterDataStoreConnectionTestAgentClient, error)
 	// Sends datastore connection test result back to the server
 	SendDataStoreConnectionTestResult(ctx context.Context, in *DataStoreConnectionTestResponse, opts ...grpc.CallOption) (*Empty, error)
+	// Register an agent to listen for graphql introspect commands
+	RegisterGraphqlIntrospectListener(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterGraphqlIntrospectListenerClient, error)
+	// Send the graphql introspect response schema
+	SendGraphqlIntrospectResult(ctx context.Context, in *GraphqlIntrospectResponse, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type orchestratorClient struct {
@@ -304,6 +308,47 @@ func (c *orchestratorClient) SendDataStoreConnectionTestResult(ctx context.Conte
 	return out, nil
 }
 
+func (c *orchestratorClient) RegisterGraphqlIntrospectListener(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterGraphqlIntrospectListenerClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[6], "/proto.Orchestrator/RegisterGraphqlIntrospectListener", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &orchestratorRegisterGraphqlIntrospectListenerClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Orchestrator_RegisterGraphqlIntrospectListenerClient interface {
+	Recv() (*GraphqlIntrospectRequest, error)
+	grpc.ClientStream
+}
+
+type orchestratorRegisterGraphqlIntrospectListenerClient struct {
+	grpc.ClientStream
+}
+
+func (x *orchestratorRegisterGraphqlIntrospectListenerClient) Recv() (*GraphqlIntrospectRequest, error) {
+	m := new(GraphqlIntrospectRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *orchestratorClient) SendGraphqlIntrospectResult(ctx context.Context, in *GraphqlIntrospectResponse, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/proto.Orchestrator/SendGraphqlIntrospectResult", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrchestratorServer is the server API for Orchestrator service.
 // All implementations must embed UnimplementedOrchestratorServer
 // for forward compatibility
@@ -334,6 +379,10 @@ type OrchestratorServer interface {
 	RegisterDataStoreConnectionTestAgent(*AgentIdentification, Orchestrator_RegisterDataStoreConnectionTestAgentServer) error
 	// Sends datastore connection test result back to the server
 	SendDataStoreConnectionTestResult(context.Context, *DataStoreConnectionTestResponse) (*Empty, error)
+	// Register an agent to listen for graphql introspect commands
+	RegisterGraphqlIntrospectListener(*AgentIdentification, Orchestrator_RegisterGraphqlIntrospectListenerServer) error
+	// Send the graphql introspect response schema
+	SendGraphqlIntrospectResult(context.Context, *GraphqlIntrospectResponse) (*Empty, error)
 	mustEmbedUnimplementedOrchestratorServer()
 }
 
@@ -376,6 +425,12 @@ func (UnimplementedOrchestratorServer) RegisterDataStoreConnectionTestAgent(*Age
 }
 func (UnimplementedOrchestratorServer) SendDataStoreConnectionTestResult(context.Context, *DataStoreConnectionTestResponse) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendDataStoreConnectionTestResult not implemented")
+}
+func (UnimplementedOrchestratorServer) RegisterGraphqlIntrospectListener(*AgentIdentification, Orchestrator_RegisterGraphqlIntrospectListenerServer) error {
+	return status.Errorf(codes.Unimplemented, "method RegisterGraphqlIntrospectListener not implemented")
+}
+func (UnimplementedOrchestratorServer) SendGraphqlIntrospectResult(context.Context, *GraphqlIntrospectResponse) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendGraphqlIntrospectResult not implemented")
 }
 func (UnimplementedOrchestratorServer) mustEmbedUnimplementedOrchestratorServer() {}
 
@@ -624,6 +679,45 @@ func _Orchestrator_SendDataStoreConnectionTestResult_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Orchestrator_RegisterGraphqlIntrospectListener_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(AgentIdentification)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(OrchestratorServer).RegisterGraphqlIntrospectListener(m, &orchestratorRegisterGraphqlIntrospectListenerServer{stream})
+}
+
+type Orchestrator_RegisterGraphqlIntrospectListenerServer interface {
+	Send(*GraphqlIntrospectRequest) error
+	grpc.ServerStream
+}
+
+type orchestratorRegisterGraphqlIntrospectListenerServer struct {
+	grpc.ServerStream
+}
+
+func (x *orchestratorRegisterGraphqlIntrospectListenerServer) Send(m *GraphqlIntrospectRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Orchestrator_SendGraphqlIntrospectResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GraphqlIntrospectResponse)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrchestratorServer).SendGraphqlIntrospectResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Orchestrator/SendGraphqlIntrospectResult",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrchestratorServer).SendGraphqlIntrospectResult(ctx, req.(*GraphqlIntrospectResponse))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Orchestrator_ServiceDesc is the grpc.ServiceDesc for Orchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -655,6 +749,10 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "SendDataStoreConnectionTestResult",
 			Handler:    _Orchestrator_SendDataStoreConnectionTestResult_Handler,
 		},
+		{
+			MethodName: "SendGraphqlIntrospectResult",
+			Handler:    _Orchestrator_SendGraphqlIntrospectResult_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -685,6 +783,11 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "RegisterDataStoreConnectionTestAgent",
 			Handler:       _Orchestrator_RegisterDataStoreConnectionTestAgent_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RegisterGraphqlIntrospectListener",
+			Handler:       _Orchestrator_RegisterGraphqlIntrospectListener_Handler,
 			ServerStreams: true,
 		},
 	},

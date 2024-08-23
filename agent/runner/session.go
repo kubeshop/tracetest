@@ -177,10 +177,18 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		workers.WithTestConnectionMeter(meter),
 	)
 
+	graphqlIntrospectionWorker := workers.NewGraphqlIntrospectWorker(
+		controlPlaneClient,
+		workers.WithGraphqlIntrospectLogger(logger),
+		workers.WithGraphqlIntrospectTracer(tracer),
+		workers.WithGraphqlIntrospectMeter(meter),
+	)
+
 	controlPlaneClient.OnDataStoreTestConnectionRequest(dataStoreTestConnectionWorker.Test)
 	controlPlaneClient.OnStopRequest(stopWorker.Stop)
 	controlPlaneClient.OnTriggerRequest(triggerWorker.Trigger)
 	controlPlaneClient.OnPollingRequest(pollingWorker.Poll)
+	controlPlaneClient.OnGraphqlIntrospectionRequest(graphqlIntrospectionWorker.Introspect)
 	controlPlaneClient.OnConnectionClosed(func(ctx context.Context, sr *proto.ShutdownRequest) error {
 		logger.Info(fmt.Sprintf("Server terminated the connection with the agent. Reason: %s\n", sr.Reason))
 		return controlPlaneClient.Close()

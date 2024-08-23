@@ -43,6 +43,12 @@ service Orchestrator {
 
     // Sends datastore connection test result back to the server
     rpc SendDataStoreConnectionTestResult(DataStoreConnectionTestResponse) returns (Empty) {}
+
+    // Register an agent to listen for graphql introspect commands
+    rpc RegisterGraphqlIntrospectListener(AgentIdentification) returns (stream GraphqlIntrospectRequest) {}
+
+    // Send the graphql introspect response schema
+    rpc SendGraphqlIntrospectResult(GraphqlIntrospectResponse) returns (Empty) {}
 }
 
 // Empty message for endpoints that don't return anything
@@ -218,6 +224,21 @@ message OTLPConnectionTestResponse {
     AgentIdentification agentIdentification = 2;
     int64 spanCount = 3;
     int64 lastSpanTimestamp = 4;
+    map <string, string> metadata = 5;
+}
+
+message GraphqlIntrospectRequest {
+    string requestID = 1;
+    string url = 2;
+    repeated HttpHeader headers = 3;
+    map <string, string> metadata = 4;
+}
+
+message GraphqlIntrospectResponse {
+    string requestID = 1;
+    bool successful = 2;
+    AgentIdentification agentIdentification = 3;
+    string schema = 4;
     map <string, string> metadata = 5;
 }
 
