@@ -34,7 +34,7 @@ func TestGraphqlIntrospectionWorker(t *testing.T) {
 	}
 
 	controlPlane.SendGraphqlIntrospectionRequest(ctx, request)
-	time.Sleep(3 * time.Second)
+	time.Sleep(1 * time.Second)
 
 	resp := controlPlane.GetLastGraphqlIntrospectionResponse()
 	require.NotNil(t, resp, "agent did not send graphql introspection response back to server")
