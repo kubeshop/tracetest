@@ -27,6 +27,7 @@ API_KEY=""
 AGENT_VERSION="latest"
 SKIP_VERIFY=false
 SERVER_URL=""
+ENVIRONMENT=""
 
 POSITIONAL_ARGS=()
 
@@ -38,6 +39,11 @@ while [[ $# -gt 0 ]]; do
             ;;
         --server-url)
             SERVER_URL="$2"
+            shift
+            shift
+            ;;
+        --environment)
+            ENVIRONMENT="$2"
             shift
             shift
             ;;
@@ -81,6 +87,10 @@ fi
 
 if [ -n "$SERVER_URL" ]; then
   extraCmd+=("--server-url" "$SERVER_URL")
+fi
+
+if [ -n "$ENVIRONMENT" ]; then
+  extraCmd+=("--environment" "$ENVIRONMENT")
 fi
 
 
