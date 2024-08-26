@@ -240,17 +240,15 @@ message OTLPConnectionTestResponse {
 
 message GraphqlIntrospectRequest {
     string requestID = 1;
-    string url = 2;
-    repeated HttpHeader headers = 3;
-    map <string, string> metadata = 4;
+    GraphqlRequest graphql = 2;
+    map <string, string> metadata = 3;
 }
 
 message GraphqlIntrospectResponse {
     string requestID = 1;
-    bool successful = 2;
+    HttpResponse response = 2;
     AgentIdentification agentIdentification = 3;
-    string schema = 4;
-    map <string, string> metadata = 5;
+    map <string, string> metadata = 4;
 }
 
 message DataStoreConnectionTestRequest {
