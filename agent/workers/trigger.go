@@ -89,12 +89,14 @@ func NewTriggerWorker(client *client.Client, opts ...TriggerOption) *TriggerWork
 		opt(worker)
 	}
 
+	http := trigger.HTTP()
 	registry := trigger.NewRegistry(worker.tracer)
-	registry.Add(trigger.HTTP())
+	registry.Add(http)
 	registry.Add(trigger.GRPC())
 	registry.Add(trigger.TRACEID())
 	registry.Add(trigger.KAFKA())
 	registry.Add(trigger.PLAYWRIGHTENGINE())
+	registry.Add(trigger.GRAPHQL(http))
 
 	// Assign registry into worker
 	worker.registry = registry
@@ -214,6 +216,7 @@ func convertProtoToTrigger(pt *proto.Trigger) trigger.Trigger {
 		TraceID:          convertProtoTraceIDTriggerToTraceIDTrigger(pt.TraceID),
 		Kafka:            convertProtoKafkaTriggerToKafkaTrigger(pt.Kafka),
 		PlaywrightEngine: convertProtoPlaywrightEngineTriggerToPlaywrightEngineTrigger(pt.PlaywrightEngine),
+		Graphql:          convertProtoGraphqlTriggerToGraphqlTrigger(pt.Graphql),
 	}
 }
 
@@ -321,6 +324,24 @@ func convertProtoPlaywrightEngineTriggerToPlaywrightEngineTrigger(playwrightEngi
 	}
 }
 
+func convertProtoGraphqlTriggerToGraphqlTrigger(graphqlRequest *proto.GraphqlRequest) *trigger.GraphqlRequest {
+	if graphqlRequest == nil {
+		return nil
+	}
+
+	headers := make([]trigger.HTTPHeader, 0, len(graphqlRequest.Headers))
+	for _, header := range graphqlRequest.Headers {
+		headers = append(headers, trigger.HTTPHeader{Key: header.Key, Value: header.Value})
+	}
+
+	return &trigger.GraphqlRequest{
+		URL:             graphqlRequest.Url,
+		Headers:         headers,
+		Body:            graphqlRequest.Body,
+		SSLVerification: graphqlRequest.SSLVerification,
+	}
+}
+
 func convertProtoKafkaTriggerToKafkaTrigger(kafkaRequest *proto.KafkaRequest) *trigger.KafkaRequest {
 	if kafkaRequest == nil {
 		return nil
@@ -368,6 +389,7 @@ func convertResponseToProtoResponse(request *proto.TriggerRequest, response trig
 			TraceID:          convertTraceIDResponseToProto(response.Result.TraceID),
 			Kafka:            convertKafkaResponseToProto(response.Result.Kafka),
 			PlaywrightEngine: convertPlaywrightEngineResponseToProto(response.Result.PlaywrightEngine),
+			Graphql:          convertGraphqlResponseToProto(response.Result.Graphql),
 		},
 	}
 }
@@ -436,5 +458,23 @@ func convertPlaywrightEngineResponseToProto(playwerightEngine *trigger.Playwrigh
 	return &proto.PlaywrightEngineResponse{
 		Success: playwerightEngine.Success,
 		Out:     playwerightEngine.Out,
+	}
+}
+
+func convertGraphqlResponseToProto(graphql *trigger.GraphqlResponse) *proto.HttpResponse {
+	if graphql == nil {
+		return nil
+	}
+
+	headers := make([]*proto.HttpHeader, 0, len(graphql.Headers))
+	for _, header := range graphql.Headers {
+		headers = append(headers, &proto.HttpHeader{Key: header.Key, Value: header.Value})
+	}
+
+	return &proto.HttpResponse{
+		StatusCode: int32(graphql.StatusCode),
+		Status:     graphql.Status,
+		Headers:    headers,
+		Body:       []byte(graphql.Body),
 	}
 }

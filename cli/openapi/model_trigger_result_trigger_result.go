@@ -24,6 +24,7 @@ type TriggerResultTriggerResult struct {
 	Traceid          *TRACEIDResponse          `json:"traceid,omitempty"`
 	Kafka            *KafkaResponse            `json:"kafka,omitempty"`
 	PlaywrightEngine *PlaywrightEngineResponse `json:"playwrightEngine,omitempty"`
+	Graphql          *GraphqlResponse          `json:"graphql,omitempty"`
 	Error            *TriggerError             `json:"error,omitempty"`
 }
 
@@ -204,6 +205,38 @@ func (o *TriggerResultTriggerResult) SetPlaywrightEngine(v PlaywrightEngineRespo
 	o.PlaywrightEngine = &v
 }
 
+// GetGraphql returns the Graphql field value if set, zero value otherwise.
+func (o *TriggerResultTriggerResult) GetGraphql() GraphqlResponse {
+	if o == nil || isNil(o.Graphql) {
+		var ret GraphqlResponse
+		return ret
+	}
+	return *o.Graphql
+}
+
+// GetGraphqlOk returns a tuple with the Graphql field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *TriggerResultTriggerResult) GetGraphqlOk() (*GraphqlResponse, bool) {
+	if o == nil || isNil(o.Graphql) {
+		return nil, false
+	}
+	return o.Graphql, true
+}
+
+// HasGraphql returns a boolean if a field has been set.
+func (o *TriggerResultTriggerResult) HasGraphql() bool {
+	if o != nil && !isNil(o.Graphql) {
+		return true
+	}
+
+	return false
+}
+
+// SetGraphql gets a reference to the given GraphqlResponse and assigns it to the Graphql field.
+func (o *TriggerResultTriggerResult) SetGraphql(v GraphqlResponse) {
+	o.Graphql = &v
+}
+
 // GetError returns the Error field value if set, zero value otherwise.
 func (o *TriggerResultTriggerResult) GetError() TriggerError {
 	if o == nil || isNil(o.Error) {
@@ -260,6 +293,9 @@ func (o TriggerResultTriggerResult) ToMap() (map[string]interface{}, error) {
 	}
 	if !isNil(o.PlaywrightEngine) {
 		toSerialize["playwrightEngine"] = o.PlaywrightEngine
+	}
+	if !isNil(o.Graphql) {
+		toSerialize["graphql"] = o.Graphql
 	}
 	if !isNil(o.Error) {
 		toSerialize["error"] = o.Error
