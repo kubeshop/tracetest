@@ -76,11 +76,12 @@ type GraphqlRequest struct {
 	Headers         []HTTPHeader       `json:"headers,omitempty"`
 	Auth            *HTTPAuthenticator `json:"auth,omitempty"`
 	SSLVerification bool               `json:"sslVerification,omitempty"`
+	Schema          string             `json:"schema,omitempty"`
 }
 
 type GraphqlResponse struct {
-	Status     string
-	StatusCode int
-	Headers    []HTTPHeader
-	Body       string
+	Status     string       `json:"status,omitempty"`
+	StatusCode int          `json:"statusCode,omitempty"`
+	Headers    []HTTPHeader `json:"headers,omitempty"`
+	Body       string       `json:"body,omitempty"`
 }

@@ -30,6 +30,6 @@ components:
         headers:
           type: array
           items:
-            $ref: "#/components/schemas/HTTPHeader"
+            $ref: "./http.yaml#/components/schemas/HTTPHeader"
         body:
           type: string

@@ -60,7 +60,6 @@ require (
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.9.0
 	github.com/teris-io/shortid v0.0.0-20220617161101-71ec9f2aa569
-	github.com/wundergraph/graphql-go-tools v1.67.4
 	github.com/wundergraph/graphql-go-tools/v2 v2.0.0-rc.75
 	gitlab.com/metakeule/fmtdate v1.2.2
 	go.opencensus.io v0.24.0
@@ -121,9 +120,11 @@ require (
 	github.com/elastic/elastic-transport-go/v8 v8.0.0-20211216131617-bbee439d559c // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
+	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-playground/validator/v10 v10.15.5 // indirect
 	github.com/go-redis/redis/v7 v7.4.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -147,6 +148,7 @@ require (
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
 	github.com/knadh/koanf v1.5.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lib/pq v1.10.5 // indirect
