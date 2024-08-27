@@ -123,6 +123,7 @@ enabled=1
 gpgcheck=0
 EOF
   $SUDO yum install -y tracetest --refresh
+  $SUDO yum update -y tracetest
 }
 
 install_brew() {
