@@ -2,6 +2,7 @@ package workers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/telemetry"
@@ -231,10 +232,15 @@ func convertProtoHttpTriggerToHttpTrigger(pt *proto.HttpRequest) *trigger.HTTPRe
 		headers = append(headers, trigger.HTTPHeader{Key: header.Key, Value: header.Value})
 	}
 
+	body, err := json.Marshal(pt.Body)
+	if err != nil {
+		return nil
+	}
+
 	return &trigger.HTTPRequest{
 		Method:          trigger.HTTPMethod(pt.Method),
 		URL:             pt.Url,
-		Body:            pt.Body,
+		Body:            string(body),
 		Headers:         headers,
 		Auth:            convertProtoHttpAuthToHttpAuth(pt.Authentication),
 		SSLVerification: pt.SSLVerification,
@@ -335,9 +341,13 @@ func convertProtoGraphqlTriggerToGraphqlTrigger(graphqlRequest *proto.GraphqlReq
 	}
 
 	return &trigger.GraphqlRequest{
-		URL:             graphqlRequest.Url,
-		Headers:         headers,
-		Body:            graphqlRequest.Body,
+		URL:     graphqlRequest.Url,
+		Headers: headers,
+		Body: trigger.GraphqlBody{
+			Query:         graphqlRequest.Body.Query,
+			Variables:     graphqlRequest.Body.Variables,
+			OperationName: graphqlRequest.Body.OperationName,
+		},
 		SSLVerification: graphqlRequest.SSLVerification,
 	}
 }

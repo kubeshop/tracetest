@@ -13,7 +13,7 @@ components:
         auth:
           $ref: "./http.yaml#/components/schemas/HTTPAuth"
         body:
-          type: string
+          $ref: "#/components/schemas/GraphqlBody"
         sslVerification:
           type: boolean
           default: false
@@ -32,4 +32,16 @@ components:
           items:
             $ref: "./http.yaml#/components/schemas/HTTPHeader"
         body:
+          type: string
+
+    GraphqlBody:
+      type: object
+      properties:
+        query:
+          type: string
+        variables:
+          type: object
+          additionalProperties:
+            type: string
+        operationName:
           type: string

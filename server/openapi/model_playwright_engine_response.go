@@ -11,6 +11,8 @@ package openapi
 
 type PlaywrightEngineResponse struct {
 	Success bool `json:"success,omitempty"`
+
+	Out string `json:"out,omitempty"`
 }
 
 // AssertPlaywrightEngineResponseRequired checks if the required fields are not zero-ed

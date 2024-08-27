@@ -20,6 +20,8 @@ type TriggerResultTriggerResult struct {
 
 	PlaywrightEngine PlaywrightEngineResponse `json:"playwrightEngine,omitempty"`
 
+	Graphql GraphqlResponse `json:"graphql,omitempty"`
+
 	Error TriggerError `json:"error,omitempty"`
 }
 
@@ -38,6 +40,9 @@ func AssertTriggerResultTriggerResultRequired(obj TriggerResultTriggerResult) er
 		return err
 	}
 	if err := AssertPlaywrightEngineResponseRequired(obj.PlaywrightEngine); err != nil {
+		return err
+	}
+	if err := AssertGraphqlResponseRequired(obj.Graphql); err != nil {
 		return err
 	}
 	if err := AssertTriggerErrorRequired(obj.Error); err != nil {

@@ -22,7 +22,7 @@ type GraphqlRequest struct {
 	Url             *string      `json:"url,omitempty"`
 	Headers         []HTTPHeader `json:"headers,omitempty"`
 	Auth            *HTTPAuth    `json:"auth,omitempty"`
-	Body            *string      `json:"body,omitempty"`
+	Body            *GraphqlBody `json:"body,omitempty"`
 	SslVerification *bool        `json:"sslVerification,omitempty"`
 	Schema          *string      `json:"schema,omitempty"`
 }
@@ -145,9 +145,9 @@ func (o *GraphqlRequest) SetAuth(v HTTPAuth) {
 }
 
 // GetBody returns the Body field value if set, zero value otherwise.
-func (o *GraphqlRequest) GetBody() string {
+func (o *GraphqlRequest) GetBody() GraphqlBody {
 	if o == nil || isNil(o.Body) {
-		var ret string
+		var ret GraphqlBody
 		return ret
 	}
 	return *o.Body
@@ -155,7 +155,7 @@ func (o *GraphqlRequest) GetBody() string {
 
 // GetBodyOk returns a tuple with the Body field value if set, nil otherwise
 // and a boolean to check if the value has been set.
-func (o *GraphqlRequest) GetBodyOk() (*string, bool) {
+func (o *GraphqlRequest) GetBodyOk() (*GraphqlBody, bool) {
 	if o == nil || isNil(o.Body) {
 		return nil, false
 	}
@@ -171,8 +171,8 @@ func (o *GraphqlRequest) HasBody() bool {
 	return false
 }
 
-// SetBody gets a reference to the given string and assigns it to the Body field.
-func (o *GraphqlRequest) SetBody(v string) {
+// SetBody gets a reference to the given GraphqlBody and assigns it to the Body field.
+func (o *GraphqlRequest) SetBody(v GraphqlBody) {
 	o.Body = &v
 }
 
