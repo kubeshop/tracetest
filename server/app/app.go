@@ -139,11 +139,11 @@ func (app *App) initAnalytics(configFromDB config.Config) error {
 	return analytics.Init(configFromDB.IsAnalyticsEnabled(), app.serverID, version.Version, version.Env, app.cfg.AnalyticsServerKey(), app.cfg.AnalyticsFrontendKey())
 }
 
+// instanceID is a temporary ID for this instance of the server
+// it is regenerated on every start intentionally
 var instanceID = id.GenerateID().String()
 
 func (app *App) Start(opts ...appOption) error {
-	// instanceID is a temporary ID for this instance of the server
-	// it is regenerated on every start intentionally
 	for _, opt := range opts {
 		opt(app)
 	}
@@ -153,18 +153,18 @@ func (app *App) Start(opts ...appOption) error {
 
 	poolcfg, err := pgxpool.ParseConfig(app.cfg.PostgresConnString())
 	if err != nil {
-		return err
+		return fmt.Errorf("could not parse postgres connection string: %w", err)
 	}
 	poolcfg.MaxConns = 20
 
 	pool, err := pgxpool.NewWithConfig(context.Background(), poolcfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not create postgres connection pool: %w", err)
 	}
 
 	db, err := testdb.Connect(app.cfg.PostgresConnString())
 	if err != nil {
-		return err
+		return fmt.Errorf("could not connect to postgres: %w", err)
 	}
 	db.SetMaxOpenConns(80)
 
@@ -173,7 +173,7 @@ func (app *App) Start(opts ...appOption) error {
 	)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("could not create testdb: %w", err))
 	}
 
 	natsConn, err := nats.Connect(app.cfg.NATSEndpoint())
@@ -189,12 +189,12 @@ func (app *App) Start(opts ...appOption) error {
 
 	tracer, err := telemetry.NewTracer(ctx, app.cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("could not create tracer: %w", err))
 	}
 
 	meter, err := telemetry.NewMeter(ctx, app.cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("could not create meter: %w", err))
 	}
 
 	app.registerStopFn(func() {
@@ -204,20 +204,20 @@ func (app *App) Start(opts ...appOption) error {
 
 	serverID, isNewInstall, err := testDB.ServerID()
 	if err != nil {
-		return err
+		return fmt.Errorf("could not get server ID: %w", err)
 	}
 	app.serverID = serverID
 
 	err = app.initAnalytics(configFromDB)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not init analytics: %w", err)
 	}
 
 	fmt.Println("New install?", isNewInstall)
 	if isNewInstall {
 		err = analytics.SendEvent("Install", "beacon", "", nil)
 		if err != nil {
-			return err
+			return fmt.Errorf("could not send install event: %w", err)
 		}
 	}
 
@@ -304,7 +304,7 @@ func (app *App) Start(opts ...appOption) error {
 
 	err = analytics.SendEvent("Server Started", "beacon", "", nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not send server started event: %w", err)
 	}
 
 	provisioner := provisioning.New()

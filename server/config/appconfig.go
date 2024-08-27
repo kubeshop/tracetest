@@ -44,7 +44,7 @@ func New(confOpts ...Option) (*AppConfig, error) {
 
 	err = cfg.vp.Unmarshal(&cfg.config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot unmarshal config: %w", err)
 	}
 
 	if err := cfg.Validate(); err != nil {

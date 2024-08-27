@@ -21,7 +21,7 @@ var (
 			var err error
 			appInstance, err = app.New(cfg)
 			if err != nil {
-				return err
+				return fmt.Errorf("cannot create app instance: %w", err)
 			}
 
 			return nil
@@ -44,7 +44,7 @@ func init() {
 			config.WithLogger(log.Default()),
 		)
 		if err != nil {
-			fmt.Println(err.Error())
+			fmt.Println("error loading config:", err.Error())
 			os.Exit(1)
 		}
 	})
