@@ -74,10 +74,10 @@ gRPC: `http://localhost:4317`
 HTTP: `http://localhost:4318/v1/traces`
 
 </TabItem>
-<TabItem value="docker" label="Docker" default>
+<TabItem value="docker" label="Docker">
 
 <CodeBlock
-    language="text"
+    language="js"
     title="Terminal"
 >
 {`docker run \\\n  -p 4317:4317 \\\n  -p 4318:4318 \\\n  -e TRACETEST_API_KEY="<TRACETEST_API_KEY>" \\\n  -e TRACETEST_ENVIRONMENT_ID="<TRACETEST_ENVIRONMENT_ID>" \\\n  kubeshop/tracetest-agent`}
@@ -104,11 +104,11 @@ You can reach services running on your local machine using:
 :::
 
 </TabItem>
-<TabItem value="docker-compose" label="Docker Compose" default>
+<TabItem value="docker-compose" label="Docker Compose">
 
 <CodeBlock
-    language="text"
-    title="Terminal"
+    language="yaml"
+    title="docker-compose.yaml"
 >
 {`tracetest-agent:
   image: kubeshop/tracetest-agent
@@ -141,13 +141,78 @@ You can reach services running on your local machine using:
 :::
 
 </TabItem>
-<TabItem value="kubernetes" label="Kubernetes" default>
+<TabItem value="kubernetes" label="Kubernetes">
 
 <CodeBlock
-    language="text"
+    language="yaml"
+    title="tracetest-agent.yaml"
+>
+{`---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracetest-agent
+  labels:
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+spec:
+  selector:
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+  ports:
+    - name: grpc-collector-entrypoint
+      protocol: TCP
+      port: 4317
+      targetPort: 4317
+    - name: http-collector-entrypoint
+      protocol: TCP
+      port: 4318
+      targetPort: 4318
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracetest-agent
+  labels:
+    app: tracetest-agent
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tracetest-agent
+      app.kubernetes.io/instance: tracetest-agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tracetest-agent
+        app.kubernetes.io/instance: tracetest-agent
+    spec:
+      containers:
+        - name: agent
+          image: "kubeshop/tracetest-agent:latest"
+          imagePullPolicy: Always
+          args: [
+            "--environment",
+            "<TRACETEST_ENVIRONMENT_ID>", # Add your env id
+            "--api-key",
+            "$TRACETEST_API_KEY",
+            "--server-url",
+            "https://app.tracetest.io",
+          ]
+          env:
+          - name: TRACETEST_API_KEY
+            value: "<TRACETEST_API_KEY>" # Add your API key
+`}
+</CodeBlock>
+
+<CodeBlock
+    language="css"
     title="Terminal"
 >
-{`curl https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/agent/deploy-agent.sh | bash -s -- default <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_ID>`}
+{`kubectl apply -f ./tracetest-agent.yaml`}
 </CodeBlock>
 
 The Tracetest Agent is running in Kubernetes and ready to accept traces.
@@ -158,16 +223,33 @@ HTTP: `http://<service-name>:4318/v1/traces`
 
 :::note K8s Network
 Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+Make sure to run tests using the internal Kubernetes service networking eg: `http://api.default.svc.cluster.internal:port`.
+:::
 
-To run tests against apps running on your local machine you have two options:
+</TabItem>
+<TabItem value="helm" label="Helm">
 
-1. Run Tracetest Agent locally with the `tracetest start` command.
-2. Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+Set the `<release-name>` and `<namespace>` to your desired values.
 
-You can reach services running on your local machine using:
+<CodeBlock
+    language="js"
+    title="Terminal"
+>
+{`helm repo add tracetestcloud https://kubeshop.github.io/tracetest-cloud-charts --force-update && \\
 
-- Linux (docker version < 20.10.0): `172.17.0.1:8080`
-- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
+helm install <release-name> -n <namespace> tracetestcloud/tracetest-agent \\
+--set agent.apiKey=<TRACETEST_API_KEY> --set agent.environmentId=<TRACETEST_ENVIRONMENT_ID>`}
+</CodeBlock>
+
+The Tracetest Agent is running in Kubernetes and ready to accept traces.
+
+gRPC: `http://<service-name>:4317`
+
+HTTP: `http://<service-name>:4318/v1/traces`
+
+:::note K8s Network
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+Make sure to run tests using the internal Kubernetes service networking eg: `http://api.default.svc.cluster.internal:port`.
 :::
 
 </TabItem>
@@ -177,6 +259,9 @@ You can reach services running on your local machine using:
 
 To create tests quickly, start the official sample called [Pokeshop API](/live-examples/pokeshop/overview).
 
+<Tabs groupId="installation">
+<TabItem value="cli" label="Tracetest CLI" default>
+
 ```bash title="Terminal"
 git clone --depth 1 https://github.com/kubeshop/tracetest.git
 cd tracetest/examples/tracetest-agent/pokeshop/
@@ -185,9 +270,88 @@ docker compose up -d --build
 ```
 
 - [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
-- [`http://localhost:8081`](http://localhost:8081) and [`http://localhost:8081`](http://localhost:8081) - Access the Pokeshop API demo to run tests.
-- `http://localhost:4317` / `http://localhost:4318` / `http://service-name:4317` / `http://service-name:4318` - Trace ingestion URL where Tracetest Agent will accept traces.
+- [`http://localhost:8081`](http://localhost:8081) - Access the Pokeshop API demo to run tests.
+- `http://localhost:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+- `http://host.docker.internal` - Pokeshop is running in Docker. Tracetest Agent is running on `localhost`. To ingest traces and trigger tests use the `host.docker.internal` value instead of `localhost`.
 
+</TabItem>
+
+<TabItem value="docker" label="Docker">
+
+```bash title="Terminal"
+git clone --depth 1 https://github.com/kubeshop/pokeshop.git
+cd pokeshop
+
+docker compose up -d --build
+```
+
+- [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
+- [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is exposed from Docker to `localhost` on this port. To run tests you will use the Docker internal network and the service name, `http://api:8081`.
+- `tracetest-agent:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+
+</TabItem>
+
+<TabItem value="docker-compose" label="Docker Compose">
+
+```bash title="Terminal"
+git clone --depth 1 https://github.com/kubeshop/pokeshop.git
+cd pokeshop
+
+docker compose up -d --build
+```
+
+- [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
+- [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is exposed from Docker to `localhost` on this port. To run tests you will use the Docker internal network and the service name, `http://api:8081`.
+- `tracetest-agent:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+
+</TabItem>
+
+<TabItem value="kubernetes" label="Kubernetes">
+
+```bash title="Terminal"
+git clone --depth 1 https://github.com/kubeshop/pokeshop.git
+cd pokeshop/k8s
+
+kubectl apply -f .
+```
+
+To access the Pokeshop API run a `port-forward`:
+
+```bash
+kubectl port-forward svc/api 8081:8081
+```
+
+- [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
+- [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is port forwarded from Kubernetes to `localhost` on this port.
+- To run tests you will use the Kubernetes internal network and the service name, `http://http://api.default.svc.cluster.internal:8081`.
+- `tracetest-agent.default.svc.cluster.local:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+
+</TabItem>
+
+<TabItem value="helm" label="Helm">
+
+```bash title="Terminal"
+git clone --depth 1 https://github.com/kubeshop/pokeshop.git
+cd pokeshop/helm-charts
+
+helm dependency update
+helm install -n <namespace> -f values.yaml --create-namespace <namespace> .
+```
+
+To access the Pokeshop API run a `port-forward`:
+
+```bash
+kubectl port-forward svc/api 8081:8081
+```
+
+- [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
+- [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is port forwarded from Kubernetes to `localhost` on this port.
+- To run tests you will use the Kubernetes internal network and the service name, `http://http://api.default.svc.cluster.internal:8081`.
+- `tracetest-agent.default.svc.cluster.local:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+
+</TabItem>
+
+</Tabs>
 
 <details>
   <summary>
