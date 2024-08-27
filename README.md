@@ -58,7 +58,7 @@
     <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?logo=github" alt="PRs welcome!" />
   </a>
   <a href="https://github.com/kubeshop/tracetest/issues">
-    <img src="https://img.shields.io/github/stars/kubeshop/tracetest?color=%23EAC54F&logo=github&label=Help us reach 1k stars! Now at:" alt="Help us reach 1k stars!" />
+    <img src="https://img.shields.io/github/stars/kubeshop/tracetest?color=%23EAC54F&logo=github&label=Help us reach 2k stars! Now at:" alt="Help us reach 2k stars!" />
   </a>
   <a href="https://tracetest.io/community">
     <img src="https://img.shields.io/badge/Join-Community!-purple" alt="Join our Community!" />
