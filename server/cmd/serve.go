@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -45,6 +46,7 @@ var serveCmd = &cobra.Command{
 		wg.Add(1)
 		err := appInstance.Start(app.WithProvisioningFile(provisioningFile))
 		if err != nil {
+			fmt.Println("Error starting server:", err.Error())
 			return err
 		}
 
