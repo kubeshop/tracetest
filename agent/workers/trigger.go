@@ -2,7 +2,6 @@ package workers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/telemetry"
@@ -232,15 +231,10 @@ func convertProtoHttpTriggerToHttpTrigger(pt *proto.HttpRequest) *trigger.HTTPRe
 		headers = append(headers, trigger.HTTPHeader{Key: header.Key, Value: header.Value})
 	}
 
-	body, err := json.Marshal(pt.Body)
-	if err != nil {
-		return nil
-	}
-
 	return &trigger.HTTPRequest{
 		Method:          trigger.HTTPMethod(pt.Method),
 		URL:             pt.Url,
-		Body:            string(body),
+		Body:            pt.Body,
 		Headers:         headers,
 		Auth:            convertProtoHttpAuthToHttpAuth(pt.Authentication),
 		SSLVerification: pt.SSLVerification,
