@@ -14,6 +14,7 @@ type triggerJSONV3 struct {
 	TraceID          *TraceIDRequest          `json:"traceid,omitempty"`
 	Kafka            *KafkaRequest            `json:"kafka,omitempty"`
 	PlaywrightEngine *PlaywrightEngineRequest `json:"playwrightEngine,omitempty"`
+	Graphql          *GraphqlRequest          `json:"graphql,omitempty"`
 }
 
 func (v3 triggerJSONV3) valid() bool {
@@ -22,7 +23,7 @@ func (v3 triggerJSONV3) valid() bool {
 		(v3.HTTP != nil ||
 			v3.GRPC != nil ||
 			v3.TraceID != nil ||
-			v3.Kafka != nil) || v3.PlaywrightEngine != nil) || (v3.Type == TriggerTypeCypress || v3.Type == TriggerTypePlaywright || v3.Type == TriggerTypeArtillery || v3.Type == TriggerTypeK6)
+			v3.Kafka != nil) || v3.PlaywrightEngine != nil || v3.Graphql != nil) || (v3.Type == TriggerTypeCypress || v3.Type == TriggerTypePlaywright || v3.Type == TriggerTypeArtillery || v3.Type == TriggerTypeK6)
 }
 
 type triggerJSONV2 struct {
@@ -122,11 +123,12 @@ type triggerResultV2 struct {
 	TraceID          *TraceIDResponse          `json:"traceid,omitempty"`
 	Kafka            *KafkaResponse            `json:"kafka,omitempty"`
 	PlaywrightEngine *PlaywrightEngineResponse `json:"playwrightEngine,omitempty"`
+	Graphql          *GraphqlResponse          `json:"graphql,omitempty"`
 	Error            *TriggerError             `json:"error,omitempty"`
 }
 
 func (tr *triggerResultV2) valid() bool {
-	return tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil || tr.Kafka != nil || tr.PlaywrightEngine != nil || tr.Error != nil
+	return tr.HTTP != nil || tr.GRPC != nil || tr.TraceID != nil || tr.Kafka != nil || tr.PlaywrightEngine != nil || tr.Graphql != nil || tr.Error != nil
 }
 
 func (t *TriggerResult) UnmarshalJSON(data []byte) error {
@@ -140,6 +142,7 @@ func (t *TriggerResult) UnmarshalJSON(data []byte) error {
 		t.TraceID = v2.TraceID
 		t.Kafka = v2.Kafka
 		t.PlaywrightEngine = v2.PlaywrightEngine
+		t.Graphql = v2.Graphql
 		t.Error = v2.Error
 
 		return nil

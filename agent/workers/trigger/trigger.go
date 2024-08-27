@@ -23,6 +23,7 @@ type (
 		TraceID          *TraceIDRequest          `json:"traceid,omitempty"`
 		Kafka            *KafkaRequest            `json:"kafka,omitempty"`
 		PlaywrightEngine *PlaywrightEngineRequest `json:"playwrightEngine,omitempty"`
+		Graphql          *GraphqlRequest          `json:"graphql,omitempty"`
 	}
 
 	TriggerResult struct {
@@ -32,6 +33,7 @@ type (
 		TraceID          *TraceIDResponse          `json:"traceid,omitempty"`
 		Kafka            *KafkaResponse            `json:"kafka,omitempty"`
 		PlaywrightEngine *PlaywrightEngineResponse `json:"playwrightEngine,omitempty"`
+		Graphql          *GraphqlResponse          `json:"graphql,omitempty"`
 		Error            *TriggerError             `json:"error,omitempty"`
 	}
 

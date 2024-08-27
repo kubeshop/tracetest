@@ -43,6 +43,12 @@ service Orchestrator {
 
     // Sends datastore connection test result back to the server
     rpc SendDataStoreConnectionTestResult(DataStoreConnectionTestResponse) returns (Empty) {}
+
+    // Register an agent to listen for graphql introspect commands
+    rpc RegisterGraphqlIntrospectListener(AgentIdentification) returns (stream GraphqlIntrospectRequest) {}
+
+    // Send the graphql introspect response schema
+    rpc SendGraphqlIntrospectResult(GraphqlIntrospectResponse) returns (Empty) {}
 }
 
 // Empty message for endpoints that don't return anything
@@ -108,6 +114,7 @@ message Trigger {
     TraceIDRequest traceID = 4;
     KafkaRequest kafka = 5;
     PlaywrightEngineRequest playwrightEngine = 6;
+    GraphqlRequest graphql = 7;
 }
 
 message HttpRequest {
@@ -117,6 +124,15 @@ message HttpRequest {
     repeated HttpHeader headers = 4;
     HttpAuthentication authentication = 5;
     bool SSLVerification = 6;
+}
+
+message GraphqlRequest {
+    string url = 1;
+    string body = 2;
+    repeated HttpHeader headers = 3;
+    HttpAuthentication authentication = 4;
+    bool SSLVerification = 5;
+    string schema = 6;
 }
 
 message HttpHeader {
@@ -182,6 +198,7 @@ message TriggerResult {
     KafkaResponse kafka = 5;
     Error error = 6;
     PlaywrightEngineResponse playwrightEngine = 7;
+    HttpResponse graphql = 8;
 }
 
 message HttpResponse {
@@ -219,6 +236,19 @@ message OTLPConnectionTestResponse {
     int64 spanCount = 3;
     int64 lastSpanTimestamp = 4;
     map <string, string> metadata = 5;
+}
+
+message GraphqlIntrospectRequest {
+    string requestID = 1;
+    GraphqlRequest graphql = 2;
+    map <string, string> metadata = 3;
+}
+
+message GraphqlIntrospectResponse {
+    string requestID = 1;
+    HttpResponse response = 2;
+    AgentIdentification agentIdentification = 3;
+    map <string, string> metadata = 4;
 }
 
 message DataStoreConnectionTestRequest {
