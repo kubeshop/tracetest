@@ -14,6 +14,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/processor"
+	"github.com/kubeshop/tracetest/cli/processor/trigger_preprocessor"
 	"github.com/kubeshop/tracetest/cli/runner"
 )
 
@@ -117,7 +118,12 @@ var (
 		resourcemanager.WithApplyPostProcessor(environmentPostproessor.Postprocess),
 	)
 
-	testPreprocessor = processor.Test(cliLogger, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
+	triggerPreprocessorRegistry = trigger_preprocessor.NewRegistry(cliLogger).
+					Register(trigger_preprocessor.GRPC(cliLogger)).
+					Register(trigger_preprocessor.PLAYWRIGHTENGINE(cliLogger)).
+					Register(trigger_preprocessor.GRAPHQL(cliLogger))
+
+	testPreprocessor = processor.Test(cliLogger, triggerPreprocessorRegistry, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
 		updated, err := pollingProfileClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
 		if err != nil {
 			return input, fmt.Errorf("cannot apply polling profile: %w", err)
