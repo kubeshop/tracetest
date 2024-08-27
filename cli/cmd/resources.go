@@ -121,7 +121,8 @@ var (
 	triggerPreprocessorRegistry = trigger_preprocessor.NewRegistry(cliLogger).
 					Register(trigger_preprocessor.GRPC(cliLogger)).
 					Register(trigger_preprocessor.PLAYWRIGHTENGINE(cliLogger)).
-					Register(trigger_preprocessor.GRAPHQL(cliLogger))
+					Register(trigger_preprocessor.GRAPHQL(cliLogger)).
+					Register(trigger_preprocessor.HTTP(cliLogger))
 
 	testPreprocessor = processor.Test(cliLogger, triggerPreprocessorRegistry, func(ctx context.Context, input fileutil.File) (fileutil.File, error) {
 		updated, err := pollingProfileClient.Apply(ctx, input, resourcemanager.Formats.Get(resourcemanager.FormatYAML))
