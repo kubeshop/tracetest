@@ -15,12 +15,6 @@ const defaultVersionExtension = "json"
 func GetVersion(ctx context.Context, cfg Config) (string, bool) {
 	result := fmt.Sprintf(`CLI: %s`, Version)
 
-	if cfg.UIEndpoint != "" {
-		scheme, endpoint, path, _ := ParseServerURL(cfg.UIEndpoint)
-		cfg.Scheme = scheme
-		cfg.Endpoint = endpoint
-		cfg.ServerPath = path
-	}
 	client := GetAPIClient(cfg)
 
 	if cfg.IsEmpty() {
