@@ -13,6 +13,7 @@ import (
 	"github.com/spf13/cobra"
 
 	cloudCmd "github.com/kubeshop/tracetest/cli/cloud/cmd"
+	cliRunner "github.com/kubeshop/tracetest/cli/runner"
 )
 
 var (
@@ -109,7 +110,12 @@ func runMultipleFiles(ctx context.Context) (string, error) {
 	}
 
 	exitCode, err := cloudCmd.RunMultipleFiles(ctx, cliLogger, httpClient, runParams, &cliConfig, runnerRegistry, output)
-	ExitCLI(exitCode)
+	// General Error is 1, which is the default for errors. if this is the case,
+	// let the CLI handle the error and exit.
+	// otherwise exit with the exit code.
+	if exitCode > cliRunner.ExitCodeGeneralError {
+		ExitCLI(exitCode)
+	}
 	return "", err
 }
 

@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"sync"
 
@@ -15,6 +13,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/runner"
+
 	"github.com/kubeshop/tracetest/cli/varset"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"go.uber.org/zap"
@@ -356,30 +355,4 @@ func getRequiredGates(gates []string) []openapi.SupportedGates {
 	}
 
 	return requiredGates
-}
-
-// HandleRunError handles errors returned by the server when running a test.
-// It normalizes the handling of general errors, like 404,
-// but more importantly, it processes the missing environment variables error
-// so the orchestrator can request them from the user.
-func HandleRunError(resp *http.Response, reqErr error) error {
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("could not read response body: %w", err)
-	}
-	resp.Body.Close()
-
-	if resp.StatusCode == http.StatusNotFound {
-		return fmt.Errorf("resource not found in server")
-	}
-
-	if resp.StatusCode == http.StatusUnprocessableEntity {
-		return varset.BuildMissingVarsError(body)
-	}
-
-	if reqErr != nil {
-		return fmt.Errorf("could not run test suite: %w", reqErr)
-	}
-
-	return nil
 }
