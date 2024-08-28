@@ -329,6 +329,7 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 	}
 
 	if ok, msg := attemptToParseStructuredError(body); ok {
+		spew.Dump(body)
 		return fmt.Errorf("could not run resouce: %s", msg)
 	}
 
@@ -346,7 +347,7 @@ func attemptToParseStructuredError(body []byte) (bool, string) {
 	}
 
 	err := jsonFormat.Unmarshal(body, &parsed)
-	if err != nil {
+	if err != nil || parsed.Status == 0 {
 		return false, ""
 	}
 
