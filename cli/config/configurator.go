@@ -176,7 +176,6 @@ func (c Configurator) createConfig(serverURL string) (Config, error) {
 }
 
 type invalidServerErr struct {
-	ui        cliUI.UI
 	serverURL string
 	parent    error
 }
@@ -185,9 +184,8 @@ func (e invalidServerErr) Error() string {
 	return fmt.Errorf("cannot reach %s: %w", e.serverURL, e.parent).Error()
 }
 
-func (e invalidServerErr) Render() {
-	msg := fmt.Sprintf(`Cannot reach "%s". Please verify the url and enter it again.`, e.serverURL)
-	e.ui.Error(msg)
+func (e invalidServerErr) Message() string {
+	return fmt.Sprintf(`Cannot reach "%s". Please verify the url and enter it again.`, e.serverURL)
 }
 
 func (c Configurator) populateConfigWithDevConfig(_ context.Context, cfg *Config) {
@@ -227,7 +225,7 @@ func (c Configurator) populateConfigWithVersionInfo(ctx context.Context, cfg Con
 	client := GetAPIClient(cfg)
 	version, err := getVersionMetadata(ctx, client)
 	if err != nil {
-		err = invalidServerErr{c.ui, c.finalServerURL, fmt.Errorf("cannot get version metadata: %w", err)}
+		err = invalidServerErr{c.finalServerURL, fmt.Errorf("cannot get version metadata: %w", err)}
 		return Config{}, err, false
 	}
 

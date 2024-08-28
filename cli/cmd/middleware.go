@@ -82,8 +82,8 @@ func retryCommand(ctx context.Context) {
 	handleRootExecErr(rootCmd.ExecuteContext(ctx))
 }
 
-type errorMessageRenderer interface {
-	Render()
+type errorMessager interface {
+	Message() string
 }
 
 const defaultErrorFormat = `
@@ -96,14 +96,23 @@ An error ocurred when executing the command
 `
 
 func OnError(err error) {
-	errorMessage := handleErrorMessage(err)
-
-	if renderer, ok := err.(errorMessageRenderer); ok {
-		renderer.Render()
+	if renderer := findErrorMessageRenderer(err); renderer != nil {
+		ui.DefaultUI.Error(renderer.Message())
 	} else {
+		errorMessage := handleErrorMessage(err)
 		fmt.Fprintf(os.Stderr, defaultErrorFormat, versionText, errorMessage)
 	}
 	ExitCLI(1)
+}
+
+func findErrorMessageRenderer(err error) errorMessager {
+	for err != nil {
+		if renderer, ok := err.(errorMessager); ok {
+			return renderer
+		}
+		err = errors.Unwrap(err)
+	}
+	return nil
 }
 
 func handleErrorMessage(err error) string {

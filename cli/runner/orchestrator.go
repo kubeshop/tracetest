@@ -309,6 +309,20 @@ func getRequiredGates(gates []string) []openapi.SupportedGates {
 	return requiredGates
 }
 
+var (
+	ErrAgentNotStarted = agentNotStartedError{}
+)
+
+type agentNotStartedError struct{}
+
+func (e agentNotStartedError) Error() string {
+	return "agent not started"
+}
+
+func (e agentNotStartedError) Message() string {
+	return "Agent is not started for this environment. Please start the agent and try again."
+}
+
 // HandleRunError handles errors returned by the server when running a test.
 // It normalizes the handling of general errors, like 404,
 // but more importantly, it processes the missing environment variables error
@@ -326,6 +340,10 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 
 	if resp.StatusCode == http.StatusUnprocessableEntity {
 		return varset.BuildMissingVarsError(body)
+	}
+
+	if resp.StatusCode == http.StatusFailedDependency {
+		return ErrAgentNotStarted
 	}
 
 	if ok, msg := attemptToParseStructuredError(body); ok {
