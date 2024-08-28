@@ -346,7 +346,7 @@ func attemptToParseStructuredError(body []byte) (bool, string) {
 	}
 
 	err := jsonFormat.Unmarshal(body, &parsed)
-	if err != nil || parsed.Status == 0 {
+	if err != nil {
 		return false, ""
 	}
 
