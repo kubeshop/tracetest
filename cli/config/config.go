@@ -43,8 +43,7 @@ type Config struct {
 }
 
 func (c Config) OAuthEndpoint() string {
-	return fmt.Sprintf("%s%s", c.URL(), c.Path())
-
+	return path.Join(c.URL(), c.Path())
 }
 
 func (c Config) URL() string {

@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"path"
 	"sync"
 
 	"github.com/kubeshop/tracetest/cli/ui"
@@ -58,7 +59,7 @@ func (s *OAuthServer) GetAuthJWT() error {
 		return fmt.Errorf("failed to start oauth server: %w", err)
 	}
 
-	loginUrl := fmt.Sprintf("%soauth?callback=%s", s.frontendEndpoint, url)
+	loginUrl := path.Join(s.frontendEndpoint, fmt.Sprintf("oauth?callback=%s", url))
 
 	ui := ui.DefaultUI
 	err = ui.OpenBrowser(loginUrl)
