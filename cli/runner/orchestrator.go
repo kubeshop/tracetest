@@ -296,8 +296,6 @@ func (a orchestrator) writeJUnitReport(ctx context.Context, r Runner, result Run
 	return err
 }
 
-var source = "cli"
-
 func getRequiredGates(gates []string) []openapi.SupportedGates {
 	if len(gates) == 0 {
 		return nil
@@ -330,9 +328,29 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 		return varset.BuildMissingVarsError(body)
 	}
 
+	if ok, msg := attemptToParseStructuredError(body); ok {
+		return fmt.Errorf("could not run resouce: %s", msg)
+	}
+
 	if reqErr != nil {
-		return fmt.Errorf("could not run test suite: %w", reqErr)
+		return fmt.Errorf("could not run resouce: %w", reqErr)
 	}
 
 	return nil
+}
+
+func attemptToParseStructuredError(body []byte) (bool, string) {
+	var parsed struct {
+		Status int    `json:"status"`
+		Detail string `json:"detail"`
+	}
+
+	err := jsonFormat.Unmarshal(body, &parsed)
+	if err != nil || parsed.Status == 0 {
+		return false, ""
+	}
+
+	msg := fmt.Sprintf("%s (code %d)", parsed.Detail, parsed.Status)
+
+	return true, msg
 }
