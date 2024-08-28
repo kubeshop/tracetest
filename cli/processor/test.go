@@ -8,18 +8,21 @@ import (
 	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
+	"github.com/kubeshop/tracetest/cli/processor/trigger_preprocessor"
 	"go.uber.org/zap"
 )
 
 type test struct {
-	logger                  *zap.Logger
-	applyPollingProfileFunc applyResourceFunc
+	logger                   *zap.Logger
+	applyPollingProfileFunc  applyResourceFunc
+	triggerProcessorRegistry trigger_preprocessor.Registry
 }
 
-func Test(logger *zap.Logger, applyPollingProfileFunc applyResourceFunc) test {
+func Test(logger *zap.Logger, triggerProcessorRegistry trigger_preprocessor.Registry, applyPollingProfileFunc applyResourceFunc) test {
 	return test{
-		logger:                  cmdutil.GetLogger(),
-		applyPollingProfileFunc: applyPollingProfileFunc,
+		logger:                   cmdutil.GetLogger(),
+		applyPollingProfileFunc:  applyPollingProfileFunc,
+		triggerProcessorRegistry: triggerProcessorRegistry,
 	}
 }
 
@@ -37,14 +40,9 @@ func (t test) Preprocess(ctx context.Context, input fileutil.File) (fileutil.Fil
 		return input, fmt.Errorf("could not map polling profiles referenced in test yaml: %w", err)
 	}
 
-	test, err = t.consolidateGRPCFile(input, test)
+	test, err = t.triggerProcessorRegistry.Preprocess(input, test)
 	if err != nil {
-		return input, fmt.Errorf("could not consolidate grpc file: %w", err)
-	}
-
-	test, err = t.consolidateScriptFile(input, test)
-	if err != nil {
-		return input, fmt.Errorf("could not consolidate playwrightengine script file: %w", err)
+		return input, fmt.Errorf("could not preprocess trigger: %w", err)
 	}
 
 	marshalled, err := yaml.Marshal(test)
@@ -88,66 +86,4 @@ func (t test) mapPollingProfiles(ctx context.Context, input fileutil.File, test 
 	test.Spec.PollingProfile = &pollingProfile.Spec.Id
 
 	return test, nil
-}
-
-func (t test) consolidateGRPCFile(input fileutil.File, test openapi.TestResource) (openapi.TestResource, error) {
-	if test.Spec.Trigger.GetType() != "grpc" {
-		t.logger.Debug("test does not use grpc", zap.String("triggerType", test.Spec.Trigger.GetType()))
-		return test, nil
-	}
-
-	definedPBFile := test.Spec.Trigger.Grpc.GetProtobufFile()
-	if !t.isValidGrpcFilePath(definedPBFile, input.AbsDir()) {
-		t.logger.Debug("protobuf file is not a file path", zap.String("protobufFile", definedPBFile))
-		return test, nil
-	}
-
-	pbFilePath := input.RelativeFile(definedPBFile)
-	t.logger.Debug("protobuf file", zap.String("path", pbFilePath))
-
-	pbFile, err := fileutil.Read(pbFilePath)
-	if err != nil {
-		return test, fmt.Errorf(`cannot read protobuf file: %w`, err)
-	}
-	t.logger.Debug("protobuf file contents", zap.String("contents", string(pbFile.Contents())))
-
-	test.Spec.Trigger.Grpc.SetProtobufFile(string(pbFile.Contents()))
-
-	return test, nil
-}
-
-func (t test) consolidateScriptFile(input fileutil.File, test openapi.TestResource) (openapi.TestResource, error) {
-	if test.Spec.Trigger.GetType() != "playwrightengine" {
-		t.logger.Debug("test does not use playwrightengine", zap.String("triggerType", test.Spec.Trigger.GetType()))
-		return test, nil
-	}
-
-	definedScriptFile := test.Spec.Trigger.PlaywrightEngine.GetScript()
-	if !t.isValidGrpcFilePath(definedScriptFile, input.AbsDir()) {
-		t.logger.Debug("script file is not a file path", zap.String("protobufFile", definedScriptFile))
-		return test, nil
-	}
-
-	scriptFilePath := input.RelativeFile(definedScriptFile)
-	t.logger.Debug("script file", zap.String("path", scriptFilePath))
-
-	scriptFile, err := fileutil.Read(scriptFilePath)
-	if err != nil {
-		return test, fmt.Errorf(`cannot read script file: %w`, err)
-	}
-	t.logger.Debug("script file contents", zap.String("contents", string(scriptFile.Contents())))
-
-	test.Spec.Trigger.PlaywrightEngine.SetScript(string(scriptFile.Contents()))
-
-	return test, nil
-}
-
-func (t test) isValidGrpcFilePath(grpcFilePath, testFile string) bool {
-	if fileutil.LooksLikeRelativeFilePath(grpcFilePath) {
-		// if looks like a relative file path, test if it exists
-		return fileutil.IsFilePathToRelativeDir(grpcFilePath, testFile)
-	}
-
-	// it could be an absolute file path, test it
-	return fileutil.IsFilePath(grpcFilePath)
 }
