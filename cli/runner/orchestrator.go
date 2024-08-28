@@ -329,7 +329,6 @@ func HandleRunError(resp *http.Response, reqErr error) error {
 	}
 
 	if ok, msg := attemptToParseStructuredError(body); ok {
-		spew.Dump(body)
 		return fmt.Errorf("could not run resouce: %s", msg)
 	}
 
