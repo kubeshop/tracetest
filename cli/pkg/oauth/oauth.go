@@ -59,10 +59,12 @@ func (s *OAuthServer) GetAuthJWT() error {
 		return fmt.Errorf("failed to start oauth server: %w", err)
 	}
 
-	loginUrl, err := neturl.JoinPath(s.frontendEndpoint, fmt.Sprintf("oauth?callback=%s", url))
+	loginUrl, err := neturl.JoinPath(s.frontendEndpoint, "oauth")
 	if err != nil {
 		return fmt.Errorf("could not build path: %w", err)
 	}
+
+	loginUrl += fmt.Sprintf("?callback=%s", url)
 
 	ui := ui.DefaultUI
 	err = ui.OpenBrowser(loginUrl)
