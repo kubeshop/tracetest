@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"go.uber.org/zap"
 )
@@ -16,9 +15,9 @@ type runGroup struct {
 	logger        *zap.Logger
 }
 
-func RunGroup(openapiClient *openapi.APIClient) *runGroup {
+func RunGroup(logger *zap.Logger, openapiClient *openapi.APIClient) *runGroup {
 	return &runGroup{
-		logger:        cmdutil.GetLogger(),
+		logger:        logger,
 		openapiClient: openapiClient,
 	}
 }

@@ -8,10 +8,11 @@ import (
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	cliRunner "github.com/kubeshop/tracetest/cli/runner"
+	"go.uber.org/zap"
 )
 
-func Wait(ctx context.Context, cliConfig *config.Config, runGroupID, format string) (int, error) {
-	rungroupWaiter := runner.RunGroup(config.GetAPIClient(*cliConfig))
+func Wait(ctx context.Context, logger *zap.Logger, cliConfig *config.Config, runGroupID, format string) (int, error) {
+	rungroupWaiter := runner.RunGroup(logger, config.GetAPIClient(*cliConfig))
 	runGroup, err := rungroupWaiter.WaitForCompletion(ctx, runGroupID)
 	if err != nil {
 		return runner.ExitCodeGeneralError, err

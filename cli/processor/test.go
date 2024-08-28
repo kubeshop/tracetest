@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/processor/trigger_preprocessor"
@@ -20,7 +19,7 @@ type test struct {
 
 func Test(logger *zap.Logger, triggerProcessorRegistry trigger_preprocessor.Registry, applyPollingProfileFunc applyResourceFunc) test {
 	return test{
-		logger:                   cmdutil.GetLogger(),
+		logger:                   logger,
 		applyPollingProfileFunc:  applyPollingProfileFunc,
 		triggerProcessorRegistry: triggerProcessorRegistry,
 	}

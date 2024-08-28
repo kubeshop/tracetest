@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/workers/trigger"
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
@@ -15,7 +14,7 @@ type playwrightengine struct {
 }
 
 func PLAYWRIGHTENGINE(logger *zap.Logger) playwrightengine {
-	return playwrightengine{logger: cmdutil.GetLogger()}
+	return playwrightengine{logger: logger}
 }
 
 func (g playwrightengine) Type() trigger.TriggerType {

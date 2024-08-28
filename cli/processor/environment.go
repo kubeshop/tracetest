@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
@@ -21,7 +20,7 @@ type environment struct {
 }
 
 func Environment(logger *zap.Logger, applyFn applyFn, updateEnvFn updateEnvFn) environment {
-	return environment{logger: cmdutil.GetLogger(), applyFn: applyFn, updateEnvFn: updateEnvFn}
+	return environment{logger: logger, applyFn: applyFn, updateEnvFn: updateEnvFn}
 }
 
 func (e environment) Postprocess(ctx context.Context, input fileutil.File) (fileutil.File, error) {
