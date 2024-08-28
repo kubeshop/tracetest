@@ -2,6 +2,7 @@ package trigger_preprocessor
 
 import (
 	"github.com/kubeshop/tracetest/agent/workers/trigger"
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
@@ -12,7 +13,7 @@ type graphql struct {
 }
 
 func GRAPHQL(logger *zap.Logger) graphql {
-	return graphql{logger}
+	return graphql{logger: cmdutil.GetLogger()}
 }
 
 func (g graphql) Type() trigger.TriggerType {

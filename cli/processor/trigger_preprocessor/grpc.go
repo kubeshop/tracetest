@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/workers/trigger"
+	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
@@ -14,7 +15,7 @@ type grpc struct {
 }
 
 func GRPC(logger *zap.Logger) grpc {
-	return grpc{logger}
+	return grpc{logger: cmdutil.GetLogger()}
 }
 
 func (g grpc) Type() trigger.TriggerType {
