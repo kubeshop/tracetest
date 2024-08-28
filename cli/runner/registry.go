@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"go.uber.org/zap"
 )
 
@@ -18,7 +17,7 @@ func NewRegistry(logger *zap.Logger) Registry {
 	return Registry{
 		runners: map[string]Runner{},
 		proxies: map[string]string{},
-		logger:  cmdutil.GetLogger(),
+		logger:  logger,
 	}
 }
 

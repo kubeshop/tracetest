@@ -10,24 +10,25 @@ import (
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/processor"
+	"go.uber.org/zap"
 
 	cliRunner "github.com/kubeshop/tracetest/cli/runner"
 )
 
-func RunMultipleFiles(ctx context.Context, httpClient *resourcemanager.HTTPClient, runParams *cmdutil.RunParameters, cliConfig *config.Config, runnerRegistry cliRunner.Registry, format string) (int, error) {
+func RunMultipleFiles(ctx context.Context, logger *zap.Logger, httpClient *resourcemanager.HTTPClient, runParams *cmdutil.RunParameters, cliConfig *config.Config, runnerRegistry cliRunner.Registry, format string) (int, error) {
 	if cliConfig.Jwt == "" {
 		return cliRunner.ExitCodeGeneralError, fmt.Errorf("you should be authenticated to run multiple files, please run 'tracetest configure'")
 	}
 
-	variableSetPreprocessor := processor.VariableSet(cmdutil.GetLogger())
+	variableSetPreprocessor := processor.VariableSet(logger)
 
-	runGroup := runner.RunGroup(config.GetAPIClient(*cliConfig))
+	runGroup := runner.RunGroup(logger, config.GetAPIClient(*cliConfig))
 	formatter := formatters.MultipleRun[cliRunner.RunResult](func() string { return cliConfig.UI() }, true)
 
 	orchestrator := runner.MultiFileOrchestrator(
-		cmdutil.GetLogger(),
+		logger,
 		runGroup,
-		GetVariableSetClient(httpClient, variableSetPreprocessor),
+		GetVariableSetClient(logger, httpClient, variableSetPreprocessor),
 		runnerRegistry,
 		formatter,
 	)
@@ -44,9 +45,9 @@ func RunMultipleFiles(ctx context.Context, httpClient *resourcemanager.HTTPClien
 	}, format)
 }
 
-func GetVariableSetClient(httpClient *resourcemanager.HTTPClient, preprocessor processor.Preprocessor) resourcemanager.Client {
+func GetVariableSetClient(logger *zap.Logger, httpClient *resourcemanager.HTTPClient, preprocessor processor.Preprocessor) resourcemanager.Client {
 	variableSetClient := resourcemanager.NewClient(
-		httpClient, cmdutil.GetLogger(),
+		httpClient, logger,
 		"variableset", "variablesets",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{

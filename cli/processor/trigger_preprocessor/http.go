@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/kubeshop/tracetest/agent/workers/trigger"
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
@@ -15,7 +14,7 @@ type http struct {
 }
 
 func HTTP(logger *zap.Logger) http {
-	return http{logger: cmdutil.GetLogger()}
+	return http{logger: logger}
 }
 
 func (g http) Type() trigger.TriggerType {

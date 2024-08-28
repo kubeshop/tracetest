@@ -10,7 +10,6 @@ import (
 	"path"
 	"strings"
 
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"go.uber.org/zap"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -102,7 +101,7 @@ func NewClient(
 		client:             httpClient,
 		resourceName:       resourceName,
 		resourceNamePlural: resourceNamePlural,
-		logger:             cmdutil.GetLogger(),
+		logger:             logger,
 	}
 
 	for _, opt := range opts {

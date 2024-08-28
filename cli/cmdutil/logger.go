@@ -7,8 +7,6 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var logger *zap.Logger
-
 type loggerConfig struct {
 	Verbose bool
 }
@@ -22,10 +20,6 @@ func WithVerbose(verbose bool) loggerOption {
 }
 
 func GetLogger(opts ...loggerOption) *zap.Logger {
-	if logger != nil {
-		return logger
-	}
-
 	loggerConfig := loggerConfig{}
 	for _, opt := range opts {
 		opt(&loggerConfig)

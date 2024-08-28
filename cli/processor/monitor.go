@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/goccy/go-yaml"
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/openapi"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"go.uber.org/zap"
@@ -19,7 +18,7 @@ type monitor struct {
 
 func Monitor(logger *zap.Logger, applyTestSuiteFn, applyTestFn applyResourceFunc) monitor {
 	return monitor{
-		logger:           cmdutil.GetLogger(),
+		logger:           logger,
 		applyTestFn:      applyTestFn,
 		applyTestSuiteFn: applyTestSuiteFn,
 	}

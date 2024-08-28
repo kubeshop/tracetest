@@ -9,13 +9,13 @@ import (
 
 	"github.com/Jeffail/gabs/v2"
 	"github.com/kubeshop/tracetest/cli/analytics"
-	"github.com/kubeshop/tracetest/cli/cmdutil"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/pkg/fileutil"
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 	"github.com/kubeshop/tracetest/cli/processor"
 	"github.com/kubeshop/tracetest/cli/processor/trigger_preprocessor"
 	"github.com/kubeshop/tracetest/cli/runner"
+	"go.uber.org/zap"
 )
 
 var resourceParams = &resourceParameters{}
@@ -41,7 +41,7 @@ var (
 	httpClient = &resourcemanager.HTTPClient{}
 
 	variableSetPreprocessor = processor.VariableSet(cliLogger)
-	variableSetClient       = GetVariableSetClient(httpClient, variableSetPreprocessor)
+	variableSetClient       = GetVariableSetClient(cliLogger, httpClient, variableSetPreprocessor)
 
 	pollingProfileClient = resourcemanager.NewClient(
 		httpClient, cliLogger,
@@ -453,9 +453,9 @@ func formatItemDate(item *gabs.Container, path string) error {
 	return nil
 }
 
-func GetVariableSetClient(httpClient *resourcemanager.HTTPClient, preprocessor processor.Preprocessor) resourcemanager.Client {
+func GetVariableSetClient(logger *zap.Logger, httpClient *resourcemanager.HTTPClient, preprocessor processor.Preprocessor) resourcemanager.Client {
 	variableSetClient := resourcemanager.NewClient(
-		httpClient, cmdutil.GetLogger(),
+		httpClient, logger,
 		"variableset", "variablesets",
 		resourcemanager.WithTableConfig(resourcemanager.TableConfig{
 			Cells: []resourcemanager.TableCellConfig{

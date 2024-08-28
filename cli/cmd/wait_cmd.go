@@ -17,7 +17,7 @@ var waitCmd = &cobra.Command{
 	Long:    "Waits for a run group to be finished and displays the result",
 	PreRun:  setupCommand(),
 	Run: WithResultHandler(WithParamsHandler(waitParams)(func(_ context.Context, _ *cobra.Command, _ []string) (string, error) {
-		exitCode, err := cmd.Wait(context.Background(), &cliConfig, waitParams.RunGroupID, output)
+		exitCode, err := cmd.Wait(context.Background(), cliLogger, &cliConfig, waitParams.RunGroupID, output)
 
 		ExitCLI(exitCode)
 		return "", err
