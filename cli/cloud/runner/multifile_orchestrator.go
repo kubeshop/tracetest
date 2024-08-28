@@ -308,7 +308,7 @@ func (o orchestrator) createRun(ctx context.Context, resource any, vars *varset.
 		}
 		if !errors.Is(err, varset.MissingVarsError{}) {
 			// actual error, return
-			return result, resource, fmt.Errorf("cannot run test: %w", err)
+			return result, resource, fmt.Errorf("cannot create test run: %w", err)
 		}
 
 		// missing vars error
