@@ -335,9 +335,13 @@ func convertProtoGraphqlTriggerToGraphqlTrigger(graphqlRequest *proto.GraphqlReq
 	}
 
 	return &trigger.GraphqlRequest{
-		URL:             graphqlRequest.Url,
-		Headers:         headers,
-		Body:            graphqlRequest.Body,
+		URL:     graphqlRequest.Url,
+		Headers: headers,
+		Body: trigger.GraphqlBody{
+			Query:         graphqlRequest.Body.Query,
+			Variables:     graphqlRequest.Body.Variables,
+			OperationName: graphqlRequest.Body.OperationName,
+		},
 		SSLVerification: graphqlRequest.SSLVerification,
 	}
 }

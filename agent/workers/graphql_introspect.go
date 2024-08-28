@@ -2,7 +2,6 @@ package workers
 
 import (
 	"context"
-	"encoding/json"
 	"strings"
 
 	"github.com/kubeshop/tracetest/agent/client"
@@ -56,6 +55,9 @@ func NewGraphqlIntrospectWorker(client *client.Client, opts ...GraphqlIntrospect
 		meter:  telemetry.GetNoopMeter(),
 	}
 
+	http := trigger.HTTP()
+	worker.graphqlTrigger = trigger.GRAPHQL(http)
+
 	for _, opt := range opts {
 		opt(worker)
 	}
@@ -77,7 +79,7 @@ func (w *GraphqlIntrospectWorker) Introspect(ctx context.Context, r *proto.Graph
 	}
 
 	w.logger.Debug("Sending graphql introspection result", zap.Any("response", response))
-	err = w.client.SendGraphqlIntrospectionResult(ctx, mapGraphqlToProtoResponse(response.Result.Graphql))
+	err = w.client.SendGraphqlIntrospectionResult(ctx, mapGraphqlToProtoResponse(r, response.Result.Graphql))
 	if err != nil {
 		w.logger.Error("Could not send graphql introspection result", zap.Error(err))
 		span.RecordError(err)
@@ -97,18 +99,20 @@ func mapProtoToGraphqlRequest(r *proto.GraphqlIntrospectRequest) trigger.Trigger
 		})
 	}
 
+	headers = append(headers, trigger.HTTPHeader{
+		Value: "application/json",
+		Key:   "Content-Type",
+	})
+
 	request := &trigger.GraphqlRequest{
 		URL:             r.Graphql.Url,
 		SSLVerification: r.Graphql.SSLVerification,
 		Headers:         headers,
 	}
 
-	body := GraphQLBody{
+	request.Body = trigger.GraphqlBody{
 		Query: IntrospectionQuery,
 	}
-
-	json, _ := json.Marshal(body)
-	request.Body = string(json)
 
 	return trigger.Trigger{
 		Type:    trigger.TriggerTypeGraphql,
@@ -116,13 +120,9 @@ func mapProtoToGraphqlRequest(r *proto.GraphqlIntrospectRequest) trigger.Trigger
 	}
 }
 
-type GraphQLBody struct {
-	Query string `json:"query"`
-}
-
-func mapGraphqlToProtoResponse(r *trigger.GraphqlResponse) *proto.GraphqlIntrospectResponse {
+func mapGraphqlToProtoResponse(r *proto.GraphqlIntrospectRequest, resp *trigger.GraphqlResponse) *proto.GraphqlIntrospectResponse {
 	headers := make([]*proto.HttpHeader, 0)
-	for _, header := range r.Headers {
+	for _, header := range resp.Headers {
 		headers = append(headers, &proto.HttpHeader{
 			Key:   header.Key,
 			Value: header.Value,
@@ -130,11 +130,12 @@ func mapGraphqlToProtoResponse(r *trigger.GraphqlResponse) *proto.GraphqlIntrosp
 	}
 
 	return &proto.GraphqlIntrospectResponse{
+		RequestID: r.RequestID,
 		Response: &proto.HttpResponse{
-			StatusCode: int32(r.StatusCode),
-			Status:     r.Status,
+			StatusCode: int32(resp.StatusCode),
+			Status:     resp.Status,
 			Headers:    headers,
-			Body:       []byte(r.Body),
+			Body:       []byte(resp.Body),
 		},
 	}
 }
