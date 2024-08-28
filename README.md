@@ -58,7 +58,7 @@
     <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen?logo=github" alt="PRs welcome!" />
   </a>
   <a href="https://github.com/kubeshop/tracetest/issues">
-    <img src="https://img.shields.io/github/stars/kubeshop/tracetest?color=%23EAC54F&logo=github&label=Help us reach 1k stars! Now at:" alt="Help us reach 1k stars!" />
+    <img src="https://img.shields.io/github/stars/kubeshop/tracetest?color=%23EAC54F&logo=github&label=Help us reach 2k stars! Now at:" alt="Help us reach 2k stars!" />
   </a>
   <a href="https://tracetest.io/community">
     <img src="https://img.shields.io/badge/Join-Community!-purple" alt="Join our Community!" />
@@ -147,9 +147,9 @@ You can:
 
 The easiest and most reliable way to test microservices and distributed apps with OpenTelemetry distributed traces is signing up for free at [app.tracetest.io](https://app.tracetest.io/). After creating an account, getting started is as easy as [installing the Tracetest Agent](https://docs.tracetest.io/getting-started/installation).
 
-## Enterprise Self-hosted Tracetest (Coming soon...)
+## Enterprise Self-hosted Tracetest (1 month free trial!)
 
-Get the same experience as with the Cloud-based Managed Tracetest but self-hosted in your own infrastructure. [Book a call](https://dub.sh/tracetest-demo) to get into early access.
+Get the same experience as with the Cloud-based Managed Tracetest but self-hosted in your own infrastructure. [Get a trial license key](https://tracetest.io/on-prem-installation) and try it for free! [Book a call](https://dub.sh/tracetest-demo) to get a demo from the team.
 
 ## Hobby Self-hosted Open-source Tracetest Core
 

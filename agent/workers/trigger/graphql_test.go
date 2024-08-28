@@ -26,7 +26,7 @@ func TestGraphqlTrigger(t *testing.T) {
 
 		b, err := io.ReadAll(req.Body)
 		assert.NoError(t, err)
-		assert.Equal(t, `query { films { name } }`, string(b))
+		assert.Equal(t, `{"query":"query { films { name } }"}`, string(b))
 
 		rw.Header().Add("Content-Type", "application/json")
 		rw.WriteHeader(200)
@@ -42,7 +42,9 @@ func TestGraphqlTrigger(t *testing.T) {
 			Headers: []trigger.HTTPHeader{
 				{Key: "Key1", Value: "Value1"},
 			},
-			Body: `query { films { name } }`,
+			Body: trigger.GraphqlBody{
+				Query: `query { films { name } }`,
+			},
 		},
 	}
 

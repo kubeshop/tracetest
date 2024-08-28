@@ -156,6 +156,7 @@ func (c Configurator) getServerURL(prev *Config) (string, error) {
 }
 
 func (c Configurator) createConfig(serverURL string) (Config, error) {
+	serverURL = strings.TrimSuffix(serverURL, "/")
 	scheme, endpoint, path, err := ParseServerURL(serverURL)
 	if err != nil {
 		return Config{}, err

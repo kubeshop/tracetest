@@ -2,6 +2,7 @@ package trigger
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 )
 
@@ -41,12 +42,17 @@ func (t *graphqlTriggerer) Type() TriggerType {
 const TriggerTypeGraphql TriggerType = "graphql"
 
 func mapGraphqlToHttp(triggerConfig Trigger) Trigger {
+	json, err := json.Marshal(triggerConfig.Graphql.Body)
+	if err != nil {
+		return Trigger{}
+	}
+
 	return Trigger{
 		Type: TriggerTypeHTTP,
 		HTTP: &HTTPRequest{
 			URL:             triggerConfig.Graphql.URL,
 			Method:          HTTPMethodPOST,
-			Body:            triggerConfig.Graphql.Body,
+			Body:            string(json),
 			Headers:         triggerConfig.Graphql.Headers,
 			SSLVerification: triggerConfig.Graphql.SSLVerification,
 		},
@@ -72,7 +78,7 @@ func mapHttpToGraphql(response Response) Response {
 
 type GraphqlRequest struct {
 	URL             string             `expr_enabled:"true" json:"url,omitempty"`
-	Body            string             `expr_enabled:"true" json:"body,omitempty"`
+	Body            GraphqlBody        `expr_enabled:"true" json:"body,omitempty"`
 	Headers         []HTTPHeader       `json:"headers,omitempty"`
 	Auth            *HTTPAuthenticator `json:"auth,omitempty"`
 	SSLVerification bool               `json:"sslVerification,omitempty"`
@@ -84,4 +90,10 @@ type GraphqlResponse struct {
 	StatusCode int          `json:"statusCode,omitempty"`
 	Headers    []HTTPHeader `json:"headers,omitempty"`
 	Body       string       `json:"body,omitempty"`
+}
+
+type GraphqlBody struct {
+	Query         string            `json:"query,omitempty"`
+	Variables     map[string]string `json:"variables,omitempty"`
+	OperationName string            `json:"operationName,omitempty"`
 }

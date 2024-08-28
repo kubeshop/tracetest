@@ -21,6 +21,8 @@ type Trigger struct {
 	Kafka KafkaRequest `json:"kafka,omitempty"`
 
 	PlaywrightEngine PlaywrightEngineRequest `json:"playwrightEngine,omitempty"`
+
+	Graphql GraphqlRequest `json:"graphql,omitempty"`
 }
 
 // AssertTriggerRequired checks if the required fields are not zero-ed
@@ -38,6 +40,9 @@ func AssertTriggerRequired(obj Trigger) error {
 		return err
 	}
 	if err := AssertPlaywrightEngineRequestRequired(obj.PlaywrightEngine); err != nil {
+		return err
+	}
+	if err := AssertGraphqlRequestRequired(obj.Graphql); err != nil {
 		return err
 	}
 	return nil

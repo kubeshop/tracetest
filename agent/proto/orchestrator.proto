@@ -128,11 +128,17 @@ message HttpRequest {
 
 message GraphqlRequest {
     string url = 1;
-    string body = 2;
+    GraphqlBody body = 2;
     repeated HttpHeader headers = 3;
     HttpAuthentication authentication = 4;
     bool SSLVerification = 5;
     string schema = 6;
+}
+
+message GraphqlBody {
+    string query = 1;
+    map <string, string> variables = 2;
+    string operationName = 3;
 }
 
 message HttpHeader {
