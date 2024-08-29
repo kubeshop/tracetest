@@ -123,8 +123,8 @@ jobs:
         with:
           token: ${{ secrets.INFRA_REPO_PAT }}
           repository: ${{ secrets.CORE_REPO }}
-          event-type: update-chart
-          client-payload: '{"version": "${{ github.ref_name }}"}'
+          event-type: update-cli-version
+          client-payload: '{"new_tag": "${{ github.ref_name }}"}'
 
   helm_chart_version_bump:
       name: "Trigger Helm chart appVersion update"
