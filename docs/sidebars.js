@@ -43,6 +43,11 @@ const sidebars = {
               id: "examples-tutorials/recipes/running-tests-with-tracetest-playwright-engine",
               label: "True End-To-End Trace-Based Tests with the Tracetest Playwright Engine",
             },
+            {
+              type: "doc",
+              id: "examples-tutorials/recipes/running-tests-with-tracetest-graphql-pokeshop",
+              label: "Trace-Based Tests with the Tracetest GrapqhQL Trigger",
+            },
           ],
         },
         {
@@ -983,6 +988,11 @@ const sidebars = {
                     },
                     {
                       type: "doc",
+                      id: "web-ui/creating-tests-graphql",
+                      label: "Creating Tests - GraphQL",
+                    },
+                    {
+                      type: "doc",
                       id: "web-ui/creating-tests-traceid",
                       label: "Creating Tests - TraceID",
                     },
@@ -1123,6 +1133,11 @@ const sidebars = {
                       type: "doc",
                       id: "cli/creating-tests-kafka",
                       label: "Creating Tests - Kafka",
+                    },
+                    {
+                      type: "doc",
+                      id: "cli/creating-tests-graphql",
+                      label: "Creating Tests - GraphQL",
                     },
                     {
                       type: "doc",

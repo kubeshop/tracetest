@@ -1,0 +1,34 @@
+type: Test
+spec:
+  id: re9XOxqSR
+  name: Pokeshop - Import
+  trigger:
+    type: graphql
+    graphql:
+      url: http://demo-api:8081/graphql
+      headers:
+        - key: Content-Type
+          value: application/json
+      auth:
+        apiKey: {}
+        basic: {}
+        bearer: {}
+      body:
+        query: ./query.graphql
+        variables: {}
+        operationName: ""
+      sslVerification: false
+      schema: ./schema.graphql
+  specs:
+    - name: Import Pokemon Span Exists
+      selector: span[tracetest.span.type="general" name="import pokemon"]
+      assertions:
+        - attr:tracetest.selected_spans.count = 1
+    - name: Uses Correct PokemonId
+      selector: span[tracetest.span.type="http" name="GET" http.method="GET"]
+      assertions:
+        - attr:http.url  =  "https://pokeapi.co/api/v2/pokemon/6"
+    - name: Matching db result with the Pokemon Name
+      selector: span[tracetest.span.type="database" name="create postgres.pokemon"]:first
+      assertions:
+        - attr:db.result  contains      "charizard"

@@ -1,0 +1,33 @@
+---
+id: creating-tests-graphql
+title: Defining GraphQL Tests as Text Files
+description: Tracetest enables developers to define tests as text files and run them using a CLI. Integrate the execution of tests in your existing CI pipeline.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - graphql
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+When defining a GraphQL trigger, you are required to define a `graphql` object containing the request Tracetest will send to your system. You also define: `body` with `query`, `variables` and `operationName`, `url`, `headers`, and `SSLVerification`, and `schema`.
+
+```yaml
+trigger:
+  type: graphql
+  graphql:
+    url: ${env:GRAPHQL_URL}
+    headers:
+      - key: Content-Type
+        value: application/json
+    body:
+      # path to the query file or the query itself
+      query: ./query.graphql
+      variables: {}
+      operationName: ""
+    sslVerification: false
+    # path to the schema file or the schema itself
+    schema: ./schema.graphql
+```
