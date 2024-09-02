@@ -29,7 +29,7 @@ func GetLogger(opts ...loggerOption) *zap.Logger {
 	if loggerConfig.Verbose {
 		atom.SetLevel(zap.DebugLevel)
 	} else {
-		return zap.NewNop()
+		atom.SetLevel(zap.WarnLevel)
 	}
 
 	encoderCfg := zapcore.EncoderConfig{
