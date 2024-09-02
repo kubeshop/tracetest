@@ -7,7 +7,6 @@ services:
       # Get the required information here: https://app.tracetest.io/retrieve-token
       - TRACETEST_API_KEY=${TRACETEST_TOKEN}
       - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
-      - TRACETEST_SERVER_URL=${TRACETEST_SERVER_URL}
 
   tracetest-apply:
     build:
@@ -17,8 +16,6 @@ services:
     environment:
       TRACETEST_TOKEN: ${TRACETEST_TOKEN}
       TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
-      SERVER_URL: ${TRACETEST_SERVER_URL}
-      TRACETEST_DEV: true
     entrypoint:
       - bash
       - /resources/apply.sh
@@ -38,8 +35,6 @@ services:
     environment:
       TRACETEST_TOKEN: ${TRACETEST_TOKEN}
       TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
-      SERVER_URL: ${TRACETEST_SERVER_URL}
-      TRACETEST_DEV: true
     entrypoint:
       - bash
       - /resources/run.sh
