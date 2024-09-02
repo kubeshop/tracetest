@@ -3,7 +3,6 @@ package runner
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 
 	"github.com/golang-jwt/jwt"
@@ -16,7 +15,6 @@ import (
 	"github.com/kubeshop/tracetest/cli/pkg/resourcemanager"
 
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 )
 
 type Runner struct {
@@ -39,7 +37,7 @@ func NewRunner(configurator config.Configurator, resources *resourcemanager.Regi
 	}
 }
 
-func (s *Runner) Run(ctx context.Context, cfg config.Config, flags agentConfig.Flags, verbose bool) error {
+func (s *Runner) Run(ctx context.Context, logger *zap.Logger, cfg config.Config, flags agentConfig.Flags, verbose bool) error {
 	s.ui.Banner(config.Version)
 	s.ui.Println(`Tracetest start launches a lightweight agent. It enables you to run tests and collect traces with Tracetest.
 Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces via gRCP and HTTP.`)
@@ -51,31 +49,6 @@ Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces 
 
 	s.mode = flags.Mode
 	s.ui.Infof("Running in %s mode...", s.mode)
-
-	logger := zap.NewNop()
-
-	if enableLogging(flags.LogLevel) {
-		var err error
-		atom := zap.NewAtomicLevel()
-		if verbose {
-			atom.SetLevel(zapcore.DebugLevel)
-		}
-
-		logger, err = zap.NewDevelopment()
-		if err != nil {
-			return fmt.Errorf("could not create logger: %w", err)
-		}
-
-		logger = logger.WithOptions(zap.WrapCore(func(c zapcore.Core) zapcore.Core {
-			return zapcore.NewCore(
-				zapcore.NewJSONEncoder(zap.NewDevelopmentEncoderConfig()),
-				zapcore.Lock(os.Stdout),
-				atom,
-			)
-		}))
-
-		s.loggerLevel = &atom
-	}
 
 	s.logger = logger
 	s.configurator = s.configurator.WithLogger(logger)

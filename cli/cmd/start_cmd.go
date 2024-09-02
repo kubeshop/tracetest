@@ -76,7 +76,7 @@ var startCmd = &cobra.Command{
 			cfg.EnvironmentID = flags.EnvironmentID
 		}
 
-		err = agentRunner.Run(ctx, cliConfig, flags, verbose)
+		err = agentRunner.Run(ctx, cliLogger, cliConfig, flags, verbose)
 		return "", err
 	})),
 	PostRun: teardownCommand,
