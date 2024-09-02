@@ -1,0 +1,5 @@
+mutation import {
+  importPokemon(id: 6) {
+    id
+  }
+}
