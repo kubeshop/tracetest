@@ -10,6 +10,7 @@ import (
 	"github.com/kubeshop/tracetest/cli/config"
 	"github.com/kubeshop/tracetest/cli/formatters"
 	"github.com/kubeshop/tracetest/cli/openapi"
+	"github.com/kubeshop/tracetest/cli/pkg/oauth"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -132,6 +133,7 @@ func validateConfig(cmd *cobra.Command, args []string) {
 func setupLogger(cmd *cobra.Command, args []string) {
 	l := cmdutil.GetLogger(cmdutil.WithVerbose(verbose))
 	*cliLogger = *l
+	oauth.SetLogger(l)
 }
 
 func teardownCommand(cmd *cobra.Command, args []string) {
