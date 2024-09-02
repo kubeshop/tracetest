@@ -304,7 +304,6 @@ func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
 	c.logger.Debug("Exchanging token", zap.String("token", token))
 	jwt, err := oauth.ExchangeToken(cfg.OAuthEndpoint(), token)
 	if err != nil {
-		c.logger.Error("Could not exchange token", zap.Error(err))
 		return Config{}, err
 	}
 
