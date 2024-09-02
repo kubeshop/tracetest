@@ -117,7 +117,7 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 
 	_, err = c.handleOAuth(ctx, cfg, prev)
 	if err != nil {
-		c.logger.Error("Could not handle OAuth", zap.Error(err))
+		c.logger.Debug("Could not handle OAuth", zap.Error(err))
 		return err
 	}
 
@@ -265,7 +265,7 @@ func (c Configurator) handleOAuth(ctx context.Context, cfg Config, prev *Config)
 		var err error
 		cfg, err = c.exchangeToken(cfg, c.flags.Token)
 		if err != nil {
-			c.logger.Error("Could not exchange token", zap.Error(err))
+			c.logger.Debug("could not exchange token", zap.Error(err))
 			return Config{}, err
 		}
 	}
@@ -304,7 +304,6 @@ func (c Configurator) exchangeToken(cfg Config, token string) (Config, error) {
 	c.logger.Debug("Exchanging token", zap.String("token", token))
 	jwt, err := oauth.ExchangeToken(cfg.OAuthEndpoint(), token)
 	if err != nil {
-		c.logger.Error("Could not exchange token", zap.Error(err))
 		return Config{}, err
 	}
 

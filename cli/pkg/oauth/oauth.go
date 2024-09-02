@@ -85,6 +85,19 @@ func SetLogger(l *zap.Logger) {
 	logger = l
 }
 
+type oauthError struct {
+	err error
+	msg string
+}
+
+func (e oauthError) Error() string {
+	return e.err.Error()
+}
+
+func (e oauthError) Message() string {
+	return e.msg
+}
+
 func ExchangeToken(endpoint string, token string) (string, error) {
 	logger.Debug("Exchanging token", zap.String("endpoint", endpoint), zap.String("token", token))
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/tokens/%s/exchange", endpoint, token), nil)
@@ -95,16 +108,24 @@ func ExchangeToken(endpoint string, token string) (string, error) {
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		logger.Debug("Failed to exchange token", zap.Error(err))
-		return "", fmt.Errorf("failed to exchange token: %w", err)
+		logger.Debug("Cannot create exchange token request", zap.Error(err))
+		return "", fmt.Errorf("cannot create exchange token request: %w", err)
 	}
-
-	if res.StatusCode != http.StatusCreated {
-		logger.Debug("Failed to exchange token", zap.String("status", res.Status))
-		return "", fmt.Errorf("failed to exchange token: %s", res.Status)
-	}
-
 	defer res.Body.Close()
+
+	switch res.StatusCode {
+	case http.StatusNotFound:
+		return "", oauthError{err: fmt.Errorf("token not found"), msg: "Token not found"}
+	case http.StatusUnauthorized:
+		return "", oauthError{err: fmt.Errorf("token expired"), msg: "Token has expired"}
+	case http.StatusCreated:
+		logger.Debug("Token exchanged")
+	default:
+		b, _ := io.ReadAll(res.Body)
+		logger.Debug("Failed to exchange token", zap.String("status", res.Status), zap.String("response", string(b)))
+		return "", oauthError{err: fmt.Errorf("failed to exchange token: %s", res.Status), msg: "Unexpected error exchanging token"}
+	}
+
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		logger.Debug("Failed to read response body", zap.Error(err))
