@@ -1,0 +1,58 @@
+---
+id: cloud-helm
+title: Install with Helm
+hide_table_of_contents: false
+description: Installation and deployment instructions for using Helm to deploy Enterprise self-hosted Tracetest and use the On-Prem Tracetest Control Plane / Dashboard.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+This guide explains how to install a Tracetest Agent in your Kubernetes environment with Helm. It will install a Tracetest Agent in your infrastructure and use the Cloud-based managed Tracetest Control Plane and Dashboard.
+
+## Prerequisites
+
+- A running Kubernetes cluster.
+- A Tracetest license key. If you don't have one, you can request a trial license key [here](https://tracetest.io/on-prem-installation).
+- Install [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl).
+- Install [Helm](https://helm.sh/).
+
+## Install Tracetest Agent with Helm
+
+The [main chart for this repository is called `tracetest-agent`](https://github.com/kubeshop/tracetest-cloud-charts/tree/main/charts/tracetest-agent) and contains all components necessary to run Tracetest Agent in a cluster that fits the [deployment architecture](/install/deployment-architecture).
+
+```js title="Terminal"
+helm repo add tracetestcloud https://kubeshop.github.io/tracetest-cloud-charts --force-update  && \
+
+helm install <release-name> -n <namespace> tracetestcloud/tracetest-agent \
+--set agent.apiKey=<TRACETEST_API_KEY> --set agent.environmentId=<TRACETEST_ENVIRONMENT_ID>
+```
+
+If you use `agent` as the `<release-name>` with this installation, the trace ingestion endpoints will be:
+
+gRPC: `http://agent-tracetest-agent:4317`
+
+HTTP: `http://agent-tracetest-agent:4318/v1/traces`
+
+## Configuration
+
+Configure the Helm installation with the `values.yaml` file. View the [`values.yaml` default values, here.](https://github.com/kubeshop/tracetest-cloud-charts/blob/main/charts/tracetest-agent/values.yaml)
+
+<details>
+  <summary>
+    <b>Click to expand the `values.yaml` default values.</b>
+  </summary>
+
+```yaml
+agent:
+  apiKey: "apiKey"
+  environmentId: "environment-id"
+  serverURL: "https://app.tracetest.io"
+  skipVerify: false
+```
+
+</details>

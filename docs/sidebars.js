@@ -574,6 +574,11 @@ const sidebars = {
               id: "install/kubernetes",
               label: "Install with Kubernetes",
             },
+            {
+              type: "doc",
+              id: "install/cloud-helm",
+              label: "Install with Helm",
+            },
           ],
         },
         {
@@ -582,7 +587,7 @@ const sidebars = {
           items: [
             {
               type: "doc",
-              id: "install/helm",
+              id: "install/on-prem-helm",
               label: "Install with Helm",
             },
             {
