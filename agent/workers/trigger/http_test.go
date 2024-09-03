@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/kubeshop/tracetest/agent/workers/trigger"
-	triggerer "github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/trace"
@@ -56,7 +55,7 @@ func TestTriggerGet(t *testing.T) {
 		},
 	}
 
-	ex := triggerer.HTTP()
+	ex := trigger.HTTP()
 
 	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
@@ -100,7 +99,7 @@ func TestTriggerPost(t *testing.T) {
 		},
 	}
 
-	ex := triggerer.HTTP()
+	ex := trigger.HTTP()
 
 	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
@@ -158,7 +157,7 @@ func TestTriggerPostWithApiKeyAuth(t *testing.T) {
 		},
 	}
 
-	ex := triggerer.HTTP()
+	ex := trigger.HTTP()
 
 	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
@@ -215,7 +214,7 @@ func TestTriggerPostWithBasicAuth(t *testing.T) {
 		},
 	}
 
-	ex := triggerer.HTTP()
+	ex := trigger.HTTP()
 
 	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
@@ -271,7 +270,7 @@ func TestTriggerPostWithBearerAuth(t *testing.T) {
 		},
 	}
 
-	ex := triggerer.HTTP()
+	ex := trigger.HTTP()
 
 	resp, err := ex.Trigger(createContext(), triggerConfig, nil)
 	assert.NoError(t, err)
