@@ -388,11 +388,6 @@ const sidebars = {
       items: [
         {
           type: "doc",
-          id: "ci-cd-automation/github-actions-pipeline",
-          label: "GitHub Actions Pipeline",
-        },
-        {
-          type: "doc",
           id: "ci-cd-automation/github-actions-pipeline-with-secrets",
           label: "Github Actions Pipeline with Secrets",
         },

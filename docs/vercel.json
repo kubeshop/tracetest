@@ -185,6 +185,11 @@
       "destination": "/getting-started/installation",
       "source": "/deployment/overview",
       "statusCode": 301
+    },
+    {
+      "destination": "/ci-cd-automation/github-actions-pipeline-with-secrets",
+      "source": "/ci-cd-automation/github-actions-pipeline",
+      "statusCode": 301
     }
   ]
 }
