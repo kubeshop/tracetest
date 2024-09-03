@@ -174,7 +174,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: tracetest-dist
           path: dist/
@@ -209,7 +209,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: tracetest-dist
           path: dist/
@@ -243,7 +243,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: tracetest-dist
           path: dist/
@@ -272,7 +272,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: tracetest-dist
           path: dist/
@@ -310,7 +310,7 @@ jobs:
           go-version-file: "go.mod"
           cache: true
           cache-dependency-path: "go.mod"
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: tracetest-dist
           path: dist/
@@ -347,7 +347,7 @@ jobs:
   #         go-version-file: "go.mod"
   #         cache: true
   #         cache-dependency-path: "go.mod"
-  #     - uses: actions/download-artifact@v3
+  #     - uses: actions/download-artifact@v4.1.7
   #       with:
   #         name: tracetest-dist
   #         path: dist/
@@ -415,7 +415,7 @@ jobs:
         if: steps.cache-nodemodules.outputs.cache-hit != 'true'
         run: cd web/; npm ci
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: tracetest-dist
           path: dist/
