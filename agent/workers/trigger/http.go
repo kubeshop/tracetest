@@ -75,6 +75,10 @@ func (te *httpTriggerer) Trigger(ctx context.Context, triggerConfig Trigger, opt
 	tReq.Authenticate(req)
 	propagators().Inject(ctx, propagation.HeaderCarrier(req.Header))
 
+	if host := req.Header.Get("Host"); host != "" {
+		req.Host = host
+	}
+
 	resp, err := client.Do(req.WithContext(ctx))
 	if err != nil {
 		return response, err
