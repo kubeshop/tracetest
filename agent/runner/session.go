@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/kubeshop/tracetest/agent/client"
 	"github.com/kubeshop/tracetest/agent/collector"
@@ -69,12 +70,19 @@ func StartSession(ctx context.Context, cfg config.Config, observer event.Observe
 	}
 
 	controlPlaneClient.OnOTLPConnectionTest(func(ctx context.Context, otr *proto.OTLPConnectionTestRequest) error {
+		logger.Debug("Received OTLP connection test request", zap.Bool("resetCounter", otr.ResetCounter))
 		if otr.ResetCounter {
+			logger.Debug("Resetting statistics")
 			agentCollector.ResetStatistics()
 			return nil
 		}
 
 		statistics := agentCollector.Statistics()
+		logger.Debug("Sending OTLP connection test response",
+			zap.Int64("spanCount", statistics.SpanCount),
+			zap.Int64("lastSpanTimestamp", time.Since(statistics.LastSpanTimestamp).Milliseconds()),
+		)
+
 		controlPlaneClient.SendOTLPConnectionResult(ctx, &proto.OTLPConnectionTestResponse{
 			RequestID:         otr.RequestID,
 			SpanCount:         int64(statistics.SpanCount),
