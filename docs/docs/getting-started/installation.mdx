@@ -217,11 +217,13 @@ spec:
 
 The Tracetest Agent is running in Kubernetes and ready to accept traces.
 
-gRPC: `http://<service-name>:4317`
+gRPC: `http://tracetest-agent.default.svc.cluster.local:4317`
 
-HTTP: `http://<service-name>:4318/v1/traces`
+HTTP: `http://tracetest-agent.default.svc.cluster.local:4318/v1/traces`
 
 :::note K8s Network
+Make sure to check use the correct `<service-name>` if you edit the Tracetest Agent `service` name.
+
 Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
 Make sure to run tests using the internal Kubernetes service networking eg: `http://api.default.svc.cluster.internal:port`.
 :::
@@ -229,27 +231,25 @@ Make sure to run tests using the internal Kubernetes service networking eg: `htt
 </TabItem>
 <TabItem value="helm" label="Helm">
 
-Set the `<release-name>` and `<namespace>` to your desired values.
-
 <CodeBlock
     language="js"
     title="Terminal"
 >
 {`helm repo add tracetestcloud https://kubeshop.github.io/tracetest-cloud-charts --force-update && \\
 
-helm install <release-name> -n <namespace> tracetestcloud/tracetest-agent \\
+helm install agent tracetestcloud/tracetest-agent \\
 --set agent.apiKey=<TRACETEST_API_KEY> --set agent.environmentId=<TRACETEST_ENVIRONMENT_ID>`}
 </CodeBlock>
 
-The Tracetest Agent is running in Kubernetes and ready to accept traces.
+The Tracetest Agent is running in Kubernetes and ready to accept traces. With this installation of using `agent` as the `<release-name>`, the trace ingestion endpoints will be:
 
-gRPC: `http://<service-name>:4317`
+gRPC: `http://agent-tracetest-agent:4317`
 
-HTTP: `http://<service-name>:4318/v1/traces`
+HTTP: `http://agent-tracetest-agent:4318/v1/traces`
 
 :::note K8s Network
 Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
-Make sure to run tests using the internal Kubernetes service networking eg: `http://api.default.svc.cluster.internal:port`.
+Make sure to run tests using the internal Kubernetes service networking eg: `http://pokeshop-pokemon-api:8081`.
 :::
 
 </TabItem>
@@ -323,7 +323,7 @@ kubectl port-forward svc/api 8081:8081
 
 - [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
 - [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is port forwarded from Kubernetes to `localhost` on this port.
-- To run tests you will use the Kubernetes internal network and the service name, `http://http://api.default.svc.cluster.internal:8081`.
+- To run tests you will use the Kubernetes internal network and the service name, `http://api.default.svc.cluster.internal:8081`.
 - `tracetest-agent.default.svc.cluster.local:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
 
 </TabItem>
@@ -335,19 +335,19 @@ git clone --depth 1 https://github.com/kubeshop/pokeshop.git
 cd pokeshop/helm-charts
 
 helm dependency update
-helm install -n <namespace> -f values.yaml --create-namespace <namespace> .
+helm install -f values.yaml --create-namespace pokeshop .
 ```
 
 To access the Pokeshop API run a `port-forward`:
 
 ```bash
-kubectl port-forward svc/api 8081:8081
+kubectl port-forward svc/pokeshop-pokemon-api 8081:8081
 ```
 
 - [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
 - [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is port forwarded from Kubernetes to `localhost` on this port.
-- To run tests you will use the Kubernetes internal network and the service name, `http://http://api.default.svc.cluster.internal:8081`.
-- `tracetest-agent.default.svc.cluster.local:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+- To run tests you will use the Kubernetes internal network and the service name, `http://pokeshop-pokemon-api:8081`.
+- `http://agent-tracetest-agent:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
 
 </TabItem>
 
@@ -404,7 +404,7 @@ This installation is meant for testing purposes only. It uses self signed certif
 For the Production-ready installation:
 
 - [View the official Helm chart readme](https://github.com/kubeshop/tracetest-cloud-charts/blob/main/README.md).
-- [View the official installation docs](/install/helm).
+- [View the official installation docs](/install/on-prem-helm).
 :::
 
 1. Install [Helm](https://helm.sh/) and [kind](https://kind.sigs.k8s.io/) on your machine. Clone the official Tracetest Helm chart.

@@ -26,28 +26,82 @@ This guide explains how to install a Tracetest Agent in your Kubernetes environm
 
 ## Install the Tracetest Agent with Kubernetes
 
-[Tracetest Agent](/concepts/agent) runs as a Kubernetes Daemonset.
+[Tracetest Agent](/concepts/agent) runs as a Kubernetes Deployment with a Service.
+
+```yaml title="tracetest-agent.yaml"
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracetest-agent
+  labels:
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+spec:
+  selector:
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+  ports:
+    - name: grpc-collector-entrypoint
+      protocol: TCP
+      port: 4317
+      targetPort: 4317
+    - name: http-collector-entrypoint
+      protocol: TCP
+      port: 4318
+      targetPort: 4318
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracetest-agent
+  labels:
+    app: tracetest-agent
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tracetest-agent
+      app.kubernetes.io/instance: tracetest-agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tracetest-agent
+        app.kubernetes.io/instance: tracetest-agent
+    spec:
+      containers:
+        - name: agent
+          image: "kubeshop/tracetest-agent:latest"
+          imagePullPolicy: Always
+          args: [
+            "--environment",
+            "<TRACETEST_ENVIRONMENT_ID>", # Add your env id
+            "--api-key",
+            "$TRACETEST_API_KEY",
+            "--server-url",
+            "https://app.tracetest.io",
+          ]
+          env:
+          - name: TRACETEST_API_KEY
+            value: "<TRACETEST_API_KEY>" # Add your API key
+```
 
 ```bash title="Terminal"
-curl https://raw.githubusercontent.com/kubeshop/tracetest/main/k8s/agent/deploy-agent.sh | bash -s -- default <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_ID>
+kubectl apply -f ./tracetest-agent.yaml
 ```
 
 The Tracetest Agent is running in Kubernetes and ready to accept traces.
 
-gRPC: `http://<service-name>:4317`
+gRPC: `http://tracetest-agent.default.svc.cluster.local:4317`
 
-HTTP: `http://<service-name>:4318/v1/traces`
+HTTP: `http://tracetest-agent.default.svc.cluster.local:4318/v1/traces`
 
 :::note K8s Network
+Make sure to check use the correct `<service-name>` if you edit the Tracetest Agent `service` name.
+
 Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
-
-To run tests against apps running on your local machine you have two options:
-
-1. Run the Tracetest Agent locally with the `tracetest start` command.
-2. Add the Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
-
-You can reach services running on your local machine using:
-
-- Linux (docker version < 20.10.0): `172.17.0.1:8080`
-- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
+Make sure to run tests using the internal Kubernetes service networking eg: `http://api.default.svc.cluster.internal:port`.
 :::

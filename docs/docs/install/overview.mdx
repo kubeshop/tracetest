@@ -24,9 +24,19 @@ Tracetest supports two deployment models.
 
 With both options Tracetest Agents run in your infrastructure on the same network as your application under test. Tracetest Agents are test runners and trace ingestors. You can choose to run the control plane / dashboard self-hosted or let us manage it in Cloud-based managed Tracetest, it's up to you. Check out the [deployment architecture](/install/deployment-architecture) to learn more.
 
-You can install Tracetest by using one of the following deployment options:
+
+## Cloud-based Managed Tracetest
+
+You can install Cloud-based Managed Tracetest by using one of the following deployment options.
 
 - Use the [Tracetest CLI](/install/cli) for an out-of-the-box experience with Cloud-based managed Tracetest.
 - Use [Docker](/install/docker) to run Tracetest Agent with with Cloud-based managed Tracetest.
-- Use [Kubernetes](/install/kubernetes) to run Tracetest Agent with with Cloud-based managed Tracetest.
-- Use the [Tracetest Helm Chart](/install/helm) to customize your deployment with Enterprise self-hosted Tracetest.
+- Use [Kubernetes](/install/kubernetes) to run Tracetest Agent with Cloud-based managed Tracetest.
+- Use the [Tracetest Helm Chart](/install/cloud-helm) to install Tracetest Agent with Helm in your Kubernetes cluster and run it with Cloud-based managed Tracetest.
+
+## Enterprise Self-hosted Tracetest
+
+You can install Enterprise Self-hosted Tracetest by using one of the following deployment options.
+
+- Use the [Tracetest Helm Chart](/install/on-prem-helm) to customize your deployment with Enterprise self-hosted Tracetest.
+- Use the [Tracetest Helm Chart with GCP](/install/gcp) to customize your deployment of Enterprise self-hosted Tracetest for running in GCP.

@@ -1,5 +1,5 @@
 ---
-id: helm
+id: on-prem-helm
 title: Install with Helm
 hide_table_of_contents: false
 description: Installation and deployment instructions for using Helm to deploy Enterprise self-hosted Tracetest and use the On-Prem Tracetest Control Plane / Dashboard.
@@ -23,12 +23,12 @@ Installation and deployment instructions for using Helm to deploy Enterprise sel
 
 ## Install Tracetest On-Premises with Helm
 
-The [main chart for this repository is called `tracetest-onprem`](https://github.com/kubeshop/tracetest-cloud-charts/blob/main/README.md) and contains all components necessary to run Enterprise self-hosted Tracetest on-premises in a cluster that fits the [deployment architecture](/install/deployment-architecture).
+The [main chart for this repository is called `tracetest-onprem`](https://github.com/kubeshop/tracetest-cloud-charts/tree/main/charts/tracetest-onprem) and contains all components necessary to run Enterprise self-hosted Tracetest on-premises in a cluster that fits the [deployment architecture](/install/deployment-architecture).
 
-```bash title="Terminal"
-helm repo add tracetestcloud https://kubeshop.github.io/tracetest-cloud-charts --force-update
+```js title="Terminal"
+helm repo add tracetestcloud https://kubeshop.github.io/tracetest-cloud-charts --force-update  && \
 
-helm install my-tracetest tracetestcloud/tracetest-onprem \
+helm install <release-name> -n <namespace> tracetestcloud/tracetest-onprem \
   --set global.licenseKey=<YOUR_TRACETEST_LICENSE> \
   --values values.yaml
 ```
