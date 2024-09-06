@@ -32,6 +32,8 @@ func (c *Client) startup(ctx context.Context) error {
 		return fmt.Errorf("could not send request to server: %w", err)
 	}
 
+	// TODO: receive info about amount of connected agents here
+
 	c.sessionConfig = &SessionConfig{
 		BatchTimeout:        time.Duration(response.Configuration.BatchTimeout) * time.Millisecond,
 		AgentIdentification: response.Identification,

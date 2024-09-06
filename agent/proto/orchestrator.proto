@@ -78,6 +78,7 @@ message ConnectRequest {
 message AgentConfiguration {
     SessionConfiguration configuration = 1;
     AgentIdentification identification = 2;
+    int32 agentsConnected = 3;
 }
 
 // SessionConfiguration is a set of configuration values that must be used by the agent while
