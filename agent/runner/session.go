@@ -28,7 +28,9 @@ type Session struct {
 }
 
 func (s *Session) Close() {
-	s.client.Close()
+	if s != nil && s.client != nil {
+		s.client.Close()
+	}
 }
 
 func (s *Session) WaitUntilDisconnected() {

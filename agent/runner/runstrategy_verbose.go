@@ -18,11 +18,11 @@ func (s *Runner) RunVerboseStrategy(ctx context.Context, cfg agentConfig.Config)
 	s.ui.Infof("%s Starting Agent with name %s...", consoleUI.Emoji_Truck, cfg.Name)
 
 	session, err := StartSession(ctx, cfg, &verboseObserver{ui: s.ui}, s.logger)
-
-	if err != nil && errors.Is(err, ErrOtlpServerStart) {
-		s.ui.Errorf("%s Tracetest Agent binds to the OpenTelemetry ports 4317 and 4318 which are used to receive trace information from your system. The agent tried to bind to these ports, but failed.", consoleUI.Emoji_RedCircle)
-
-		s.ui.Finish()
+	if err != nil {
+		if errors.Is(err, ErrOtlpServerStart) {
+			s.ui.Errorf("%s Tracetest Agent binds to the OpenTelemetry ports 4317 and 4318 which are used to receive trace information from your system. The agent tried to bind to these ports, but failed.", consoleUI.Emoji_RedCircle)
+			s.ui.Finish()
+		}
 		return err
 	}
 
