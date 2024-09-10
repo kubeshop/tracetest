@@ -28,7 +28,7 @@ services:
     volumes:
       - ./collector.config.yaml:/otel-local-config.yaml
   # Tracetest End
- 
+
 
   # Demo
   postgres:

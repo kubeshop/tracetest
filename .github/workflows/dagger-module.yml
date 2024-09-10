@@ -1,0 +1,39 @@
+name: Dagger module
+
+concurrency:
+  group: "dagger-module"
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'docs/**'
+      - 'cli/**'
+  pull_request:
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Call Dagger Function
+        uses: dagger/dagger-for-github@v6
+        with:
+          version: "latest"
+          verb: develop
+
+  pokeshop-test:
+    name: Pokeshop test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Call tracetest
+        uses: dagger/dagger-for-github@v6
+        with:
+          workdir: examples/quick-start-pokeshop
+          version: "latest"
+          args: tracetest --test-file ./tests/test.yaml

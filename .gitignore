@@ -30,3 +30,9 @@ server/html
 
 __debug*
 web/cypress/downloads
+
+# Dagger
+/dagger.gen.go
+/internal/dagger
+/internal/querybuilder
+/internal/telemetry

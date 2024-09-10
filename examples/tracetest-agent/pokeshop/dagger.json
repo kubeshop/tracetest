@@ -1,0 +1,12 @@
+{
+  "name": "pokeshop",
+  "sdk": "go",
+  "dependencies": [
+    {
+      "name": "tracetest",
+      "source": "../../../."
+    }
+  ],
+  "source": "dagger",
+  "engineVersion": "v0.12.7"
+}
