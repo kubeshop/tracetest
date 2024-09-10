@@ -20,13 +20,16 @@ func FromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) Trace {
 	for _, resource := range resourceSpans {
 		for _, scopeSpans := range resource.ScopeSpans {
 			for _, span := range scopeSpans.Spans {
-				span.Attributes = append(span.Attributes, &v11.KeyValue{
-					Key:   MetadataServiceName,
-					Value: &v11.AnyValue{Value: &v11.AnyValue_StringValue{StringValue: scopeSpans.Scope.Name}},
-				})
+				// if service exists, add it as an attribute
+				if scopeSpans.Scope != nil {
+					span.Attributes = append(span.Attributes, &v11.KeyValue{
+						Key:   MetadataServiceName,
+						Value: &v11.AnyValue{Value: &v11.AnyValue_StringValue{StringValue: scopeSpans.Scope.Name}},
+					})
 
-				// Add attributes from the resource
-				span.Attributes = append(span.Attributes, scopeSpans.Scope.Attributes...)
+					// Add attributes from the resource
+					span.Attributes = append(span.Attributes, scopeSpans.Scope.Attributes...)
+				}
 			}
 
 			flattenSpans = append(flattenSpans, scopeSpans.Spans...)
