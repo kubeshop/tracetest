@@ -1,0 +1,53 @@
+---
+id: creating-tests-playwright-engine
+title: Creating Tests - Playwright Engine
+description: Tracetest enables creating and running native Playwright tests visually in the Tracetest Web UI.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - playwright
+  - playwright engine
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+:::info How is Playwright Engine different from the Playwright npm module integration?
+TODO add link [here](https://tracetest.io/blog/tracetest-tip-instrumentation-for-end-to-end-tests).
+:::
+
+[Playwright](https://playwright.dev/) is an open-source automation framework developed by Microsoft that enables cross-browser automation for web applications. It provides a set of APIs and libraries for automating interactions with web browsers such as Chrome, Firefox, and Microsoft Edge.
+
+👉 **Join our [shared Pokeshop API Demo environment](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept) and try creating a Test yourself!**
+
+Click the Playwright Engine option to continue:
+
+![Choose Trigger](https://res.cloudinary.com/djwdcmwdz/image/upload/v1725949257/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_231b49e808c29e6a_tests_page_1_2_sl75n1.png)
+
+You can choose an example test in the shared Pokeshop API Demo environment.
+
+![Choose Example Pokemon](https://res.cloudinary.com/djwdcmwdz/image/upload/v1725951354/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_231b49e808c29e6a_test_create_playwrightengine_ktazl2.png)
+
+Choose the **Pokeshop - Import** example and click **Run**.
+
+The Playwright Testing Engine executes your testing scripts natively in the platform, by specifying three things:
+
+- The target URL of your website (private or public).
+- A JavaScript file with your tests.
+- And the exported method you want to execute.
+
+When the test finishes, you will get the following results:
+
+- The Playwright script output.
+- The trace from both the front-end UI and back-end processes.
+
+![test result](https://res.cloudinary.com/djwdcmwdz/image/upload/v1725951959/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_231b49e808c29e6a_test_IwCdBElIR_run_1385_trigger_1_plxh33.png)
+
+![trace result](https://res.cloudinary.com/djwdcmwdz/image/upload/v1725951905/docs/app.tracetest.io_organizations_ttorg_2179a9cd8ba8dfa5_environments_ttenv_231b49e808c29e6a_test_IwCdBElIR_run_1385_trigger_kflqrv.png)
+
+Please visit the [Test Results](/web-ui/test-results) document for an explanation of viewing the results of a test.
+
+👉 **Join our [shared Pokeshop API Demo environment](https://app.tracetest.io/organizations/ttorg_2179a9cd8ba8dfa5/invites/invite_760904a64b4b9dc9/accept) and try creating a Test yourself!**
+

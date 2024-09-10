@@ -46,7 +46,7 @@ const sidebars = {
             {
               type: "doc",
               id: "examples-tutorials/recipes/running-tests-with-tracetest-graphql-pokeshop",
-              label: "Trace-Based Tests with the Tracetest GrapqhQL Trigger",
+              label: "Trace-Based Tests with the Tracetest GraphQL Trigger",
             },
           ],
         },
@@ -988,6 +988,11 @@ const sidebars = {
                     },
                     {
                       type: "doc",
+                      id: "web-ui/creating-tests-playwright-engine",
+                      label: "Creating Tests - Playwright Engine",
+                    },
+                    {
+                      type: "doc",
                       id: "web-ui/creating-tests-graphql",
                       label: "Creating Tests - GraphQL",
                     },
@@ -1133,6 +1138,11 @@ const sidebars = {
                       type: "doc",
                       id: "cli/creating-tests-kafka",
                       label: "Creating Tests - Kafka",
+                    },
+                    {
+                      type: "doc",
+                      id: "cli/creating-tests-playwright-engine",
+                      label: "Creating Tests - Playwright Engine",
                     },
                     {
                       type: "doc",

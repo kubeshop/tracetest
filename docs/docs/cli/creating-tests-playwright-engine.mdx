@@ -1,0 +1,55 @@
+---
+id: creating-tests-playwright-engine
+title: Defining Playwright Engine Tests as Text Files
+description: Tracetest enables developers to define tests as text files and run them using a CLI. Integrate the execution of Playwright Engine tests in your existing CI pipeline.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - playwright
+  - playwright engine
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+The Playwright Testing Engine executes your testing scripts natively in the platform, by specifying three things:
+
+- The target URL of your website (private or public).
+- A JavaScript file with your tests.
+- And the exported method you want to execute.
+
+Tracetest Playwright Engine test definition YAML:
+
+```yaml
+trigger:
+  type: playwrightengine
+  playwrightEngine:
+    target: ${env:TARGET_URL}
+    script: ./script.js
+    method: importPokemon
+```
+
+Playwright `script.js` definition:
+
+```js
+const { expect } = require("@playwright/test");
+
+// [...]
+
+async function importPokemon(page) {
+  expect(await page.getByText("Pokeshop")).toBeTruthy();
+
+  await page.click("text=Import");
+  await page.getByLabel("ID").fill("143");
+
+  await Promise.all([
+    page.waitForResponse(
+      (resp) => resp.url().includes("/pokemon/import") && resp.status() === 200
+    ),
+    page.getByRole("button", { name: "OK", exact: true }).click(),
+  ]);
+}
+
+module.exports = { importPokemon };
+```
