@@ -45,6 +45,11 @@ const sidebars = {
             },
             {
               type: "doc",
+              id: "examples-tutorials/recipes/migrating-tests-from-playwright-integration-to-playwright-engine",
+              label: "Migrating tests from Playwright integration to Playwright Engine",
+            },
+            {
+              type: "doc",
               id: "examples-tutorials/recipes/running-tests-with-tracetest-graphql-pokeshop",
               label: "Trace-Based Tests with the Tracetest GraphQL Trigger",
             },
