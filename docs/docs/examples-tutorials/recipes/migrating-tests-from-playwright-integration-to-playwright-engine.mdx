@@ -1,6 +1,6 @@
 ---
 id: migrating-tests-from-playwright-integration-to-playwright-engine
-title: Migrating tests from Playwright integration to Playwright Engine
+title: Migrating Tests from Playwright Integration to Playwright Engine
 description: Quickstart on how to Migrating tests from Playwright integration to Playwright Engine
 hide_table_of_contents: false
 keywords:
@@ -44,7 +44,7 @@ The [Tracetest integration for Playwright](/tools-and-integrations/playwright) e
 
 ### Why Migrate to Playwright Engine?
 
-By creating a Tracetest Playwright Engine test, you will be able to create trace-based assertions to be applied across the entire flow like any other Tracetest test. Not only that but it allows you to mix and match it with your existing Monitors, Test Suites and CI/CD validations.
+By creating a Tracetest Playwright Engine test, you will be able to create trace-based assertions to be applied across the entire flow like any other Tracetest test. It also allows you to mix and match it with your existing Monitors, Test Suites and CI/CD validations.
 
 You do not need to edit your existing Playwright tests. Only import your existing tests into Tracetest.
 
@@ -54,7 +54,7 @@ You do not need to edit your existing Playwright tests. Only import your existin
 
 Running a Tracetest test with the [Playwright integration](/tools-and-integrations/playwright) requires you to do 3 things:
 
-1. Install the `@tracetest/playwright` npm module and eidt your existing Playwright test scripts.
+1. Install the `@tracetest/playwright` npm module and edit your existing Playwright test scripts.
 2. Load the Tracetest test definition YAML file.
 3. Add three lifecycle hooks to the Playwright test script: `beforeAll`, `beforeEach`, `afterAll`. They are used to trigger Tracetest.
 
@@ -152,9 +152,9 @@ test("Playwright: deletes a pokemon", async ({ page }) => {
 
 Running a Tracetest test with the [Playwright Engine](/examples-tutorials/recipes/running-tests-with-tracetest-playwright-engine) requires you to do 3 things:
 
-1. Add the target URL of your website
-2. Upload your existing unedited Playwright test script
-3. Select the exported method to execute from the Playwright test script
+1. Add the target URL of your website.
+2. Upload your existing unedited Playwright test script.
+3. Select the exported method to execute from the Playwright test script.
 
 Tracetest now natively supports Playwright tests without including third-party libraries or code snippets that are not 100% related to your tests.
 
