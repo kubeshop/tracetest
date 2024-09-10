@@ -23,7 +23,8 @@ const (
 	TracetestMetadataFieldStatusCode        string = "tracetest.span.status_code"
 	TracetestMetadataFieldStatusDescription string = "tracetest.span.status_description"
 
-	MetadataServiceName string = "service.name"
+	MetadataServiceName  string = "service.name"
+	TracetestServiceName string = "tracetest"
 )
 
 func NewAttributes(inputs ...map[string]string) Attributes {
@@ -372,5 +373,6 @@ func (span Span) setTriggerResultAttributes(result trigger.TriggerResult) Span {
 		span.Attributes.Set("tracetest.response.headers", string(jsonheaders))
 	}
 
+	span.Attributes.Set(MetadataServiceName, TracetestServiceName)
 	return span
 }
