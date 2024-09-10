@@ -22,6 +22,8 @@ const (
 	TracetestMetadataFieldKind              string = "tracetest.span.kind"
 	TracetestMetadataFieldStatusCode        string = "tracetest.span.status_code"
 	TracetestMetadataFieldStatusDescription string = "tracetest.span.status_description"
+
+	MetadataServiceName string = "service.name"
 )
 
 func NewAttributes(inputs ...map[string]string) Attributes {

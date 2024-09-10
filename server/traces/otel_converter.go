@@ -19,6 +19,16 @@ func FromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) Trace {
 	flattenSpans := make([]*v1.Span, 0)
 	for _, resource := range resourceSpans {
 		for _, scopeSpans := range resource.ScopeSpans {
+			for _, span := range scopeSpans.Spans {
+				span.Attributes = append(span.Attributes, &v11.KeyValue{
+					Key:   MetadataServiceName,
+					Value: &v11.AnyValue{Value: &v11.AnyValue_StringValue{StringValue: scopeSpans.Scope.Name}},
+				})
+
+				// Add attributes from the resource
+				span.Attributes = append(span.Attributes, scopeSpans.Scope.Attributes...)
+			}
+
 			flattenSpans = append(flattenSpans, scopeSpans.Spans...)
 		}
 	}
@@ -64,6 +74,7 @@ func ConvertOtelSpanIntoSpan(span *v1.Span) *Span {
 
 	spanID := createSpanID(span.SpanId)
 	attributes.Set(TracetestMetadataFieldParentID, createSpanID(span.ParentSpanId).String())
+
 	return &Span{
 		ID:         spanID,
 		Name:       span.Name,
