@@ -6,4 +6,4 @@ spec:
     - key: POKESHOP_API_URL
       value: https://demo-pokeshop.tracetest.io
     - key: POKESHOP_KAFKA_BROKER
-      value: demo-pokeshop.tracetest.io:9092
+      value: stream.demo:9092
