@@ -30,6 +30,11 @@ func FromOtelResourceSpans(resourceSpans []*v1.ResourceSpans) Trace {
 					// Add attributes from the resource
 					span.Attributes = append(span.Attributes, scopeSpans.Scope.Attributes...)
 				}
+
+				// Add attributes from the resource
+				if resource.Resource != nil {
+					span.Attributes = append(span.Attributes, resource.Resource.Attributes...)
+				}
 			}
 
 			flattenSpans = append(flattenSpans, scopeSpans.Spans...)
