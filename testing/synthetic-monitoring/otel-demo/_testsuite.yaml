@@ -1,9 +1,7 @@
-# test suite based on https://github.com/open-telemetry/opentelemetry-demo/tree/main/test/tracetesting/frontend-service
-
 type: TestSuite
 spec:
   id: pokeshop-demo-test-suite
-  name: OTel Demo Synthetic tests
+  name: 'OTel Demo Synthetic tests'
   description: Run all Frontend tests enabled in sequence, simulating a process of a user purchasing products on Astronomy store
   steps:
   - ./01-see-ads.yaml

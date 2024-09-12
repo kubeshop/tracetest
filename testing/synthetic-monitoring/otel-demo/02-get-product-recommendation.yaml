@@ -1,5 +1,3 @@
-# test suite based on https://github.com/open-telemetry/opentelemetry-demo/tree/main/test/tracetesting/frontend-service
-
 type: Test
 spec:
   id: frontend-get-recommendation
