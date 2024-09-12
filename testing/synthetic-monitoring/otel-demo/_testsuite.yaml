@@ -3,7 +3,7 @@
 type: TestSuite
 spec:
   id: pokeshop-demo-test-suite
-  name: OTel Demo Synthetic tests
+  name: 'OTel Demo Synthetic tests'
   description: Run all Frontend tests enabled in sequence, simulating a process of a user purchasing products on Astronomy store
   steps:
   - ./01-see-ads.yaml
