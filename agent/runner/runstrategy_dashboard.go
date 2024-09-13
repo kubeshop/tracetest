@@ -3,6 +3,7 @@ package runner
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/kubeshop/tracetest/agent/collector"
@@ -60,6 +61,7 @@ func (s *Runner) disableLogger() func() {
 type dashboardObserver struct {
 	runs   map[string]models.TestRun
 	sensor sensors.Sensor
+	mutex  sync.Mutex
 }
 
 func (o *dashboardObserver) EndDataStoreConnection(*proto.DataStoreConnectionTestRequest, error) {
@@ -130,6 +132,8 @@ func (o *dashboardObserver) getRun(testID string, runID int32) models.TestRun {
 }
 
 func (o *dashboardObserver) setRun(model models.TestRun) {
+	o.mutex.Lock()
+	defer o.mutex.Unlock()
 	o.runs[fmt.Sprintf("%s-%s", model.TestID, model.RunID)] = model
 }
 
