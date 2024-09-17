@@ -11,7 +11,7 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-func TestSpanEnvelopeWithSmallSpans(t *testing.T) {
+func TestSpanEnvelope(t *testing.T) {
 	// each of these spans take 73 bytes
 	spans := []*proto.Span{
 		createSpan(),
@@ -23,7 +23,7 @@ func TestSpanEnvelopeWithSmallSpans(t *testing.T) {
 	require.Len(t, envelope, 2)
 }
 
-func TestSpanEnvelopeWithSmallSpansButOneShouldBeIgnored(t *testing.T) {
+func TestSpanEnvelopeShouldIgnoreRestOfSpansIfTheyDontFit(t *testing.T) {
 	// each of these spans take 73 bytes
 	span1, span2, span3 := createSpan(), createSpan(), createSpan()
 	spans := []*proto.Span{
@@ -39,7 +39,7 @@ func TestSpanEnvelopeWithSmallSpansButOneShouldBeIgnored(t *testing.T) {
 	assert.Equal(t, envelope[1].Id, span2.Id)
 }
 
-func TestSpanEnvelopeIncludeSmallerSpans(t *testing.T) {
+func TestSpanEnvelopeShouldFitAsManySpansAsPossible(t *testing.T) {
 	// these spans take 73 bytes, 73 bytes, and 33 bytes respectively
 	span1, span2, span3 := createSpan(), createSpan(), createSmallSpan()
 	spans := []*proto.Span{
@@ -55,7 +55,7 @@ func TestSpanEnvelopeIncludeSmallerSpans(t *testing.T) {
 	assert.Equal(t, envelope[1].Id, span3.Id)
 }
 
-func TestSpanEnvelopeWithOneLargeSpan(t *testing.T) {
+func TestSpanEnvelopeShouldAllowLargeSpans(t *testing.T) {
 	// a large span is 682 bytes long, in theory, it should not fit the envelope, however,
 	// we should allow 1 per envelope just to make sure ALL spans are sent.
 	spans := []*proto.Span{
@@ -66,7 +66,7 @@ func TestSpanEnvelopeWithOneLargeSpan(t *testing.T) {
 	require.Len(t, envelope, 1)
 }
 
-func TestSpanEnvelopeWithTwoLargeSpan(t *testing.T) {
+func TestSpanEnvelopeShouldOnlyAllowOneLargeSpan(t *testing.T) {
 	// a large span is 682 bytes long, in theory, it should not fit the envelope, however,
 	// we should allow 1 per envelope just to make sure ALL spans are sent.
 	largeSpan1, largeSpan2 := createLargeSpan(), createLargeSpan()
@@ -80,7 +80,7 @@ func TestSpanEnvelopeWithTwoLargeSpan(t *testing.T) {
 	assert.Equal(t, largeSpan1.Id, envelope[0].Id)
 }
 
-func TestSpanEnvelopeWithSmallSpansAndALargeOne(t *testing.T) {
+func TestSpanEnvelopeShouldAddALargeSpanEvenIfThereAreMoreSpansInIt(t *testing.T) {
 	// Given a list of small spans that should be able to fit the envelope, but also a large span that doesn't fit an envelope,
 	// it should include the largeSpan with the 2 first spans and leave the third small span out
 	smallSpan1, smallSpan2, largeSpan1, smallSpan3 := createSmallSpan(), createSmallSpan(), createLargeSpan(), createSmallSpan()
@@ -98,7 +98,7 @@ func TestSpanEnvelopeWithSmallSpansAndALargeOne(t *testing.T) {
 	assert.Equal(t, largeSpan1.Id, envelope[2].Id)
 }
 
-func TestSpanEnvelopeWithSmallSpansAndTwoLargeOne(t *testing.T) {
+func TestSpanEnvelopeShouldIgnoreExtraLargeSpan(t *testing.T) {
 	// Given a list of small spans that should be able to fit the envelope, but also a large span that doesn't fit an envelope,
 	// it should include the largeSpan with the 2 first spans and leave the third small span out
 	smallSpan1, smallSpan2, largeSpan1, smallSpan3, largeSpan2 := createSmallSpan(), createSmallSpan(), createLargeSpan(), createSmallSpan(), createLargeSpan()
