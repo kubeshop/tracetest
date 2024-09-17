@@ -1,0 +1,11 @@
+streamlit==1.38.0
+langchain==0.2.16
+langchain-openai==0.1.24
+langchain-huggingface==0.0.3
+langchain-google-genai==1.0.10
+langchain-community==0.2.16
+python-dotenv==1.0.1
+opentelemetry-distro==0.48b0
+opentelemetry-exporter-otlp==1.27.0
+opentelemetry-exporter-otlp-proto-grpc==1.27.0
+traceloop-sdk==0.30.0
