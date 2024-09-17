@@ -98,6 +98,25 @@ func TestSpanEnvelopeWithSmallSpansAndALargeOne(t *testing.T) {
 	assert.Equal(t, largeSpan1.Id, envelope[2].Id)
 }
 
+func TestSpanEnvelopeWithSmallSpansAndTwoLargeOne(t *testing.T) {
+	// Given a list of small spans that should be able to fit the envelope, but also a large span that doesn't fit an envelope,
+	// it should include the largeSpan with the 2 first spans and leave the third small span out
+	smallSpan1, smallSpan2, largeSpan1, smallSpan3, largeSpan2 := createSmallSpan(), createSmallSpan(), createLargeSpan(), createSmallSpan(), createLargeSpan()
+	spans := []*proto.Span{
+		smallSpan1,
+		smallSpan2,
+		largeSpan1,
+		smallSpan3,
+		largeSpan2,
+	}
+
+	envelope := envelope.EnvelopeSpans(spans, 100)
+	require.Len(t, envelope, 3)
+	assert.Equal(t, smallSpan1.Id, envelope[0].Id)
+	assert.Equal(t, smallSpan2.Id, envelope[1].Id)
+	assert.Equal(t, largeSpan1.Id, envelope[2].Id)
+}
+
 func createSpan() *proto.Span {
 	return &proto.Span{
 		Id:        id.NewRandGenerator().SpanID().String(),
