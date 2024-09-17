@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/kubeshop/tracetest/cli/formatters"
@@ -209,14 +210,45 @@ func (o orchestrator) Run(ctx context.Context, opts RunOptions, outputFormat str
 	return exitCode, nil
 }
 
-func (o orchestrator) getDefinitionFiles(file []string) ([]string, error) {
-	files := make([]string, 0)
-
+func (o orchestrator) getDefinitionFiles(file []string, resourceName string) (files []string, err error) {
 	for _, f := range file {
 		files = append(files, fileutil.ReadDirFileNames(f)...)
 	}
 
+	if resourceName != "" {
+		o.logger.Debug("filtering files by resource name", zap.String("resourceName", resourceName))
+		files, err = o.filterFilesByResourceName(files, resourceName)
+		if err != nil {
+			return nil, fmt.Errorf("cannot filter files by resource name: %w", err)
+		}
+	}
+
+	o.logger.Debug("selected files", zap.Strings("files", files))
+
 	return files, nil
+}
+
+func (o orchestrator) filterFilesByResourceName(files []string, resourceName string) ([]string, error) {
+	filteredFiles := make([]string, 0)
+
+	for _, f := range files {
+		o.logger.Debug("reading file", zap.String("file", f))
+		file, err := fileutil.Read(f)
+		if err != nil {
+			return nil, fmt.Errorf("cannot read file: %w", err)
+		}
+
+		// EqualFold means compare case insensitive
+		if ft := file.Type(); !strings.EqualFold(ft, resourceName) {
+			o.logger.Debug("skipping file", zap.String("type", ft), zap.String("file", f))
+			continue
+		}
+
+		o.logger.Debug("file matches", zap.String("file", f))
+		filteredFiles = append(filteredFiles, f)
+	}
+
+	return filteredFiles, nil
 }
 
 func (o orchestrator) runByFiles(ctx context.Context, opts RunOptions, resourceFetcher runner.ResourceFetcher, vars *varset.VarSets, varsID string, runGroupID string) ([]any, []runner.RunResult, error) {
@@ -224,12 +256,12 @@ func (o orchestrator) runByFiles(ctx context.Context, opts RunOptions, resourceF
 	runsResults := make([]runner.RunResult, 0)
 	var mainErr error
 
-	hasDefinitionFilesDefined := opts.DefinitionFiles != nil && len(opts.DefinitionFiles) > 0
+	hasDefinitionFilesDefined := len(opts.DefinitionFiles) > 0
 	if !hasDefinitionFilesDefined {
 		return resources, runsResults, fmt.Errorf("no definition files defined")
 	}
 
-	definitionFiles, err := o.getDefinitionFiles(opts.DefinitionFiles)
+	definitionFiles, err := o.getDefinitionFiles(opts.DefinitionFiles, opts.ResourceName)
 	if err != nil {
 		return resources, runsResults, fmt.Errorf("cannot get definition files: %w", err)
 	}
