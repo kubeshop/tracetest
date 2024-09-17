@@ -25,7 +25,7 @@ import (
 	"go.uber.org/zap"
 )
 
-const maxEnvelopeSize = 4 * 1024 * 1024 // 4MB
+const maxEnvelopeSize = 3 * 1024 * 1024 // 3MB
 
 type PollerWorker struct {
 	client                 *client.Client
