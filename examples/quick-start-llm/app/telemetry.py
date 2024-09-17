@@ -6,7 +6,7 @@ from traceloop.sdk import Traceloop
 # import openlit
 import os
 
-otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "localhost:4317")
+otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", "localhost:4317")
 otlp_service_name = os.getenv("OTEL_SERVICE_NAME", "quick-start-llm")
 
 def init():

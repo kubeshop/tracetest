@@ -5,11 +5,12 @@ services:
       - "host.docker.internal:host-gateway"
     environment:
       - OTEL_SERVICE_NAME=quick-start-llm
-      - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     ports:
-      - 8051:8051
+      - 8501:8501
     depends_on:
       - otel-collector
 
@@ -45,4 +46,12 @@ services:
     ports:
       - 16686:16686
 
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+      - TRACETEST_MODE=verbose
 

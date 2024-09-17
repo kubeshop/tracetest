@@ -1,0 +1,10 @@
+type: Test
+spec:
+  id: WpOo9ZgHR
+  name: Run Gemini test
+  trigger:
+    type: playwrightengine
+    playwrightEngine:
+      target: http://app:8501/
+      script: ./run-llm-script.js
+      method: runGeminiSummarization

@@ -6,15 +6,17 @@ help: Makefile ## show list of commands
 build-images: ## build images used by docker compose file
 	@docker compose build
 
-start/with-docker: build-images ## build and run app using docker compose
+start/on-docker: build-images ## build and run app using docker compose
 	@docker compose up
 
-start/with-docker/only-observability: ## run observability stack using docker compose in debug mode
-	@docker compose up otel-collector jaeger
+start/on-docker/only-observability: ## run observability stack using docker compose in debug mode
+	@docker compose up -d otel-collector jaeger tracetest-agent
 
-start/with-local: ## run app using docker compose
-	@docker compose up -d otel-collector jaeger
+start/local: start/on-docker/only-observability ## run app using docker compose
 	@OTEL_SERVICE_NAME=quick-start-llm OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 opentelemetry-instrument streamlit run ./app/streamlit_app.py
 
 stop: ## stop all running containers
 	@docker compose down
+
+test: ## run e2e tests
+	@npx playwright test
