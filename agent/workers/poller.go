@@ -15,6 +15,7 @@ import (
 	"github.com/kubeshop/tracetest/agent/telemetry"
 	"github.com/kubeshop/tracetest/agent/tracedb"
 	"github.com/kubeshop/tracetest/agent/tracedb/connection"
+	"github.com/kubeshop/tracetest/agent/workers/envelope"
 	"github.com/kubeshop/tracetest/agent/workers/poller"
 	"github.com/kubeshop/tracetest/server/datastore"
 	"github.com/kubeshop/tracetest/server/executor"
@@ -23,6 +24,8 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 )
+
+const maxEnvelopeSize = 4 * 1024 * 1024 // 4MB
 
 type PollerWorker struct {
 	client                 *client.Client
@@ -222,7 +225,7 @@ func (w *PollerWorker) poll(ctx context.Context, request *proto.PollingRequest) 
 				w.logger.Debug("Span was already sent", zap.String("runKey", runKey))
 			}
 		}
-		pollingResponse.Spans = newSpans
+		pollingResponse.Spans = envelope.EnvelopeSpans(newSpans, maxEnvelopeSize)
 
 		w.logger.Debug("Filtered spans", zap.Any("pollingResponse", spew.Sdump(pollingResponse)))
 	}
