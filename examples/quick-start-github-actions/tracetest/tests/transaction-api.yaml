@@ -1,4 +1,4 @@
-type: Transaction
+type: TestSuite
 spec:
   id: 3YIB7rPVg
   name: All Tests for the Books List API

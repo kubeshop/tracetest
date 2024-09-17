@@ -1,4 +1,4 @@
-type: Transaction
+type: TestSuite
 spec:
   id: 3q47ooxVR
   name: Step Functions

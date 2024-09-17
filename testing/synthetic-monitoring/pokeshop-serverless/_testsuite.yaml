@@ -1,4 +1,4 @@
-type: Transaction
+type: TestSuite
 spec:
   id: pokeshop-serverless-demo-test-suite
   name: "Serverless - Pokeshop  Synthetic tests"
