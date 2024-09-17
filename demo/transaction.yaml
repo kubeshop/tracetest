@@ -1,4 +1,4 @@
-type: Transaction
+type: TestSuite
 spec:
   name: my transaction
   description: haha
