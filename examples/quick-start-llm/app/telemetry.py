@@ -1,8 +1,5 @@
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.resources import SERVICE_NAME, Resource
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 from traceloop.sdk import Traceloop
 
@@ -12,24 +9,13 @@ import os
 otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "localhost:4317")
 otlp_service_name = os.getenv("OTEL_SERVICE_NAME", "quick-start-llm")
 
-resource = Resource(attributes={
-  SERVICE_NAME: otlp_service_name
-})
-
-provider = TracerProvider(resource=resource)
-
-processor = BatchSpanProcessor(
-  OTLPSpanExporter(endpoint=otlp_endpoint, insecure=True)
-)
-provider.add_span_processor(processor)
-
-trace.set_tracer_provider(provider)
-
 def init():
   tracer = trace.get_tracer(otlp_service_name)
 
   Traceloop.init(
-    exporter=OTLPSpanExporter(endpoint=otlp_endpoint, insecure=True)
+    exporter=OTLPSpanExporter(endpoint=otlp_endpoint, insecure=True),
+    disable_batch=True,
+    should_enrich_metrics=True
   )
 
   return tracer

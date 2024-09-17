@@ -31,11 +31,3 @@ OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=localhost:4317 \
 opentelemetry-instrument \
   streamlit run ./app/streamlit_app.py
 ```
-
-### References
-
-- https://github.com/openlit/openlit?tab=readme-ov-file#-getting-started
-- https://github.com/langchain-ai/langchain
-- https://github.com/streamlit/streamlit
-- https://docs.streamlit.io/develop/api-reference
-- https://wandb.ai/site
