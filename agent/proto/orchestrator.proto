@@ -395,7 +395,7 @@ message PollingResponse {
     bool traceFound = 7;
     Error error = 8;
     map <string, string> metadata = 9;
-    bool expectAnotherBatch = 10;
+    bool hasAnotherBatch = 10;
 }
 
 message Span {
