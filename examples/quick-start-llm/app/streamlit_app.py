@@ -3,10 +3,12 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Initialize OpenLit
-from telemetry import init as telemetry_init, heartbeat as telemetry_heartbeat, otlp_endpoint
+# Initialize telemetry
+from telemetry import init as telemetry_init, otlp_endpoint
 tracer = telemetry_init() # run telemetry.init() before loading any other modules to capture any module-level telemetry
-telemetry_heartbeat(tracer)
+
+# from telemetry import heartbeat as telemetry_heartbeat
+# telemetry_heartbeat(tracer)
 
 import streamlit as st
 
@@ -16,8 +18,13 @@ def read_default_text():
   with open("./example.txt") as f:
     return f.read()
 
+@tracer.start_as_current_span("perform_summarization")
+def perform_summarization(provider_type, source_text):
+  provider = get_provider(provider_type)
+  return provider.summarize(source_text)
+
 ############################
-# App start
+# UI App start
 ############################
 
 # Streamlit app
@@ -37,7 +44,7 @@ provider_type = st.selectbox(
 def callback():
   st.session_state['source_text'] = read_default_text()
 
-st.button("Add default text", on_click=callback)
+st.button("Add example text", on_click=callback)
 source_text = st.text_area("Source Text", label_visibility="collapsed", height=250, key="source_text")
 
 # If the 'Summarize' button is clicked
@@ -48,8 +55,7 @@ if st.button("Summarize"):
   else:
     try:
       with st.spinner('Please wait...'):
-        provider = get_provider(provider_type)
-        summary = provider.summarize(source_text)
+        summary = perform_summarization(provider_type, source_text)
         st.success(summary)
     except Exception as e:
       st.exception(f"An error occurred: {e}")

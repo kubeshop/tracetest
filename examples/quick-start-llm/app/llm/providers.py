@@ -1,10 +1,8 @@
 from .provider_google_gemini import GoogleGeminiProvider
-from .provider_huggingface_bart import HuggingFaceBartProvider
 from .provider_openai_chatgpt import OpenAIChatGPTProvider
 
 _providers = [
   GoogleGeminiProvider(),
-  HuggingFaceBartProvider(),
   OpenAIChatGPTProvider()
 ]
 

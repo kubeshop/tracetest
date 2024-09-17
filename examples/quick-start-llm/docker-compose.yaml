@@ -6,7 +6,6 @@ services:
     environment:
       - OTEL_SERVICE_NAME=quick-start-llm
       - OTEL_EXPORTER_OTLP_ENDPOINT=otel-collector:4317
-      - HUGGINGFACE_HUB_API_TOKEN=${HUGGINGFACE_HUB_API_TOKEN}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     ports:
@@ -24,7 +23,6 @@ services:
     image: otel/opentelemetry-collector:0.108.0
     ports:
       - 4317:4317
-      - 4318:4318
     volumes:
       - type: bind
         source: ./observability/otelcollector.config.yaml

@@ -31,16 +31,10 @@ def init():
   Traceloop.init(
     exporter=OTLPSpanExporter(endpoint=otlp_endpoint, insecure=True)
   )
-  # openlit.init(
-  #   environment='development',
-  #   application_name=otlp_service_name,
-  #   tracer=tracer,
-  #   disable_metrics=True,
-  #   collect_gpu_stats=False
-  # )
 
   return tracer
 
+# Test method to guarantee that the telemetry is working
 def heartbeat(tracer):
   with tracer.start_as_current_span("heartbeat"):
     current_span = trace.get_current_span()

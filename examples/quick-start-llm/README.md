@@ -13,7 +13,10 @@ python -m venv ./_venv
 source _venv/bin/activate
 
 # install requirements
-pip install -r requirements.txt
+pip install -r app/requirements.txt
+
+# install OTel auto-instrumentation
+opentelemetry-bootstrap -a install
 
 # add openai api key
 echo "OPENAI_API_KEY={your-open-ai-api-key}" >> .env
@@ -22,7 +25,11 @@ echo "OPENAI_API_KEY={your-open-ai-api-key}" >> .env
 ### Run example
 
 ```bash
-streamlit run ./app/streamlit_app.py
+OTEL_SERVICE_NAME=quick-start-llm \
+OTEL_TRACES_EXPORTER=console,otlp \
+OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=localhost:4317 \
+opentelemetry-instrument \
+  streamlit run ./app/streamlit_app.py
 ```
 
 ### References
