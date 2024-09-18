@@ -1,0 +1,4 @@
+opentelemetry-distro==0.48b0
+opentelemetry-exporter-otlp==1.27.0
+opentelemetry-exporter-otlp-proto-grpc==1.27.0
+traceloop-sdk==0.30.0

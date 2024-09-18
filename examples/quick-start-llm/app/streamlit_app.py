@@ -49,13 +49,25 @@ source_text = st.text_area("Source Text", label_visibility="collapsed", height=2
 
 # If the 'Summarize' button is clicked
 if st.button("Summarize"):
-  # Validate inputs
-  if not source_text.strip():
-    st.error(f"Please provide the source text.")
-  else:
-    try:
-      with st.spinner('Please wait...'):
-        summary = perform_summarization(provider_type, source_text)
-        st.success(summary)
-    except Exception as e:
-      st.exception(f"An error occurred: {e}")
+  with tracer.start_as_current_span("summarize button click") as span:
+    # Validate inputs
+    if not source_text.strip():
+      st.error(f"Please provide the source text.")
+    else:
+      try:
+        with st.spinner('Please wait...'):
+          summary = perform_summarization(provider_type, source_text)
+          st.success(summary)
+
+          # Get trace ID from current span
+          trace_id = span.get_span_context().trace_id
+
+          # Convert trace_id to a hex string
+          trace_id_hex = format(trace_id, '032x')
+          st.text(f"Trace ID: {trace_id_hex}")
+
+          # Add a hyperlink to the trace visualization tool
+          trace_url = f"http://localhost:16686//trace/{trace_id_hex}"
+          st.markdown(f"[View Trace]({trace_url})")
+      except Exception as e:
+        st.exception(f"An error occurred: {e}")

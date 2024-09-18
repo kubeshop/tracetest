@@ -1,16 +1,42 @@
 services:
-  app:
+  llm-ui:
     build: ./app
+    command:
+      - opentelemetry-instrument
+      - streamlit
+      - run
+      - streamlit_app.py
+      - --server.port=8501
+      - --server.address=0.0.0.0
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      - OTEL_SERVICE_NAME=quick-start-llm
+      - OTEL_SERVICE_NAME=quick-start-llm-ui
       - OTEL_TRACES_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     ports:
       - 8501:8501
+    depends_on:
+      - otel-collector
+
+  llm-api:
+    build: ./app
+    command:
+      - opentelemetry-instrument
+      - python
+      - flask_app.py
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - OTEL_SERVICE_NAME=quick-start-llm-api
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    ports:
+      - 8800:8800
     depends_on:
       - otel-collector
 
