@@ -1,5 +1,3 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
-org: adnankubeshop
 service: otel-serverless-node
 
 provider:

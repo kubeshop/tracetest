@@ -10,6 +10,7 @@ api.diag.setLogger(new api.DiagConsoleLogger(), api.DiagLogLevel.ALL);
 const provider = new NodeTracerProvider();
 const spanProcessor = new BatchSpanProcessor(
   new OTLPTraceExporter({
+    // Use the HTTP endpoint for the agent
     url: 'https://agent-<ID>.tracetest.io:443',
   }),
 );
