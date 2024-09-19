@@ -1,0 +1,58 @@
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracetest-agent
+  labels:
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+spec:
+  selector:
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+  ports:
+    - name: grpc-collector-entrypoint
+      protocol: TCP
+      port: 4317
+      targetPort: 4317
+    - name: http-collector-entrypoint
+      protocol: TCP
+      port: 4318
+      targetPort: 4318
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracetest-agent
+  labels:
+    app: tracetest-agent
+    app.kubernetes.io/name: tracetest-agent
+    app.kubernetes.io/instance: tracetest-agent
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tracetest-agent
+      app.kubernetes.io/instance: tracetest-agent
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tracetest-agent
+        app.kubernetes.io/instance: tracetest-agent
+    spec:
+      containers:
+        - name: agent
+          image: "kubeshop/tracetest-agent:latest"
+          imagePullPolicy: Always
+          args: [
+            "--environment",
+            "<TRACETEST_ENVIRONMENT_ID>", # Add your env id
+            "--api-key",
+            "$TRACETEST_API_KEY",
+            "--server-url",
+            "https://app.tracetest.io",
+          ]
+          env:
+          - name: TRACETEST_API_KEY
+            value: "<TRACETEST_API_KEY>" # Add your API key

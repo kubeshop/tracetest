@@ -1,0 +1,42 @@
+# Deployment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    service: app
+  name: app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: app
+  template:
+    metadata:
+      labels:
+        service: app
+    spec:
+      containers:
+        - name: app
+          image: YOUR_DOCKERHUB_USERNAME/get-started-cloud-based-managed-tracetest-app # (Built from the Dockerfile above) 
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+      restartPolicy: Always
+
+# Service
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: app
+  name: app
+spec:
+  ports:
+    - name: "http"
+      port: 8080
+      targetPort: 8080
+  selector:
+    service: app

@@ -1,0 +1,17 @@
+services:
+  app:
+    image: app
+    build: .
+    command: npm start # runs "node app.js"
+    ports:
+      - 8080:8080
+  tracetest-agent:
+    image: kubeshop/tracetest-agent
+    environment:
+      - TRACETEST_API_KEY=${TRACETEST_API_KEY}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+    command:
+      - "--mode=verbose"
+    ports:
+      - 4317:4317
+      - 4318:4318

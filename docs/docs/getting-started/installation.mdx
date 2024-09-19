@@ -225,7 +225,7 @@ HTTP: `http://tracetest-agent.default.svc.cluster.local:4318/v1/traces`
 Make sure to check use the correct `<service-name>` if you edit the Tracetest Agent `service` name.
 
 Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
-Make sure to run tests using the internal Kubernetes service networking eg: `http://api.default.svc.cluster.internal:port`.
+Make sure to run tests using the internal Kubernetes service networking eg: `http://api.default.svc.cluster.local:port`.
 :::
 
 </TabItem>
@@ -323,7 +323,7 @@ kubectl port-forward svc/api 8081:8081
 
 - [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
 - [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is port forwarded from Kubernetes to `localhost` on this port.
-- To run tests you will use the Kubernetes internal network and the service name, `http://api.default.svc.cluster.internal:8081`.
+- To run tests you will use the Kubernetes internal network and the service name, `http://api.default.svc.cluster.local:8081`.
 - `tracetest-agent.default.svc.cluster.local:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
 
 </TabItem>
