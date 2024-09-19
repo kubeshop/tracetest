@@ -11,6 +11,6 @@ functions:
   hello:
     handler: handler.hello
     events:
-      - http:
+      - httpApi:
           path: /
           method: get
