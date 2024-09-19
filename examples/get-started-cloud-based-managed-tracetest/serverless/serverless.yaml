@@ -1,0 +1,18 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: adnankubeshop
+service: otel-serverless-node
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  environment:
+    NODE_OPTIONS: --require ./tracing
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /
+          method: get
