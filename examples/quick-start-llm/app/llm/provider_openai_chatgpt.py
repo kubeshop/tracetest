@@ -20,7 +20,7 @@ class OpenAIChatGPTProvider:
       raise ValueError("Please provide the OpenAI API Key on a .env file.")
 
     llm = ChatOpenAI(
-      model="gpt-3.5-turbo-instruct",
+      model="gpt-4o-mini",
       openai_api_key=openai_api_key
     )
 

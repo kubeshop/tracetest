@@ -2,7 +2,15 @@
 
 This is an example of a simple LLM app that uses the `langchain` library to summarize the content of a URL, based on [this example](https://github.com/alphasecio/langchain-examples/tree/main/url-summary)
 
-### Starting new env from scratch
+### Running example with docker
+
+```bash
+make start/on-docker
+```
+
+### Running example with locally
+
+#### Setting up the environment
 
 ```bash
 
@@ -20,14 +28,19 @@ opentelemetry-bootstrap -a install
 
 # add openai api key
 echo "OPENAI_API_KEY={your-open-ai-api-key}" >> .env
+# add google gemini api key
+echo "GOOGLE_API_KEY={your-google-gemini-api-key}" >> .env
+
+# add tracetest agent keys
+echo "TRACETEST_API_KEY={your-tracetest-api-key}" >> .env
+echo "TRACETEST_ENVIRONMENT_ID={your-tracetest-env-id}" >> .env
 ```
 
-### Run example
+#### Running the apps
 
 ```bash
-OTEL_SERVICE_NAME=quick-start-llm \
-OTEL_TRACES_EXPORTER=console,otlp \
-OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=localhost:4317 \
-opentelemetry-instrument \
-  streamlit run ./app/streamlit_app.py
+
+make start/local-ui
+make start/local-api
+
 ```

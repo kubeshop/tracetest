@@ -22,4 +22,4 @@ stop: ## stop all running containers
 	@docker compose down
 
 test: ## run e2e tests
-	@npx playwright test
+	@tracetest run -f ./tests/run-gemini.yaml
