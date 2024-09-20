@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"os"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
@@ -76,7 +78,13 @@ var startCmd = &cobra.Command{
 			cfg.EnvironmentID = flags.EnvironmentID
 		}
 
+		// early exit if the versions are not compatible
 		err = agentRunner.Run(ctx, cliLogger, cliConfig, flags, verbose)
+		if errors.Is(err, config.ErrVersionMismatch) {
+			fmt.Println(err.Error())
+			ExitCLI(1)
+		}
+
 		return "", err
 	})),
 	PostRun: teardownCommand,

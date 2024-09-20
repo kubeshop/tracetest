@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"net/url"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
@@ -28,7 +30,7 @@ var configureCmd = &cobra.Command{
 			SkipVerify: skipVerify,
 		}
 
-		config, err := config.LoadConfig("")
+		cfg, err := config.LoadConfig("")
 		if err != nil {
 			return "", err
 		}
@@ -49,7 +51,14 @@ var configureCmd = &cobra.Command{
 			flags.OrganizationID = configParams.OrganizationID
 		}
 
-		return "", configurator.Start(ctx, &config, flags)
+		// early exit if the versions are not compatible
+		err = configurator.Start(ctx, &cfg, flags)
+		if errors.Is(err, config.ErrVersionMismatch) {
+			fmt.Println(err.Error())
+			ExitCLI(1)
+		}
+
+		return "", err
 	})),
 	PostRun: teardownCommand,
 }

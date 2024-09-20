@@ -146,12 +146,7 @@ func setupVersion() {
 
 func validateVersionMismatch() {
 	if !isVersionMatch && os.Getenv("TRACETEST_DEV") == "" {
-		fmt.Fprintf(os.Stderr, versionText+`
-✖️ Error: Version Mismatch
-The CLI version and the server version are not compatible. To fix this, you'll need to make sure that both your CLI and server are using compatible versions.
-We recommend upgrading both of them to the latest available version. Check out our documentation https://docs.tracetest.io/configuration/upgrade for simple instructions on how to upgrade.
-Thank you for using Tracetest! We apologize for any inconvenience caused.
-`)
+		fmt.Fprintf(os.Stderr, versionText+config.ErrVersionMismatch.Error())
 		ExitCLI(1)
 	}
 }
