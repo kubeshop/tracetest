@@ -10,7 +10,7 @@ start/on-docker: build/docker ## build and run app using docker compose
 	@docker compose up
 
 start/on-docker/only-observability: ## run observability stack using docker compose in debug mode
-	@docker compose up -d otel-collector jaeger tracetest-agent
+	@docker compose up -d otel-collector jaeger
 
 start/local-ui: start/on-docker/only-observability ## run UI app using docker compose
 	@OTEL_SERVICE_NAME=quick-start-llm OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4317 opentelemetry-instrument streamlit run ./app/streamlit_app.py

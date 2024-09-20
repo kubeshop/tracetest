@@ -71,6 +71,7 @@ services:
       - COLLECTOR_OTLP_ENABLED=true
     ports:
       - 16686:16686
+      - 16685:16685
 
   # Cloud-based Managed Tracetest
   tracetest-agent:
