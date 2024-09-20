@@ -1,0 +1,16 @@
+service: otel-serverless-node
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  environment:
+    NODE_OPTIONS: --require ./tracing
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
