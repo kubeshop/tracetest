@@ -2,7 +2,6 @@ services:
   app:
     image: app
     build: .
-    command: npm start # runs "node app.js"
     ports:
       - 8080:8080
   tracetest-agent:
