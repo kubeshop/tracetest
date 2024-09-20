@@ -6,7 +6,8 @@
 npm install express \
   @opentelemetry/sdk-node \
   @opentelemetry/auto-instrumentations-node \
-  @opentelemetry/exporter-trace-otlp-grpc
+  @opentelemetry/exporter-trace-otlp-grpc \
+  @opentelemetry/sdk-trace-node
 ```
 
 ## Run Node.js
