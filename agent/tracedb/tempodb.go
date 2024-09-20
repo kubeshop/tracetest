@@ -90,9 +90,12 @@ func grpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn
 		return traces.Trace{}, err
 	}
 
-	resp, err := query.FindTraceByID(ctx, &tempopb.TraceByIDRequest{
+	// This is a temporary solution while we figure out how to paginate the traces from Tempo
+	maxSizeOption := grpc.MaxCallRecvMsgSize(1024 * 1024 * 10) // 10MB
+
+	resp, err := query.FindTraceByID(context.Background(), &tempopb.TraceByIDRequest{
 		TraceID: []byte(trID[:]),
-	})
+	}, maxSizeOption)
 	if err != nil {
 		return traces.Trace{}, handleError(err)
 	}
