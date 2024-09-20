@@ -38,11 +38,11 @@ Go to the Trace Ingestion tab in the settings, select OpenTelemetry, and enable 
 
 ## Run Trace-based Tests
 
-You can now run tests against your apps on `app:8080` by going to Tracetest and creating a new HTTP test.
+You can now run tests against your apps on `http://app.default.svc.cluster.local:8080` by going to Tracetest and creating a new HTTP test.
 
 1. Click create a test and select HTTP.
 2. Add `http://app.default.svc.cluster.local:8080` in the URL field.
-3. Click Run. You’ll see the response data right away.
+3. Click Run. You’ll see the response and trace data right away.
 
 ## (Optional) Use Helm to Deploy Tracetest Agent
 

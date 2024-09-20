@@ -1,6 +1,6 @@
-# Running Node.js with OpenTelemetry and Cloud-based Managed Tracetest Locally
+# Running Node.js with OpenTelemetry and Cloud-based Managed Tracetest with Serverless
 
-## Install deps
+## Install Dependencies
 
 ```bash
 npm install serverless \
@@ -45,17 +45,17 @@ This will deploy the serverless app and give you an output similar to this:
 
 Deploying "otel-serverless-node" to stage "dev" (us-east-1)
 
-✔ Service deployed to stack otel-serverless-node-dev (50s)
+✔ Service deployed to stack otel-serverless-node-dev (52s)
 
-endpoint: GET - https://<ID>.execute-api.us-east-1.amazonaws.com/dev/
+endpoint: GET - https://<ID>.execute-api.us-east-1.amazonaws.com/
 functions:
-  hello: otel-serverless-node-dev-hello (18 MB)
+  hello: otel-serverless-node-dev-hello (17 MB)
 ```
 
 ## Run Trace-based Tests
 
-You can now run tests against your apps on `https://<ID>.execute-api.us-east-1.amazonaws.com/dev/` by going to Tracetest and creating a new HTTP test.
+You can now run tests against your apps on `https://<ID>.execute-api.us-east-1.amazonaws.com/` by going to Tracetest and creating a new HTTP test.
 
 1. Click create a test and select HTTP.
-2. Add `https://<ID>.execute-api.us-east-1.amazonaws.com/dev/` in the URL field.
-3. Click Run. You’ll see the response data right away.
+2. Add `https://<ID>.execute-api.us-east-1.amazonaws.com/` in the URL field.
+3. Click Run. You’ll see the response and trace data right away.

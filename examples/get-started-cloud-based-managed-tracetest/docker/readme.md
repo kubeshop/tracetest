@@ -26,4 +26,4 @@ You can now run tests against your apps on `app:8080` by going to Tracetest and 
 
 1. Click create a test and select HTTP.
 2. Add `http://app:8080` in the URL field.
-3. Click Run. You’ll see the response data right away.
+3. Click Run. You’ll see the response and trace data right away.
