@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -17,6 +18,15 @@ import (
 )
 
 type onFinishFn func(context.Context, Config)
+
+var (
+	ErrVersionMismatch = errors.New(`
+
+✖️ Version Mismatch
+The CLI version and the server version are not compatible. To fix this, you'll need to make sure that both your CLI and server are using compatible versions.
+We recommend upgrading both of them to the latest available version. Check out our documentation https://docs.tracetest.io/configuration/upgrade for simple instructions on how to upgrade.
+Thank you for using Tracetest! We apologize for any inconvenience caused`)
+)
 
 type Configurator struct {
 	logger         *zap.Logger
@@ -104,6 +114,11 @@ func (c Configurator) Start(ctx context.Context, prev *Config, flags agentConfig
 		c.logger.Debug("OSS server detected, skipping OAuth")
 		// we don't need anything else for OSS
 		return nil
+	}
+
+	versionText, isMatching := GetVersion(ctx, cfg)
+	if !isMatching && os.Getenv("TRACETEST_DEV") == "" {
+		return fmt.Errorf("%s %w", versionText, ErrVersionMismatch)
 	}
 
 	if c.flags.CI {
