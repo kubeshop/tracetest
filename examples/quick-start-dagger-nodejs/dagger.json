@@ -1,0 +1,12 @@
+{
+  "name": "quick-start-dagger-nodejs",
+  "sdk": "typescript",
+  "dependencies": [
+    {
+      "name": "tracetest",
+      "source": "github.com/kubeshop/tracetest@8c44d01e33e677518a555d1b958cf7be0d70f940"
+    }
+  ],
+  "source": "dagger",
+  "engineVersion": "v0.13.3"
+}
