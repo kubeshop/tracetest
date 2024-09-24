@@ -523,6 +523,36 @@ const sidebars = {
       items: [
         {
           type: "doc",
+          id: "getting-started/create-tracetest-account",
+          label: "1. Create a Tracetest Account",
+        },
+        {
+          type: "doc",
+          id: "getting-started/install-cli",
+          label: "2. Install Tracetest CLI",
+        },
+        {
+          type: "doc",
+          id: "getting-started/install-agent",
+          label: "3. Install Tracetest Agent",
+        },
+        {
+          type: "doc",
+          id: "getting-started/create-response-based-test",
+          label: "4. Create a Response-based Test",
+        },
+        {
+          type: "doc",
+          id: "getting-started/configure-trace-ingestion",
+          label: "5. Configure Trace Ingestion",
+        },
+        {
+          type: "doc",
+          id: "getting-started/create-trace-based-test",
+          label: "6. Create a Trace-based Test",
+        },
+        {
+          type: "doc",
           id: "getting-started/installation",
           label: "Installing Tracetest",
         },
