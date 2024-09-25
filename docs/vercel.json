@@ -148,12 +148,12 @@
     },
     {
       "destination": "/getting-started/overview",
-      "source": "/getting-started/overview",
+      "source": "/getting-started/installation",
       "statusCode": 301
     },
     {
       "destination": "/getting-started/overview",
-      "source": "/getting-started/overview/",
+      "source": "/getting-started/installation/",
       "statusCode": 301
     },
     {
