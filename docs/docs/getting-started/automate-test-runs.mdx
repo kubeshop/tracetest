@@ -1,0 +1,100 @@
+---
+id: automate-test-runs
+title: Automate Test Runs
+description: Get started by installing Tracetest! Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+You know how to:
+
+- Create and run a test.
+- Generate a trace for every test. 
+- Create assertions.
+
+The only thing left is to automate test runs. You can do this:
+
+- [Natively with Synthetic Monitors](/concepts/monitors)
+- [With CI/CD Integrations](/ci-cd-automation/overview)
+- [With SDKs](/tools-and-integrations/typescript)
+- [With Test Tool Integrations](/tools-and-integrations/overview)
+
+## Automate Test Runs with Synthetic Monitors
+
+This guide explains how to create a Synthetic Monitor that triggers a test every 5 minutes.
+
+A Synthetic Monitor consists of:
+
+- Name
+- Enabled flag (`true`/`false`)
+- List of tests
+- Schedule (cronjob syntax)
+- List of alerts
+
+## List of Tests
+
+You can define any number of tests to run on a schedule as part of a Synthetic Monitor.
+
+## Schedule
+
+Use a cronjob syntax or the Web UI dropdown to configure the schedule when the Synthetic Monitor will run.
+
+## List of Alerts
+
+You can define any number of webhooks to send alerts to. This enables integrating with your favorite alerting tools.
+
+## Create Synthetic Monitors in Two Ways
+
+1. Programmatically, in YAML
+2. Visually, in the Web UI
+
+## Create Synthetic Monitors Programatically in YAML
+
+Using the test you added assertions to in the previous section, you can refernce it in the resource defintion for a Synthetic Monitor.
+
+```yaml
+type: Monitor
+spec:
+  name: Import Pokemon Monitor
+  enabled: true
+  tests:
+  - ./import-pokemon.yaml
+  schedule:
+    cron: "*/5 * * * *"
+  alerts:
+  - id: slack-webhook-message
+    type: webhook
+    webhook:
+      body: "{\n \"text\": \"Monitor ${.Monitor.Name} has failed, follow the link to find the <${.URL}|results>\"\n}"
+      method: POST
+      url: <your-webhook-url>
+      headers:
+      - key: Content-Type
+        value: application/json
+    events:
+    - FAILED
+```
+
+### The Synthetic Monitor You Defined
+
+1. Runs the `import-pokemon.yaml` test.
+2. It has a schedule of every 5 minutes.
+3. It will send a webhook alert to Slack when the test fails.
+
+## Create Synthetic Monitors Visually with the Web UI
+
+Add Synthetic Monitors quickly by using the Web UI.
+
+![create monitor 1](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727285755/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_monitor_jCqz9yRNg_run_2_j8zqdb.png)
+
+## Why Tracetest Synthetic Monitors are Powerful
+
+1. You wrote **ZERO** lines of programming code. It's all defined in YAML.
+2. You can save them as part of your GitHub repo because it's defined in YAML.
+3. You do **NOT** need to use external CI tools to automate running tests.

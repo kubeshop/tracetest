@@ -553,6 +553,16 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "getting-started/create-assertions",
+          label: "7. Create Assertions",
+        },
+        {
+          type: "doc",
+          id: "getting-started/automate-test-runs",
+          label: "8. Automate Test Runs",
+        },
+        {
+          type: "doc",
           id: "getting-started/installation",
           label: "Installing Tracetest",
         },
