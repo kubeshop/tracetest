@@ -16,7 +16,7 @@
 
 <b>
   <p align="center">
-    <a href="https://docs.tracetest.io/getting-started/installation">
+    <a href="https://docs.tracetest.io/getting-started/overview">
       Get Started! &nbsp;👉&nbsp;
     </a>
   </p>
@@ -145,7 +145,7 @@ You can:
 
 ## Cloud-based Managed Tracetest (Free to get started!)
 
-The easiest and most reliable way to test microservices and distributed apps with OpenTelemetry distributed traces is signing up for free at [app.tracetest.io](https://app.tracetest.io/). After creating an account, getting started is as easy as [installing the Tracetest Agent](https://docs.tracetest.io/getting-started/installation).
+The easiest and most reliable way to test microservices and distributed apps with OpenTelemetry distributed traces is signing up for free at [app.tracetest.io](https://app.tracetest.io/). After creating an account, getting started is as easy as [installing the Tracetest Agent](https://docs.tracetest.io/getting-started/overview).
 
 ## Enterprise Self-hosted Tracetest (1 month free trial!)
 
@@ -161,7 +161,7 @@ Get the same experience as with the Cloud-based Managed Tracetest but self-hoste
 curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s
 ```
 
-> [:gear: Read the CLI installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-cli)
+> [:gear: Read the CLI installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/install-cli)
 
 ### 2️⃣ Install the Tracetest Server
 
@@ -177,7 +177,7 @@ Or, install Tracetest with Helm. The Tracetest Helm charts are located [here](ht
 helm install tracetest kubeshop/tracetest --namespace=tracetest --create-namespace
 ```
 
-> [:gear: Read the Server installation docs for more options and instructions.](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-server)
+> [:gear: Read the Server installation docs for more options and instructions.](https://docs.tracetest.io/core/getting-started/overview)
 
 ### 3️⃣ Open Tracetest
 
@@ -204,7 +204,7 @@ Check out the [Opening Tracetest guide](https://docs.tracetest.io/core/getting-s
 - Use test definition files and the Tracetest CLI to [enable Gitops flows and CI/CD automation](https://docs.tracetest.io/ci-cd-automation/overview).
 - [Tracetest CLI](https://docs.tracetest.io/cli/cli-installation-reference) allows importing & exporting tests, running tests, and more.
 - [Version tests](https://docs.tracetest.io/concepts/versioning/) as the definition of the test is altered.
-- The [guided install](https://docs.tracetest.io/getting-started/installation) can include [an example "Pokeshop" microservice](https://docs.tracetest.io/live-examples/pokeshop/overview) that is instrumented with OpenTelemetry to use as an example application under test.
+- The [guided install](https://docs.tracetest.io/getting-started/overview) can include [an example "Pokeshop" microservice](https://docs.tracetest.io/live-examples/pokeshop/overview) that is instrumented with OpenTelemetry to use as an example application under test.
 - Create [environment variables](https://docs.tracetest.io/concepts/environments) to assert the same behavior across multiple environments (dev, staging, and production, for example)
 - Create [test outputs](https://docs.tracetest.io/web-ui/creating-test-outputs/) by defining a variable based on the information contained in a particular span's attributes.
 - Run [ad-hoc tests](https://docs.tracetest.io/concepts/ad-hoc-testing) by using undefined variables to enable supplying variables at runtime.

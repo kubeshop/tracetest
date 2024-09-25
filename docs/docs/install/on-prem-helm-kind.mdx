@@ -1,0 +1,52 @@
+---
+id: on-prem-helm-kind
+title: Install with Helm in Kind (Simplified)
+hide_table_of_contents: false
+description: Installation and deployment instructions for using Helm to deploy Enterprise self-hosted Tracetest and use the On-Prem Tracetest Control Plane / Dashboard.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+:::note For Development Environment
+This installation is meant for testing purposes only. It uses self signed certificates, so your browser will show a warning about it.
+:::
+
+:::tip For Production
+For the Production-ready installation:
+
+- [View the official Helm chart readme](https://github.com/kubeshop/tracetest-cloud-charts/blob/main/README.md).
+- [View the official installation docs](/install/on-prem-helm).
+:::
+
+1. Install [Helm](https://helm.sh/) and [kind](https://kind.sigs.k8s.io/) on your machine. Clone the official Tracetest Helm chart.
+
+```sh
+git clone https://github.com/kubeshop/tracetest-cloud-charts.git
+cd ./tracetest-cloud-charts
+```
+
+2. Request a **license key, [here](https://tracetest.io/on-prem-installation)**.
+
+3. Run the setup script with a demo. Add your license key when you get prompted.
+
+```sh
+sh ./scripts/setup_kind_cluster.sh --install-demo
+```
+
+4. Add the following lines to your `/etc/hosts` file to access Tracetest.
+
+```sh
+sudo sh -c 'echo "127.0.0.1 tracetest.localdev" >> /etc/hosts'
+sudo sh -c 'echo "127.0.0.1 pokeshop.localdev" >> /etc/hosts'
+```
+
+This setup will configure a local kind cluster with Tracetest On-Prem and the [Pokeshop API demo](/live-examples/pokeshop/overview), with all networking and prerequisites configured to work locally. You can go to the following links:
+
+- [`https://tracetest.localdev:30000`](https://tracetest.localdev:30000) - Access the Tracetest Web UI. You get a user and an organization created for you.
+- [`https://pokeshop.localdev:30000`](https://pokeshop.localdev:30000) - Access the Pokeshop API demo to run tests.
+

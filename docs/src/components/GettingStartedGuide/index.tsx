@@ -8,7 +8,7 @@ import Heading from '@theme/Heading';
 const TracetestGettingStartedGuides = [
   {
     name: 'Tracetest 🚀',
-    url: '/getting-started/installation',
+    url: '/getting-started/create-tracetest-account',
     description: (
       <Translate >
         Set up Tracetest and start trace-based testing your distributed system.

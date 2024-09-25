@@ -224,7 +224,7 @@ Increasing the duration to a more reasonable `500ms` will make the test pass.
 
 ## Run Tracetest tests with the Tracetest CLI
 
-First, [install the CLI](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-cli).
+First, [install the CLI](https://docs.tracetest.io/getting-started/install-cli).
 Then, configure the CLI:
 
 ```bash

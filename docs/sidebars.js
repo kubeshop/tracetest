@@ -563,16 +563,6 @@ const sidebars = {
         },
         {
           type: "doc",
-          id: "getting-started/installation",
-          label: "Installing Tracetest",
-        },
-        {
-          type: "doc",
-          id: "getting-started/open",
-          label: "Opening Tracetest",
-        },
-        {
-          type: "doc",
           id: "getting-started/no-otel",
           label: "What if I don't have OpenTelemetry installed?",
         },
@@ -625,6 +615,11 @@ const sidebars = {
           type: "category",
           label: "Enterprise self-hosted",
           items: [
+            {
+              type: "doc",
+              id: "install/on-prem-helm-kind",
+              label: "Install with Helm in Kind (Simplified)",
+            },
             {
               type: "doc",
               id: "install/on-prem-helm",

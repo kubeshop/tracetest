@@ -1,6 +1,6 @@
 # Quick Start - Tracetest + Pokeshop
 
-> [Read the installation guide in our documentation.](https://docs.tracetest.io/getting-started/installation)
+> [Read the installation guide in our documentation.](https://docs.tracetest.io/getting-started/overview)
 
 This examples' objective is to show how you can:
 
