@@ -19,8 +19,8 @@ import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
 
 [Tracetest Agent](/concepts/agent) runs alongside your apps, in the same environment/network, to do two things:
 
-1. Run tests against your apps
-2. Ingest traces from your apps
+1. Run tests against your apps.
+2. Ingest traces from your apps.
 
 This page explains (1), how to start Tracetest Agent to enable running tests against your apps. Tracetest Agent can run either locally on your machine or as a container in Docker or Kubernetes.
 
@@ -63,7 +63,7 @@ You can:
 :::note Docker Network
 Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
 
-To run tests against apps running on your local machine you have two options:
+To run tests against apps running on your local machine, you have two options:
 
 1. Run Tracetest Agent locally with the `tracetest start` command.
 2. Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*

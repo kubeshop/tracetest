@@ -43,7 +43,7 @@ You can define any number of tests to run on a schedule as part of a Synthetic M
 
 ## Schedule
 
-Use a cronjob syntax or the Web UI dropdown to configure the schedule when the Synthetic Monitor will run.
+Use a CronJob syntax or the Web UI dropdown to configure the schedule when the Synthetic Monitor will run.
 
 ## List of Alerts
 
@@ -56,7 +56,7 @@ You can define any number of webhooks to send alerts to. This enables integratin
 
 ## Create Synthetic Monitors Programatically in YAML
 
-Using the test you added assertions to in the previous section, you can refernce it in the resource defintion for a Synthetic Monitor.
+Using the test you added assertions to in the previous section, you can reference it in the resource definition for a Synthetic Monitor.
 
 ```yaml
 type: Monitor
@@ -84,8 +84,8 @@ spec:
 ### The Synthetic Monitor You Defined
 
 1. Runs the `import-pokemon.yaml` test.
-2. It has a schedule of every 5 minutes.
-3. It will send a webhook alert to Slack when the test fails.
+2. Has a schedule of every 5 minutes.
+3. Sends a webhook alert to Slack when the test fails.
 
 ## Create Synthetic Monitors Visually with the Web UI
 
