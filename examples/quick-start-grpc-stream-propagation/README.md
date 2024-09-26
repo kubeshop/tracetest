@@ -28,7 +28,7 @@ flowchart LR
 
 To run this example, you need to have the following tools installed:
 - [Docker](https://www.docker.com/)
-- [Tracetest CLI](https://docs.tracetest.io/getting-started/installation#install-the-tracetest-cli)
+- [Tracetest CLI](https://docs.tracetest.io/getting-started/install-cli)
 - [grpcurl](https://github.com/fullstorydev/grpcurl?tab=readme-ov-file#installation)
   
 You can run this example using your environment on [Tracetest](https://app.tracetest.io), or using Tracetest Core. When you have a [Tracetest Agent](https://docs.tracetest.io/configuration/agent) configured on Tracetest UI and an API Key, you can run the following commands:

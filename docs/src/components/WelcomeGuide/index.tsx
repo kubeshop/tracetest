@@ -17,7 +17,7 @@ const WelcomeGuides = [
   // },
   {
     name: '👉 Getting Started',
-    url: './getting-started/installation',
+    url: './getting-started/overview',
     description: (
       <Translate>
         Check out guides and installation examples to get started quickly!

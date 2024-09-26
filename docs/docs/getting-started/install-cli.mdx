@@ -1,0 +1,32 @@
+---
+id: install-cli
+title: Install Tracetest CLI
+description: Get started by installing Tracetest CLI! Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+hide_table_of_contents: true
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - cli
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
+
+:::note
+This getting started guide is a quick start with [Cloud-based Managed Tracetest](https://app.tracetest.io/). To use [Enterprise On-prem Tracetest, refer to this guide](/install/on-prem-helm).
+:::
+
+1. Install the Tracetest CLI.
+
+    <GtagInstallCliTabs></GtagInstallCliTabs>
+
+2. Configure the CLI with your Organization API Key/Token and Environment ID.
+
+    ```bash title="Terminal"
+    tracetest configure -t <TRACETEST_API_KEY> --environment <TRACETEST_ENVIRONMENT_ID>
+    ```

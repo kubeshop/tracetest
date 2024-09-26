@@ -1,0 +1,75 @@
+---
+id: create-response-based-test
+title: Create a Response-based Test
+description: Get started by creating a response-based test in Tracetest! Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - create test
+  - create tracetest test
+  - run tracetest test
+  - execute tracetest test
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
+
+To create a test, you define a `trigger`. A trigger is an action that executes an action against your system. The most basic trigger is an HTTP requests, but we support several trigger types.
+
+1. Playwright
+2. HTTP
+3. GRPC
+4. GraphQL
+5. Kafka
+
+:::note 
+Playwright enables a useful technique: True end-to-end testing, where you start tests from the Web UI and explore the entire internal process of that request across the back end, database, and external services.
+:::
+
+You can create tests in two ways:
+
+1. Programmatically, in YAML
+2. Visually, in the Web UI
+
+Once started, Tracetest Agent executes tests in the environment where it is running and returns the response from triggered tests. This is how you run basic response-based testing.
+
+## Create a Test Programatically in YAML
+
+Create a file called `ping-google.yaml`.
+
+```yaml title="ping-google.yaml"
+type: Test
+spec:
+  name: Ping Google
+  trigger:
+    type: http
+    httpRequest:
+      method: GET
+      url: https://google.com
+      headers:
+      - key: Content-Type
+        value: application/json
+```
+
+Run it with the CLI.
+
+```bash title="Terminal"
+tracetest run test -f ./ping-google.yaml
+```
+
+## Create a Test Visually with the Web UI
+
+Create a test in the Web UI by opening your Tracetest Account, clicking the Create button, and selecting HTTP.
+
+![create response based test 1](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727177155/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_qc1291.png)
+
+Enter `https://google.com` as the URL, and click Run.
+
+![create response based test 2](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727177429/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_1_qpqa4w.png)
