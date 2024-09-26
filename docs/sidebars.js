@@ -534,7 +534,7 @@ const sidebars = {
         {
           type: "doc",
           id: "getting-started/install-agent",
-          label: "3. Install Tracetest Agent",
+          label: "3. Start Tracetest Agent",
         },
         {
           type: "doc",
