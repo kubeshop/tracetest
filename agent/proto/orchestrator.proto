@@ -49,6 +49,10 @@ service Orchestrator {
 
     // Send the graphql introspect response schema
     rpc SendGraphqlIntrospectResult(GraphqlIntrospectResponse) returns (Empty) {}
+
+    // trace mode
+    rpc RegisterTraceModeAgent(AgentIdentification) returns (stream TraceModeRequest) {}
+    rpc SendTraceModeResponse(TraceModeResponse) returns (Empty) {}
 }
 
 // Empty message for endpoints that don't return anything
@@ -446,4 +450,55 @@ message PlaywrightEngineRequest {
 message PlaywrightEngineResponse {
     bool success = 1;
     string out = 2;
+}
+
+message TraceMetadata {
+    string traceID = 1;
+    string rootServiceName = 2;
+    string rootTraceName = 3;
+    int64 startTimeUnixNano = 4;
+    int32 durationMs = 5;
+    int32 spanCount = 6;
+}
+
+message ListTracesRequest {
+    int32 take = 3;
+    int32 skip = 4;
+    DataStore datastore = 5;
+}
+
+message ListTracesResponse {
+    repeated TraceMetadata traces = 3;
+}
+
+message GetTraceRequest {
+    string traceID = 2;
+    DataStore datastore = 3;
+}
+
+message GetTraceResponse {
+    repeated Span spans = 3;
+    map <string, string> metadata = 4;
+}
+
+message TraceModeRequest {
+    string requestID = 1;
+    AgentIdentification agentIdentification = 2;
+
+    ListTracesRequest listTracesRequest = 3;
+    GetTraceRequest getTraceRequest = 4;
+
+    Error error = 5;
+    map <string, string> metadata = 6;
+}
+
+message TraceModeResponse {
+    string requestID = 1;
+    AgentIdentification agentIdentification = 2;
+
+    ListTracesResponse listTracesResponse = 3;
+    GetTraceResponse getTraceResponse = 4;
+
+    Error error = 5;
+    map <string, string> metadata = 6;
 }

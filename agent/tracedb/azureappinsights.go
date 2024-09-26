@@ -79,6 +79,10 @@ func (db *azureAppInsightsDB) GetEndpoints() string {
 	return azureLogUrl
 }
 
+func (db *azureAppInsightsDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
+	return []traces.TraceMetadata{}, nil
+}
+
 func (db *azureAppInsightsDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	url := azureLogUrl
 	tester := connection.NewTester(

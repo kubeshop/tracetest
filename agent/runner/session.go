@@ -111,6 +111,7 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 		collector.WithStartRemoteServer(false),
 		collector.WithObserver(observer),
 		collector.WithLogger(logger),
+		collector.WithTraceMode(config.TraceMode),
 	}
 
 	collector, err := collector.Start(
@@ -168,9 +169,11 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		workers.WithTriggerMeter(meter),
 	)
 
+	inMemoryDs := poller.NewInMemoryDatastore(traceCache)
+
 	pollingWorker := workers.NewPollerWorker(
 		controlPlaneClient,
-		workers.WithInMemoryDatastore(poller.NewInMemoryDatastore(traceCache)),
+		workers.WithInMemoryDatastore(inMemoryDs),
 		workers.WithPollerTraceCache(traceCache),
 		workers.WithPollerObserver(observer),
 		workers.WithPollerStoppableProcessRunner(processStopper.RunStoppableProcess),
@@ -203,6 +206,17 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		logger.Info(fmt.Sprintf("Server terminated the connection with the agent. Reason: %s\n", sr.Reason))
 		return controlPlaneClient.Close()
 	})
+
+	// Trace Mode
+	traceModeWorker := workers.NewTracesWorker(
+		controlPlaneClient,
+		workers.WithTracesLogger(logger),
+		workers.WithTracesTracer(tracer),
+		workers.WithTracesMeter(meter),
+		workers.WithTracesInMemoryDatastore(inMemoryDs),
+	)
+
+	controlPlaneClient.OnTraceModeRequest(traceModeWorker.Handler)
 
 	return controlPlaneClient, nil
 }

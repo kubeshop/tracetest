@@ -93,6 +93,10 @@ func (db *awsxrayDB) GetEndpoints() string {
 	return fmt.Sprintf("xray.%s.amazonaws.com:443", db.region)
 }
 
+func (db *awsxrayDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
+	return []traces.TraceMetadata{}, nil
+}
+
 func (db *awsxrayDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	url := fmt.Sprintf("xray.%s.amazonaws.com:443", db.region)
 	tester := connection.NewTester(

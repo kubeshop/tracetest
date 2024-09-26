@@ -52,6 +52,9 @@ type OrchestratorClient interface {
 	RegisterGraphqlIntrospectListener(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterGraphqlIntrospectListenerClient, error)
 	// Send the graphql introspect response schema
 	SendGraphqlIntrospectResult(ctx context.Context, in *GraphqlIntrospectResponse, opts ...grpc.CallOption) (*Empty, error)
+	// trace mode
+	RegisterTraceModeAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterTraceModeAgentClient, error)
+	SendTraceModeResponse(ctx context.Context, in *TraceModeResponse, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type orchestratorClient struct {
@@ -349,6 +352,47 @@ func (c *orchestratorClient) SendGraphqlIntrospectResult(ctx context.Context, in
 	return out, nil
 }
 
+func (c *orchestratorClient) RegisterTraceModeAgent(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterTraceModeAgentClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Orchestrator_ServiceDesc.Streams[7], "/proto.Orchestrator/RegisterTraceModeAgent", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &orchestratorRegisterTraceModeAgentClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Orchestrator_RegisterTraceModeAgentClient interface {
+	Recv() (*TraceModeRequest, error)
+	grpc.ClientStream
+}
+
+type orchestratorRegisterTraceModeAgentClient struct {
+	grpc.ClientStream
+}
+
+func (x *orchestratorRegisterTraceModeAgentClient) Recv() (*TraceModeRequest, error) {
+	m := new(TraceModeRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *orchestratorClient) SendTraceModeResponse(ctx context.Context, in *TraceModeResponse, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/proto.Orchestrator/SendTraceModeResponse", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrchestratorServer is the server API for Orchestrator service.
 // All implementations must embed UnimplementedOrchestratorServer
 // for forward compatibility
@@ -383,6 +427,9 @@ type OrchestratorServer interface {
 	RegisterGraphqlIntrospectListener(*AgentIdentification, Orchestrator_RegisterGraphqlIntrospectListenerServer) error
 	// Send the graphql introspect response schema
 	SendGraphqlIntrospectResult(context.Context, *GraphqlIntrospectResponse) (*Empty, error)
+	// trace mode
+	RegisterTraceModeAgent(*AgentIdentification, Orchestrator_RegisterTraceModeAgentServer) error
+	SendTraceModeResponse(context.Context, *TraceModeResponse) (*Empty, error)
 	mustEmbedUnimplementedOrchestratorServer()
 }
 
@@ -431,6 +478,12 @@ func (UnimplementedOrchestratorServer) RegisterGraphqlIntrospectListener(*AgentI
 }
 func (UnimplementedOrchestratorServer) SendGraphqlIntrospectResult(context.Context, *GraphqlIntrospectResponse) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendGraphqlIntrospectResult not implemented")
+}
+func (UnimplementedOrchestratorServer) RegisterTraceModeAgent(*AgentIdentification, Orchestrator_RegisterTraceModeAgentServer) error {
+	return status.Errorf(codes.Unimplemented, "method RegisterTraceModeAgent not implemented")
+}
+func (UnimplementedOrchestratorServer) SendTraceModeResponse(context.Context, *TraceModeResponse) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendTraceModeResponse not implemented")
 }
 func (UnimplementedOrchestratorServer) mustEmbedUnimplementedOrchestratorServer() {}
 
@@ -718,6 +771,45 @@ func _Orchestrator_SendGraphqlIntrospectResult_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Orchestrator_RegisterTraceModeAgent_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(AgentIdentification)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(OrchestratorServer).RegisterTraceModeAgent(m, &orchestratorRegisterTraceModeAgentServer{stream})
+}
+
+type Orchestrator_RegisterTraceModeAgentServer interface {
+	Send(*TraceModeRequest) error
+	grpc.ServerStream
+}
+
+type orchestratorRegisterTraceModeAgentServer struct {
+	grpc.ServerStream
+}
+
+func (x *orchestratorRegisterTraceModeAgentServer) Send(m *TraceModeRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Orchestrator_SendTraceModeResponse_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TraceModeResponse)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrchestratorServer).SendTraceModeResponse(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Orchestrator/SendTraceModeResponse",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrchestratorServer).SendTraceModeResponse(ctx, req.(*TraceModeResponse))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Orchestrator_ServiceDesc is the grpc.ServiceDesc for Orchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -752,6 +844,10 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendGraphqlIntrospectResult",
 			Handler:    _Orchestrator_SendGraphqlIntrospectResult_Handler,
+		},
+		{
+			MethodName: "SendTraceModeResponse",
+			Handler:    _Orchestrator_SendTraceModeResponse_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
@@ -788,6 +884,11 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "RegisterGraphqlIntrospectListener",
 			Handler:       _Orchestrator_RegisterGraphqlIntrospectListener_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RegisterTraceModeAgent",
+			Handler:       _Orchestrator_RegisterTraceModeAgent_Handler,
 			ServerStreams: true,
 		},
 	},

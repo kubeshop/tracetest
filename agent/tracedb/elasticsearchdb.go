@@ -44,6 +44,10 @@ func (db *elasticsearchDB) GetEndpoints() string {
 	return strings.Join(db.config.Addresses, ", ")
 }
 
+func (db *elasticsearchDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
+	return []traces.TraceMetadata{}, nil
+}
+
 func (db *elasticsearchDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	tester := connection.NewTester(
 		connection.WithPortLintingTest(connection.PortLinter("ElasticSearch", elasticSearchDefaultPorts(), db.config.Addresses...)),

@@ -9,8 +9,10 @@ import (
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/events"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
 	"github.com/kubeshop/tracetest/server/otlp"
+	"github.com/kubeshop/tracetest/server/traces"
 	"go.opencensus.io/trace"
 	pb "go.opentelemetry.io/proto/otlp/collector/trace/v1"
+	v11 "go.opentelemetry.io/proto/otlp/common/v1"
 	v1 "go.opentelemetry.io/proto/otlp/trace/v1"
 	"go.uber.org/zap"
 )
@@ -73,6 +75,7 @@ type remoteIngesterConfig struct {
 	logger            *zap.Logger
 	observer          event.Observer
 	sensor            sensors.Sensor
+	traceMode         bool
 }
 
 func (i *forwardIngester) Statistics() Statistics {
@@ -136,6 +139,21 @@ func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
 	for _, resourceSpan := range resourceSpans {
 		for _, scopedSpan := range resourceSpan.ScopeSpans {
 			for _, span := range scopedSpan.Spans {
+				if scopedSpan.Scope != nil {
+					span.Attributes = append(span.Attributes, &v11.KeyValue{
+						Key:   traces.MetadataServiceName,
+						Value: &v11.AnyValue{Value: &v11.AnyValue_StringValue{StringValue: scopedSpan.Scope.Name}},
+					})
+
+					// Add attributes from the resource
+					span.Attributes = append(span.Attributes, scopedSpan.Scope.Attributes...)
+				}
+
+				// Add attributes from the resource
+				if resourceSpan.Resource != nil {
+					span.Attributes = append(span.Attributes, resourceSpan.Resource.Attributes...)
+				}
+
 				traceID := trace.TraceID(span.TraceId).String()
 				spans[traceID] = append(spans[traceID], span)
 			}
@@ -148,7 +166,7 @@ func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
 		i.Lock()
 		i.traceIDs[traceID] = true
 		i.Unlock()
-		if _, ok := i.traceCache.Get(traceID); !ok {
+		if _, ok := i.traceCache.Get(traceID); !ok && !i.RemoteIngester.traceMode {
 			i.logger.Debug("traceID is not part of a test", zap.String("traceID", traceID))
 			// traceID is not part of a test
 			continue

@@ -25,6 +25,7 @@ type Runner struct {
 	logger       *zap.Logger
 	loggerLevel  *zap.AtomicLevel
 	claims       jwt.MapClaims
+	traceMode    bool
 }
 
 func NewRunner(configurator config.Configurator, resources *resourcemanager.Registry, ui ui.ConsoleUI) *Runner {
@@ -34,6 +35,7 @@ func NewRunner(configurator config.Configurator, resources *resourcemanager.Regi
 		ui:           ui,
 		mode:         agentConfig.Mode_Desktop,
 		logger:       nil,
+		traceMode:    false,
 	}
 }
 
@@ -48,6 +50,7 @@ Once started, Tracetest Agent exposes OTLP ports 4317 and 4318 to ingest traces 
 	}
 
 	s.mode = flags.Mode
+	s.traceMode = flags.TraceMode
 	s.ui.Infof("Running in %s mode...", s.mode)
 
 	s.logger = logger
@@ -90,6 +93,7 @@ func (s *Runner) StartAgent(ctx context.Context, cliConfig config.Config, agentA
 
 	cfg.Insecure = cliConfig.AllowInsecure
 	cfg.SkipVerify = cliConfig.SkipVerify
+	cfg.TraceMode = s.traceMode
 
 	s.logger.Debug("Loaded agent config", zap.Any("config", cfg))
 	if err != nil {

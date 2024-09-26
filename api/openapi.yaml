@@ -1889,7 +1889,7 @@ paths:
 
   /invites/{inviteID}:
     parameters:
-        - $ref: "./parameters.yaml#/components/parameters/inviteID"
+      - $ref: "./parameters.yaml#/components/parameters/inviteID"
     get:
       description: get invite
       tags:
@@ -1964,7 +1964,7 @@ paths:
 
   /tokens/{tokenID}:
     parameters:
-        - $ref: "./parameters.yaml#/components/parameters/tokenID"
+      - $ref: "./parameters.yaml#/components/parameters/tokenID"
     delete:
       description: delete token
       tags:
@@ -2027,7 +2027,7 @@ paths:
 
   /environments/{environmentID}:
     parameters:
-        - $ref: "./parameters.yaml#/components/parameters/environmentID"
+      - $ref: "./parameters.yaml#/components/parameters/environmentID"
     get:
       tags:
         - api
@@ -2059,3 +2059,62 @@ paths:
       responses:
         "204":
           $ref: "./environments.yaml#/components/responses/EnvironmentResource"
+
+  /graphql/introspection:
+    post:
+      tags:
+        - api
+      summary: "Introspect the GraphQL schema"
+      description: "Introspect the GraphQL schema"
+      operationId: graphqlIntrospection
+      requestBody:
+        content:
+          text/json:
+            schema:
+              $ref: "./graphql.yaml#/components/schemas/GraphqlRequest"
+      responses:
+        201:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "./graphql.yaml#/components/schemas/GraphqlResponse"
+
+  /traces:
+    get:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/take"
+        - $ref: "./parameters.yaml#/components/parameters/skip"
+      summary: "Get list of traces from agent"
+      description: "Get list of traces from agent"
+      operationId: getTraces
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./tracemode.yaml#/components/schemas/ListTracesResponse"
+        404:
+          description: MonitorRun run not found
+
+  /traces/{traceId}:
+    get:
+      tags:
+        - api
+      parameters:
+        - $ref: "./parameters.yaml#/components/parameters/traceId"
+      summary: "Get a specific trace"
+      description: "Get a specific trace"
+      operationId: getTrace
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "./trace.yaml#/components/schemas/Trace"
+        404:
+          description: MonitorRun run not found

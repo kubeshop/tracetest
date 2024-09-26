@@ -21,6 +21,7 @@ type TraceDB interface {
 	GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error)
 	Close() error
 	GetEndpoints() string
+	List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error)
 }
 
 type TestableTraceDB interface {
@@ -36,6 +37,10 @@ type noopTraceDB struct{}
 
 func (db *noopTraceDB) GetTraceByID(ctx context.Context, traceID string) (t traces.Trace, err error) {
 	return traces.Trace{}, nil
+}
+
+func (db *noopTraceDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
+	return []traces.TraceMetadata{}, nil
 }
 
 func (db *noopTraceDB) GetTraceID() trace.TraceID {

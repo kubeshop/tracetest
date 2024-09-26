@@ -33,6 +33,12 @@ func WithTraceCache(traceCache TraceCache) CollectorOption {
 	}
 }
 
+func WithTraceMode(traceMode bool) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.traceMode = traceMode
+	}
+}
+
 func WithStartRemoteServer(startRemoteServer bool) CollectorOption {
 	return func(ric *remoteIngesterConfig) {
 		ric.startRemoteServer = startRemoteServer

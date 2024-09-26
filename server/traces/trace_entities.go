@@ -13,6 +13,15 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
+type TraceMetadata struct {
+	TraceID           string
+	RootServiceName   string
+	RootTraceName     string
+	StartTimeUnixNano int64
+	DurationMs        int64
+	SpanCount         int
+}
+
 type Trace struct {
 	ID       trace.TraceID
 	RootSpan Span
@@ -29,6 +38,17 @@ func nonNilTraces(traces []*Trace) []*Trace {
 		nonNil = append(nonNil, trace)
 	}
 	return nonNil
+}
+
+func (t Trace) ToTraceMetadata() TraceMetadata {
+	return TraceMetadata{
+		TraceID:           t.ID.String(),
+		RootServiceName:   t.RootSpan.Attributes.Get(MetadataServiceName),
+		RootTraceName:     t.RootSpan.Name,
+		StartTimeUnixNano: t.RootSpan.StartTime.UnixNano(),
+		DurationMs:        timing.TimeDiff(t.RootSpan.StartTime, t.RootSpan.EndTime).Milliseconds(),
+		SpanCount:         len(t.Flat),
+	}
 }
 
 func MergeTraces(traces ...*Trace) *Trace {

@@ -2,6 +2,8 @@ package poller
 
 import (
 	"context"
+	"slices"
+	"sort"
 
 	"github.com/kubeshop/tracetest/agent/collector"
 	"github.com/kubeshop/tracetest/agent/tracedb"
@@ -34,6 +36,39 @@ func (d *inmemoryDatastore) GetEndpoints() string {
 	return ""
 }
 
+func (d *inmemoryDatastore) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
+	keys := d.cache.Keys()
+	slices.Reverse(keys)
+
+	list := make([]traces.Trace, 0)
+	for _, key := range keys {
+		spans, found := d.cache.Get(key)
+		if !found {
+			return nil, connection.ErrTraceNotFound
+		}
+
+		trace := traces.FromSpanList(spans)
+		if trace.RootSpan.Name == traces.TemporaryRootSpanName {
+			continue
+		}
+
+		list = append(list, trace)
+	}
+
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].RootSpan.StartTime.After(list[j].RootSpan.StartTime)
+	})
+
+	list = paginate(list, skip, take)
+
+	metadata := make([]traces.TraceMetadata, len(list))
+	for i, trace := range list {
+		metadata[i] = trace.ToTraceMetadata()
+	}
+
+	return metadata, nil
+}
+
 // GetTraceByID implements tracedb.TraceDB.
 func (d *inmemoryDatastore) GetTraceByID(ctx context.Context, traceID string) (traces.Trace, error) {
 	spans, found := d.cache.Get(traceID)
@@ -57,4 +92,17 @@ func (d *inmemoryDatastore) Ready() bool {
 // ShouldRetry implements tracedb.TraceDB.
 func (d *inmemoryDatastore) ShouldRetry() bool {
 	return true
+}
+
+func paginate(x []traces.Trace, skip int, size int) []traces.Trace {
+	if skip > len(x) {
+		skip = len(x)
+	}
+
+	end := skip + size
+	if end > len(x) {
+		end = len(x)
+	}
+
+	return x[skip:end]
 }
