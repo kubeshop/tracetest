@@ -58,16 +58,3 @@ func (d *inmemoryDatastore) Ready() bool {
 func (d *inmemoryDatastore) ShouldRetry() bool {
 	return true
 }
-
-func paginate(x []traces.Trace, skip int, size int) []traces.Trace {
-	if skip > len(x) {
-		skip = len(x)
-	}
-
-	end := skip + size
-	if end > len(x) {
-		end = len(x)
-	}
-
-	return x[skip:end]
-}

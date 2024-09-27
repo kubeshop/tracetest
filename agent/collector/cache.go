@@ -3,7 +3,6 @@ package collector
 import (
 	"slices"
 	"sync"
-	"time"
 
 	gocache "github.com/Code-Hex/go-generics-cache"
 	"go.opentelemetry.io/otel/trace"
@@ -15,7 +14,6 @@ type TraceCache interface {
 	Append(string, []*v1.Span)
 	RemoveSpans(string, []string)
 	Exists(string) bool
-	Keys() []string
 }
 
 type traceCache struct {
@@ -32,14 +30,6 @@ func (c *traceCache) Get(traceID string) ([]*v1.Span, bool) {
 	return c.internalCache.Get(traceID)
 }
 
-// List implements TraceCache.
-func (c *traceCache) Keys() []string {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-
-	return c.internalCache.Keys()
-}
-
 // Append implements TraceCache.
 func (c *traceCache) Append(traceID string, spans []*v1.Span) {
 	c.mutex.Lock()
@@ -52,7 +42,7 @@ func (c *traceCache) Append(traceID string, spans []*v1.Span) {
 	spans = append(existingTraces, spans...)
 
 	c.internalCache.Set(traceID, spans)
-	c.receivedSpans.Set(traceID, currentNumberSpans, gocache.WithExpiration(time.Minute*10))
+	c.receivedSpans.Set(traceID, currentNumberSpans)
 }
 
 func (c *traceCache) RemoveSpans(traceID string, spanID []string) {
