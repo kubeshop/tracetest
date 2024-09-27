@@ -66,7 +66,15 @@ func StartSession(ctx context.Context, cfg config.Config, observer event.Observe
 		return nil, err
 	}
 
-	agentCollector, err := StartCollector(ctx, cfg, traceCache, observer, logger, tracer)
+	// Trace Mode
+	traceModeWorker := workers.NewTracesWorker(
+		controlPlaneClient,
+		workers.WithTracesLogger(logger),
+		workers.WithTracesTracer(tracer),
+		workers.WithTracesMeter(meter),
+	)
+
+	agentCollector, err := StartCollector(ctx, cfg, traceCache, traceModeWorker, observer, logger, tracer)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +107,7 @@ func StartSession(ctx context.Context, cfg config.Config, observer event.Observe
 	}, nil
 }
 
-func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache, observer event.Observer, logger *zap.Logger, tracer trace.Tracer) (collector.Collector, error) {
+func StartCollector(ctx context.Context, config config.Config, traceCache collector.TraceCache, traceModeWorker collector.TraceModeForwarder, observer event.Observer, logger *zap.Logger, tracer trace.Tracer) (collector.Collector, error) {
 
 	collectorConfig := collector.Config{
 		HTTPPort: config.OTLPServer.HTTPPort,
@@ -112,6 +120,7 @@ func StartCollector(ctx context.Context, config config.Config, traceCache collec
 		collector.WithObserver(observer),
 		collector.WithLogger(logger),
 		collector.WithTraceMode(config.TraceMode),
+		collector.WithTraceModeForwarder(traceModeWorker),
 	}
 
 	collector, err := collector.Start(
@@ -206,17 +215,6 @@ func newControlPlaneClient(ctx context.Context, config config.Config, traceCache
 		logger.Info(fmt.Sprintf("Server terminated the connection with the agent. Reason: %s\n", sr.Reason))
 		return controlPlaneClient.Close()
 	})
-
-	// Trace Mode
-	traceModeWorker := workers.NewTracesWorker(
-		controlPlaneClient,
-		workers.WithTracesLogger(logger),
-		workers.WithTracesTracer(tracer),
-		workers.WithTracesMeter(meter),
-		workers.WithTracesInMemoryDatastore(inMemoryDs),
-	)
-
-	controlPlaneClient.OnTraceModeRequest(traceModeWorker.Handler)
 
 	return controlPlaneClient, nil
 }

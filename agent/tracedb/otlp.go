@@ -42,10 +42,6 @@ func (tdb *OTLPTraceDB) GetEndpoints() string {
 	return ""
 }
 
-func (tdb *OTLPTraceDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
-	return []traces.TraceMetadata{}, nil
-}
-
 // GetTraceByID implements TraceDB
 func (tdb *OTLPTraceDB) GetTraceByID(ctx context.Context, id string) (traces.Trace, error) {
 	t, err := tdb.traceGetter.Get(ctx, traces.DecodeTraceID(id))

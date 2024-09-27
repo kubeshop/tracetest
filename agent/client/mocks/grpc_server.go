@@ -22,14 +22,12 @@ type GrpcServerMock struct {
 	terminationChannel          chan Message[*proto.ShutdownRequest]
 	dataStoreTestChannel        chan Message[*proto.DataStoreConnectionTestRequest]
 	graphqlIntrospectionChannel chan Message[*proto.GraphqlIntrospectRequest]
-	traceModeChannel            chan Message[*proto.TraceModeRequest]
 
 	lastTriggerResponse              Message[*proto.TriggerResponse]
 	lastPollingResponse              Message[*proto.PollingResponse]
 	lastOtlpConnectionResponse       Message[*proto.OTLPConnectionTestResponse]
 	lastDataStoreConnectionResponse  Message[*proto.DataStoreConnectionTestResponse]
 	lastGraphqlIntrospectionResponse Message[*proto.GraphqlIntrospectResponse]
-	lastTraceModeResponse            Message[*proto.TraceModeResponse]
 
 	server *grpc.Server
 }
@@ -47,7 +45,6 @@ func NewGrpcServer() *GrpcServerMock {
 		dataStoreTestChannel:        make(chan Message[*proto.DataStoreConnectionTestRequest]),
 		otlpConnectionTestChannel:   make(chan Message[*proto.OTLPConnectionTestRequest]),
 		graphqlIntrospectionChannel: make(chan Message[*proto.GraphqlIntrospectRequest]),
-		traceModeChannel:            make(chan Message[*proto.TraceModeRequest]),
 	}
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -180,21 +177,6 @@ func (s *GrpcServerMock) RegisterGraphqlIntrospectListener(id *proto.AgentIdenti
 	}
 }
 
-func (s *GrpcServerMock) RegisterTraceModeAgent(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterTraceModeAgentServer) error {
-	if id.Token != "token" {
-		return fmt.Errorf("could not validate token")
-	}
-
-	for {
-		traceModeRequest := <-s.traceModeChannel
-
-		err := stream.Send(traceModeRequest.Data)
-		if err != nil {
-			log.Println("could not trace mode request to agent: %w", err)
-		}
-	}
-}
-
 func (s *GrpcServerMock) RegisterOTLPConnectionTestListener(id *proto.AgentIdentification, stream proto.Orchestrator_RegisterOTLPConnectionTestListenerServer) error {
 	if id.Token != "token" {
 		return fmt.Errorf("could not validate token")
@@ -246,15 +228,6 @@ func (s *GrpcServerMock) SendGraphqlIntrospectResult(ctx context.Context, result
 	return &proto.Empty{}, nil
 }
 
-func (s *GrpcServerMock) SendTraceModeResponse(ctx context.Context, result *proto.TraceModeResponse) (*proto.Empty, error) {
-	if result.AgentIdentification == nil || result.AgentIdentification.Token != "token" {
-		return nil, fmt.Errorf("could not validate token")
-	}
-
-	s.lastTraceModeResponse = Message[*proto.TraceModeResponse]{Data: result, Context: ctx}
-	return &proto.Empty{}, nil
-}
-
 func (s *GrpcServerMock) RegisterShutdownListener(_ *proto.AgentIdentification, stream proto.Orchestrator_RegisterShutdownListenerServer) error {
 	for {
 		shutdownRequest := <-s.terminationChannel
@@ -284,10 +257,6 @@ func (s *GrpcServerMock) SendGraphqlIntrospectionRequest(ctx context.Context, re
 	s.graphqlIntrospectionChannel <- Message[*proto.GraphqlIntrospectRequest]{Context: ctx, Data: request}
 }
 
-func (s *GrpcServerMock) SendTraceModeRequest(ctx context.Context, request *proto.TraceModeRequest) {
-	s.traceModeChannel <- Message[*proto.TraceModeRequest]{Context: ctx, Data: request}
-}
-
 func (s *GrpcServerMock) SendOTLPConnectionTestRequest(ctx context.Context, request *proto.OTLPConnectionTestRequest) {
 	s.otlpConnectionTestChannel <- Message[*proto.OTLPConnectionTestRequest]{Context: ctx, Data: request}
 }
@@ -310,10 +279,6 @@ func (s *GrpcServerMock) GetLastDataStoreConnectionResponse() Message[*proto.Dat
 
 func (s *GrpcServerMock) GetLastGraphqlIntrospectionResponse() Message[*proto.GraphqlIntrospectResponse] {
 	return s.lastGraphqlIntrospectionResponse
-}
-
-func (s *GrpcServerMock) GetLastTraceModeResponse() Message[*proto.TraceModeResponse] {
-	return s.lastTraceModeResponse
 }
 
 func (s *GrpcServerMock) TerminateConnection(ctx context.Context, reason string) {

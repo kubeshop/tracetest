@@ -8,13 +8,13 @@ import (
 	"github.com/kubeshop/tracetest/agent/telemetry"
 )
 
-func (c *Client) SendTraceModeResponse(ctx context.Context, response *proto.TraceModeResponse) error {
+func (c *Client) SendTraces(ctx context.Context, response *proto.ExportRequest) error {
 	client := proto.NewOrchestratorClient(c.conn)
 
 	response.AgentIdentification = c.sessionConfig.AgentIdentification
 	response.Metadata = telemetry.ExtractMetadataFromContext(ctx)
 
-	_, err := client.SendTraceModeResponse(ctx, response)
+	_, err := client.Export(ctx, response)
 	if err != nil {
 		return fmt.Errorf("could not send list traces result request: %w", err)
 	}

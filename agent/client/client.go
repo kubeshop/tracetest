@@ -56,8 +56,6 @@ type Client struct {
 	graphqlIntrospectionListener func(context.Context, *proto.GraphqlIntrospectRequest) error
 	shutdownListener             func(context.Context, *proto.ShutdownRequest) error
 	dataStoreConnectionListener  func(context.Context, *proto.DataStoreConnectionTestRequest) error
-	traceModeListener            func(context.Context, *proto.TraceModeRequest) error
-	getTraceListener             func(context.Context, *proto.GetTraceRequest) error
 	otlpConnectionTestListener   func(context.Context, *proto.OTLPConnectionTestRequest) error
 }
 
@@ -128,12 +126,6 @@ func (c *Client) Start(ctx context.Context) error {
 		return err
 	}
 
-	err = c.startTraceModeListener(ctx)
-	if err != nil {
-		c.logger.Error("Failed to start list traces listener", zap.Error(err))
-		return err
-	}
-
 	c.logger.Debug("ControlPlane client started")
 
 	return nil
@@ -167,10 +159,6 @@ func (c *Client) OnTriggerRequest(listener func(context.Context, *proto.TriggerR
 
 func (c *Client) OnDataStoreTestConnectionRequest(listener func(context.Context, *proto.DataStoreConnectionTestRequest) error) {
 	c.dataStoreConnectionListener = listener
-}
-
-func (c *Client) OnTraceModeRequest(listener func(context.Context, *proto.TraceModeRequest) error) {
-	c.traceModeListener = listener
 }
 
 func (c *Client) OnPollingRequest(listener func(context.Context, *proto.PollingRequest) error) {

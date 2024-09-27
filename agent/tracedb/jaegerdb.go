@@ -81,10 +81,6 @@ func (jtd *jaegerTraceDB) Close() error {
 	return jtd.dataSource.Close()
 }
 
-func (jtd *jaegerTraceDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
-	return []traces.TraceMetadata{}, nil
-}
-
 func jaegerGrpcGetTraceByID(ctx context.Context, traceID string, conn *grpc.ClientConn) (traces.Trace, error) {
 	query := pb.NewQueryServiceClient(conn)
 

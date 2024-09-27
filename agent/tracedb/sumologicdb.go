@@ -67,10 +67,6 @@ func (db *sumologicDB) GetEndpoints() string {
 	return db.URL
 }
 
-func (db *sumologicDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
-	return []traces.TraceMetadata{}, nil
-}
-
 func (db *sumologicDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	tester := connection.NewTester(
 		connection.WithConnectivityTest(connection.ConnectivityStep(model.ProtocolHTTP, db.GetEndpoints())),

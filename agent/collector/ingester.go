@@ -31,15 +31,20 @@ type ingester interface {
 	SetSensor(sensors.Sensor)
 }
 
-func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, startRemoteServer bool) (ingester, error) {
+type TraceModeForwarder interface {
+	Export(ctx context.Context, request *pb.ExportTraceServiceRequest) error
+}
+
+func newForwardIngester(ctx context.Context, batchTimeout time.Duration, cfg remoteIngesterConfig, traceModeForwarder TraceModeForwarder, startRemoteServer bool) (ingester, error) {
 	ingester := &forwardIngester{
-		BatchTimeout:   batchTimeout,
-		RemoteIngester: cfg,
-		traceIDs:       make(map[string]bool, 0),
-		done:           make(chan bool),
-		traceCache:     cfg.traceCache,
-		logger:         cfg.logger,
-		sensor:         cfg.sensor,
+		BatchTimeout:       batchTimeout,
+		RemoteIngester:     cfg,
+		traceIDs:           make(map[string]bool, 0),
+		done:               make(chan bool),
+		traceCache:         cfg.traceCache,
+		logger:             cfg.logger,
+		sensor:             cfg.sensor,
+		traceModeForwarder: traceModeForwarder,
 	}
 
 	return ingester, nil
@@ -53,14 +58,15 @@ type Statistics struct {
 // forwardIngester forwards all incoming spans to a remote ingester. It also batches those
 // spans to reduce network traffic.
 type forwardIngester struct {
-	BatchTimeout   time.Duration
-	RemoteIngester remoteIngesterConfig
-	mutex          sync.Mutex
-	traceIDs       map[string]bool
-	done           chan bool
-	traceCache     TraceCache
-	logger         *zap.Logger
-	sensor         sensors.Sensor
+	BatchTimeout       time.Duration
+	RemoteIngester     remoteIngesterConfig
+	mutex              sync.Mutex
+	traceIDs           map[string]bool
+	done               chan bool
+	traceCache         TraceCache
+	logger             *zap.Logger
+	sensor             sensors.Sensor
+	traceModeForwarder TraceModeForwarder
 
 	statistics Statistics
 
@@ -68,14 +74,15 @@ type forwardIngester struct {
 }
 
 type remoteIngesterConfig struct {
-	URL               string
-	Token             string
-	traceCache        TraceCache
-	startRemoteServer bool
-	logger            *zap.Logger
-	observer          event.Observer
-	sensor            sensors.Sensor
-	traceMode         bool
+	URL                string
+	Token              string
+	traceCache         TraceCache
+	startRemoteServer  bool
+	logger             *zap.Logger
+	observer           event.Observer
+	sensor             sensors.Sensor
+	traceMode          bool
+	traceModeForwarder TraceModeForwarder
 }
 
 func (i *forwardIngester) Statistics() Statistics {
@@ -92,6 +99,12 @@ func (i *forwardIngester) SetSensor(sensor sensors.Sensor) {
 
 func (i *forwardIngester) Ingest(ctx context.Context, request *pb.ExportTraceServiceRequest, requestType otlp.RequestType) (*pb.ExportTraceServiceResponse, error) {
 	go i.ingestSpans(request)
+	if i.RemoteIngester.traceMode {
+		err := i.traceModeForwarder.Export(ctx, request)
+		if err != nil {
+			i.logger.Error("failed to forward spans to trace mode", zap.Error(err))
+		}
+	}
 
 	return &pb.ExportTraceServiceResponse{
 		PartialSuccess: &pb.ExportTracePartialSuccess{
@@ -166,7 +179,7 @@ func (i *forwardIngester) cacheTestSpans(resourceSpans []*v1.ResourceSpans) {
 		i.Lock()
 		i.traceIDs[traceID] = true
 		i.Unlock()
-		if _, ok := i.traceCache.Get(traceID); !ok && !i.RemoteIngester.traceMode {
+		if _, ok := i.traceCache.Get(traceID); !ok {
 			i.logger.Debug("traceID is not part of a test", zap.String("traceID", traceID))
 			// traceID is not part of a test
 			continue

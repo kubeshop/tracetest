@@ -51,10 +51,6 @@ func (ttd *tempoTraceDB) GetEndpoints() string {
 	return ttd.dataSource.Endpoint()
 }
 
-func (ttd *tempoTraceDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
-	return []traces.TraceMetadata{}, nil
-}
-
 func (ttd *tempoTraceDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	tester := connection.NewTester(
 		connection.WithPortLintingTest(connection.PortLinter("Tempo", tempoDefaultPorts(), ttd.dataSource.Endpoint())),

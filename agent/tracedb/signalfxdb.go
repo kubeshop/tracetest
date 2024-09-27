@@ -52,10 +52,6 @@ func (db *signalfxDB) GetEndpoints() string {
 	return fmt.Sprintf("%s:%s", db.getURL(), "443")
 }
 
-func (db *signalfxDB) List(ctx context.Context, take int, skip int) ([]traces.TraceMetadata, error) {
-	return []traces.TraceMetadata{}, nil
-}
-
 func (db *signalfxDB) TestConnection(ctx context.Context) model.ConnectionResult {
 	url := fmt.Sprintf("%s:%s", db.getURL(), "443")
 	tester := connection.NewTester(
