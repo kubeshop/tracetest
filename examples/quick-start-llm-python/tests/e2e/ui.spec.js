@@ -6,12 +6,6 @@ const chatgptTraceBasedTest = require('./definitions/chatgpt');
 
 const { runTracebasedTest } = require('./tracetest');
 
-const timeToWait = 10_000; // 10 seconds
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 test('generated summarized test for Gemini', async ({ page }) => {
   // Go to Streamlit app
   await page.goto('http://localhost:8501/');
@@ -25,14 +19,17 @@ test('generated summarized test for Gemini', async ({ page }) => {
   // Click on button to call summarization rule
   await page.getByRole('button', { name: 'Summarize' }).click();
 
-  // Wait for time
-  await sleep(timeToWait);
+  // Wait link to appear
+  await page.getByText('Trace ID').waitFor({ state: 'visible' });
 
   // Capture TraceID
-  const traceIDLabel = await page.getByRole('link', { name: 'Trace ID' });
-  expect(traceIDLabel).toHaveText('Trace ID');
+  const traceIDElement = await page.getByRole('link');
+  console.log(traceIDElement.innerHTML());
 
-  console.log(traceIDLabel);
+  // const traceIDLabel = await page.getByRole('link', { name: 'Trace ID' });
+  // expect(traceIDLabel).toHaveText('Trace ID');
+
+  // console.log(traceIDLabel);
 
   // const traceID = (traceIDLabel || '').replace('Trace ID:', '').trim();
 
