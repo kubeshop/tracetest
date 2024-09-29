@@ -21,9 +21,7 @@ python -m venv ./_venv
 source _venv/bin/activate
 
 # install requirements
-pip install -r app/requirements.llm.txt
-pip install -r app/requirements.telemetry.txt
-pip install -r app/requirements.app.txt
+pip install -r app/requirements.txt
 
 # install OTel auto-instrumentation
 opentelemetry-bootstrap -a install
@@ -36,13 +34,22 @@ echo "GOOGLE_API_KEY={your-google-gemini-api-key}" >> .env
 # add tracetest agent keys
 echo "TRACETEST_API_KEY={your-tracetest-api-key}" >> .env
 echo "TRACETEST_ENVIRONMENT_ID={your-tracetest-env-id}" >> .env
+
+# add tracetest token for playwright tests with TS lib
+echo "TRACETEST_API_TOKEN={your-tracetest-token-for-ts-libs}" >> ./tests/.env
 ```
 
 #### Running the apps
 
 ```bash
 
+# start the app running the UI locally
 make start/local-ui
+
+# start the app running the API locally
 make start/local-api
+
+# start the app everything on docker
+make start/on-docker
 
 ```
