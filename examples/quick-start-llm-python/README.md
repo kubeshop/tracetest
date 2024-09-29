@@ -21,7 +21,9 @@ python -m venv ./_venv
 source _venv/bin/activate
 
 # install requirements
-pip install -r app/requirements.txt
+pip install -r app/requirements.llm.txt
+pip install -r app/requirements.telemetry.txt
+pip install -r app/requirements.app.txt
 
 # install OTel auto-instrumentation
 opentelemetry-bootstrap -a install

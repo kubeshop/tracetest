@@ -4,9 +4,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialize telemetry
-from telemetry import init as telemetry_init, otlp_endpoint
+from telemetry import init as telemetry_init
 tracer = telemetry_init() # run telemetry.init() before loading any other modules to capture any module-level telemetry
 
+from opentelemetry import trace
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 
 # from telemetry import heartbeat as telemetry_heartbeat
@@ -39,7 +40,14 @@ def summarize_text():
   provider = get_provider(provider_type)
   summarize_text =  provider.summarize(source_text)
 
-  return jsonify({ "summary": summarize_text })
+  # Get trace ID from current span
+  span = trace.get_current_span()
+  trace_id = span.get_span_context().trace_id
+
+  # Convert trace_id to a hex string
+  trace_id_hex = format(trace_id, '032x')
+
+  return jsonify({"summary": summarize_text, "trace_id": trace_id_hex})
 
 if __name__ == '__main__':
   print('Running on port: ' + api_port)

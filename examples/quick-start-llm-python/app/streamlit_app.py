@@ -64,10 +64,9 @@ if st.button("Summarize"):
 
           # Convert trace_id to a hex string
           trace_id_hex = format(trace_id, '032x')
-          st.text(f"Trace ID: {trace_id_hex}")
 
           # Add a hyperlink to the trace visualization tool
-          trace_url = f"http://localhost:16686//trace/{trace_id_hex}"
-          st.markdown(f"[View Trace]({trace_url})")
+          trace_url = f"http://localhost:16686/trace/{trace_id_hex}"
+          st.markdown(f"[Trace ID: {trace_id_hex}]({trace_url})")
       except Exception as e:
         st.exception(f"An error occurred: {e}")

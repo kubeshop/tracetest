@@ -14,6 +14,7 @@ services:
       - OTEL_SERVICE_NAME=quick-start-llm-ui
       - OTEL_TRACES_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
+      - OTEL_PYTHON_DISABLED_INSTRUMENTATIONS=aleph_alpha_client,chromadb,cohere,groq,haystack-ai,lancedb,llama-index,marqo,milvus,mistralai,pinecone_client,qdrant_client,replicate,together,google_cloud_aiplatform,ibm-watson-machine-learning,weaviate_client
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     ports:
@@ -33,6 +34,7 @@ services:
       - OTEL_SERVICE_NAME=quick-start-llm-api
       - OTEL_TRACES_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://otel-collector:4317
+      - OTEL_PYTHON_DISABLED_INSTRUMENTATIONS=aleph_alpha_client,chromadb,cohere,groq,haystack-ai,lancedb,llama-index,marqo,milvus,mistralai,pinecone_client,qdrant_client,replicate,together,google_cloud_aiplatform,ibm-watson-machine-learning,weaviate_client
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
     ports:
@@ -76,6 +78,7 @@ services:
   # Cloud-based Managed Tracetest
   tracetest-agent:
     image: kubeshop/tracetest-agent:latest
+    command: ["-v"]
     environment:
       # Get the required information here: https://app.tracetest.io/retrieve-token
       - TRACETEST_API_KEY=${TRACETEST_API_KEY}
