@@ -19,6 +19,7 @@ type Flags struct {
 	CollectorEndpoint string
 	Insecure          bool
 	SkipVerify        bool
+	TraceMode         bool
 }
 
 func (f Flags) AutomatedEnvironmentCanBeInferred() bool {

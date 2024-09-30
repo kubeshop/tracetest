@@ -113,6 +113,14 @@ components:
       schema:
         type: string
 
+    traceId:
+      in: path
+      name: traceId
+      required: true
+      description: "ID of a Trace"
+      schema:
+        type: string
+
     fileExtension:
       in: path
       name: fileExtension

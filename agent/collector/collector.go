@@ -33,6 +33,12 @@ func WithTraceCache(traceCache TraceCache) CollectorOption {
 	}
 }
 
+func WithTraceMode(traceMode bool) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.traceMode = traceMode
+	}
+}
+
 func WithStartRemoteServer(startRemoteServer bool) CollectorOption {
 	return func(ric *remoteIngesterConfig) {
 		ric.startRemoteServer = startRemoteServer
@@ -54,6 +60,12 @@ func WithObserver(observer event.Observer) CollectorOption {
 func WithSensor(sensor sensors.Sensor) CollectorOption {
 	return func(ric *remoteIngesterConfig) {
 		ric.sensor = sensor
+	}
+}
+
+func WithTraceModeForwarder(traceModeForwarder TraceModeForwarder) CollectorOption {
+	return func(ric *remoteIngesterConfig) {
+		ric.traceModeForwarder = traceModeForwarder
 	}
 }
 
@@ -108,7 +120,7 @@ func Start(ctx context.Context, config Config, tracer trace.Tracer, opts ...Coll
 		opt(&ingesterConfig)
 	}
 
-	ingester, err := newForwardIngester(ctx, config.BatchTimeout, ingesterConfig, ingesterConfig.startRemoteServer)
+	ingester, err := newForwardIngester(ctx, config.BatchTimeout, ingesterConfig, ingesterConfig.traceModeForwarder, ingesterConfig.startRemoteServer)
 	if err != nil {
 		return nil, fmt.Errorf("could not start local collector: %w", err)
 	}

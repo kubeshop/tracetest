@@ -19,6 +19,7 @@ type Config struct {
 	Mode              string `mapstructure:"mode"`
 	Insecure          bool   `mapstructure:"insecure"`
 	SkipVerify        bool   `mapstructure:"skip_verify"`
+	TraceMode         bool   `mapstructure:"trace_mode"`
 
 	OTLPServer OtlpServer `mapstructure:"otlp_server"`
 }

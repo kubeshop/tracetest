@@ -52,6 +52,7 @@ type OrchestratorClient interface {
 	RegisterGraphqlIntrospectListener(ctx context.Context, in *AgentIdentification, opts ...grpc.CallOption) (Orchestrator_RegisterGraphqlIntrospectListenerClient, error)
 	// Send the graphql introspect response schema
 	SendGraphqlIntrospectResult(ctx context.Context, in *GraphqlIntrospectResponse, opts ...grpc.CallOption) (*Empty, error)
+	Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type orchestratorClient struct {
@@ -349,6 +350,15 @@ func (c *orchestratorClient) SendGraphqlIntrospectResult(ctx context.Context, in
 	return out, nil
 }
 
+func (c *orchestratorClient) Export(ctx context.Context, in *ExportRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/proto.Orchestrator/Export", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrchestratorServer is the server API for Orchestrator service.
 // All implementations must embed UnimplementedOrchestratorServer
 // for forward compatibility
@@ -383,6 +393,7 @@ type OrchestratorServer interface {
 	RegisterGraphqlIntrospectListener(*AgentIdentification, Orchestrator_RegisterGraphqlIntrospectListenerServer) error
 	// Send the graphql introspect response schema
 	SendGraphqlIntrospectResult(context.Context, *GraphqlIntrospectResponse) (*Empty, error)
+	Export(context.Context, *ExportRequest) (*Empty, error)
 	mustEmbedUnimplementedOrchestratorServer()
 }
 
@@ -431,6 +442,9 @@ func (UnimplementedOrchestratorServer) RegisterGraphqlIntrospectListener(*AgentI
 }
 func (UnimplementedOrchestratorServer) SendGraphqlIntrospectResult(context.Context, *GraphqlIntrospectResponse) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendGraphqlIntrospectResult not implemented")
+}
+func (UnimplementedOrchestratorServer) Export(context.Context, *ExportRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Export not implemented")
 }
 func (UnimplementedOrchestratorServer) mustEmbedUnimplementedOrchestratorServer() {}
 
@@ -718,6 +732,24 @@ func _Orchestrator_SendGraphqlIntrospectResult_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Orchestrator_Export_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrchestratorServer).Export(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.Orchestrator/Export",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrchestratorServer).Export(ctx, req.(*ExportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Orchestrator_ServiceDesc is the grpc.ServiceDesc for Orchestrator service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -752,6 +784,10 @@ var Orchestrator_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendGraphqlIntrospectResult",
 			Handler:    _Orchestrator_SendGraphqlIntrospectResult_Handler,
+		},
+		{
+			MethodName: "Export",
+			Handler:    _Orchestrator_Export_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

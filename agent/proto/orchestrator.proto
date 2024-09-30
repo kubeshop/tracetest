@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+import "opentelemetry/proto/collector/trace/v1/trace_service.proto";
+
 package proto;
 option go_package = "github.com/kubeshop/tracetest/agent/proto";
 
@@ -49,6 +51,8 @@ service Orchestrator {
 
     // Send the graphql introspect response schema
     rpc SendGraphqlIntrospectResult(GraphqlIntrospectResponse) returns (Empty) {}
+
+    rpc Export(ExportRequest) returns (Empty) {}
 }
 
 // Empty message for endpoints that don't return anything
@@ -446,4 +450,11 @@ message PlaywrightEngineRequest {
 message PlaywrightEngineResponse {
     bool success = 1;
     string out = 2;
+}
+
+message ExportRequest {
+    AgentIdentification agentIdentification = 1;
+    map <string, string> metadata = 2;
+    opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest request = 3;
+    Error error = 4;
 }

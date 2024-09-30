@@ -1,0 +1,28 @@
+openapi: 3.0.0
+components:
+  schemas:
+    ListTracesResponse:
+      type: object
+      properties:
+        traces:
+          type: array
+          items:
+            $ref: "#/components/schemas/TraceMetadata"
+        error:
+          type: string
+
+    TraceMetadata:
+      type: object
+      properties:
+        traceId:
+          type: string
+        rootServiceName:
+          type: string
+        rootTraceName:
+          type: string
+        startTimeUnixNano:
+          type: integer
+        durationMs:
+          type: integer
+        spanCount:
+          type: integer
