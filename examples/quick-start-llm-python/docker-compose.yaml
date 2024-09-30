@@ -53,9 +53,7 @@ services:
     ports:
       - 4317:4317
     volumes:
-      - type: bind
-        source: ./observability/otelcollector.config.yaml
-        target: /otel-local-config.yaml
+      - ./observability/otelcollector.config.yaml:/otel-local-config.yaml
 
   jaeger:
     healthcheck:

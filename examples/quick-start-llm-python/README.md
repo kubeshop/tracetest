@@ -28,7 +28,7 @@ opentelemetry-bootstrap -a install
 
 # add openai api key
 echo "OPENAI_API_KEY={your-open-ai-api-key}" >> .env
-# add google gemini api key
+# add google gemini api key (optional)
 echo "GOOGLE_API_KEY={your-google-gemini-api-key}" >> .env
 
 # add tracetest agent keys

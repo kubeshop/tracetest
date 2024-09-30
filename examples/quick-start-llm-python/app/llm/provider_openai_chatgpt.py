@@ -5,12 +5,15 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 
 from langchain_openai import ChatOpenAI
 
-import streamlit as st
 import os
 
 class OpenAIChatGPTProvider:
   def provider_name(self):
     return "OpenAI (ChatGPT)"
+
+  def enabled(self):
+    openai_api_key = os.getenv("OPENAI_API_KEY", "")
+    return openai_api_key != ""
 
   def summarize(self, text):
     # Get OpenAI API key and URL to be summarized
