@@ -14,69 +14,26 @@
  * if appropriate. All modules should have a short description.
  */
 import { dag, Container, Directory, object, func, Service, File, ClientTracetestOpts, ContainerWithExecOpts, Secret } from "@dagger.io/dagger"
-import { Context } from "../sdk/context/context"
-import * as dotenv from "dotenv";
-dotenv.config({ path: __dirname+'../../env' });
-
-const otelCollectorConfig = `
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
-
-processors:
-  batch:
-    timeout: 100ms
-
-  # Data sources: traces
-  probabilistic_sampler:
-    hash_seed: 22
-    sampling_percentage: 100
-
-exporters:
-  otlp/tracetestagent:
-    endpoint: tracetest-agent:4317
-    tls:
-      insecure: true
-
-service:
-  pipelines:
-    traces/tracetestagent:
-      receivers: [otlp]
-      processors: [probabilistic_sampler, batch]
-      exporters: [otlp/tracetestagent]
-`
-
-const tracetestTestDefinition = `
-type: Test
-spec:
-  id: W656Q0c4g
-  name: Test API
-  description: akadlkasjdf
-  trigger:
-    type: http
-    httpRequest:
-      url: http://app:8080
-      method: GET
-      headers:
-      - key: Content-Type
-        value: application/json
-  specs:
-  - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
-    assertions:
-    - attr:http.status_code  =  200
-    - attr:tracetest.span.duration  <  500ms
-`
 
 @object()
 class QuickStartDaggerNodejs {
+
+  apiKey: any
+  environment: any
+  organization: any
+
+  constructor(apiKey, environment, organization) {
+    this.apiKey = apiKey
+    this.environment = environment
+    this.organization = organization
+  }
+
   @func()
   build(source: Directory): Container {
     const nodeCache = dag.cacheVolume("node")
     return dag
       .container()
-      .from("node:21-slim")
+      .from("node:20-slim")
       .withDirectory("/usr/src/app", source)
       .withMountedCache("/usr/src/app/node_modules", nodeCache)
       .withWorkdir("/usr/src/app")
@@ -84,66 +41,65 @@ class QuickStartDaggerNodejs {
   }
 
   @func()
-  app(source: Directory): Service {
+  app(
+    source: Directory
+  ): Service {
     return this.build(source)
       .withExec(["npm", "run", "with-grpc-tracer"])
-      .withEnvVariable('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT', process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT)
+      .withEnvVariable('OTEL_EXPORTER_OTLP_TRACES_ENDPOINT', 'http://tracetest-agent:4317')
       .withExposedPort(8080)
+      .withServiceBinding(
+        'tracetest-agent',
+        dag
+          .tracetest(
+            this.apiKey,
+            this.environment,
+            this.organization
+          )
+          .agent()
+          .asService()
+      )
       .asService()
   }
 
   @func()
-  tracetestAgent(): Service {
-    return dag.container()
-      .from('kubeshop/tracetest:v1.6.1')
-      .withEnvVariable('TRACETEST_TOKEN', process.env.TRACETEST_TOKEN)
-      .withEnvVariable('TRACETEST_ENVIRONMENT_ID', process.env.TRACETEST_ENVIRONMENT_ID)
-      .withExposedPort(4317)
-      .asService()
-  }
+  tracetest(
+    source: Directory
+  ): Promise<string> {
 
-  @func()
-  tracetestCli(source: Directory): Promise<string> {
-    this.app(source)
-    this.tracetestAgent()
+    const appSvc = this.app(source)
+    const	appSvcEndpoint = appSvc.endpoint()
 
-    return dag.container()
-      .from('alpine')
-      .withWorkdir("/app")
-      .withExec(["apk", "--update", "add", "bash", "jq", "curl"])
-      .withExec(["curl", "-L", `https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s -- ${process.env.TRACETEST_IMAGE_VERSION}`])
-      .withExec(["configure", "--token", process.env.TRACETEST_TOKEN, "--environment", process.env.TRACETEST_ENVIRONMENT_ID])
+    const tracetestTestDefinition = `
+      type: Test
+      spec:
+        id: W656Q0c4g
+        name: Test API
+        description: akadlkasjdf
+        trigger:
+          type: http
+          httpRequest:
+            url: ${appSvcEndpoint}
+            method: GET
+            headers:
+            - key: Content-Type
+              value: application/json
+        specs:
+        - selector: span[tracetest.span.type="http" name="GET /" http.target="/" http.method="GET"]
+          assertions:
+          - attr:http.status_code  =  200
+          - attr:tracetest.span.duration  <  500ms
+    `
+
+    return dag
+      .tracetest(
+        this.apiKey,
+        this.environment,
+        this.organization
+      )
+      .cli()
       .withNewFile("test.yaml", tracetestTestDefinition)
-      .withExec(["run", "test", "--file", "test.yaml"])
+      .withExec(["run", "test", "--file", "test.yaml"], { "useEntrypoint": true })
       .stdout()
   }
-
-  // @func()
-  // otelCollector(): Service {
-  //   return dag.container()
-  //     .from('otel/opentelemetry-collector:0.100.0')
-  //     .withNewFile("/etc/otelcol/config.yaml", otelCollectorConfig)
-  //     .withExec(["/otelcol", "--config", "/etc/otelcol/config.yaml"])
-  //     .withExposedPort(4317)
-  //     .withServiceBinding(
-  //       "tracetest-agent",
-  //       dag.tracetest().agent().asService()
-  //     )
-  //     .asService()
-  // }
-
-//   @func()
-//   tracetest(source: Directory, token: Secret, environment: string): Promise<string> {
-//     this.app(source)
-//     this.otelCollector()
-
-//     return dag.tracetest({
-//       apiKey: token,
-//       environment: environment,
-//     })
-//       .cli()
-//       .withNewFile("test.yaml", tracetestTestDefinition)
-//       .withExec(["run", "test", "--file", "test.yaml"])
-//       .stdout()
-//   }
-// }
+}
