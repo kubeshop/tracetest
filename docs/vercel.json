@@ -137,12 +137,32 @@
       "statusCode": 301
     },
     {
-      "destination": "/getting-started/installation",
+      "destination": "/getting-started/overview",
+      "source": "/getting-started/open",
+      "statusCode": 301
+    },
+    {
+      "destination": "/getting-started/overview",
+      "source": "/getting-started/open/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/getting-started/overview",
+      "source": "/getting-started/installation",
+      "statusCode": 301
+    },
+    {
+      "destination": "/getting-started/overview",
+      "source": "/getting-started/installation/",
+      "statusCode": 301
+    },
+    {
+      "destination": "/getting-started/overview",
       "source": "/getting-started/detailed-installation",
       "statusCode": 301
     },
     {
-      "destination": "/getting-started/installation",
+      "destination": "/getting-started/overview",
       "source": "/getting-started/detailed-installation/",
       "statusCode": 301
     },
@@ -177,12 +197,12 @@
       "statusCode": 301
     },
     {
-      "destination": "/getting-started/installation",
+      "destination": "/getting-started/overview",
       "source": "/deployment/overview/",
       "statusCode": 301
     },
     {
-      "destination": "/getting-started/installation",
+      "destination": "/getting-started/overview",
       "source": "/deployment/overview",
       "statusCode": 301
     },

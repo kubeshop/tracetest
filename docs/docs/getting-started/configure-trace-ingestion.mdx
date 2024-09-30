@@ -1,0 +1,147 @@
+---
+id: configure-trace-ingestion
+title: Configure Trace Ingestion
+description: Get started by configuring trace ingestion to connect traces to tests. Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
+hide_table_of_contents: false
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - trace ingestion
+  - trace testing
+  - ingest traces
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
+
+[Tracetest Agent](/concepts/agent) runs alongside your apps, in the same environment/network, to do two things:
+
+1. Run tests against your apps.
+2. Ingest traces from your apps.
+
+This page explains (2), how to ingest traces into Tracetest Agent to enable trace-based testing.
+
+## Enable Trace Ingestion with an OTLP Endpoint
+
+Create a file called `trace-ingestion.yaml`.
+
+```yaml title="trace-ingestion.yaml"
+type: DataStore
+spec:
+  name: Opentelemetry Collector pipeline
+  type: otlp
+  default: true
+```
+
+And, run it with the CLI.
+
+```bash title="Terminal"
+tracetest apply datastore -f ./trace-ingestion.yaml
+```
+
+Or, use the Web UI. Go to Settings > Trace Ingestion, and toggle "Enable Trace Ingestion" to on.
+
+![trace ingestion 1](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727178199/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_3_l0v8wp.png)
+
+Select OpenTelemetry.
+
+![trace ingestion 2](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727178201/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_4_fyhu3d.png)
+
+## Configure Trace Exporters to Send Traces to Tracetest Agent
+
+Once configured, Tracetest Agent exposes OTLP ports `4317` (gRPC) and `4318` (HTTP) for trace ingestion. Configure your trace exporters to send traces to the Tracetest Agent OTLP endpoint.
+
+<Tabs groupId="installation">
+<TabItem value="cli" label="Tracetest CLI" default>
+
+With the Tracetest Agent running locally, the trace ingestion OTLP endpoints will be:
+
+- gRPC: `http://localhost:4317`
+- HTTP: `http://localhost:4318/v1/traces`
+
+</TabItem>
+<TabItem value="docker" label="Docker">
+
+With the Tracetest Agent running in Docker with `tracetest-agent` as the service name, the trace ingestion OTLP endpoints will be:
+
+- gRPC: `http://tracetest-agent:4317`
+- HTTP: `http://tracetest-agent:4318/v1/traces`
+
+:::note Docker Network
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+
+Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+
+You can reach services running on your local machine using:
+
+- Linux (docker version < 20.10.0): `172.17.0.1:8080`
+- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
+:::
+
+</TabItem>
+<TabItem value="docker-compose" label="Docker Compose">
+
+With the Tracetest Agent running in Docker with `tracetest-agent` as the service name, the trace ingestion OTLP endpoints will be:
+
+- gRPC: `http://tracetest-agent:4317`
+- HTTP: `http://tracetest-agent:4318/v1/traces`
+
+:::note Docker Network
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+
+Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+
+You can reach services running on your local machine using:
+
+- Linux (Docker version < 20.10.0): `172.17.0.1:8080`
+- MacOS (Docker version >= 18.03) and Linux (Docker version >= 20.10.0): `host.docker.internal:8080`
+:::
+
+</TabItem>
+<TabItem value="kubernetes" label="Kubernetes">
+
+With the Tracetest Agent running in Kubernetes with `tracetest-agent` as the service name, the trace ingestion OTLP endpoints will be:
+
+- gRPC: `http://tracetest-agent.default.svc.cluster.local:4317`
+- HTTP: `http://tracetest-agent.default.svc.cluster.local:4318/v1/traces`
+
+:::note K8s Network
+Make sure to use the correct `<service-name>` if you edit the Tracetest Agent `service` name.
+
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+Make sure to run tests using the internal Kubernetes service networking eg: `http://<your-app-service-name>.default.svc.cluster.local:port`.
+:::
+
+</TabItem>
+<TabItem value="helm" label="Helm">
+
+With the Tracetest Agent running in Kubernetes with `agent` as the Helm `<release-name>`, the trace ingestion OTLP endpoints will be:
+
+- gRPC: `http://agent-tracetest-agent:4317`
+- HTTP: `http://agent-tracetest-agent:4318/v1/traces`
+
+:::note K8s Network
+Make sure to use the correct `<service-name>` if you edit the Tracetest Agent Helm chart `<release-name>` name.
+
+Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+Make sure to run tests using the internal Kubernetes service networking eg: `http://<your-app-service-name>.default.svc.cluster.local:port`.
+
+In the following example you can use: `http://pokeshop-pokemon-api:8081`.
+:::
+
+</TabItem>
+</Tabs>
+
+:::note Need more detailed guidance?
+[Refer to the Trace Ingestion docs, here.](/configuration/connecting-to-data-stores/overview)
+:::
+
+:::tip Don't have OpenTelemetry installed?
+[Follow these instructions to install OpenTelemetry in 5 minutes without any code changes!](./no-otel.mdx)
+:::

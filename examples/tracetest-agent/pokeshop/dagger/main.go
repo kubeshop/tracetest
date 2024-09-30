@@ -44,7 +44,7 @@ func New(
 		WithServiceBinding("postgres", p.postgres(ctx)).
 		WithServiceBinding("cache", p.cache(ctx)).
 		WithServiceBinding("queue", p.queue(ctx)).
-		WithServiceBinding("otel-collector", p.otelCollector(ctx)).
+		WithServiceBinding("otel-collector", p.OtelCollector(ctx)).
 		WithEnvVariable("REDIS_URL", "cache").
 		WithEnvVariable("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/postgres?schema=public").
 		WithEnvVariable("RABBITMQ_HOST", "queue").
@@ -77,7 +77,10 @@ func (m *Pokeshop) API(ctx context.Context) (*dagger.Service, error) {
 	return apiSvc, nil
 }
 
-func (m *Pokeshop) Tracetest(ctx context.Context, file *dagger.File) (string, error) {
+// runs the pokeshop Tracetest agent e2e tests
+func (m *Pokeshop) Tracetest(ctx context.Context,
+	// +defaultPath="/examples/tracetest-agent/pokeshop/tests/pokemon-import.yaml"
+	file *dagger.File) (string, error) {
 	apiSvc, err := m.API(ctx)
 	if err != nil {
 		return "", err
@@ -176,12 +179,18 @@ service:
       exporters: [otlp/tracetestagent]
 `
 
-func (m *Pokeshop) otelCollector(ctx context.Context) *dagger.Service {
+func (m *Pokeshop) OtelCollector(ctx context.Context) *dagger.Service {
 	c := dag.Container().
 		From("otel/opentelemetry-collector:0.54.0")
 
 	if m.TraceTestAPIKey != nil && m.TracetestEnvironment != "" {
-		c = c.WithServiceBinding("tracetest", dag.Tracetest().Agent().
+
+		c = c.WithServiceBinding("tracetest", dag.Tracetest(dagger.TracetestOpts{
+			APIKey:       m.TraceTestAPIKey,
+			Environment:  m.TracetestEnvironment,
+			Organization: m.TracetestOrganization,
+		}).Agent().
+			WithEntrypoint([]string{"tracetest", "start", "-m", "verbose"}).
 			AsService())
 	}
 

@@ -1,6 +1,6 @@
 # Pokeshop with Tracetest Cloud
 
-> [Read the detailed instructions for setting up Tracetest Cloud in our documentation.](https://docs.tracetest.io/getting-started/installation)
+> [Read the detailed instructions for setting up Tracetest Cloud in our documentation.](https://docs.tracetest.io/getting-started/overview)
 
 This examples' objective is to show how you can:
 

@@ -1,0 +1,22 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "record-test": "npx playwright codegen localhost:8501",
+    "api-tests": "npx playwright test **/*api.spec.js",
+    "ui-tests": "npx playwright test **/*ui.spec.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.47.2",
+    "@types/node": "^22.7.4"
+  },
+  "dependencies": {
+    "@tracetest/client": "^0.2.0",
+    "dotenv": "^16.4.5"
+  }
+}

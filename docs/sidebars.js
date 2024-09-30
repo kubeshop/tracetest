@@ -523,13 +523,43 @@ const sidebars = {
       items: [
         {
           type: "doc",
-          id: "getting-started/installation",
-          label: "Installing Tracetest",
+          id: "getting-started/create-tracetest-account",
+          label: "1. Create a Tracetest Account",
         },
         {
           type: "doc",
-          id: "getting-started/open",
-          label: "Opening Tracetest",
+          id: "getting-started/install-cli",
+          label: "2. Install Tracetest CLI",
+        },
+        {
+          type: "doc",
+          id: "getting-started/install-agent",
+          label: "3. Start Tracetest Agent",
+        },
+        {
+          type: "doc",
+          id: "getting-started/create-response-based-test",
+          label: "4. Create a Response-based Test",
+        },
+        {
+          type: "doc",
+          id: "getting-started/configure-trace-ingestion",
+          label: "5. Configure Trace Ingestion",
+        },
+        {
+          type: "doc",
+          id: "getting-started/create-trace-based-test",
+          label: "6. Create a Trace-based Test",
+        },
+        {
+          type: "doc",
+          id: "getting-started/create-assertions",
+          label: "7. Create Assertions",
+        },
+        {
+          type: "doc",
+          id: "getting-started/automate-test-runs",
+          label: "8. Automate Test Runs",
         },
         {
           type: "doc",
@@ -585,6 +615,11 @@ const sidebars = {
           type: "category",
           label: "Enterprise self-hosted",
           items: [
+            {
+              type: "doc",
+              id: "install/on-prem-helm-kind",
+              label: "Install with Helm in Kind (Simplified)",
+            },
             {
               type: "doc",
               id: "install/on-prem-helm",
