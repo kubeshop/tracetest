@@ -4,9 +4,15 @@ from langchain_text_splitters import CharacterTextSplitter
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 
+import os
+
 class GoogleGeminiProvider:
   def provider_name(self):
     return "Google (Gemini)"
+
+  def enabled(self):
+    gemini_api_key = os.getenv("GOOGLE_API_KEY", "")
+    return gemini_api_key != ""
 
   def summarize(self, text):
     chat = ChatGoogleGenerativeAI(model="gemini-pro")

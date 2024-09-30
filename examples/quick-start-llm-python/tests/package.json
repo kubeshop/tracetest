@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "record-test": "npx playwright codegen localhost:8501",
-    "api-tests": "npx playwright test **/*api.spec.js",
-    "ui-tests": "npx playwright test **/*ui.spec.js"
+    "api-tests": "npx playwright test **/*api.spec.js"
   },
   "keywords": [],
   "author": "",

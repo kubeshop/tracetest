@@ -7,7 +7,13 @@ _providers = [
 ]
 
 def get_providers():
-  return list(map(lambda p: p.provider_name(), _providers))
+  providers = []
+
+  for provider in _providers:
+    if provider.enabled():
+      providers.append(provider.provider_name())
+
+  return providers
 
 def get_provider(provider_name):
   for provider in _providers:
