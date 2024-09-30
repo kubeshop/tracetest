@@ -67,17 +67,16 @@ func (c Config) UI() string {
 }
 
 func (c Config) Path() string {
-	// pathPrefix := "/api"
-	// if c.ServerPath != "" {
-	// 	pathPrefix = c.ServerPath
-	// }
+	pathPrefix := "/api"
+	if c.ServerPath != "" {
+		pathPrefix = c.ServerPath
+	}
 
-	// if pathPrefix == "/" {
-	// 	return ""
-	// }
+	if pathPrefix == "/" {
+		return ""
+	}
 
-	// return pathPrefix
-	return ""
+	return pathPrefix
 }
 
 func (c Config) IsEmpty() bool {

@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/kubeshop/tracetest/agent/workers/trigger"
 	"github.com/kubeshop/tracetest/server/pkg/id"
@@ -117,7 +118,7 @@ func getRootSpan(allRoots []*Span) *Span {
 	}
 
 	if root == nil {
-		root = &Span{ID: id.NewRandGenerator().SpanID(), Name: TemporaryRootSpanName, Attributes: NewAttributes(), Children: []*Span{}}
+		root = &Span{ID: id.NewRandGenerator().SpanID(), StartTime: time.Now(), EndTime: time.Now(), Name: TemporaryRootSpanName, Attributes: NewAttributes(), Children: []*Span{}}
 	}
 
 	for _, span := range allRoots {
