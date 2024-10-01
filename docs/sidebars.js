@@ -358,6 +358,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "tools-and-integrations/pagerduty",
+          label: "PagerDuty",
+        },
+        {
+          type: "doc",
           id: "tools-and-integrations/artillery-plugin",
           label: "Artillery Plugin",
         },
