@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/kubeshop/tracetest/agent/workers/trigger"
@@ -74,5 +75,6 @@ func (r *Registry) Get(triggererType trigger.TriggerType) (Triggerer, error) {
 }
 
 func WrapInQuotes(input string, quoteChar string) string {
+	input = strings.ReplaceAll(input, quoteChar, fmt.Sprintf("\\%s", quoteChar))
 	return fmt.Sprintf("%s%s%s", quoteChar, input, quoteChar)
 }
