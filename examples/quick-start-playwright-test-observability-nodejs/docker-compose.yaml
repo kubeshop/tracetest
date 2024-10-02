@@ -1,0 +1,99 @@
+version: "3"
+services:
+  next:
+    image: quick-start-nextjs 
+    build: 
+      context: ./next-app
+      dockerfile: ./Dockerfile
+    command: npm start
+    ports:
+      - "3000:3000"
+    environment:
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+    depends_on:
+      otel-collector:
+        condition: service_started
+      availability:
+        condition: service_started
+
+  app:
+    image: quick-start-nodejs 
+    build: 
+      context: ./node-app
+      dockerfile: ./Dockerfile
+    command: npm run app-with-grpc-tracer
+    ports:
+      - "8080:8080"
+    environment:
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+    depends_on:
+      otel-collector:
+        condition: service_started
+      availability:
+        condition: service_started
+
+  availability:
+    image: quick-start-nodejs-availability
+    build:
+      context: ./node-app
+      dockerfile: ./Dockerfile
+    command: npm run availability-with-grpc-tracer
+    ports:
+      - "8080"
+    environment:
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+    depends_on:
+      otel-collector:
+        condition: service_started
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.59.0
+    command:
+      - "--config"
+      - "/otel-local-config.yaml"
+    volumes:
+      - ./collector.config.yaml:/otel-local-config.yaml
+
+  # Cloud-based Managed Tracetest
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:latest
+    environment:
+      # Get the required information here: https://app.tracetest.io/retrieve-token
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+
+  tracetest-apply:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/apply.sh
+    networks:
+      default: null
+    depends_on:
+      app:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  tracetest-run:
+    build:
+      dockerfile: Dockerfile.tracetest
+    volumes:
+      - ./resources:/resources
+    environment:
+      TRACETEST_TOKEN: ${TRACETEST_TOKEN}
+      TRACETEST_ENVIRONMENT_ID: ${TRACETEST_ENVIRONMENT_ID}
+    entrypoint:
+      - bash
+      - /resources/run.sh
+    networks:
+      default: null
+    depends_on:
+      tracetest-apply:
+        condition: service_completed_successfully
