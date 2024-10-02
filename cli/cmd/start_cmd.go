@@ -14,11 +14,12 @@ import (
 )
 
 var (
-	agentRunner     = runner.NewRunner(configurator.WithErrorHandler(handleError), resources, ui.DefaultUI)
-	defaultToken    = os.Getenv("TRACETEST_TOKEN")
-	defaultEndpoint = os.Getenv("TRACETEST_SERVER_URL")
-	defaultAPIKey   = os.Getenv("TRACETEST_API_KEY")
-	startParams     = &startParameters{}
+	agentRunner      = runner.NewRunner(configurator.WithErrorHandler(handleError), resources, ui.DefaultUI)
+	defaultToken     = os.Getenv("TRACETEST_TOKEN")
+	defaultEndpoint  = os.Getenv("TRACETEST_SERVER_URL")
+	defaultAPIKey    = os.Getenv("TRACETEST_API_KEY")
+	defaultTraceMode = os.Getenv("TRACETEST_TRACE_MODE") == "true"
+	startParams      = &startParameters{}
 )
 
 var startCmd = &cobra.Command{
@@ -101,7 +102,7 @@ func init() {
 	startCmd.Flags().StringVarP(&startParams.logLevel, "log-level", "l", "debug", "set the agent log level")
 	startCmd.Flags().StringVarP(&startParams.collectorEndpoint, "collector-endpoint", "", "", "address of the OTel Collector endpoint")
 	startCmd.Flags().BoolVarP(&startParams.insecure, "insecure", "", false, "allow insecure connections to control plane")
-	startCmd.Flags().BoolVarP(&startParams.traceMode, "trace-mode", "", false, "enables the trace mode")
+	startCmd.Flags().BoolVarP(&startParams.traceMode, "trace-mode", "", defaultTraceMode, "enables the trace mode")
 
 	startCmd.Flags().MarkDeprecated("endpoint", "use --server-url instead")
 	startCmd.Flags().MarkShorthandDeprecated("e", "use --server-url instead")
