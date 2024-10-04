@@ -5,22 +5,16 @@
   "main": "app.js",
   "scripts": {
     "app": "node -r ./instrumentation.js app.js",
-    "availability": "node -r ./instrumentation.js availability.js"
+    "availability": "node -r ./instrumentation.js availability.js",
+    "app-zero-local": "env OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register app.js",
+    "availability-zero-local": "env OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register availability.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@opentelemetry/api": "^1.4.0",
-    "@opentelemetry/auto-instrumentations-node": "^0.36.0",
-    "@opentelemetry/exporter-collector": "^0.25.0",
-    "@opentelemetry/exporter-trace-otlp-http": "^0.35.0",
-    "@opentelemetry/instrumentation": "^0.35.0",
-    "@opentelemetry/resources": "^1.9.0",
-    "@opentelemetry/sdk-node": "^0.35.0",
-    "@opentelemetry/sdk-trace-node": "^1.9.0",
-    "@opentelemetry/semantic-conventions": "^1.9.0",
-    "@opentelemetry/tracing": "^0.24.0",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.50.0",
     "axios": "^1.2.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
