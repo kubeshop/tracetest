@@ -1,10 +1,14 @@
 import { test, expect } from '@playwright/test';
-const Tracetest = require('@tracetest/playwright').default;
+import Tracetest from'@tracetest/playwright';
 let tracetest;
 
-const { TRACETEST_API_TOKEN = '', TRACETEST_SERVER_URL = 'https://app.tracetest.io', TRACETEST_ENVIRONMENT_ID = '' } = process.env;
-
 test.describe.configure({ mode: 'serial' });
+
+const {
+  TRACETEST_TOKEN,
+  TRACETEST_SERVER_URL,
+  TRACETEST_ENVIRONMENT_ID
+} = process.env;
 
 const definition = `
 type: Test
@@ -31,14 +35,14 @@ spec:
 
 test.beforeAll(async () => {
   tracetest = await Tracetest({
-    apiToken: TRACETEST_API_TOKEN,
+    apiToken: TRACETEST_TOKEN,
     serverUrl: TRACETEST_SERVER_URL,
     serverPath: '',
     environmentId: TRACETEST_ENVIRONMENT_ID,
   });
 
   await tracetest.setOptions({
-    'should have a list with 3 items': {
+    'should validate Bookstore': {
       definition,
     },
   });

@@ -6,8 +6,8 @@
   "scripts": {
     "app": "node -r ./instrumentation.js app.js",
     "availability": "node -r ./instrumentation.js availability.js",
-    "app-zero-local": "env OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register app.js",
-    "availability-zero-local": "env OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register availability.js"
+    "app-zero-local": "env OTEL_SERVICE_NAME=node-app OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register app.js",
+    "availability-zero-local": "env OTEL_SERVICE_NAME=node-availability OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register availability.js"
   },
   "keywords": [],
   "author": "",
