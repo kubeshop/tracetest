@@ -1,10 +1,28 @@
 const opentelemetry = require('@opentelemetry/api')
-const tracer = opentelemetry.trace.getTracer('quick-start-nodejs-manual-instrumentation-tracer')
+const tracer = opentelemetry.trace.getTracer('node-app')
 
 const express = require('express')
 const app = express()
-
 const axios = require('axios')
+const cors = require("cors")
+
+const allowedOrigins = ["http://localhost:3000", "http://localhost:8080"]
+app.use(
+  cors({
+    origin: function(origin, callback) {
+      if (!origin) return callback(null, true)
+      if (allowedOrigins.indexOf(origin) === -1) {
+        var msg =
+          "The CORS policy for this site does not " +
+          "allow access from the specified Origin."
+        return callback(new Error(msg), false)
+      }
+      return callback(null, true)
+    }
+  })
+)
+
+const { AVAILABILITY_HOST = 'localhost' } = process.env
 
 app.get('/', (req, res) => {
   const span = tracer.startSpan('Hello World')
@@ -13,12 +31,6 @@ app.get('/', (req, res) => {
 })
 
 app.get('/books', booksListHandler)
-
-app.get('/books/:bookId', async function(req, res){
-  const avRes = await axios.get(`http://localhost:8081/availability/${req.params.bookId}`)
-  const isAvailable = avRes.data
-  res.json(isAvailable)
-})
 
 async function booksListHandler(req, res) {
   const span = tracer.startSpan('Books List')
@@ -33,7 +45,7 @@ async function getAvailableBooks() {
   const books = getBooks()
   const availableBooks = await Promise.all(
     books.map(async book => {
-      const endpoint = `http://availability:8080/availability/${book.id}`
+      const endpoint = `http://${AVAILABILITY_HOST}:8082/availability/${book.id}`
       const { data: { isAvailable } } = await axios.get(`${endpoint}`)
       return { ...book, isAvailable }
     })
@@ -58,6 +70,6 @@ function getBooks() {
   ]
 }
 
-app.listen(8080, () => {
-  console.log(`Listening for requests on http://localhost:8080`)
+app.listen(8081, () => {
+  console.log(`Listening for requests on http://localhost:8081`)
 })

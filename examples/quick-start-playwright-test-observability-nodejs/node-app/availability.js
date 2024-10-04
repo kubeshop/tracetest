@@ -1,5 +1,5 @@
 const opentelemetry = require('@opentelemetry/api')
-const tracer = opentelemetry.trace.getTracer('quick-start-nodejs-manual-instrumentation-tracer')
+const tracer = opentelemetry.trace.getTracer('node-app')
 
 const express = require('express')
 const app = express()
@@ -35,6 +35,6 @@ function getStock() {
   ]
 }
 
-app.listen(8080, () => {
-  console.log(`Listening for requests on http://localhost:8080`)
+app.listen(8082, () => {
+  console.log(`Listening for requests on http://localhost:8082`)
 })

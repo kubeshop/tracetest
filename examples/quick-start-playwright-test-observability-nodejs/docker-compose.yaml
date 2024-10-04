@@ -1,33 +1,51 @@
 version: "3"
 services:
-  next:
-    image: quick-start-nextjs 
+  # next:
+  #   image: quick-start-nextjs 
+  #   build: 
+  #     context: ./next-app
+  #     dockerfile: ./Dockerfile
+  #   command: npm start
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+  #     - APP_HOST=${APP_HOST}
+  #   depends_on:
+  #     app:
+  #       condition: service_started
+  #     tracetest-agent:
+  #       condition: service_started
+
+  react:
+    image: quick-start-reactjs
     build: 
-      context: ./next-app
+      context: ./react-app
       dockerfile: ./Dockerfile
-    command: npm start
     ports:
-      - "3000:3000"
+      - "3000:80"
     environment:
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+      - APP_HOST=${APP_HOST}
     depends_on:
-      otel-collector:
+      app:
         condition: service_started
-      availability:
+      tracetest-agent:
         condition: service_started
 
   app:
-    image: quick-start-nodejs 
+    image: quick-start-nodejs-app
     build: 
       context: ./node-app
       dockerfile: ./Dockerfile
-    command: npm run app-with-grpc-tracer
+    command: npm run app
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+      - AVAILABILITY_HOST=${AVAILABILITY_HOST}
     depends_on:
-      otel-collector:
+      tracetest-agent:
         condition: service_started
       availability:
         condition: service_started
@@ -37,22 +55,14 @@ services:
     build:
       context: ./node-app
       dockerfile: ./Dockerfile
-    command: npm run availability-with-grpc-tracer
+    command: npm run availability
     ports:
-      - "8080"
+      - "8082:8082"
     environment:
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
     depends_on:
-      otel-collector:
+      tracetest-agent:
         condition: service_started
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.59.0
-    command:
-      - "--config"
-      - "/otel-local-config.yaml"
-    volumes:
-      - ./collector.config.yaml:/otel-local-config.yaml
 
   # Cloud-based Managed Tracetest
   tracetest-agent:
@@ -76,7 +86,7 @@ services:
     networks:
       default: null
     depends_on:
-      app:
+      react:
         condition: service_started
       tracetest-agent:
         condition: service_started

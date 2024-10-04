@@ -3,10 +3,22 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "start-standalone": "node .next/standalone/server.js",
     "start": "next start",
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@opentelemetry/api-logs": "^0.53.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.50.0",
+    "@opentelemetry/exporter-jaeger": "^1.26.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.53.0",
+    "@opentelemetry/resources": "^1.26.0",
+    "@opentelemetry/sdk-logs": "^0.53.0",
+    "@opentelemetry/sdk-node": "^0.53.0",
+    "@opentelemetry/sdk-trace-node": "^1.26.0",
+    "@opentelemetry/semantic-conventions": "^1.27.0",
+    "@opentelemetry/winston-transport": "^0.6.0",
+    "@vercel/otel": "^1.10.0",
     "next": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

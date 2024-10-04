@@ -3,4 +3,6 @@ WORKDIR /usr/src/app/
 COPY package*.json ./
 RUN npm install
 COPY . .
-EXPOSE 8081-8082
+RUN npm run build
+RUN npm install -g serve
+EXPOSE 3000

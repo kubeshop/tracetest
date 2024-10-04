@@ -10,7 +10,8 @@ run() {
   tracetest configure --token $TOKEN --environment $ENVIRONMENT_ID
 
   echo "Running Trace-Based Tests..."
-  tracetest run test -f /resources/test.yaml
+  tracetest run test -f /resources/playwright-test.yaml
+  tracetest run test -f /resources/api-test.yaml
 }
 
 run
