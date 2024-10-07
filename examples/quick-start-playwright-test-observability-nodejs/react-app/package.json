@@ -24,9 +24,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "postinstall": "npx playwright install",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "playwright test",
+    "test:ui": "npx playwright test --ui",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
