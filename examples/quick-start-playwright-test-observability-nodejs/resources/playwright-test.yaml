@@ -19,7 +19,7 @@ spec:
         - attr:books.list.count = 3
     - selector: span[tracetest.span.type="http" name="GET /availability/:bookId" http.method="GET"]
       assertions:
-        - attr:http.host = "availability:8080"
+        - attr:http.host = "availability:8082"
     - selector: span[tracetest.span.type="general" name="Availablity check"]
       assertions:
         - attr:isAvailable = "true"

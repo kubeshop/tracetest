@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 import { config } from 'dotenv';
-config();
+config({ path: '../.env'});
 
-const baseURL = process.env.REACT_APP_URL || 'http://localhost:3000';
+const baseURL = process.env.REACT_URL || 'http://localhost:3000';
 
 /**
  * See https://playwright.dev/docs/test-configuration.
