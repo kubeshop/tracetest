@@ -3,6 +3,7 @@ package runner
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	agentConfig "github.com/kubeshop/tracetest/agent/config"
 	"github.com/kubeshop/tracetest/agent/ui/dashboard/sensors"
@@ -27,7 +28,12 @@ You can`
 		{
 			Text: "Open Tracetest in a browser to this environment",
 			Fn: func(_ consoleUI.ConsoleUI) {
-				s.ui.OpenBrowser(fmt.Sprintf("%sorganizations/%s/environments/%s", uiEndpoint, claims["organization_id"], claims["environment_id"]))
+				endpoint, err := url.JoinPath(uiEndpoint, fmt.Sprintf("/organizations/%s/environments/%s", claims["organization_id"], claims["environment_id"]))
+				if err != nil {
+					s.ui.Exit(fmt.Errorf("could not create URL: %w", err).Error())
+				}
+
+				s.ui.OpenBrowser(endpoint)
 			},
 		},
 		{
