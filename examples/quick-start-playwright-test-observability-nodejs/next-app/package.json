@@ -4,10 +4,12 @@
     "dev": "next dev",
     "build": "next build",
     "start-standalone": "node .next/standalone/server.js",
+    "start-standalone-zero-local": "env OTEL_SERVICE_NAME=next-app OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register .next/standalone/server.js",
     "start": "next start",
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/api-logs": "^0.53.0",
     "@opentelemetry/auto-instrumentations-node": "^0.50.0",
     "@opentelemetry/exporter-jaeger": "^1.26.0",

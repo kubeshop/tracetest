@@ -6,6 +6,7 @@ export default async function Page() {
   return (
     <div>
       <h1>Bookstore</h1>
+      <h2>http://{APP_HOST}:8081/books</h2>
       <ul>
         {books.map((book) => (
           <li key={book.id}>
