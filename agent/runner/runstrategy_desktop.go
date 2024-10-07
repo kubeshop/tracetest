@@ -27,7 +27,7 @@ You can`
 		{
 			Text: "Open Tracetest in a browser to this environment",
 			Fn: func(_ consoleUI.ConsoleUI) {
-				s.ui.OpenBrowser(fmt.Sprintf("%sorganizations/%s/environments/%s", uiEndpoint, claims["organization_id"], claims["environment_id"]))
+				s.ui.OpenBrowser(fmt.Sprintf("%s/organizations/%s/environments/%s", uiEndpoint, claims["organization_id"], claims["environment_id"]))
 			},
 		},
 		{
