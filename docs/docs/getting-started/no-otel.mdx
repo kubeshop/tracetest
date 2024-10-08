@@ -29,7 +29,23 @@ This page will explain getting started with OpenTelemetry:
 You can also find more ways to instrument OpenTelemetry in their [documentation](https://opentelemetry.io/docs/instrumentation/).
 
 <Tabs groupId="otel-install-options">
-  <TabItem value="no-code-changes" label="No Code Changes" default>
+  <TabItem value="zero-code-instrumentation" label="Zero-code Instrumentation (No Code Changes)" default>
+
+[Zero-code instrumentation adds the OpenTelemetry](https://opentelemetry.io/docs/concepts/instrumentation/zero-code/) API and SDK capabilities to your application typically as an agent or agent-like installation.
+
+Below we provide quick links to all key docs and samples.
+
+| Language | Docs |
+|---|---|
+| **C#/.NET** | https://opentelemetry.io/docs/zero-code/net/ |
+| **Java**  | https://opentelemetry.io/docs/zero-code/java/ |
+| **JavaScript** | https://opentelemetry.io/docs/zero-code/js/ |
+| **PHP** | https://opentelemetry.io/docs/zero-code/php/ |
+| **Python** | https://opentelemetry.io/docs/zero-code/python/ |
+| **Go** | https://opentelemetry.io/docs/zero-code/go/ |
+
+  </TabItem>
+  <TabItem value="opentelemetry-operator" label="OpenTelemetry Operator (No Code Changes)" default>
 
 You can install the OpenTelemetry Operator in any existing Kubernetes environment in under 5 minutes by running the following set of commands.
 
@@ -142,12 +158,6 @@ Apply the changes and you're ready! You can start writing integration and end-to
 :::note
 Check the [official OpenTelemetry docs](https://opentelemetry.io/docs/k8s-operator/automatic/) explaining how to use the OpenTelemetry Operator.
 :::
-
-  </TabItem>
-
-  <TabItem value="other-options" label="Other Options" default>
-
-#### [Odigos](https://docs.odigos.io/intro), is a new open source project that can do this for you without a single line of code.
 
   </TabItem>
 
