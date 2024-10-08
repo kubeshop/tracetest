@@ -670,6 +670,11 @@ const sidebars = {
         },
         {
           type: "doc",
+          id: "concepts/traces",
+          label: "Traces",
+        },
+        {
+          type: "doc",
           id: "concepts/polling-profiles",
           label: "Polling Profiles",
         },
@@ -702,6 +707,11 @@ const sidebars = {
           type: "doc",
           id: "concepts/environment-tokens",
           label: "Environment Tokens",
+        },
+        {
+          type: "doc",
+          id: "concepts/triggers",
+          label: "Triggers",
         },
         {
           type: "doc",
@@ -888,6 +898,11 @@ const sidebars = {
               items: [
                 {
                   type: "doc",
+                  id: "configuration/connecting-to-data-stores/otlp-ingestion-endpoint",
+                  label: "OTLP Ingestion Endpoint",
+                },
+                {
+                  type: "doc",
                   id: "configuration/connecting-to-data-stores/awsxray",
                   label: "AWS X-Ray",
                 },
@@ -920,6 +935,11 @@ const sidebars = {
                   type: "doc",
                   id: "configuration/connecting-to-data-stores/honeycomb",
                   label: "Honeycomb",
+                },
+                {
+                  type: "doc",
+                  id: "configuration/connecting-to-data-stores/instana",
+                  label: "Instana",
                 },
                 {
                   type: "doc",
@@ -967,6 +987,11 @@ const sidebars = {
                   label: "OpenTelemetry Collector Configuration File Reference",
                 },
               ],
+            },
+            {
+              type: "doc",
+              id: "configuration/trace-mode",
+              label: "Trace Mode",
             },
             {
               type: "doc",

@@ -1,0 +1,55 @@
+---
+id: triggers
+title: Triggers
+description: Tracetest uses the concept of Tests to define how to trigger a test against your application, define assertions against its trace data, and automate its execution. Every time a Test is triggered it will create a Run.
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+Tracetest uses the concept of Triggers to define how to initiate a test run.
+
+## Native Triggers
+
+Triggers define how Tracetest interacts with your application.
+
+### Web UI
+
+- [HTTP Request - Create a basic HTTP request.](/web-ui/creating-tests-http)
+- [GRPC Request - Test and debug your GRPC request.](/web-ui/creating-tests-gRPC)
+- [Kafka - Test consumers with Kafka messages.](/web-ui/creating-tests-kafka)
+- [Playwright Engine - Run Playwright tests natively in Tracetest.](/web-ui/creating-tests-playwright-engine)
+- [GraphQL - Test and debug your GraphQL request.](/web-ui/creating-tests-graphql)
+- [TraceID - Define your test via a TraceID.](/web-ui/creating-tests-traceid)
+
+![webui triggers](https://res.cloudinary.com/djwdcmwdz/image/upload/v1728388264/docs/Screenshot_2024-10-08_at_13.50.45_ng1lfg.png)
+
+### CLI
+
+The attribute `type` defines which trigger method you are going to use to interact with your application.
+
+```yaml
+trigger:
+  type: http|grpc|kafka|traceid|cypress|playwright|k6|artillery
+...
+```
+
+- [HTTP Request - Create a basic HTTP request.](/cli/creating-tests-http)
+- [GRPC Request - Test and debug your GRPC request.](/cli/creating-tests-grpc)
+- [Kafka - Test consumers with Kafka messages.](/cli/creating-tests-kafka)
+- [Playwright Engine - Run Playwright tests natively in Tracetest.](/cli/creating-tests-playwright-engine)
+- [GraphQL - Test and debug your GraphQL request.](/cli/creating-tests-graphql)
+- [TraceID - Define your test via a TraceID.](/cli/creating-tests-traceid)
+
+## Integrations
+
+Initiate test runs from triggers outside of Tracetest.
+
+- [Cypress](/web-ui/creating-tests-cypress)
+- [Playwright](/web-ui/creating-tests-playwright)
+- [k6](/web-ui/creating-tests-k6)
+- [Artillery](/web-ui/creating-tests-artillery)
