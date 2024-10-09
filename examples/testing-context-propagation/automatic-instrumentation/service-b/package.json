@@ -1,0 +1,17 @@
+{
+  "name": "service-b",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node --require @opentelemetry/auto-instrumentations-node/register app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.50.1",
+    "express": "^4.21.0"
+  }
+}

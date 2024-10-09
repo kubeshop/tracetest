@@ -1,0 +1,19 @@
+type: Test
+spec:
+  id: FMqdxukHg
+  name: Test if service B is called after service A
+  trigger:
+    type: http
+    httpRequest:
+      method: POST
+      url: http://service-a:8800/sendData
+      body: "{\n  \"some\": \"test\" \n}"
+      headers:
+      - key: Content-Type
+        value: application/json
+  specs:
+  - selector: span[tracetest.span.type = "http" service.name = "service-a" name = "POST /sendData"]
+              span[tracetest.span.type="http" service.name="service-b" name="POST /augmentData"]
+    name: Service B was called after Service A
+    assertions:
+    - attr:tracetest.selected_spans.count >= 1
