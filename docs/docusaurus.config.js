@@ -127,8 +127,10 @@ const config = {
         // content:
         //   '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/test-observability-for-teams-with-tracetest-v1-x-launch-week-recap">🎉 Test Observability for Platform & Observability Teams with Tracetest v1.3 is here! 🔥</a>',
         // isCloseable: false,
+        // content:
+        //   '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/announcing-tracetest-enterprise-on-prem">🎉 Self-Hosted Tracetest is here: Get a license key and try it for free for 30 days! 🔥</a>',
         content:
-          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/announcing-tracetest-enterprise-on-prem">🎉 Self-Hosted Tracetest is here: Get a license key and try it for free for 30 days! 🔥</a>',
+          '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/get-started-with-cloud-based-managed-tracetest">📚 Get started with Trace-based Testing: Embrace test-driven development with observability, using real data, and skip the hassle of mocks and black box testing 🔥</a>',
         isCloseable: false,
       },  
       navbar: {

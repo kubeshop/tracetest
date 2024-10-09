@@ -1,0 +1,37 @@
+---
+id: traces
+title: Traces
+description: Tracetest uses the concept of Traces to enable previewing ingested traces. While in trace mode you can view all traces your apps are exporting. You can select traces to test and start creating assertions right away!
+keywords:
+  - tracetest
+  - trace-based testing
+  - observability
+  - distributed tracing
+  - testing
+  - traces
+  - tracing
+image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_Thumbnail_14_rsvkmo.jpg
+---
+
+Tracetest uses the concept of Traces to enable previewing ingested traces. On the Traces screen you can view all traces your apps are exporting. You can select traces to test and start creating assertions right away!
+
+:::note trace retention
+Ingested traces will be deleted after 96 hours.
+:::
+
+- [Tests](/concepts/tests)
+- [Assertions](/concepts/assertions)
+
+![Traces](https://res.cloudinary.com/djwdcmwdz/image/upload/v1728327048/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_1931fbfb43cc96c1_traces_page_1_a9znan.png)
+
+A trace allows you to:
+
+- Preview spans in distributed traces that your distributed system is exporting.
+- Analyze traces and span attributes.
+- Create tests from traces that are ingested in your Tracetest account via a trace ID.
+- Create assertions for particular spans to verify the behavior of the system at every step of the request transaction.
+- Create test triggers automatically based on span attributes and metadata.
+
+![Open a Trace to create a test](https://res.cloudinary.com/djwdcmwdz/image/upload/v1728327049/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_1931fbfb43cc96c1_traces_page_1_1_zovlo4.png)
+
+A trace in Tracetest helps you get insight into what your system is doing. It will guide you to define trace-based assertions that validate the end-to-end behavior of a distributed system, going beyond just UI or API-level testing.
