@@ -82,7 +82,7 @@ func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 		return
 	}
 
-	err = s.StartAgent(ctx, cfg, agentToken, "")
+	err = s.StartAgent(ctx, cfg, agentToken, cfg.EnvironmentID)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}
