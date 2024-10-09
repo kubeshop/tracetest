@@ -1005,6 +1005,11 @@ const sidebars = {
               label: "Configuring Trace Ingestion",
             },
             {
+              type: "doc",
+              id: "web-ui/trace-mode",
+              label: "Configuring Traces",
+            },
+            {
               type: "category",
               label: "Configuring Tests",
               items: [
