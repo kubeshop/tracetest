@@ -1,0 +1,29 @@
+{
+  "name": "end-to-end-observability",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "index-with-tracer": "node -r ./tracer.js index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.50.0",
+    "@opentelemetry/exporter-prometheus": "^0.53.0",
+    "@opentelemetry/exporter-trace-otlp-grpc": "^0.53.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.53.0",
+    "@opentelemetry/instrumentation": "^0.53.0",
+    "@opentelemetry/metrics": "^0.24.0",
+    "@opentelemetry/resources": "^1.26.0",
+    "@opentelemetry/sdk-node": "^0.53.0",
+    "@opentelemetry/sdk-trace-base": "^1.26.0",
+    "@opentelemetry/sdk-trace-node": "^1.26.0",
+    "@opentelemetry/semantic-conventions": "^1.27.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "winston": "^3.14.2",
+    "winston-loki": "^6.1.2"
+  }
+}

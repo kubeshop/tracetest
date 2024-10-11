@@ -1,0 +1,15 @@
+type: DataStore
+spec:
+  id: current
+  name: Grafana Tempo
+  type: tempo
+  default: true
+  tempo:
+    type: http
+    http:
+      url: http://tempo
+      tls:
+        insecure: true
+
+# RUN:
+# tracetest apply datastore -f tracetest-trace-ingestion.yaml

@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  app:
+    image: adnanrahic/tracetest-app
+    build: .
+    command: npm run index-with-tracer
+    ports:
+      - "8081:8081"
+    environment:
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
+    depends_on:
+      tempo:
+        condition: service_started
+      tracetest-agent:
+        condition: service_started
+
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  loki:
+    image: grafana/loki:2.9.10
+    ports:
+      - "3100:3100"
+    environment:
+      - LOKI_ENABLE_API=true
+
+  init:
+    image: &tempoImage grafana/tempo:latest
+    user: root
+    entrypoint:
+      - "chown"
+      - "10001:10001"
+      - "/var/tempo"
+    volumes:
+      - ./tempo-data:/var/tempo
+
+  tempo:
+    image: *tempoImage
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+      - ./tempo-data:/var/tempo
+    ports:
+      - "3200:80"   # tempo http
+      - "9095:9095" # tempo grpc
+    depends_on:
+      - init
+
+  tracetest-agent:
+    image: kubeshop/tracetest-agent:v1.7.1
+    environment:
+      - TRACETEST_API_KEY=${TRACETEST_TOKEN}
+      - TRACETEST_ENVIRONMENT_ID=${TRACETEST_ENVIRONMENT_ID}
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana:/var/lib/grafana
+

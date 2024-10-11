@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'hello-world-app'
+    static_configs:
+      - targets: ['app:9464']  # Metrics exposed on port 9464
