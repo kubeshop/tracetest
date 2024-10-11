@@ -10,6 +10,7 @@ This project demonstrates an end-to-end observability setup using the Grafana st
 - **Tempo**: Distributed tracing backend.
 - **OpenTelemetry (OTel)**: Traces and metrics generator.
 - **Winston-Loki**: Logging integration for Loki.
+- **Tracetest**: Trace-based testing.
 
 ## Prerequisites
 
@@ -38,6 +39,7 @@ This will spin up the following services:
 - Prometheus on [localhost:9090](localhost:9090)
 - Loki on [localhost:3100](localhost:3100)
 - Tempo on [localhost:3200](localhost:3200)
+- Tracetest Agent connected to [your Tracetest account](https://app.tracetest.io)
 - Node app on [localhost:8081](localhost:8081)
 
 ### 3. Configure Trace Ingestion
@@ -46,7 +48,7 @@ This will spin up the following services:
 tracetest apply datastore -f ./tracetest-trace-ingestion.yaml
 ```
 
-### 3. Trigger a Test
+### 4. Trigger a Test
 
 ```bash
 tracetest run test -f ./tracetest-test.yaml
