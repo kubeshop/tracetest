@@ -51,6 +51,8 @@ var configureCmd = &cobra.Command{
 			flags.OrganizationID = configParams.OrganizationID
 		}
 
+		configurator = configurator.WithLogger(cliLogger)
+
 		// early exit if the versions are not compatible
 		err = configurator.Start(ctx, &cfg, flags)
 		if errors.Is(err, config.ErrVersionMismatch) {

@@ -398,6 +398,12 @@ func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config
 		}
 
 		cfg.EnvironmentID = envID
+
+		cfg.DefaultAgenApiKey, err = c.getEnvironmentDefaultAgentApiKey(ctx, cfg)
+		if err != nil {
+			c.errorHandlerFn(ctx, err)
+			return
+		}
 	}
 
 	ctx, err := Save(ctx, cfg)
@@ -408,6 +414,17 @@ func (c Configurator) showOrganizationSelector(ctx context.Context, prev *Config
 	}
 
 	c.onFinish(ctx, cfg)
+}
+
+func (c Configurator) getEnvironmentDefaultAgentApiKey(ctx context.Context, cfg Config) (string, error) {
+	c.logger.Debug("Getting environment default agent API key", zap.String("environmentID", cfg.EnvironmentID))
+	agentApiKey, err := GetAgentToken(ctx, c.logger, cfg.FullURL(), cfg.OrganizationID, cfg.EnvironmentID, cfg.Jwt)
+	if err != nil {
+		c.logger.Debug("Could not get environment", zap.Error(err))
+		return "", err
+	}
+
+	return agentApiKey, nil
 }
 
 func SetupHttpClient(cfg Config) *resourcemanager.HTTPClient {
