@@ -1,0 +1,5 @@
+flask
+opentelemetry-distro
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation
+psycopg2-binary
