@@ -97,6 +97,8 @@ With the Tracetest Agent running in Kubernetes with `agent` as the Helm `<releas
 </TabItem>
 </Tabs>
 
+OpenTelemetry auto-instrumentation allows you to send basic data quickly using the OpenTelemetry industry standard, before adding custom context.
+
 <Tabs groupId="exporters">
 <TabItem value="nodejs" label="Node.js" default>
 
@@ -313,20 +315,41 @@ go run .
 ```
 
 </TabItem>
-<TabItem value="kubernetes" label="Kubernetes">
+<TabItem value="otelcol" label="OpenTelemetry Collector">
 
-With the Tracetest Agent running in Kubernetes with `tracetest-agent` as the service name, the trace ingestion OTLP endpoints will be:
+1. Configure Exporters
 
-- gRPC: `http://tracetest-agent.default.svc.cluster.local:4317`
-- HTTP: `http://tracetest-agent.default.svc.cluster.local:4318/v1/traces`
+```yaml
+exporters:
+  # This is the exporter that will send traces to Tracetest
+  otlp/tracetest:
+    endpoint: http://<tracetest-agent>:4317
+    headers:
+      "x-tracetest-token": "<token>"
+    tls:
+      insecure: true
+```
+
+2. Add a Service Pipeline
+
+```yaml
+service:
+  pipelines:
+    # You most likely have a traces pipeline. You don't have to change it.
+    # Add this one to your configuration. Make sure to not have two
+    # pipelines with the same name.
+    traces/tracetest:
+      receivers: [otlp] # your receiver
+      processors: [batch]
+      exporters: [otlp/tracetest] # your exporter pointing to the Tracetest OTLP endpoint
+```
 
 </TabItem>
-<TabItem value="helm" label="Helm">
+<TabItem value="more" label="More...">
 
-With the Tracetest Agent running in Kubernetes with `agent` as the Helm `<release-name>`, the trace ingestion OTLP endpoints will be:
+Using other programming languages? More guides are coming soon.
 
-- gRPC: `http://agent-tracetest-agent:4317`
-- HTTP: `http://agent-tracetest-agent:4318/v1/traces`
+Until then, check out our reference for getting started with OpenTelemetry below!
 
 </TabItem>
 </Tabs>
