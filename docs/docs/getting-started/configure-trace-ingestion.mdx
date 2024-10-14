@@ -163,7 +163,7 @@ opentelemetry-bootstrap --action=install
 
 3. Configure and Run
 
-Configure OpenTelemetry to send traces to Tracetest using environment variables. Run the Node.js app by preloading the OpenTelemetry initialization file with `-r`.
+Configure OpenTelemetry to send traces to Tracetest using environment variables. Run the Python app by using the `opentelemetry-instrument` module.
 
 ```bash
 export OTEL_SERVICE_NAME=my-service-name
@@ -179,51 +179,137 @@ opentelemetry-instrument python app.py
 
 1. Install Dependecies
 
-```bash
-go get github.com/honeycombio/otel-config-go/otelconfig \
-       go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp
+```bash title="Terminal"
+go get \
+  github.com/gorilla/mux v1.8.1 \
+  go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.56.0 \
+  go.opentelemetry.io/otel v1.31.0 \
+  go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.31.0 \
+  go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.31.0 \
+  go.opentelemetry.io/otel/sdk v1.31.0 \
+  go.opentelemetry.io/otel/trace v1.31.0
 ```
 
 2. Initialize Tracing
 
 Update your `main.go` file.
 
-```go
+```go title="main.go"
 package main
 
 import (
-    "fmt"
-    "log"
-    "net/http"
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 
-    "github.com/honeycombio/otel-config-go/otelconfig"
-    "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.opentelemetry.io/otel/trace"
 )
 
-// Implement an HTTP Handler func to be instrumented
-func httpHandler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hello, World")
+var svcName = os.Getenv("OTEL_SERVICE_NAME")
+var tracer trace.Tracer
+
+func newExporter(ctx context.Context) (sdktrace.SpanExporter, error) {
+	otlpTraceExporter, err := otlptrace.New(ctx, otlptracehttp.NewClient())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return otlpTraceExporter, nil
 }
 
-// Wrap the HTTP handler func with OTel HTTP instrumentation
-func wrapHandler() {
-    handler := http.HandlerFunc(httpHandler)
-    wrappedHandler := otelhttp.NewHandler(handler, "hello")
-    http.Handle("/hello", wrappedHandler)
+func newTraceProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {
+	// Ensure default SDK resources and the required service name are set.
+	r, err := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String(svcName),
+		),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exp),
+		sdktrace.WithResource(r),
+	)
+
+	otel.SetTextMapPropagator(
+		propagation.NewCompositeTextMapPropagator(
+			propagation.TraceContext{},
+			propagation.Baggage{},
+		),
+	)
+
+	return tp
+}
+
+func homePage(w http.ResponseWriter, r *http.Request) {
+	_, span := tracer.Start(r.Context(), "Homepage")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.Bool("home.endpoint.hit", true),
+	)
+
+	fmt.Fprintf(w, "Welcome to the HomePage!")
+	fmt.Println("Endpoint Hit: homePage")
 }
 
 func main() {
-    // use otelconfig to setup OpenTelemetry SDK
-    otelShutdown, err := otelconfig.ConfigureOpenTelemetry()
-    if err != nil {
-        log.Fatalf("error setting up OTel SDK - %e", err)
-    }
-    defer otelShutdown()
+	ctx := context.Background()
 
-    // Initialize HTTP handler instrumentation
-    wrapHandler()
-    log.Fatal(http.ListenAndServe(":3030", nil))
+	exp, err := newExporter(ctx)
+	if err != nil {
+		log.Fatalf("failed to initialize exporter: %v", err)
+	}
+
+	// Create a new tracer provider with a batch span processor and the given exporter.
+	tp := newTraceProvider(exp)
+
+	// Handle shutdown properly so nothing leaks.
+	defer func() { _ = tp.Shutdown(ctx) }()
+
+	otel.SetTracerProvider(tp)
+
+	// Finally, set the tracer that can be used for this package.
+	tracer = tp.Tracer(svcName)
+
+	r := mux.NewRouter()
+	r.Use(otelmux.Middleware(svcName))
+	r.HandleFunc("/", homePage)
+	http.Handle("/", r)
+
+	fmt.Println("Server Started at http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
+```
+
+3. Configure and Run
+
+Configure OpenTelemetry to send traces to Tracetest using environment variables. Run the Go app by exporting environment variables.
+
+```bash title="Terminal"
+export OTEL_SERVICE_NAME=my-service-name
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
+export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+
+go run .
 ```
 
 </TabItem>
