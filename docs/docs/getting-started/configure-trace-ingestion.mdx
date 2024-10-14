@@ -141,7 +141,7 @@ Configure OpenTelemetry to send traces to Tracetest using environment variables.
 export OTEL_SERVICE_NAME=my-service-name
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
-export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
 
 node -r ./tracing.js app.js
 ```
@@ -171,7 +171,7 @@ Configure OpenTelemetry to send traces to Tracetest using environment variables.
 export OTEL_SERVICE_NAME=my-service-name
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
-export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
 
 opentelemetry-instrument python app.py
 ```
@@ -309,7 +309,7 @@ Configure OpenTelemetry to send traces to Tracetest using environment variables.
 export OTEL_SERVICE_NAME=my-service-name
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
-export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
 
 go run .
 ```
@@ -324,8 +324,8 @@ exporters:
   # This is the exporter that will send traces to Tracetest
   otlp/tracetest:
     endpoint: http://<tracetest-agent>:4317
-    headers:
-      "x-tracetest-token": "<token>"
+    # headers:
+    #   "x-tracetest-token": "<token>"
     tls:
       insecure: true
 ```
