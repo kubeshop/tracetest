@@ -29,7 +29,7 @@ This page explains (2), how to ingest traces into Tracetest Agent to enable trac
 
 ## Enable Trace Ingestion with an OTLP Endpoint
 
-Create a file called `trace-ingestion.yaml`.
+Create a file called `trace-ingestion.yaml`. And, run it with the CLI.
 
 ```yaml title="trace-ingestion.yaml"
 type: DataStore
@@ -39,19 +39,16 @@ spec:
   default: true
 ```
 
-And, run it with the CLI.
-
 ```bash title="Terminal"
 tracetest apply datastore -f ./trace-ingestion.yaml
 ```
 
-Or, use the Web UI. Go to Settings > Trace Ingestion, and toggle "Enable Trace Ingestion" to on.
+Or, use the Web UI. Go to Settings > Trace Ingestion. Toggle "Enable Trace Ingestion" to on and select OpenTelemetry.
 
-![trace ingestion 1](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727178199/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_3_l0v8wp.png)
-
-Select OpenTelemetry.
-
-![trace ingestion 2](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727178201/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_4_fyhu3d.png)
+<p align="center">
+  <img src="https://res.cloudinary.com/djwdcmwdz/image/upload/v1727178199/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_3_l0v8wp.png" alt="trace ingestion 1" width="50%" />
+  <img src="https://res.cloudinary.com/djwdcmwdz/image/upload/v1727178201/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_4_fyhu3d.png" alt="trace ingestion 2" width="50%" />
+</p>
 
 ## Configure Trace Exporters to Send Traces to Tracetest Agent
 
@@ -73,17 +70,6 @@ With the Tracetest Agent running in Docker with `tracetest-agent` as the service
 - gRPC: `http://tracetest-agent:4317`
 - HTTP: `http://tracetest-agent:4318/v1/traces`
 
-:::note Docker Network
-Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
-
-Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
-
-You can reach services running on your local machine using:
-
-- Linux (docker version < 20.10.0): `172.17.0.1:8080`
-- MacOS (docker version >= 18.03) and Linux (docker version >= 20.10.0): `host.docker.internal:8080`
-:::
-
 </TabItem>
 <TabItem value="docker-compose" label="Docker Compose">
 
@@ -91,17 +77,6 @@ With the Tracetest Agent running in Docker with `tracetest-agent` as the service
 
 - gRPC: `http://tracetest-agent:4317`
 - HTTP: `http://tracetest-agent:4318/v1/traces`
-
-:::note Docker Network
-Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
-
-Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
-
-You can reach services running on your local machine using:
-
-- Linux (Docker version < 20.10.0): `172.17.0.1:8080`
-- MacOS (Docker version >= 18.03) and Linux (Docker version >= 20.10.0): `host.docker.internal:8080`
-:::
 
 </TabItem>
 <TabItem value="kubernetes" label="Kubernetes">
@@ -111,13 +86,6 @@ With the Tracetest Agent running in Kubernetes with `tracetest-agent` as the ser
 - gRPC: `http://tracetest-agent.default.svc.cluster.local:4317`
 - HTTP: `http://tracetest-agent.default.svc.cluster.local:4318/v1/traces`
 
-:::note K8s Network
-Make sure to use the correct `<service-name>` if you edit the Tracetest Agent `service` name.
-
-Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
-Make sure to run tests using the internal Kubernetes service networking eg: `http://<your-app-service-name>.default.svc.cluster.local:port`.
-:::
-
 </TabItem>
 <TabItem value="helm" label="Helm">
 
@@ -126,14 +94,444 @@ With the Tracetest Agent running in Kubernetes with `agent` as the Helm `<releas
 - gRPC: `http://agent-tracetest-agent:4317`
 - HTTP: `http://agent-tracetest-agent:4318/v1/traces`
 
-:::note K8s Network
-Make sure to use the correct `<service-name>` if you edit the Tracetest Agent Helm chart `<release-name>` name.
+</TabItem>
+</Tabs>
 
-Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
-Make sure to run tests using the internal Kubernetes service networking eg: `http://<your-app-service-name>.default.svc.cluster.local:port`.
+OpenTelemetry auto-instrumentation allows you to send basic data quickly using the OpenTelemetry industry standard, before adding custom context.
 
-In the following example you can use: `http://pokeshop-pokemon-api:8081`.
+<Tabs groupId="exporters">
+<TabItem value="nodejs" label="Node.js" default>
+
+1. Install Dependencies
+
+```bash title="Terminal"
+npm install --save @opentelemetry/auto-instrumentations-node
+```
+
+2. Initilize Tracing
+
+Create an initialization file called `tracing.js`. Import it as the first step in your application lifecycle or include it with the `-r` / `--require` Node.js CLI option.
+
+```js title="tracing.js"
+const opentelemetry = require('@opentelemetry/sdk-node');
+const { OTLPTraceExporter } =  require('@opentelemetry/exporter-trace-otlp-http');
+const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+
+const sdk = new opentelemetry.NodeSDK({
+  // environment vars are loaded in the start step
+  traceExporter: new OTLPTraceExporter(),
+  instrumentations: [
+    getNodeAutoInstrumentations({
+      // we recommend disabling fs autoinstrumentation since it can be noisy and expensive during startup
+      '@opentelemetry/instrumentation-fs': {
+          enabled: false,
+      },
+    }),
+  ],
+});
+
+sdk.start();
+```
+
+3. Configure and Run
+
+Configure OpenTelemetry to send traces to Tracetest using environment variables. Run the Node.js app by preloading the OpenTelemetry initialization file with `-r`.
+
+```bash title="Terminal"
+export OTEL_SERVICE_NAME=my-service-name
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+
+node -r ./tracing.js app.js
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/nodejs)
 :::
+
+</TabItem>
+<TabItem value="python" label="Python">
+
+1. Install Packages
+
+```bash
+python -m pip install opentelemetry-instrumentation \
+                      opentelemetry-distro \
+                      opentelemetry-exporter-otlp
+```
+
+2. Initilize Tracing
+
+```bash
+opentelemetry-bootstrap --action=install
+```
+
+3. Configure and Run
+
+Configure OpenTelemetry to send traces to Tracetest using environment variables. Run the Python app by using the `opentelemetry-instrument` module.
+
+```bash
+export OTEL_SERVICE_NAME=my-service-name
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+
+opentelemetry-instrument python app.py
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/python)
+:::
+
+</TabItem>
+<TabItem value="go" label="Go">
+
+1. Install Dependencies
+
+```bash title="Terminal"
+go get \
+  github.com/gorilla/mux v1.8.1 \
+  go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.56.0 \
+  go.opentelemetry.io/otel v1.31.0 \
+  go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.31.0 \
+  go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.31.0 \
+  go.opentelemetry.io/otel/sdk v1.31.0 \
+  go.opentelemetry.io/otel/trace v1.31.0
+```
+
+2. Initialize Tracing
+
+Update your `main.go` file.
+
+```go title="main.go"
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/gorilla/mux"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
+	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/sdk/resource"
+	sdktrace "go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
+	"go.opentelemetry.io/otel/trace"
+)
+
+var svcName = os.Getenv("OTEL_SERVICE_NAME")
+var tracer trace.Tracer
+
+func newExporter(ctx context.Context) (sdktrace.SpanExporter, error) {
+	otlpTraceExporter, err := otlptrace.New(ctx, otlptracehttp.NewClient())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return otlpTraceExporter, nil
+}
+
+func newTraceProvider(exp sdktrace.SpanExporter) *sdktrace.TracerProvider {
+	// Ensure default SDK resources and the required service name are set.
+	r, err := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String(svcName),
+		),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	tp := sdktrace.NewTracerProvider(
+		sdktrace.WithBatcher(exp),
+		sdktrace.WithResource(r),
+	)
+
+	otel.SetTextMapPropagator(
+		propagation.NewCompositeTextMapPropagator(
+			propagation.TraceContext{},
+			propagation.Baggage{},
+		),
+	)
+
+	return tp
+}
+
+func homePage(w http.ResponseWriter, r *http.Request) {
+	_, span := tracer.Start(r.Context(), "Homepage")
+	defer span.End()
+
+	span.SetAttributes(
+		attribute.Bool("home.endpoint.hit", true),
+	)
+
+	fmt.Fprintf(w, "Welcome to the HomePage!")
+	fmt.Println("Endpoint Hit: homePage")
+}
+
+func main() {
+	ctx := context.Background()
+
+	exp, err := newExporter(ctx)
+	if err != nil {
+		log.Fatalf("failed to initialize exporter: %v", err)
+	}
+
+	// Create a new tracer provider with a batch span processor and the given exporter.
+	tp := newTraceProvider(exp)
+
+	// Handle shutdown properly so nothing leaks.
+	defer func() { _ = tp.Shutdown(ctx) }()
+
+	otel.SetTracerProvider(tp)
+
+	// Finally, set the tracer that can be used for this package.
+	tracer = tp.Tracer(svcName)
+
+	r := mux.NewRouter()
+	r.Use(otelmux.Middleware(svcName))
+	r.HandleFunc("/", homePage)
+	http.Handle("/", r)
+
+	fmt.Println("Server Started at http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+```
+
+3. Configure and Run
+
+Configure OpenTelemetry to send traces to Tracetest using environment variables. Run the Go app by exporting environment variables.
+
+```bash title="Terminal"
+export OTEL_SERVICE_NAME=my-service-name
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+
+go run .
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/go)
+:::
+
+</TabItem>
+<TabItem value="java" label="Java">
+
+1. Download OpenTelemetry Java Agent
+
+```bash title="Terminal"
+curl -L -O https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
+```
+
+2. Run with Jar and Include the OpenTelemetry Java Agent
+
+```bash
+export OTEL_SERVICE_NAME=my-service-name
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-token=<token>"
+
+java -javaagent:opentelemetry-javaagent.jar -jar /path/to/app.jar
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/java)
+:::
+
+</TabItem>
+<TabItem value="ruby" label="Ruby">
+
+1. Install Dependencies
+
+```bash title="Terminal"
+gem install opentelemetry-sdk
+            opentelemetry-exporter-otlp
+            opentelemetry-instrumentation-all
+```
+
+2. Initialize Tracing
+
+```ruby title="config/initializers/opentelemetry.rb"
+require 'opentelemetry/sdk'
+require 'opentelemetry/exporter/otlp'
+require 'opentelemetry/instrumentation/all'
+
+OpenTelemetry::SDK.configure do |c|
+    c.use_all() # enables all instrumentation!
+end
+```
+
+3. Configure and Run
+
+```bash title="Terminal"
+export OTEL_SERVICE_NAME=my-service-name
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
+export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+
+rails server -p 8080
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/ruby)
+:::
+
+</TabItem>
+<TabItem value="opentelemetry-operator" label="Kubernetes" default>
+
+1. Install [`cert-manager`](https://cert-manager.io/)
+
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+```
+
+2. Install the [OpenTelemetry Operator](https://opentelemetry.io/docs/k8s-operator/) to inject automatic instrumentation in Kubernetes
+
+Traces will be generated and collected automatically.
+
+```bash
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+```
+
+3. Create a file named `otel-collector.yaml` for the OpenTelemetry config
+
+```yaml title="otel-collector.yaml"
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+name: otel-instrumentation
+spec:
+exporter:
+    endpoint: http://otel-collector:4317
+propagators:
+    - tracecontext
+    - baggage
+    - b3
+
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+name: otel
+spec:
+config: |
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+  processors:
+    batch:
+        timeout: 100ms
+  exporters:
+    otlp/tracetest:
+      endpoint: <tracetest-agent>:4317
+      # headers:
+      #   "x-tracetest-token": "<token>"
+      tls:
+        insecure: true
+  service:
+    pipelines:
+        traces:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [otlp/tracetest]
+```
+
+You configure 2 separate things:
+
+- The Instrumentation, which is an init-container that will run on any pod you explictly mark (see step 5).
+- The OpenTelemetry collector, which will collect the traces from the init-container and send them to Tracetest.
+
+4. Apply the `otel-collector.yaml` config file
+
+```bash title="Terminal"
+kubectl apply -f otel-collector.yaml
+```
+
+5. Update any service you want to instrument
+  
+Use the [following annotations as seen in the OpenTelemetry docs](https://opentelemetry.io/docs/k8s-operator/automatic/):
+
+- **.NET**: `instrumentation.opentelemetry.io/inject-dotnet: "true"`
+- **Java**: `instrumentation.opentelemetry.io/inject-java: "true"`
+- **Node.js**: `instrumentation.opentelemetry.io/inject-nodejs: "true"`
+- **Python**: `instrumentation.opentelemetry.io/inject-python: "true"`
+
+:::note
+Add an environment variable named `SERVICE_NAME` to your service so that you can
+later identify it in the tests.
+:::
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: your-service
+spec:
+replicas: 1
+template:
+  annotations:
+    instrumentation.opentelemetry.io/inject-nodejs: 'true'
+spec:
+    containers:
+      var:
+        - name: SERVICE_NAME
+          value: 'your-service'
+```
+
+This will automatically instrument your service with OpenTelemetry and send the traces to the OpenTelemetry collector.
+
+</TabItem>
+<TabItem value="otelcol" label="OTel Collector">
+
+You can configure OpenTelemetry SDKs to export traces to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) first. Then, configure an exporter and service pipeline to forward traces to Tracetest.
+
+1. Configure Exporters
+
+```yaml
+exporters:
+  # This is the exporter that will send traces to Tracetest
+  otlp/tracetest:
+    endpoint: http://<tracetest-agent>:4317
+    # headers:
+    #   "x-tracetest-token": "<token>"
+    tls:
+      insecure: true
+```
+
+2. Add a Service Pipeline
+
+```yaml
+service:
+  pipelines:
+    # You most likely have a traces pipeline. You don't have to change it.
+    # Add this one to your configuration. Make sure to not have two
+    # pipelines with the same name.
+    traces/tracetest:
+      receivers: [otlp] # your receiver
+      processors: [batch]
+      exporters: [otlp/tracetest] # your exporter pointing to the Tracetest OTLP endpoint
+```
+
+</TabItem>
+<TabItem value="more" label="More...">
+
+Using other programming languages? More guides are coming soon.
+
+Until then, check out our reference for getting started with OpenTelemetry below!
 
 </TabItem>
 </Tabs>

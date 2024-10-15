@@ -1,37 +1,37 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer').themes.github;
-const darkCodeTheme = require('prism-react-renderer').themes.dracula;
+const lightCodeTheme = require("prism-react-renderer").themes.github;
+const darkCodeTheme = require("prism-react-renderer").themes.dracula;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Tracetest Docs',
-  tagline: 'Trace-based testing',
-  url: 'https://docs.tracetest.io',
-  baseUrl: '/',
-  onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/logo.svg',
+  title: "Tracetest Docs",
+  tagline: "Trace-based testing",
+  url: "https://docs.tracetest.io",
+  baseUrl: "/",
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "warn",
+  favicon: "img/logo.svg",
   trailingSlash: false,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'kubeshop', // Usually your GitHub org/user name.
-  projectName: 'tracetest', // Usually your repo name.
+  organizationName: "kubeshop", // Usually your GitHub org/user name.
+  projectName: "tracetest", // Usually your repo name.
 
   // Even if you don't use internalization, you can use this field to set useful
   // metadata like html lang. For example, if your site is Chinese, you may want
   // to replace "en" with "zh-Hans".
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en'],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   markdown: {
     mermaid: true,
   },
-  themes: ['@docusaurus/theme-mermaid'],
+  themes: ["@docusaurus/theme-mermaid"],
 
   presets: [
     [
@@ -49,10 +49,10 @@ const config = {
           customCss: require.resolve("./src/css/custom.css"),
         },
         sitemap: {
-          changefreq: 'always',
+          changefreq: "always",
           priority: 0.5,
-          ignorePatterns: ['/tags/**'],
-          filename: 'sitemap.xml',
+          ignorePatterns: ["/tags/**"],
+          filename: "sitemap.xml",
         },
       }),
     ],
@@ -83,7 +83,7 @@ const config = {
     //   },
     // ],
     [
-      '@docusaurus/plugin-ideal-image',
+      "@docusaurus/plugin-ideal-image",
       {
         quality: 70,
         max: 1030, // max resized image's size.
@@ -93,9 +93,9 @@ const config = {
       },
     ],
     [
-      require.resolve('docusaurus-gtm-plugin'),
+      require.resolve("docusaurus-gtm-plugin"),
       {
-        id: 'GTM-MZ7RNS7', // GTM Container ID
+        id: "GTM-MZ7RNS7", // GTM Container ID
       },
     ],
   ],
@@ -107,15 +107,15 @@ const config = {
           hideable: true,
           autoCollapseCategories: true,
         },
-      },  
+      },
       colorMode: {
-        defaultMode: 'light',
+        defaultMode: "light",
         disableSwitch: false,
         respectPrefersColorScheme: false,
       },
       // Use this to add an announcement for a webinar or event.
       announcementBar: {
-        id: 'announcement',
+        id: "announcement",
         // content:
         //   '<a target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/live/2MSDy3XHjtE?si=VlK7cxJOsgKi5QTE&t=1132">Tracetest is the official testing harness for the OpenTelemetry Demo! 🚀</a>',
         // content:
@@ -132,61 +132,61 @@ const config = {
         content:
           '<a target="_blank" rel="noopener noreferrer" href="https://tracetest.io/blog/get-started-with-cloud-based-managed-tracetest">📚 Get started with Trace-based Testing: Embrace test-driven development with observability, using real data, and skip the hassle of mocks and black box testing 🔥</a>',
         isCloseable: false,
-      },  
+      },
       navbar: {
         hideOnScroll: true,
         logo: {
-          alt: 'Tracetest Logo',
-          src: 'img/logo-landscape.svg',
-          srcDark: 'img/logo-landscape-dark.svg',
-          href: 'https://tracetest.io/',
-          target: '_blank',
+          alt: "Tracetest Logo",
+          src: "img/logo-landscape.svg",
+          srcDark: "img/logo-landscape-dark.svg",
+          href: "https://tracetest.io/",
+          target: "_blank",
         },
         items: [
           {
-            type: 'docSidebar',
-            position: 'left',
-            sidebarId: 'tutorialSidebar',
-            label: 'Docs'
+            type: "docSidebar",
+            position: "left",
+            sidebarId: "tutorialSidebar",
+            label: "Docs",
           },
           {
-            type: 'docSidebar',
-            position: 'left',
-            sidebarId: 'guidesSidebar',
-            label: 'Examples & Guides'
+            type: "docSidebar",
+            position: "left",
+            sidebarId: "guidesSidebar",
+            label: "Examples & Guides",
           },
           {
-            type: 'dropdown',
-            label: 'Support',
-            position: 'left',
+            type: "dropdown",
+            label: "Support",
+            position: "left",
             items: [
               {
-                label: 'Overview',
-                href: 'https://tracetest.io/support',
+                label: "Overview",
+                href: "https://tracetest.io/support",
               },
               {
-                label: 'Community',
-                href: 'https://tracetest.io/community',
+                label: "Community",
+                href: "https://tracetest.io/community",
               },
               {
-                label: 'Pricing',
-                href: 'https://tracetest.io/pricing',
+                label: "Pricing",
+                href: "https://tracetest.io/pricing",
               },
               {
-                label: 'Talk to us in Slack',
-                href: 'https://dub.sh/tracetest-community',
+                label: "Talk to us in Slack",
+                href: "https://dub.sh/tracetest-community",
               },
               {
-                label: 'Open an issue in GitHub',
-                href: 'https://github.com/kubeshop/tracetest/issues/new/choose',
+                label: "Open an issue in GitHub",
+                href: "https://github.com/kubeshop/tracetest/issues/new/choose",
               },
               {
-                label: 'Learn',
-                href: 'https://tracetest.io/learn',
+                label: "Learn",
+                href: "https://tracetest.io/learn",
               },
               {
-                label: 'Contact Us',
-                href: 'https://tracetest.io/contact',
+                label: "Contact Us",
+                href: "https://tracetest.io/contact",
               },
             ],
           },
@@ -259,6 +259,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
+        additionalLanguages: ["bash", "ruby"],
       },
       algolia: {
         // The application ID provided by Algolia

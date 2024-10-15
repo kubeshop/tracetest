@@ -59,8 +59,22 @@ docker compose up -d --build
 
 - [`https://app.tracetest.io/`](https://app.tracetest.io) - Access the Tracetest Web UI. Sign up and create an organization.
 - [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is exposed from Docker to `localhost` on this port. 
-- `http://api:8081` - To run tests you will use the Docker internal network and the Pokeshop app's service name.
+- `http://api:8081` - To run tests you will use the Docker internal network and the service name.
 - `http://tracetest-agent:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+
+<details>
+  <summary>
+    <b>Docker Networking</b>
+  </summary>
+  Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+
+  Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+
+  You can reach services running on your local machine using:
+
+  - Linux (Docker version < 20.10.0): `172.17.0.1:8080`
+  - MacOS (Docker version >= 18.03) and Linux (Docker version >= 20.10.0): `host.docker.internal:8080`
+</details>
 
 </TabItem>
 
@@ -77,6 +91,20 @@ docker compose up -d --build
 - [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is exposed from Docker to `localhost` on this port.
 - `http://api:8081` - To run tests you will use the Docker internal network and the service name.
 - `http://tracetest-agent:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+
+<details>
+  <summary>
+    <b>Docker Networking</b>
+  </summary>
+  Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+
+  Add Tracetest Agent to the same network and use service name mapping. *Example: Instead of running an app on `localhost:8080`, add it to your Docker Compose file, connect it to the same network as your Tracetest Agent service, and use `<service-name>:8080` in the URL field when creating a test.*
+
+  You can reach services running on your local machine using:
+
+  - Linux (Docker version < 20.10.0): `172.17.0.1:8080`
+  - MacOS (Docker version >= 18.03) and Linux (Docker version >= 20.10.0): `host.docker.internal:8080`
+</details>
 
 </TabItem>
 
@@ -100,6 +128,16 @@ kubectl port-forward svc/api 8081:8081
 - `http://api.default.svc.cluster.local:8081` - To run tests you will use the Kubernetes internal network and the service name.
 - `http://tracetest-agent.default.svc.cluster.local:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
 
+<details>
+  <summary>
+    <b>Kubernetes Networking</b>
+  </summary>
+  Make sure to use the correct `<service-name>` if you edit the Tracetest Agent `service` name.
+
+  Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+  Make sure to run tests using the internal Kubernetes service networking eg: `http://<your-app-service-name>.default.svc.cluster.local:port`.
+</details>
+
 </TabItem>
 
 <TabItem value="helm" label="Helm">
@@ -122,6 +160,18 @@ kubectl port-forward svc/pokeshop-pokemon-api 8081:8081
 - [`http://localhost:8081`](http://localhost:8081) - The Pokeshop API demo is port forwarded from Kubernetes to `localhost` on this port.
 - `http://pokeshop-pokemon-api:8081` - To run tests you will use the Kubernetes internal network and the service name.
 - `http://agent-tracetest-agent:4317` - Trace ingestion URL where Tracetest Agent will accept traces.
+
+<details>
+  <summary>
+    <b>Kubernetes Networking</b>
+  </summary>
+  Make sure to use the correct `<service-name>` if you edit the Tracetest Agent Helm chart `<release-name>` name.
+
+  Running a test against `localhost` will resolve as `127.0.0.1` inside the Tracetest Agent container.
+  Make sure to run tests using the internal Kubernetes service networking eg: `http://<your-app-service-name>.default.svc.cluster.local:port`.
+
+  In the following example you can use: `http://pokeshop-pokemon-api:8081`.
+</details>
 
 </TabItem>
 
