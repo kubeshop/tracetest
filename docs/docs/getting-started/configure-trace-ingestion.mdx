@@ -102,7 +102,7 @@ OpenTelemetry auto-instrumentation allows you to send basic data quickly using t
 <Tabs groupId="exporters">
 <TabItem value="nodejs" label="Node.js" default>
 
-1. Install Dependecies
+1. Install Dependencies
 
 ```bash title="Terminal"
 npm install --save @opentelemetry/auto-instrumentations-node
@@ -187,7 +187,7 @@ opentelemetry-instrument python app.py
 </TabItem>
 <TabItem value="go" label="Go">
 
-1. Install Dependecies
+1. Install Dependencies
 
 ```bash title="Terminal"
 go get \
@@ -389,7 +389,115 @@ rails server -p 8080
 :::
 
 </TabItem>
-<TabItem value="otelcol" label="OpenTelemetry Collector">
+<TabItem value="opentelemetry-operator" label="Kubernetes" default>
+
+1. Install [`cert-manager`](https://cert-manager.io/)
+
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+```
+
+2. Install the [OpenTelemetry Operator](https://opentelemetry.io/docs/k8s-operator/) to inject automatic instrumentation in Kubernetes
+
+Traces will be generated and collected automatically.
+
+```bash
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+```
+
+3. Create a file named `otel-collector.yaml` for the OpenTelemetry config
+
+```yaml title="otel-collector.yaml"
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+name: otel-instrumentation
+spec:
+exporter:
+    endpoint: http://otel-collector:4317
+propagators:
+    - tracecontext
+    - baggage
+    - b3
+
+---
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+name: otel
+spec:
+config: |
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+  processors:
+    batch:
+        timeout: 100ms
+  exporters:
+    otlp/tracetest:
+      endpoint: <tracetest-agent>:4317
+      # headers:
+      #   "x-tracetest-token": "<token>"
+      tls:
+        insecure: true
+  service:
+    pipelines:
+        traces:
+            receivers: [otlp]
+            processors: [batch]
+            exporters: [otlp/tracetest]
+```
+
+You configure 2 separate things:
+
+- The Instrumentation, which is an init-container that will run on any pod you explictly mark (see step 5).
+- The OpenTelemetry collector, which will collect the traces from the init-container and send them to Tracetest.
+
+4. Apply the `otel-collector.yaml` config file
+
+```bash title="Terminal"
+kubectl apply -f otel-collector.yaml
+```
+
+5. Update any service you want to instrument
+  
+Use the [following annotations as seen in the OpenTelemetry docs](https://opentelemetry.io/docs/k8s-operator/automatic/):
+
+- **.NET**: `instrumentation.opentelemetry.io/inject-dotnet: "true"`
+- **Java**: `instrumentation.opentelemetry.io/inject-java: "true"`
+- **Node.js**: `instrumentation.opentelemetry.io/inject-nodejs: "true"`
+- **Python**: `instrumentation.opentelemetry.io/inject-python: "true"`
+
+:::note
+Add an environment variable named `SERVICE_NAME` to your service so that you can
+later identify it in the tests.
+:::
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: your-service
+spec:
+replicas: 1
+template:
+  annotations:
+    instrumentation.opentelemetry.io/inject-nodejs: 'true'
+spec:
+    containers:
+      var:
+        - name: SERVICE_NAME
+          value: 'your-service'
+```
+
+This will automatically instrument your service with OpenTelemetry and send the traces to the OpenTelemetry collector.
+
+</TabItem>
+<TabItem value="otelcol" label="OTel Collector">
+
+You can configure OpenTelemetry SDKs to export traces to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) first. Then, configure an exporter and service pipeline to forward traces to Tracetest.
 
 1. Configure Exporters
 
