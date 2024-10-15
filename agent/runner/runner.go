@@ -72,7 +72,7 @@ func (s *Runner) onStartAgent(ctx context.Context, cfg config.Config) {
 		return
 	}
 
-	agentToken, err := s.getAgentToken(ctx, cfg.FullURL(), cfg.OrganizationID, cfg.EnvironmentID, cfg.Jwt)
+	agentToken, err := config.GetAgentToken(ctx, s.logger, cfg.FullURL(), cfg.OrganizationID, cfg.EnvironmentID, cfg.Jwt)
 	if err != nil {
 		s.ui.Error(err.Error())
 	}

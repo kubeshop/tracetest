@@ -33,6 +33,7 @@ type Config struct {
 	Token             string `yaml:"token,omitempty"`
 	IsOrgToken        bool   `yaml:"isOrgToken,omitempty"`
 	Jwt               string `yaml:"jwt,omitempty"`
+	DefaultAgenApiKey string `yaml:"defaultAgentApiKey,omitempty"`
 	AgentApiKey       string `yaml:"-"`
 	EndpointOverriden bool   `yaml:"-"`
 
