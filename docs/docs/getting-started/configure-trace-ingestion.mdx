@@ -378,7 +378,7 @@ end
 ```bash title="Terminal"
 export OTEL_SERVICE_NAME=my-service-name
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
-export OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4318"
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
 export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
 
 rails server -p 8080
