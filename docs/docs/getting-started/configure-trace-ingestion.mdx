@@ -389,6 +389,54 @@ rails server -p 8080
 :::
 
 </TabItem>
+<TabItem value="docker" label="Docker">
+
+You can configure [Grafana Beyla](https://grafana.com/oss/beyla-ebpf/) to autoinstrument Docker services and export traces to Tracetest.
+
+1. Add Beyla to your `docker-compose.yaml`
+
+```yaml title="docker-compose.yaml"
+services:
+  autoinstrument:
+    image: grafana/beyla:latest
+    privileged: true
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://<tracetest-agent>:4317"
+      # OTEL_EXPORTER_OTLP_HEADERS: "x-tracetest-token:<token>"
+      BEYLA_OPEN_PORT: "3000,8080" # Beyla will autoinstrument services on these ports
+      BEYLA_TRACE_PRINTER: "text"
+
+# ...
+```
+
+2. Add `pid: service:autoinstrument` to services in `docker-compose.yaml`
+
+```yaml title="docker-compose.yaml"
+services:
+  # ...
+
+  service1:
+    pid: service:autoinstrument # Add this line for Beyla to know what to instrument
+    build: ./service1
+    ports:
+      - "3000:3000"
+
+  service2:
+    pid: service:autoinstrument # Add this line for Beyla to know what to instrument
+    build: ./service2
+    ports:
+      - "8080:8080"
+```
+
+3. Run Docker Compose
+
+```bash title="Terminal"
+docker compose up
+```
+
+This will automatically instrument your Docker Compose services with Beyla using eBPF and send the traces to Tracetest.
+
+</TabItem>
 <TabItem value="opentelemetry-operator" label="Kubernetes" default>
 
 1. Install [`cert-manager`](https://cert-manager.io/)
