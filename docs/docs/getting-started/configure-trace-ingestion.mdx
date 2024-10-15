@@ -146,6 +146,10 @@ export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
 node -r ./tracing.js app.js
 ```
 
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/nodejs)
+:::
+
 </TabItem>
 <TabItem value="python" label="Python">
 
@@ -175,6 +179,10 @@ export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
 
 opentelemetry-instrument python app.py
 ```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/python)
+:::
 
 </TabItem>
 <TabItem value="go" label="Go">
@@ -313,6 +321,34 @@ export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
 
 go run .
 ```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/go)
+:::
+
+</TabItem>
+<TabItem value="java" label="Java">
+
+1. Download OpenTelemetry Java Agent
+
+```bash title="Terminal"
+curl -L -O https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/latest/download/opentelemetry-javaagent.jar
+```
+
+2. Run with Jar and Include the OpenTelemetry Java Agent
+
+```bash
+export OTEL_SERVICE_NAME=my-service-name
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-token=<token>"
+
+java -javaagent:opentelemetry-javaagent.jar -jar /path/to/app.jar
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/java)
+:::
 
 </TabItem>
 <TabItem value="otelcol" label="OpenTelemetry Collector">
