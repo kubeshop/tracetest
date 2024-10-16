@@ -6,7 +6,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@tracetest/opentelemetry-web": "^0.2.3",
+    "@tracetest/opentelemetry-web": "^0.2.5",
     "@tracetest/playwright": "^0.2.1",
     "dotenv": "^16.4.5",
     "react": "^18.3.1",
