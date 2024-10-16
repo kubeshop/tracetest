@@ -1,0 +1,18 @@
+services:
+  autoinstrument:
+    image: grafana/beyla:latest
+    privileged: true
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://host.docker.internal:4317"
+      # OTEL_EXPORTER_OTLP_HEADERS: "x-tracetest-token:<token>"
+      BEYLA_OPEN_PORT: "8080" # Beyla will autoinstrument services on these ports
+      BEYLA_TRACE_PRINTER: "text"
+      BEYLA_BPF_TRACK_REQUEST_HEADERS: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  app:
+    pid: service:autoinstrument # Add this line for Beyla to know what to instrument
+    image: adnanrahic/hello-world-nodejs
+    ports:
+      - 8080:8080
