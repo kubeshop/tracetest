@@ -437,6 +437,85 @@ rails server -p 8080
 :::
 
 </TabItem>
+<TabItem value="browser" label="Browser">
+
+1. Install Dependencies
+
+```bash title="Terminal"
+npm i @opentelemetry/core \
+      @opentelemetry/sdk-trace-web \
+      @opentelemetry/sdk-trace-base \
+      @opentelemetry/instrumentation \
+      @opentelemetry/exporter-trace-otlp-http \
+      @opentelemetry/context-zone \
+      @tracetest/instrumentation-user-interaction \
+      @opentelemetry/auto-instrumentations-web \
+      @opentelemetry/resources
+```
+
+2. Initialize Tracing
+
+```js title="instrumentation.js"
+import { CompositePropagator, W3CBaggagePropagator, W3CTraceContextPropagator } from "@opentelemetry/core";
+import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
+import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
+import { ZoneContextManager } from "@opentelemetry/context-zone";
+import { UserInteractionInstrumentation } from "@tracetest/instrumentation-user-interaction";
+import { getWebAutoInstrumentations } from "@opentelemetry/auto-instrumentations-web";
+import { Resource } from "@opentelemetry/resources";
+
+const provider = new WebTracerProvider({
+  resource: new Resource({
+    "service.name": "browser-app",
+  }),
+});
+
+provider.addSpanProcessor(
+  new BatchSpanProcessor(new OTLPTraceExporter({ url: "http://<tracetest-agent>:4318/v1/traces" }), {
+    maxQueueSize: 10000,
+    scheduledDelayMillis: 200,
+  })
+);
+
+provider.register({
+  contextManager: new ZoneContextManager(),
+  propagator: new CompositePropagator({
+    propagators: [new W3CBaggagePropagator(), new W3CTraceContextPropagator()],
+  }),
+});
+
+registerInstrumentations({
+  tracerProvider: provider,
+  instrumentations: [
+    new UserInteractionInstrumentation(),
+    getWebAutoInstrumentations({
+      "@opentelemetry/instrumentation-fetch": {
+        propagateTraceHeaderCorsUrls: /.*/,
+        clearTimingResources: true,
+      },
+      "@opentelemetry/instrumentation-user-interaction": {
+        enabled: false,
+      },
+    }),
+  ],
+});
+```
+
+Load the `instrumentation.js` at the top of your browser app's header or `index.js` entrypoint file.
+
+```js title="index.js"
+import "./instrumentation";
+
+// rest of the app's entrypoint code
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/browser)
+:::
+
+</TabItem>
 <TabItem value="docker" label="Docker">
 
 You can configure [Grafana Beyla](https://grafana.com/oss/beyla-ebpf/) to auto-instrument Docker services and export traces to Tracetest.
