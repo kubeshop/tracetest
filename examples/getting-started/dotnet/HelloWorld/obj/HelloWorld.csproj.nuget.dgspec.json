@@ -1,0 +1,99 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/adnanrahic/Code/kubeshop/tracetest/examples/getting-started/dotnet/HelloWorld/HelloWorld.csproj": {}
+  },
+  "projects": {
+    "/Users/adnanrahic/Code/kubeshop/tracetest/examples/getting-started/dotnet/HelloWorld/HelloWorld.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/adnanrahic/Code/kubeshop/tracetest/examples/getting-started/dotnet/HelloWorld/HelloWorld.csproj",
+        "projectName": "HelloWorld",
+        "projectPath": "/Users/adnanrahic/Code/kubeshop/tracetest/examples/getting-started/dotnet/HelloWorld/HelloWorld.csproj",
+        "packagesPath": "/Users/adnanrahic/.nuget/packages/",
+        "outputPath": "/Users/adnanrahic/Code/kubeshop/tracetest/examples/getting-started/dotnet/HelloWorld/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/adnanrahic/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.OpenApi": {
+              "target": "Package",
+              "version": "[8.0.10, )"
+            },
+            "OpenTelemetry": {
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
+            "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
+            "OpenTelemetry.Extensions.Hosting": {
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
+            "OpenTelemetry.Instrumentation.AspNetCore": {
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
+            "OpenTelemetry.Instrumentation.Http": {
+              "target": "Package",
+              "version": "[1.9.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.403/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
