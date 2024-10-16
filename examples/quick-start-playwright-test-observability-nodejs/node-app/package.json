@@ -1,0 +1,24 @@
+{
+  "name": "quick-start-nodejs-manual-instrumentation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "app": "node -r ./instrumentation.js app.js",
+    "availability": "node -r ./instrumentation.js availability.js",
+    "app-zero-local": "env OTEL_SERVICE_NAME=node-app OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register app.js",
+    "availability-zero-local": "env OTEL_SERVICE_NAME=node-availability OTEL_TRACES_EXPORTER=otlp OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://localhost:4318/v1/traces node --require @opentelemetry/auto-instrumentations-node/register availability.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.50.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.33.0",
+    "axios": "^1.2.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
