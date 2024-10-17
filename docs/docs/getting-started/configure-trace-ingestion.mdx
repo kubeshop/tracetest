@@ -351,6 +351,54 @@ java -javaagent:opentelemetry-javaagent.jar -jar /path/to/app.jar
 :::
 
 </TabItem>
+<TabItem value="dotnet" label=".NET">
+
+1. Add Dependencies
+
+```bash title="Terminal"
+dotnet add package OpenTelemetry
+dotnet add package OpenTelemetry.Extensions.Hosting
+dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol
+dotnet add package OpenTelemetry.Instrumentation.AspNetCore
+dotnet add package OpenTelemetry.Instrumentation.Http
+```
+
+2. Initialize Tracing
+
+```csharp title="Program.cs"
+// Import OpenTelemetry SDK
+using OpenTelemetry.Trace;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+// Configure OpenTelemetry Tracing
+builder.Services.AddOpenTelemetry().WithTracing(builder =>
+{
+  builder
+      // Configure ASP.NET Core Instrumentation
+      .AddAspNetCoreInstrumentation()
+      // Configure HTTP Client Instrumentation
+      .AddHttpClientInstrumentation()
+      // Configure OpenTelemetry Protocol (OTLP) Exporter
+      .AddOtlpExporter();
+});
+```
+
+3. Configure and Run
+
+```bash title="Terminal"
+export OTEL_SERVICE_NAME=my-service-name
+export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+
+dotnet run
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/dotnet)
+:::
+
+</TabItem>
 <TabItem value="ruby" label="Ruby">
 
 1. Install Dependencies
@@ -379,13 +427,47 @@ end
 export OTEL_SERVICE_NAME=my-service-name
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 export OTEL_EXPORTER_OTLP_ENDPOINT="http://<tracetest-agent>:4318"
-export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
+# export OTEL_EXPORTER_OTLP_HEADERS="x-tracetest-token=<token>"
 
 rails server -p 8080
 ```
 
 :::note View a code sample
 [Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/ruby)
+:::
+
+</TabItem>
+<TabItem value="browser" label="Browser">
+
+1. Install the Tracetest Web SDK
+
+```bash title="Terminal"
+npm i @tracetest/opentelemetry-web
+```
+
+2. Initialize Tracing
+
+```js title="instrumentation.js"
+import TracetestWebSDK from "@tracetest/opentelemetry-web";
+
+const sdk = new TracetestWebSDK({
+  serviceName: "browser-app",
+  endpoint: "http://<tracetest-agent>:4318/v1/traces",
+});
+
+sdk.start();
+```
+
+Load the `instrumentation.js` at the top of your browser app's header or `index.js` entrypoint file.
+
+```js title="index.js"
+import "./instrumentation";
+
+// rest of the app's entrypoint code
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/browser)
 :::
 
 </TabItem>
@@ -573,13 +655,6 @@ service:
       processors: [batch]
       exporters: [otlp/tracetest] # your exporter pointing to the Tracetest OTLP endpoint
 ```
-
-</TabItem>
-<TabItem value="more" label="More...">
-
-Using other programming languages? More guides are coming soon.
-
-Until then, check out our reference for getting started with OpenTelemetry below!
 
 </TabItem>
 </Tabs>
