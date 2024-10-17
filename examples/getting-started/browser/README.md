@@ -1,6 +1,6 @@
 # Step-by-step
 
-1. Install dependencies
+1. Install Dependencies
 
       ```bash
       npm i @opentelemetry/core \
