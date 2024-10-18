@@ -64,6 +64,10 @@ func (c Config) UI() string {
 		return fmt.Sprintf("%s/organizations/%s/environments/%s", strings.TrimSuffix(c.UIEndpoint, "/"), c.OrganizationID, c.EnvironmentID)
 	}
 
+	if c.UIEndpoint != "" {
+		return c.UIEndpoint
+	}
+
 	return c.URL()
 }
 

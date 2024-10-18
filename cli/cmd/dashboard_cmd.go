@@ -20,7 +20,7 @@ var dashboardCmd = &cobra.Command{
 		}
 
 		ui := ui.DefaultUI
-		err := ui.OpenBrowser(cliConfig.URL())
+		err := ui.OpenBrowser(cliConfig.UI())
 		if err != nil {
 			return "", fmt.Errorf("failed to open the dashboard url: %s", cliConfig.URL())
 		}
