@@ -65,7 +65,7 @@ func (c Config) UI() string {
 	}
 
 	if c.UIEndpoint != "" {
-		return fmt.Sprintf("%s%s", c.UIEndpoint, c.Path())
+		return c.UIEndpoint
 	}
 
 	return c.URL()
