@@ -159,6 +159,45 @@ html[data-theme='dark'] div[class^='gs__card'] .card:hover {
   box-shadow: none;
 }
 
+/* Welcome to Tracetest Docs */
+
+div[class^='w__card'] .card {
+  background-color: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  transition: border-color var(--ifm-transition-fast) var(--ifm-transition-timing-default);
+  /* box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1); */
+  box-shadow: none;
+}
+
+div[class^='w__card'] .card:hover {
+  border: 1px solid var(--ifm-color-primary);
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1); */
+  box-shadow: none;
+}
+
+div[class^='w__card'] .card a {
+  color: var(--ifm-font-color-base);
+  text-decoration: inherit;
+}
+
+div[class^='w__card'] .card a:hover {
+  color: var(--ifm-font-color-base);
+  text-decoration: inherit;
+}
+
+html[data-theme='dark'] div[class^='w__card'] .card {
+  background-color: #2e1623;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  /* box-shadow: 0 1px 2px 0 rgba(255, 255, 255, 0.1); */
+  box-shadow: none;
+}
+html[data-theme='dark'] div[class^='w__card'] .card:hover {
+  border: 1px solid var(--ifm-color-primary);
+  /* box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.1), 0 6px 20px 0 rgba(255, 255, 255, 0.1); */
+  box-shadow: none;
+}
+
 /* nav sign in */
 
 .sign-in-button { 
