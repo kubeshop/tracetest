@@ -54,7 +54,7 @@ func (s *OAuthServer) GetAuthJWT() error {
 		return nil
 	}
 
-	url, err := s.getUrl()
+	url, listener, err := s.getUrl()
 	if err != nil {
 		return fmt.Errorf("failed to start oauth server: %w", err)
 	}
@@ -72,7 +72,7 @@ func (s *OAuthServer) GetAuthJWT() error {
 		return fmt.Errorf("failed to open the oauth url: %s", loginUrl)
 	}
 
-	return s.start()
+	return s.start(listener)
 }
 
 type JWTResponse struct {
@@ -144,22 +144,22 @@ func ExchangeToken(endpoint string, token string) (string, error) {
 	return jwtResponse.Jwt, nil
 }
 
-func (s *OAuthServer) getUrl() (string, error) {
-	port, err := getFreePort()
+func (s *OAuthServer) getUrl() (string, *net.TCPListener, error) {
+	port, listener, err := getFreePort()
 	if err != nil {
-		return "", fmt.Errorf("failed to get free port: %w", err)
+		return "", nil, fmt.Errorf("failed to get free port: %w", err)
 	}
 
 	s.port = port
-	return fmt.Sprintf("http://localhost:%d", port), nil
+	return fmt.Sprintf("http://localhost:%d", port), listener, nil
 }
 
-func (s *OAuthServer) start() error {
+func (s *OAuthServer) start(listener *net.TCPListener) error {
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", s.port)}
 	s.server = srv
 
 	http.HandleFunc("/", s.callback)
-	return srv.ListenAndServe()
+	return srv.Serve(listener)
 }
 
 func (s *OAuthServer) callback(w http.ResponseWriter, r *http.Request) {
@@ -200,14 +200,19 @@ func redirect(w http.ResponseWriter, r *http.Request, success bool) {
 	http.Redirect(w, r, returnUrl, http.StatusMovedPermanently)
 }
 
-func getFreePort() (port int, err error) {
-	var a *net.TCPAddr
-	if a, err = net.ResolveTCPAddr("tcp", "localhost:0"); err == nil {
-		var l *net.TCPListener
-		if l, err = net.ListenTCP("tcp", a); err == nil {
-			defer l.Close()
-			return l.Addr().(*net.TCPAddr).Port, nil
-		}
+func getFreePort() (port int, listener *net.TCPListener, err error) {
+	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+	if err != nil {
+		err = fmt.Errorf("failed to resolve tcp addr: %w", err)
+		return
 	}
+
+	listener, err = net.ListenTCP("tcp", addr)
+	if err != nil {
+		err = fmt.Errorf("failed to listen: %w", err)
+		return
+	}
+	port = listener.Addr().(*net.TCPAddr).Port
+
 	return
 }
