@@ -2,7 +2,7 @@
 id: configure-trace-ingestion
 title: Configure Trace Ingestion
 description: Get started by configuring trace ingestion to connect traces to tests. Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
-hide_table_of_contents: false
+hide_table_of_contents: true
 keywords:
   - tracetest
   - trace-based testing
@@ -437,6 +437,57 @@ rails server -p 8080
 :::
 
 </TabItem>
+<TabItem value="php" label="PHP">
+
+1. Install OpenTelemetry Extension for PHP
+
+```bash title="Terminal"
+pecl install opentelemetry
+```
+
+2. Install `composer` if not installed already
+
+```bash title="Terminal"
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+
+# If you want to use Composer globally from any directory, move it to a directory in your PATH:
+sudo mv composer.phar /usr/local/bin/composer
+composer --version
+```
+
+3. Install OpenTelemetry SDK for your libraries
+
+[View all libraries here.](https://packagist.org/search/?query=open-telemetry&tags=instrumentation) The example below showcases Laravel.
+
+```bash
+composer require \
+  open-telemetry/sdk \
+  open-telemetry/exporter-otlp \
+  open-telemetry/opentelemetry-auto-laravel
+  # ...        
+```
+
+4. Configure OpenTelemetry in `php.ini`
+
+```ini
+[opentelemetry]
+extension=opentelemetry.so
+
+OTEL_PHP_AUTOLOAD_ENABLED="true"
+OTEL_SERVICE_NAME=your-php-app
+OTEL_TRACES_EXPORTER=otlp
+OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+OTEL_PROPAGATORS=baggage,tracecontext
+```
+
+:::note View a code sample
+[Visit the example in GitHub, here.](https://github.com/kubeshop/tracetest/tree/main/examples/getting-started/php)
+:::
+
+</TabItem>
 <TabItem value="browser" label="Browser">
 
 1. Install the Tracetest Web SDK
@@ -625,7 +676,7 @@ spec:
 This will automatically instrument your service with OpenTelemetry and send the traces to the OpenTelemetry collector.
 
 </TabItem>
-<TabItem value="otelcol" label="OTel Collector">
+<TabItem value="otelcol" label="OpenTelemetry&nbsp;Collector">
 
 You can configure OpenTelemetry SDKs to export traces to an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) first. Then, configure an exporter and service pipeline to forward traces to Tracetest.
 
