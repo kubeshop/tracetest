@@ -11,6 +11,7 @@ import SumoLogic from './forms/SumoLogic';
 export const DataStoreComponentMap: IDataStorePluginMap = {
   [SupportedDataStores.AWSXRay]: AwsXRay,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
+  [SupportedDataStores.Dash0]: OpenTelemetryCollector,
   [SupportedDataStores.Datadog]: OpenTelemetryCollector,
   [SupportedDataStores.Dynatrace]: OpenTelemetryCollector,
   [SupportedDataStores.ElasticApm]: ElasticSearch,

@@ -29,6 +29,7 @@ const (
 	DYNATRACE        SupportedDataStores = "dynatrace"
 	SUMOLOGIC        SupportedDataStores = "sumologic"
 	INSTANA          SupportedDataStores = "instana"
+	DASH0            SupportedDataStores = "dash0"
 )
 
 // AssertSupportedDataStoresRequired checks if the required fields are not zero-ed

@@ -137,6 +137,7 @@ const (
 	DataStoreTypeAgent            DataStoreType = "agent"
 	DataStoreTypeAwsXRay          DataStoreType = "awsxray"
 	DataStoreTypeAzureAppInsights DataStoreType = "azureappinsights"
+	DataStoreTypeDash0            DataStoreType = "dash0"
 	DataStoreTypeDataDog          DataStoreType = "datadog"
 	DataStoreTypeDynatrace        DataStoreType = "dynatrace"
 	DataStoreTypeElasticAPM       DataStoreType = "elasticapm"
@@ -157,6 +158,7 @@ var validTypes = []DataStoreType{
 	DataStoreTypeAgent,
 	DataStoreTypeAwsXRay,
 	DataStoreTypeAzureAppInsights,
+	DataStoreTypeDash0,
 	DataStoreTypeDataDog,
 	DataStoreTypeDynatrace,
 	DataStoreTypeElasticAPM,
@@ -175,6 +177,7 @@ var validTypes = []DataStoreType{
 
 var otlpBasedDataStores = []DataStoreType{
 	DataStoreTypeAgent,
+	DataStoreTypeDash0,
 	DataStoreTypeDataDog,
 	DataStoreTypeDynatrace,
 	DataStoreTypeHoneycomb,

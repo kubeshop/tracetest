@@ -162,6 +162,11 @@ const sidebars = {
             },
             {
               type: "doc",
+              id: "examples-tutorials/recipes/running-tracetest-with-dash0",
+              label: "OpenTelemetry Demo and Dash0",
+            },
+            {
+              type: "doc",
               id: "examples-tutorials/recipes/running-tracetest-with-datadog",
               label: "OpenTelemetry Demo and Datadog",
             },
@@ -910,6 +915,11 @@ const sidebars = {
                   type: "doc",
                   id: "configuration/connecting-to-data-stores/azure-app-insights",
                   label: "Azure App Insights",
+                },
+                {
+                  type: "doc",
+                  id: "configuration/connecting-to-data-stores/dash0",
+                  label: "Dash0",
                 },
                 {
                   type: "doc",

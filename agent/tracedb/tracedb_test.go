@@ -112,6 +112,14 @@ func TestCreateClient(t *testing.T) {
 			expectedType: "*tracedb.OTLPTraceDB",
 		},
 		{
+			name: "Dash0",
+			ds: datastore.DataStore{
+				Type:   datastore.DataStoreTypeDash0,
+				Values: datastore.DataStoreValues{},
+			},
+			expectedType: "*tracedb.OTLPTraceDB",
+		},
+		{
 			name: "DataDog",
 			ds: datastore.DataStore{
 				Type:   datastore.DataStoreTypeDataDog,
