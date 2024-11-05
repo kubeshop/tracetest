@@ -2,7 +2,7 @@
 id: create-response-based-test
 title: Create a Response-based Test
 description: Get started by creating a response-based test in Tracetest! Tracetest allows you to quickly build integration and end-to-end tests, powered by your OpenTelemetry traces.
-hide_table_of_contents: false
+hide_table_of_contents: true
 keywords:
   - tracetest
   - trace-based testing
@@ -21,16 +21,18 @@ import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 import GtagInstallCliTabs from '@site/src/components/GtagInstallCliTabs';
 
-To create a test, you define a `trigger`. A trigger is an action that executes an action against your system. The most basic trigger is an HTTP requests, but we support several trigger types.
+To create a test, you define a `trigger`. A trigger is an action that executes an action against your system.
 
-1. Playwright
-2. HTTP
-3. GRPC
-4. GraphQL
-5. Kafka
+The most basic trigger is an HTTP requests, but Tracetest supports several trigger types.
+
+1. HTTP
+2. GRPC
+3. GraphQL
+4. Kafka
+5. Playwright
 
 :::note 
-Playwright enables a useful technique: True end-to-end testing, where you start tests from the Web UI and explore the entire internal process of that request across the back end, database, and external services.
+[Playwright enables a useful technique](/examples-tutorials/recipes/running-tests-with-tracetest-playwright-engine): True end-to-end testing, where you start tests from the Web UI and explore the entire internal process of that request across the back end, database, and external services.
 :::
 
 You can create tests in two ways:
@@ -68,8 +70,9 @@ tracetest run test -f ./ping-google.yaml
 
 Create a test in the Web UI by opening your Tracetest Account, clicking the Create button, and selecting HTTP.
 
-![create response based test 1](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727177155/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_qc1291.png)
-
 Enter `https://google.com` as the URL, and click Run.
 
-![create response based test 2](https://res.cloudinary.com/djwdcmwdz/image/upload/v1727177429/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_1_qpqa4w.png)
+<p align="center">
+  <img src="https://res.cloudinary.com/djwdcmwdz/image/upload/v1727177155/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_qc1291.png" alt="test 1" width="50%" />
+  <img src="https://res.cloudinary.com/djwdcmwdz/image/upload/v1727177429/docs/app.tracetest.io_organizations_ttorg_e66318ba6544b856_environments_ttenv_ed85b0979257d37b_tests_page_1_1_qpqa4w.png" alt="test 2" width="50%" />
+</p>
