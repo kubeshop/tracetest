@@ -2063,7 +2063,8 @@ export interface external {
           | "signoz"
           | "dynatrace"
           | "sumologic"
-          | "instana";
+          | "instana"
+          | "dash0";
         /** @enum {string} */
         SupportedClients: "http" | "grpc";
         /** @enum {string} */

@@ -62,6 +62,7 @@ var dataStoreTypesMapping = map[datastore.DataStoreType]openapi.SupportedDataSto
 	datastore.DataStoreTypeDynatrace:        openapi.DYNATRACE,
 	datastore.DataStoreTypeSumoLogic:        openapi.SUMOLOGIC,
 	datastore.DataStoreTypeInstana:          openapi.INSTANA,
+	datastore.DataStoreTypeDash0:            openapi.DASH0,
 }
 
 func (m OpenAPI) DataStoreType(in datastore.DataStoreType) openapi.SupportedDataStores {

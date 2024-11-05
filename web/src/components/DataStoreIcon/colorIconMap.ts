@@ -1,6 +1,7 @@
 import { SupportedDataStores } from 'types/DataStore.types';
 import AWSXRay from './ColorIcons/AwsXRay';
 import AzureAppInsights from './ColorIcons/AzureAppInsights';
+import Dash0 from './ColorIcons/Dash0';
 import Datadog from './ColorIcons/Datadog';
 import Dynatrace from './ColorIcons/Dynatrace';
 import Elastic from './ColorIcons/Elastic';
@@ -19,6 +20,7 @@ import Tempo from './ColorIcons/Tempo';
 const colorIconMap = {
   [SupportedDataStores.AWSXRay]: AWSXRay,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
+  [SupportedDataStores.Dash0]: Dash0,
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Dynatrace]: Dynatrace,
   [SupportedDataStores.ElasticApm]: Elastic,

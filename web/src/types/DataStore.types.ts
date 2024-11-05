@@ -17,6 +17,7 @@ export enum ConnectionTypes {
 export enum SupportedDataStores {
   AWSXRay = 'awsxray',
   AzureAppInsights = 'azureappinsights',
+  Dash0 = 'dash0',
   Datadog = 'datadog',
   Dynatrace = 'dynatrace',
   ElasticApm = 'elasticapm',

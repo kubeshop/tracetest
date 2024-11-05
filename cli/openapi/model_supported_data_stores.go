@@ -36,6 +36,7 @@ const (
 	DYNATRACE        SupportedDataStores = "dynatrace"
 	SUMOLOGIC        SupportedDataStores = "sumologic"
 	INSTANA          SupportedDataStores = "instana"
+	DASH0            SupportedDataStores = "dash0"
 )
 
 // All allowed values of SupportedDataStores enum
@@ -56,6 +57,7 @@ var AllowedSupportedDataStoresEnumValues = []SupportedDataStores{
 	"dynatrace",
 	"sumologic",
 	"instana",
+	"dash0",
 }
 
 func (v *SupportedDataStores) UnmarshalJSON(src []byte) error {

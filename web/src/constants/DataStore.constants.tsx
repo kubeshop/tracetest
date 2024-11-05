@@ -3,6 +3,7 @@ import {SupportedDataStores} from '../types/DataStore.types';
 export const SupportedDataStoresToName = {
   [SupportedDataStores.AWSXRay]: 'AWS X-Ray',
   [SupportedDataStores.AzureAppInsights]: 'Azure App Insights',
+  [SupportedDataStores.Dash0]: 'Dash0',
   [SupportedDataStores.Datadog]: 'Datadog',
   [SupportedDataStores.Dynatrace]: 'Dynatrace',
   [SupportedDataStores.ElasticApm]: 'Elastic APM',
@@ -22,6 +23,7 @@ export const SupportedDataStoresToName = {
 export const SupportedDataStoresToDocsLink = {
   [SupportedDataStores.AWSXRay]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/aws-x-ray',
   [SupportedDataStores.AzureAppInsights]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/azure-app-insights',
+  [SupportedDataStores.Dash0]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/dash0',
   [SupportedDataStores.Datadog]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/datadog',
   [SupportedDataStores.Dynatrace]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/dynatrace',
   [SupportedDataStores.ElasticApm]: 'https://docs.tracetest.io/configuration/connecting-to-data-stores/elasticapm',
@@ -41,6 +43,7 @@ export const SupportedDataStoresToDocsLink = {
 export const SupportedDataStoresToDefaultEndpoint = {
   [SupportedDataStores.AWSXRay]: '',
   [SupportedDataStores.AzureAppInsights]: '',
+  [SupportedDataStores.Dash0]: 'ingress.eu-west-1.aws.dash0.com:4317',
   [SupportedDataStores.Datadog]: '',
   [SupportedDataStores.Dynatrace]: 'https://abc12345.live.dynatrace.com/api/v2/otlp',
   [SupportedDataStores.ElasticApm]: 'http://elasticsearch:9200',

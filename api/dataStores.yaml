@@ -208,7 +208,8 @@ components:
           signoz,
           dynatrace,
           sumologic,
-          instana
+          instana,
+          dash0
         ]
     SupportedClients:
       type: string

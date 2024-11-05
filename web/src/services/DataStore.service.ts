@@ -12,6 +12,7 @@ import SumoLogicService from './DataStores/SumoLogic.service';
 const dataStoreServiceMap = {
   [SupportedDataStores.AWSXRay]: AwsXRayService,
   [SupportedDataStores.AzureAppInsights]: AzureAppInsightsService,
+  [SupportedDataStores.Dash0]: OtelCollectorService,
   [SupportedDataStores.Datadog]: OtelCollectorService,
   [SupportedDataStores.Dynatrace]: OtelCollectorService,
   [SupportedDataStores.ElasticApm]: ElasticSearchService,

@@ -294,8 +294,43 @@ service:
       exporters: [logging, otlp/instana]
 `;
 
+export const Dash0 = (traceTestBlock: string) => `receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    timeout: 100ms
+
+exporters:
+  logging:
+    verbosity: detailed
+
+  ${traceTestBlock}
+
+  # OTLP for Dash0
+  otlp/dash0:
+    endpoint: ingress.eu-west-1.aws.dash0.com:4317
+    headers:
+      Authorization: "Bearer DASH0_AUTHORIZATION_TOKEN"
+
+service:
+  pipelines:
+    traces/tracetest:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/tracetest]
+    traces/dynatrace:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [logging, otlp/dash0]
+`;
+
 export const CollectorConfigMap = {
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights(tracetest),
+  [SupportedDataStores.Dash0]: Dash0(tracetest),
   [SupportedDataStores.Datadog]: Datadog(tracetest),
   [SupportedDataStores.Dynatrace]: Dynatrace(tracetest),
   [SupportedDataStores.Honeycomb]: Honeycomb(tracetest),
@@ -308,6 +343,7 @@ export const CollectorConfigMap = {
 
 export const CollectorConfigFunctionMap = {
   [SupportedDataStores.AzureAppInsights]: AzureAppInsights,
+  [SupportedDataStores.Dash0]: Dash0,
   [SupportedDataStores.Datadog]: Datadog,
   [SupportedDataStores.Dynatrace]: Dynatrace,
   [SupportedDataStores.Honeycomb]: Honeycomb,

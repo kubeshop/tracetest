@@ -8,6 +8,7 @@ export type TRawOtlpDataStore = {};
 type DataStore = Model<TRawDataStore, {}>['spec'] & {
   agent?: TRawOtlpDataStore;
   azureappinsights?: TRawAzureAppInsightsDataStore & TRawOtlpDataStore;
+  dash0?: TRawOtlpDataStore;
   datadog?: TRawOtlpDataStore;
   dynatrace?: TRawOtlpDataStore;
   honeycomb?: TRawOtlpDataStore;
