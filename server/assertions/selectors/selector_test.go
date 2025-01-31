@@ -142,6 +142,16 @@ func TestSelector(t *testing.T) {
 			Expression:      `span[kind="db"]`,
 			ExpectedSpanIds: []trace.SpanID{insertPokemonDatabaseSpanID, updatePokemonDatabaseSpanID},
 		},
+		{
+			Name:            "SelectorShouldMatchAllButDB",
+			Expression:      `span[kind!="db"]`,
+			ExpectedSpanIds: []trace.SpanID{postImportSpanID, getPokemonFromExternalAPISpanID},
+		},
+		{
+			Name:            "SelectorShouldGetSpansWithAttribute",
+			Expression:      `span[kind!=""]`,
+			ExpectedSpanIds: []trace.SpanID{postImportSpanID, insertPokemonDatabaseSpanID, getPokemonFromExternalAPISpanID, updatePokemonDatabaseSpanID},
+		},
 	}
 
 	for _, testCase := range testCases {
