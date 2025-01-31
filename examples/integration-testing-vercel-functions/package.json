@@ -21,7 +21,7 @@
     "@vercel/node": "^3.0.12",
     "@vercel/otel": "^0.3.0",
     "@vercel/postgres": "^0.5.1",
-    "next": "14.0.4",
+    "next": "14.1.1",
     "react": "^18",
     "react-dom": "^18"
   },
