@@ -10,6 +10,6 @@
     "@opentelemetry/auto-instrumentations-node": "^0.41.0",
     "@opentelemetry/exporter-metrics-otlp-grpc": "^0.48.0",
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.48.0",
-    "express": "^4.18.2"
+    "express": "^4.19.2"
   }
 }
