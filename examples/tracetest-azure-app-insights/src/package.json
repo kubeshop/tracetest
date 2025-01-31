@@ -15,7 +15,7 @@
     "@opentelemetry/sdk-trace-node": "^1.14.0",
     "@opentelemetry/tracing": "^0.24.0",
     "applicationinsights": "^3.0.0-beta.5",
-    "express": "^4.18.2"
+    "express": "^4.19.2"
   },
   "author": "",
   "license": "ISC"
