@@ -6,15 +6,6 @@ import Link from '@docusaurus/Link';
 import Heading from '@theme/Heading';
 
 const WelcomeGuides = [
-  // { // Changed June 17 2024 to try redirecting users to recipes.
-  //   name: '👇 Getting Started',
-  //   url: './getting-started/overview',
-  //   description: (
-  //     <Translate >
-  //       Set up Tracetest and start trace-based testing your distributed system.
-  //     </Translate>
-  //   ),
-  // },
   {
     name: '👉 Getting Started',
     url: './getting-started/overview',
@@ -62,7 +53,7 @@ interface Props {
 function WelcomeGuideCard({name, url, description}: Props) {
   return (
     <div className="col col--6 margin-bottom--lg">
-      <div className="gs__card">
+      <div className="w__card">
       <div className="card">
         <Link to={url}>
           <div className="card__body">

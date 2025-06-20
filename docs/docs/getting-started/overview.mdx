@@ -17,28 +17,35 @@ image: https://res.cloudinary.com/djwdcmwdz/image/upload/v1698686403/docs/Blog_T
 ---
 
 ```mdx-code-block
-import {TracetestGettingStartedGuideCardsRow, TracetestCoreGettingStartedGuideCardsRow} from '@site/src/components/GettingStartedGuide';
+import {TracetestCoreGettingStartedGuideCardsRow, TracetestCloudGettingStartedGuidesRow, TracetestOnPremGettingStartedGuidesRow} from '@site/src/components/GettingStartedGuide';
 ```
 
-Tracetest is a cloud-native application, designed to run in the cloud. Get started in three ways.
-
-- **[Cloud-based Managed Tracetest](https://app.tracetest.io/) (Free to get started!)**: Use managed infrastructure with collaboration for teams, and additional features on top of Tracetest Core.
-- **[Enterprise Self-hosted Tracetest](https://tracetest.io/on-prem-installation) (Free trial, no credit card required)**: Same experience as with Cloud-based Managed Tracetest but self-hosted in your own infrastructure. **([Request a demo!](https://dub.sh/tracetest-demo))**
-- **[Hobby Self-hosted Open-source Tracetest Core](/core/getting-started/overview)**: Deploy a hobby instance in your own infrastructure with Docker or Kubernetes. Not suitable for production workloads.
-
-## Cloud-based Managed Tracetest and Enterprise Self-hosted Tracetest
-
-**We recommend using [Cloud-based Managed Tracetest](https://app.tracetest.io/)**. It's the easiest way to test microservices and distributed apps with OpenTelemetry distributed traces. Tracetest provides managed infrastructure, [collaboration for teams](/concepts/environments), [RBAC](/concepts/roles-and-permissions), [organizations](/concepts/organizations), [dependency-free config](/concepts/agent), [agentless serverless config](/concepts/cloud-agent), and much more.
-
-Get started with the installation guide below, tailored for microservice and distributed app developers. You may find it insightful even if you have [one of many other supported use cases](/examples-tutorials/recipes).
-
-If your organization requires you to keep data on-prem, you can use Enterprise Self-hosted Tracetest and deploy it in your own infrastructure. It contains the same features as Cloud-based Managed Tracetest. [Request a license key for Enterprise Self-hosted Tracetest, here.](https://tracetest.io/on-prem-installation)
+There are three ways to set up your development environment and install Tracetest. Testing locally with Tracetest CLI installed on your computer and using Cloud-based Managed Tracetest for test and trace artifact storage is the most common scenario.
 
 ```mdx-code-block
-<TracetestGettingStartedGuideCardsRow />
+<TracetestCloudGettingStartedGuidesRow />
+<TracetestOnPremGettingStartedGuidesRow />
+<TracetestCoreGettingStartedGuideCardsRow />
 ```
 
-### Features Available in Cloud-based Managed Tracetest and Enterprise Self-hosted Tracetest
+## Open-source vs Commercial Tracetest
+
+- **We recommend using [Cloud-based Managed Tracetest](https://app.tracetest.io/)**. It's the easiest way to test web apps, APIs, microservices, and distributed apps with OpenTelemetry distributed traces. Tracetest provides managed infrastructure, [collaboration for teams](/concepts/environments), [RBAC](/concepts/roles-and-permissions), [organizations](/concepts/organizations), [dependency-free config](/concepts/agent), [agentless serverless config](/concepts/cloud-agent), and much more.
+
+- If your organization requires you to keep data on-prem, you can use **[Enterprise Self-hosted Tracetest](https://tracetest.io/on-prem-installation) and deploy it in your own infrastructure**. It contains the same features as Cloud-based Managed Tracetest.
+
+- **[Tracetest Core](https://github.com/kubeshop/tracetest) is the open-source hobbyist trace-based testing tool for non-production workloads**. It's a cloud-native application, packaged and distributed as a Docker image and designed to run in a containerized environment.
+
+You can view [examples and many other supported use cases, here](/examples-tutorials/recipes).
+
+## Features Available in Open-source Tracetest Core
+
+- [Open-Source Features](https://github.com/kubeshop/tracetest?tab=readme-ov-file#-features)
+- Test triggers: HTTP/GRPC, Trace ID, Kafka
+- Test specifications: Selector language + Assertions
+- Test automation options: CLI + Deep Link
+
+## Features Available in Cloud-based Managed Tracetest and Enterprise Self-hosted Tracetest
 
 #### All Tracetest Core features, plus...
 
@@ -51,20 +58,4 @@ If your organization requires you to keep data on-prem, you can use Enterprise S
 - Secrets management: Obfuscate values in variable sets.
 - Synthetic monitoring: Run your existing trace-based tests and test suites on a schedule and get alerted with your favorite alerting tools when they fail.
 - Playwright engine trigger: Run your existing Playwright tests as part of the Tracetest platform and enhance them with trace-based testing.
-
-## Hobby Self-hosted Open-source Tracetest Core
-
-Tracetest Core is a cloud-native application, packaged and distributed as a Docker image and designed to run in a containerized environment.
-
-```mdx-code-block
-<TracetestCoreGettingStartedGuideCardsRow />
-```
-
-### Features Available in Open-source Tracetest Core
-
-#### Tracetest Core functionality
-
-- [Open-Source Features](https://github.com/kubeshop/tracetest?tab=readme-ov-file#-features)
-- Test triggers: HTTP/GRPC, Trace ID, Kafka
-- Test specifications: Selector language + Assertions
-- Test automation options: CLI + Deep Link
+- Trace mode: Ingest traces and automatically build trace-based tests from ingested traces.
