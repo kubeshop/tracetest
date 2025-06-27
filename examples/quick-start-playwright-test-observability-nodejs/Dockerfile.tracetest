@@ -1,0 +1,11 @@
+FROM alpine
+
+WORKDIR /app
+ARG TRACETEST_IMAGE_VERSION=v1.4.0
+
+RUN apk --update add bash jq curl
+RUN curl -L https://raw.githubusercontent.com/kubeshop/tracetest/main/install-cli.sh | bash -s -- $TRACETEST_IMAGE_VERSION
+
+WORKDIR /resources
+
+ENTRYPOINT ["echo", "Tracetest CLI installed"]
