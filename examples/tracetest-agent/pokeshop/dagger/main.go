@@ -184,6 +184,7 @@ func (m *Pokeshop) OtelCollector(ctx context.Context) *dagger.Service {
 		From("otel/opentelemetry-collector:0.54.0")
 
 	if m.TraceTestAPIKey != nil && m.TracetestEnvironment != "" {
+
 		c = c.WithServiceBinding("tracetest", dag.Tracetest(dagger.TracetestOpts{
 			APIKey:       m.TraceTestAPIKey,
 			Environment:  m.TracetestEnvironment,
