@@ -174,6 +174,11 @@ func (i *ingester) processTrace(ctx context.Context, modelTrace traces.Trace, ix
 		span.RecordError(err)
 		return nil
 	}
+	if errors.Is(err, errRunNotActive) {
+		i.log("trace %s belongs to a test run that is no longer active, skipping it", modelTrace.ID.String())
+		span.RecordError(err)
+		return nil
+	}
 	if err != nil {
 		i.log("[%s] failed to get test run: %s", modelTrace.ID.String(), err.Error())
 		span.RecordError(err)
@@ -226,6 +231,8 @@ func (i *ingester) traces(input []*v1.ResourceSpans) []traces.Trace {
 
 var errNoTestRun = errors.New("no test run")
 
+var errRunNotActive = errors.New("test run is not awaiting trace nor executing")
+
 func (i *ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Trace) (test.Run, error) {
 	run, err := i.runGetter.GetRunByTraceID(ctx, trace.ID)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -238,7 +245,7 @@ func (i *ingester) getOngoinTestRunForTrace(ctx context.Context, trace traces.Tr
 	}
 
 	if run.State != test.RunStateAwaitingTrace && run.State != test.RunStateExecuting {
-		return test.Run{}, fmt.Errorf("test run is not awaiting trace nor executing. Actual state: %s", run.State)
+		return test.Run{}, fmt.Errorf("%w. Actual state: %s", errRunNotActive, run.State)
 	}
 
 	return run, nil
